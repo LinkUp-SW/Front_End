@@ -1,11 +1,15 @@
 // src/mocks/handlers.ts
 import { http, HttpResponse } from 'msw';
-
+interface User{
+  id:string;
+  firstName:string;
+  lastName:string;
+}
 export const handlers = [
   http.get('/get-users', async () => {
     console.log('[MSW] Intercepted GET /get-users');
 
-    return HttpResponse.json({
+    return HttpResponse.json<User>({
       id: 'c7b3d8e0-5e0b-4b0f-8b3a-3b9f4b3d3b3d',
       firstName: 'John',
       lastName: 'Maverick',

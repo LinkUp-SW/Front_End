@@ -1,7 +1,14 @@
 //add here any needed function that will fetch from an endpoint
 import axios from "axios";
 
-export const getHomePageData = async () => {
+
+interface User{
+  id:string;
+  firstName:string;
+  lastName:string;
+}
+
+export const getHomePageData = async ():Promise<User> => {
   try {
     const response = await axios.get(
       import.meta.env.VITE_NODE_ENV === "DEV"
