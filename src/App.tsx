@@ -1,10 +1,16 @@
 // src/App.tsx
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import routes from './routes';
-
+import { useSelector } from 'react-redux';
+import { RootState } from './store';
 const App: React.FC = () => {
+  const theme = useSelector((state: RootState) => state.theme.theme);
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+  }, [theme]);
   return (
     <Router>
       <Routes>
