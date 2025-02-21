@@ -2,10 +2,10 @@
 //This File is responsible for importing all the pages in one file to export it and be 
 //used for consise importing in other places
 import LandingPage from "./landing/LandingPage";
-
+import FeedPage from "./feed/FeedPage";
 
 
 
 
 //Export the Imported Pages
-export {LandingPage}
+export {LandingPage,FeedPage}

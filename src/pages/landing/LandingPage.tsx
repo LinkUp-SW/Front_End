@@ -63,7 +63,7 @@ const HomePage = () => {
             </p>
 
             <p className="mt-8 text-center text-sm text-[#00000099]">
-              New to LinkedIn?{" "}
+              New to LinkUp?{" "}
               <Link to={"/"} className="font-semibold text-[#0A66C2] underline">
                 Join now
               </Link>

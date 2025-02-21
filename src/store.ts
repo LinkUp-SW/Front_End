@@ -3,6 +3,7 @@
 import { configureStore } from "@reduxjs/toolkit";
 import counterReducer from "./slices/counter/counterSlice";
 import themeReducer from "./slices/theme/themeSlice"; // Import theme slice
+import screenReducer from "./slices/screen/screenSlice"; // Import the slice
 
 // For now, we’ll set up an empty reducer. Later, you can add slices or combine reducers.
 export const store = configureStore({
@@ -11,6 +12,8 @@ export const store = configureStore({
     // counter: counterReducer,
     counter: counterReducer,
     theme: themeReducer, // Add theme reducer
+    screen: screenReducer,
+
   },
 });
 
