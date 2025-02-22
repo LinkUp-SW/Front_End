@@ -5,6 +5,7 @@ import {
 } from "../../constants";
 import { Link } from "react-router-dom";
 import { RootState } from "../../store";
+import ThemeToggle from "../theme_toggle/ThemeToggle";
 
 const NavItems = () => {
   const screenWidth = useSelector((state: RootState) => state.screen.width);
@@ -33,6 +34,10 @@ const NavItems = () => {
               )}
             </Link>
           ))}
+          <div className="lg:block hidden">
+
+          <ThemeToggle/>
+          </div>
     </div>
   );
 };

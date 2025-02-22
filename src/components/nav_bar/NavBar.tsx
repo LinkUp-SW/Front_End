@@ -4,6 +4,7 @@ import NavItems from "./NavItems";
 import { BsChatDotsFill, BsFillGrid3X3GapFill } from "react-icons/bs";
 import { FaPlusSquare } from "react-icons/fa";
 import { MdArrowDropDown } from "react-icons/md";
+import ThemeToggle from "../theme_toggle/ThemeToggle";
 
 const NavBar = () => {
   return (
@@ -49,6 +50,7 @@ const NavBar = () => {
           <i className="scale-x-[-1]">
             <BsChatDotsFill size={30} />
           </i>
+          <ThemeToggle/>
         </div>
       </nav>
     </header>
