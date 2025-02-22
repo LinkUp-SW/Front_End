@@ -3,9 +3,9 @@
 //used for consise importing in other places
 import LandingPage from "./landing/LandingPage";
 import FeedPage from "./feed/FeedPage";
-
+import UserProfilePage from "./user_profile/UserProfilePage";
 
 
 
 //Export the Imported Pages
-export {LandingPage,FeedPage}
+export {LandingPage,FeedPage,UserProfilePage}

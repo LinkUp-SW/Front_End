@@ -1,4 +1,64 @@
 @import "tailwindcss";
 
+/* Define CSS variables for colors */
+:root {
+    --amber: #e7a33e;
+    --salmon: #f5987e;
+    --brown: #915907;
+    --red: #cb112d;
 
-@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+    --blue-hue: #dce6f1;
+    --green-hue: #d7ebce;
+    --amber-hue: #fce2ba;
+    --geraldine-hue: #fadfd8;
+
+    --light-main: #ffffff;
+    --light-background: #f4f2ee;
+    --light-green: #01754f;
+    --light-blue: #0a66c2;
+    --light-text-color: #000000;
+    /* Tailwind CSS uses `text-black` as the default black color */
+
+    --dark-main: #1b1f23;
+    --dark-background: #000000;
+    --dark-green: #37c898;
+    --dark-blue: #71b7fb;
+    --dark-text-color: #c6c7c8;
+}
+
+/* Apply Tailwind CSS utility classes */
+/* Light theme */
+[data-theme='light'] {
+    --main-color: var(--light-main);
+    --background-color: var(--light-background);
+    --accent-color: var(--light-green);
+    --secondary-accent-color: var(--light-blue);
+    --text-color: var(--light-text-color);
+}
+
+/* Dark theme */
+[data-theme='dark'] {
+    --main-color: var(--dark-main);
+    --background-color: var(--dark-background);
+    --accent-color: var(--dark-green);
+    --secondary-accent-color: var(--dark-blue);
+    --text-color: var(--dark-text-color);
+}
+
+/* Example usage */
+body {
+    background-color: var(--background-color);
+    color: var(--text-color);
+}
+
+.button {
+    background-color: var(--accent-color);
+    color: var(--main-color);
+    /* Add Tailwind CSS utility classes for padding, margin, etc. */
+    @apply px-4 py-2 rounded-md;
+}
+
+/* Define your custom variants using Tailwind CSS */
+@custom-variant light (&:where([data-theme='light'], [data-theme='light'] *));
+
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
