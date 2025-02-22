@@ -137,3 +137,24 @@ import UserList from "./user_list/UserList";
 
 export {Counter,UserList}
 ```
+
+## Naming Convention
+### - Directory Naming : 
+  - lower case Snake Case (ex: screen_width_listener)
+
+### - .ts files Naming : 
+  -  Camel Case (ex: index.ts, useFetchData.ts)
+
+### - .tsx (react components) files Naming : 
+  -  Pascal Case (ex: LandingPage.tsx)
+
+### - Variables Naming : 
+  -  constant variables: 
+      - Upper Case Snake Case (ex: SMALL_SCREEN_NAV_ITEMS)
+  -  states/non-constant variables: 
+      - Camel Case 
+      ```
+      // example on the states/non-constant variables naming
+      const [fetchedData,setFetchedData]=useState(null);
+      let userName='John'
+      ```
