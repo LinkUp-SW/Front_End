@@ -1,9 +1,11 @@
 import React from 'react'
-import { WithNavBar } from '../../components'
+import { UserList, WithNavBar } from '../../components'
 
 const FeedPage = () => {
   return (
-    <div>FeedPage</div>
+    <div>
+      <UserList/>
+    </div>
   )
 }
 

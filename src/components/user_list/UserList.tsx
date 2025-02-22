@@ -1,23 +1,20 @@
 // src/components/UserList.tsx
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { getHomePageData } from "../../endpoints/home";
+import useFetchData from "../../hooks/useFetchData";
 
 const UserList: React.FC = () => {
-  const [user, setUser] = useState<{
-    id: string;
-    firstName: string;
-    lastName: string;
-  } | null>(null);
+  const { data, loading, error } = useFetchData(() => getHomePageData(), []);
 
-  useEffect(() => {
-    getHomePageData().then((data) => setUser(data));
-  }, []);
+  if (loading) return <div>Loading...</div>;
 
-  if (!user) return <div>Loading...</div>;
+  if (error) return <div>Oops smth went wrong</div>;
+
+  if (!data) return null;
 
   return (
     <div>
-      {user.firstName} {user.lastName}
+      {data.firstName} {data.lastName}
     </div>
   );
 };
