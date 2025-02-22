@@ -1,4 +1,3 @@
-import Counter from "./counter/Counter";
 import UserList from "./user_list/UserList";
 import WithNavBar from "./hoc/WithNavBar";
 import NavBar from "./nav_bar/NavBar";
@@ -7,4 +6,4 @@ import NavItems from "./nav_bar/NavItems";
 import ThemeListener from "./theme_listener/ThemeListener";
 
 
-export { Counter, UserList, WithNavBar, NavBar, ScreenWidthListener, NavItems,ThemeListener };
+export {  UserList, WithNavBar, NavBar, ScreenWidthListener, NavItems,ThemeListener };
