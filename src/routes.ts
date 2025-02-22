@@ -1,7 +1,7 @@
 // src/routes.ts
 
 import { RouteObject } from 'react-router-dom';
-import { LandingPage,FeedPage } from './pages';
+import { LandingPage,FeedPage, UserProfilePage } from './pages';
 import React from 'react';
 
 // Define your routes as an array of RouteObject (compatible with React Router v6)
@@ -15,6 +15,10 @@ const routes: RouteObject[] = [
     path: '/feed',
     element: React.createElement(FeedPage),
   },
+  {
+    path: '/user-profile/:id',
+    element: React.createElement(UserProfilePage)
+  }
 ];
 
 export default routes;
