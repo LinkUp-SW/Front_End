@@ -1,30 +1,32 @@
 import { WithNavBar } from "../../components";
-import useFetchData from "../../hooks/useFetchData";
-import { getUserInfoByID } from "../../endpoints/userProfile";
-import { useParams } from "react-router-dom";
-import { getErrorMessage } from "../../utils/errorHandler";
+import {
+  AboutSection,
+  AnalyticsSection,
+  ExperienceSection,
+  ResourcesSection,
+  UserInfo,
+  ViewedSection,
+} from "./components";
 
 const UserProfilePage = () => {
-  const { id } = useParams<{ id: string }>();
-
-  const { data, loading, error } = useFetchData(
-    () => (id ? getUserInfoByID(id) : Promise.reject(new Error("ID is undefined"))),
-    [id]
-  );
-
-  if (loading) return <div>Loading...</div>;
-
-  if (error) return <div>Error: {getErrorMessage(error)}</div>;
-
-  if (!data) return null;
-
   return (
-    <div>
-      <h1>User Profile</h1>
-      <p>
-        {data.firstName} {data.lastName}
-      </p>
-    </div>
+    <main className="max-w-7xl mx-auto lg:px-8">
+      <div className="grid lg:grid-cols-3 gap-4 mt-4">
+        {/* Main Content Column */}
+        <div className="lg:col-span-2 space-y-4">
+          <UserInfo />
+          <AnalyticsSection />
+          <AboutSection />
+          <ExperienceSection />
+        </div>
+
+        {/* Right Sidebar */}
+        <div className="lg:col-span-1 space-y-4">
+          <ViewedSection />
+          <ResourcesSection />
+        </div>
+      </div>
+    </main>
   );
 };
 

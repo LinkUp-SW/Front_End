@@ -10,7 +10,7 @@ import ThemeToggle from "../theme_toggle/ThemeToggle";
 const NavItems = () => {
   const screenWidth = useSelector((state: RootState) => state.screen.width);
   return (
-    <div className="flex justify-between lg:border-0 border-t lg:py-0 py-1 border-t-gray-400 dark:border-gray-700 bg-white dark:bg-gray-900 w-full items-center px-2">
+    <div className="flex justify-between lg:border-0 border-t lg:py-0 py-2 border-t-gray-400 dark:border-gray-700 bg-white dark:bg-gray-900 w-full items-center px-2">
       {screenWidth >= 1024
         ? LARGE_SCREEN_NAV_ITEMS.map((item, i) => (
             <Link
@@ -34,10 +34,9 @@ const NavItems = () => {
               )}
             </Link>
           ))}
-          <div className="lg:block hidden">
-
-          <ThemeToggle/>
-          </div>
+      <div className="lg:block hidden">
+        <ThemeToggle />
+      </div>
     </div>
   );
 };
