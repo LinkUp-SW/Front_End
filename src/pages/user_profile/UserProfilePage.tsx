@@ -1,4 +1,4 @@
-import { WithNavBar } from "../../components";
+import { Modal, WithNavBar } from "../../components";
 import {
   AboutSection,
   AnalyticsSection,
@@ -26,6 +26,7 @@ const UserProfilePage = () => {
           <ResourcesSection />
         </div>
       </div>
+      <Modal />
     </main>
   );
 };
