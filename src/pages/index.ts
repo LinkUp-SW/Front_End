@@ -4,8 +4,8 @@
 import LandingPage from "./landing/LandingPage";
 import FeedPage from "./feed/FeedPage";
 import UserProfilePage from "./user_profile/UserProfilePage";
-
+import MessagingPage from "./messaging/MessagingPage";
 
 
 //Export the Imported Pages
-export {LandingPage,FeedPage,UserProfilePage}
+export {LandingPage,FeedPage,UserProfilePage,MessagingPage}
