@@ -1,12 +1,12 @@
-// Modal.tsx
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "../../store";
 import { closeModal } from "../../slices/modal/modalSlice";
+import AboutModal from "../../pages/user_profile/components/modals/AboutModal";
 
 const Modal: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
-  const { isOpen, content } = useSelector((state: RootState) => state.modal);
+  const { isOpen, modalType } = useSelector((state: RootState) => state.modal);
 
   // Local state to control if the modal should be rendered
   const [shouldRender, setShouldRender] = useState(isOpen);
@@ -31,6 +31,17 @@ const Modal: React.FC = () => {
 
   if (!shouldRender) return null;
 
+  // Render modal content based on modalType
+  const renderModalContent = () => {
+    switch (modalType) {
+      case "about":
+        return <AboutModal />;  // Add more cases for other modals as needed
+      // Add other modal cases here
+      default:
+        return null;
+    }
+  };
+
   return (
     <div
       onClick={() => dispatch(closeModal())}
@@ -41,18 +52,16 @@ const Modal: React.FC = () => {
       <div
         onClick={(e) => e.stopPropagation()}
         className={`bg-white dark:bg-gray-900 rounded-lg p-6 shadow-lg relative transform transition-all duration-300 w-fit
-                    ${
-                      animate ? "scale-100 opacity-100" : "scale-95 opacity-0"
-                    }`}
+                    ${animate ? "scale-100 opacity-100" : "scale-95 opacity-0"}`}
       >
         <button
           onClick={() => dispatch(closeModal())}
-          className="absolute top-2 right-2 cursor-pointer transition-all duration-200 ease-in-out  text-gray-500 dark:text-gray-300 dark:hover:text-gray-500 hover:text-gray-700 text-4xl"
+          className="absolute top-2 right-2 cursor-pointer transition-all duration-200 ease-in-out text-gray-500 dark:text-gray-300 dark:hover:text-gray-500 hover:text-gray-700 text-4xl"
           aria-label="Close modal"
         >
           &times;
         </button>
-        {content}
+        {renderModalContent()}
       </div>
     </div>
   );

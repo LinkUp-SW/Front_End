@@ -1,28 +1,27 @@
 // modalSlice.ts
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ReactNode } from 'react';
 
 interface ModalState {
   isOpen: boolean;
-  content: ReactNode | null;
+  modalType: string | null; // Use a string identifier for the modal type
 }
 
 const initialState: ModalState = {
   isOpen: false,
-  content: null,
+  modalType: null,
 };
 
 const modalSlice = createSlice({
   name: 'modal',
   initialState,
   reducers: {
-    openModal: (state, action: PayloadAction<ReactNode>) => {
+    openModal: (state, action: PayloadAction<string>) => {
       state.isOpen = true;
-      state.content = action.payload;
+      state.modalType = action.payload;
     },
     closeModal: (state) => {
       state.isOpen = false;
-      state.content = null;
+      state.modalType = null;
     },
   },
 });
