@@ -34,7 +34,9 @@ const UserInfo = () => {
               Contact Info
             </span>
           </p>
-          <p className="text-blue-600 font-semibold dark:text-blue-400">224 connections</p>
+          <p className="text-blue-600 font-semibold dark:text-blue-400">
+            224 connections
+          </p>
         </div>
 
         {/* Action Buttons */}
