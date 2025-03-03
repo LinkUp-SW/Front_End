@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "../../store";
 import { closeModal } from "../../slices/modal/modalSlice";
-import AboutModal from "../../pages/user_profile/components/modals/AboutModal";
+import AboutModal from "../../pages/user_profile/components/modals/about_modal/AboutModal";
 
 const Modal: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
