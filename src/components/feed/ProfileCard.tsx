@@ -3,12 +3,20 @@ import { Card, CardContent } from "../ui/card";
 import { FaUniversity } from "react-icons/fa";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
-const ProfileCard = () => {
+interface ProfileCardProps {
+  fullWidth?: boolean;
+}
+
+const ProfileCard: React.FC<ProfileCardProps> = ({ fullWidth }) => {
   return (
-    <Card className="mb-4 bg-white border-0">
+    <Card className="mb-2 bg-white border-0">
       <CardContent className="flex flex-col items-center">
         <div className="flex flex-col gap-y-1 items-start w-full relative">
-          <div className="absolute h-15 w-60 -left-6 -top-6 bg-gray-200 rounded-t-xl">
+          <div
+            className={`absolute h-15 ${
+              fullWidth ? "w-[107.2%]" : "w-60"
+            } -left-6 -top-6 bg-gray-200 rounded-t-xl`}
+          >
             <img
               src="https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png"
               alt="Cover"
