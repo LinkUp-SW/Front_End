@@ -10,21 +10,32 @@ import LinkedInNews from "@/components/feed/LinkedInNews";
 
 const FeedPage = () => {
   return (
-    <div className="flex px-[10%]">
-      <div className="flex flex-col">
-        <ProfileCard />
-        <StatsCard />
-        <PremiumBanner />
-        <Shortcuts />
+    <>
+      <div className="hidden md:flex px-0 xl:px-[10%] gap-x-[2%] w-full">
+        <div className="flex flex-col w-60">
+          <ProfileCard />
+          <StatsCard />
+          <PremiumBanner />
+          <Shortcuts />
+        </div>
+        <div className="flex flex-col w-full">
+          <CreatePost />
+          <Post name={"Doma"} content={"Hi"} />
+        </div>
+        <div className="hidden lg:flex flex-col w-[40rem] ">
+          <LinkedInNews />
+        </div>
       </div>
-      <div className="flex flex-col">
-        <CreatePost />
-        <Post name={"Doma"} content={"Hi"} />
+
+      {/* COMPACT VIEW */}
+      <div className="md:hidden flex px-0 xl:px-[10%] gap-x-[2%] w-full">
+        <div className="flex flex-col w-full">
+          <ProfileCard fullWidth />
+          <CreatePost />
+          <Post name={"Doma"} content={"Hi"} />
+        </div>
       </div>
-      <div className="flex flex-col">
-        <LinkedInNews />
-      </div>
-    </div>
+    </>
   );
 };
 
