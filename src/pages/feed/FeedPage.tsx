@@ -34,7 +34,7 @@ const FeedPage = () => {
       <div className="md:hidden flex px-0 xl:px-[10%] gap-x-[2%] w-full">
         <div className="flex flex-col w-full">
           <ProfileCard fullWidth />
-          {viewMore ? (
+          {!viewMore ? (
             <>
               <StatsCard />
               <PremiumBanner />
