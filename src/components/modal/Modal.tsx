@@ -35,7 +35,7 @@ const Modal: React.FC = () => {
   const renderModalContent = () => {
     switch (modalType) {
       case "about":
-        return <AboutModal />;  // Add more cases for other modals as needed
+        return <AboutModal />; // Add more cases for other modals as needed
       // Add other modal cases here
       default:
         return null;
@@ -52,7 +52,9 @@ const Modal: React.FC = () => {
       <div
         onClick={(e) => e.stopPropagation()}
         className={`bg-white dark:bg-gray-900 rounded-lg p-6 shadow-lg relative transform transition-all duration-300 w-fit
-                    ${animate ? "scale-100 opacity-100" : "scale-95 opacity-0"}`}
+                    ${
+                      animate ? "scale-100 opacity-100" : "scale-95 opacity-0"
+                    }`}
       >
         <button
           onClick={() => dispatch(closeModal())}
