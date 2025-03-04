@@ -6,7 +6,7 @@ import PremiumBanner from "@/components/feed/PremiumBanner";
 import Shortcuts from "@/components/feed/Shortcuts";
 import CreatePost from "@/components/feed/CreatePost";
 import Post from "@/components/feed/Post";
-import LinkedInNews from "@/components/feed/LinkedInNews";
+import LinkedInNews from "@/components/feed/LinkedInFooter";
 import { Button } from "@/components/ui/button";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 
@@ -15,15 +15,155 @@ const FeedPage = () => {
   return (
     <>
       <div className="hidden md:flex px-0 xl:px-[10%] gap-x-[2%] w-full">
-        <div className="flex flex-col w-full max-w-60">
+        <div className="flex flex-col h-full w-full max-w-60 relative">
           <ProfileCard />
           <StatsCard />
           <PremiumBanner />
           <Shortcuts />
         </div>
-        <div className="flex flex-col w-full">
+        <div className="flex flex-col w-full ">
           <CreatePost />
-          <Post name={"Doma"} content={"Hi"} />
+          <Post
+            user={{
+              name: "Abdelrahman Elsayed",
+              headline:
+                "Student at German University in cairo Student at German University in cairo Student at German University in cairo",
+              profileImage:
+                "https://gratisography.com/wp-content/uploads/2024/11/gratisography-augmented-reality-800x525.jpg", // Replace with actual image
+              degree: "Following",
+            }}
+            post={{
+              content: `
+              University Project Showcase: Herzenbrücke Donation Website
+
+Hi everyone, I'm excited to share a project my team and I recently completed for our university. It's a donation website called Herzenbrücke, built using HTML, CSS, JavaScript, and React. This project focuses on the front-end development.
+
+Our project had three main roles: Donor, Organization Representative, and Admin. My colleagues Abdelrahman Mohamed, Ahmed Waleed, and I focused on the Donor part. Adham Hatem handled the Organization Representative role, and Abdullah Sherif managed the Admin role.
+
+his project was a collaborative effort, and each of us brought our skills and expertise to create a functional and user-friendly donation platform. The Donor role allows users to make donations easily ,browse different organizations and see pickup and other notifications, while the Organization Representative can manage donation campaigns, and the Admin oversees the entire system.
+
+Working on Herzenbrücke was a fantastic learning experience, and it gave us valuable insights into front-end web development and teamwork. Thank you for watching, and I look forward to any feedback or questions you might have!
+`,
+              date: 0,
+              public: true,
+              edited: true,
+            }}
+            stats={{
+              likes: 15,
+              love: 2,
+              support: 1,
+              celebrate: 1,
+              comments: 4,
+            }}
+            action={{
+              name: "Panda",
+              action: "like",
+              profileImage:
+                "https://gratisography.com/wp-content/uploads/2024/11/gratisography-augmented-reality-800x525.jpg", // Replace with actual image
+            }}
+          />
+          <Post
+            user={{
+              name: "Abdelrahman Elsayed",
+              headline:
+                "Student at German University in cairo Student at German University in cairo Student at German University in cairo",
+              profileImage:
+                "https://gratisography.com/wp-content/uploads/2024/11/gratisography-augmented-reality-800x525.jpg", // Replace with actual image
+              degree: "Following",
+            }}
+            post={{
+              content: `
+              University Project Showcase: Herzenbrücke Donation Website
+
+Hi everyone, I'm excited to share a project my team and I recently completed for our university. It's a donation website called Herzenbrücke, built using HTML, CSS, JavaScript, and React. This project focuses on the front-end development.
+
+Our project had three main roles: Donor, Organization Representative, and Admin. My colleagues Abdelrahman Mohamed, Ahmed Waleed, and I focused on the Donor part. Adham Hatem handled the Organization Representative role, and Abdullah Sherif managed the Admin role.
+
+his project was a collaborative effort, and each of us brought our skills and expertise to create a functional and user-friendly donation platform. The Donor role allows users to make donations easily ,browse different organizations and see pickup and other notifications, while the Organization Representative can manage donation campaigns, and the Admin oversees the entire system.
+
+Working on Herzenbrücke was a fantastic learning experience, and it gave us valuable insights into front-end web development and teamwork. Thank you for watching, and I look forward to any feedback or questions you might have!
+`,
+              date: 0,
+              public: true,
+              edited: true,
+            }}
+            stats={{
+              likes: 15,
+              love: 2,
+              support: 1,
+              celebrate: 1,
+              comments: 4,
+              reposts: 4,
+            }}
+          />
+          <Post
+            user={{
+              name: "Abdelrahman Elsayed",
+              headline:
+                "Student at German University in cairo Student at German University in cairo Student at German University in cairo",
+              profileImage:
+                "https://gratisography.com/wp-content/uploads/2024/11/gratisography-augmented-reality-800x525.jpg", // Replace with actual image
+              degree: "Following",
+            }}
+            post={{
+              content: `
+              University Project Showcase: Herzenbrücke Donation Website
+
+Hi everyone, I'm excited to share a project my team and I recently completed for our university. It's a donation website called Herzenbrücke, built using HTML, CSS, JavaScript, and React. This project focuses on the front-end development.
+
+Our project had three main roles: Donor, Organization Representative, and Admin. My colleagues Abdelrahman Mohamed, Ahmed Waleed, and I focused on the Donor part. Adham Hatem handled the Organization Representative role, and Abdullah Sherif managed the Admin role.
+
+his project was a collaborative effort, and each of us brought our skills and expertise to create a functional and user-friendly donation platform. The Donor role allows users to make donations easily ,browse different organizations and see pickup and other notifications, while the Organization Representative can manage donation campaigns, and the Admin oversees the entire system.
+
+Working on Herzenbrücke was a fantastic learning experience, and it gave us valuable insights into front-end web development and teamwork. Thank you for watching, and I look forward to any feedback or questions you might have!
+`,
+              date: 0,
+              public: true,
+              edited: true,
+            }}
+            stats={{
+              likes: 15,
+              love: 2,
+              support: 1,
+              celebrate: 1,
+              comments: 4,
+              reposts: 4,
+            }}
+          />
+          <Post
+            user={{
+              name: "Abdelrahman Elsayed",
+              headline:
+                "Student at German University in cairo Student at German University in cairo Student at German University in cairo",
+              profileImage:
+                "https://gratisography.com/wp-content/uploads/2024/11/gratisography-augmented-reality-800x525.jpg", // Replace with actual image
+              degree: "Following",
+            }}
+            post={{
+              content: `
+              University Project Showcase: Herzenbrücke Donation Website
+
+Hi everyone, I'm excited to share a project my team and I recently completed for our university. It's a donation website called Herzenbrücke, built using HTML, CSS, JavaScript, and React. This project focuses on the front-end development.
+
+Our project had three main roles: Donor, Organization Representative, and Admin. My colleagues Abdelrahman Mohamed, Ahmed Waleed, and I focused on the Donor part. Adham Hatem handled the Organization Representative role, and Abdullah Sherif managed the Admin role.
+
+his project was a collaborative effort, and each of us brought our skills and expertise to create a functional and user-friendly donation platform. The Donor role allows users to make donations easily ,browse different organizations and see pickup and other notifications, while the Organization Representative can manage donation campaigns, and the Admin oversees the entire system.
+
+Working on Herzenbrücke was a fantastic learning experience, and it gave us valuable insights into front-end web development and teamwork. Thank you for watching, and I look forward to any feedback or questions you might have!
+`,
+              date: 0,
+              public: true,
+              edited: true,
+            }}
+            stats={{
+              likes: 15,
+              love: 2,
+              support: 1,
+              celebrate: 1,
+              comments: 4,
+              reposts: 4,
+            }}
+          />
         </div>
         <div className="hidden lg:flex flex-col w-[40rem] ">
           <LinkedInNews />
@@ -34,7 +174,7 @@ const FeedPage = () => {
       <div className="md:hidden flex px-0 xl:px-[10%] gap-x-[2%] w-full">
         <div className="flex flex-col w-full">
           <ProfileCard fullWidth />
-          {!viewMore ? (
+          {viewMore ? (
             <>
               <StatsCard />
               <PremiumBanner />
@@ -49,7 +189,7 @@ const FeedPage = () => {
             onClick={() => setViewMore(!viewMore)}
           >
             <div className="flex justify-between gap-x-2 items-center">
-              {viewMore ? (
+              {!viewMore ? (
                 <>
                   <p>Show more</p>
                   <FaChevronDown />
@@ -65,7 +205,38 @@ const FeedPage = () => {
 
           <CreatePost />
 
-          <Post name={"Doma"} content={"Hi"} />
+          <Post
+            user={{
+              name: "Abdelrahman Elsayed",
+              headline:
+                "Student at German University in cairo Student at German University in cairo Student at German University in cairo",
+              profileImage:
+                "https://gratisography.com/wp-content/uploads/2024/11/gratisography-augmented-reality-800x525.jpg", // Replace with actual image
+              degree: "Following",
+            }}
+            post={{
+              content: `
+              University Project Showcase: Herzenbrücke Donation Website
+
+Hi everyone, I'm excited to share a project my team and I recently completed for our university. It's a donation website called Herzenbrücke, built using HTML, CSS, JavaScript, and React. This project focuses on the front-end development.
+
+Our project had three main roles: Donor, Organization Representative, and Admin. My colleagues Abdelrahman Mohamed, Ahmed Waleed, and I focused on the Donor part. Adham Hatem handled the Organization Representative role, and Abdullah Sherif managed the Admin role.
+
+his project was a collaborative effort, and each of us brought our skills and expertise to create a functional and user-friendly donation platform. The Donor role allows users to make donations easily ,browse different organizations and see pickup and other notifications, while the Organization Representative can manage donation campaigns, and the Admin oversees the entire system.
+
+Working on Herzenbrücke was a fantastic learning experience, and it gave us valuable insights into front-end web development and teamwork. Thank you for watching, and I look forward to any feedback or questions you might have!
+`,
+              date: 0,
+              public: true,
+              edited: true,
+            }}
+            stats={{
+              likes: 15,
+              love: 2,
+              comments: 4,
+              reposts: 4,
+            }}
+          />
         </div>
       </div>
     </>
