@@ -137,7 +137,12 @@ const AboutModal = () => {
 
   const handleDocumentTouchEnd = (e: TouchEvent) => {
     e.preventDefault();
+    // Always remove the event listeners
+    document.removeEventListener("touchmove", handleDocumentTouchMove);
+    document.removeEventListener("touchend", handleDocumentTouchEnd);
+    
     if (draggingIndex === null) return;
+    
     measurePositions();
     const finalY = e.changedTouches[0].clientY;
     let dropIndex: number | null = null;
@@ -158,9 +163,8 @@ const AboutModal = () => {
     }
     setDraggingIndex(null);
     touchStartY.current = null;
-    document.removeEventListener("touchmove", handleDocumentTouchMove);
-    document.removeEventListener("touchend", handleDocumentTouchEnd);
   };
+  
 
   // Touch start handler on the draggable item
   const handleTouchStart = (
