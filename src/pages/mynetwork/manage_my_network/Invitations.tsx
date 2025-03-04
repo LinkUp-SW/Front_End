@@ -16,7 +16,7 @@ const Invitations = () => {
       name: "Nada Omar",
       title: "Sophomore Electronics and Electrical Communications Engineering, Cairo University",
       mutualConnections: "Haneen Mohamed and 38 other mutual connections",
-      image: "https://via.placeholder.com/50", 
+      image: "https://www.svgrepo.com/show/382097/female-avatar-girl-face-woman-user-9.svg", 
       profileUrl: "/profile/Nada-Omar",
     },
     {
@@ -24,7 +24,7 @@ const Invitations = () => {
       name: "Ghada Tarek",
       title: "AI and Data Science Student",
       mutualConnections: "Esraa Elbaz is a mutual connection",
-      image: "https://via.placeholder.com/50",
+      image: "https://www.svgrepo.com/show/382097/female-avatar-girl-face-woman-user-9.svg",
       profileUrl: "/profile/Ghada-Tarek",
     },
     {
@@ -32,17 +32,17 @@ const Invitations = () => {
       name: "Malak Ahmed",
       title: "Attended Ain Shams University",
       mutualConnections: "Nour Ahmed and 4 other mutual connections",
-      image: "https://via.placeholder.com/50",
+      image: "https://www.svgrepo.com/show/382097/female-avatar-girl-face-woman-user-9.svg",
       profileUrl: "/profile/Malak-Ahmed",
     },
   ]);
 
-  // Accept Invitation
+  
   const acceptInvitation = (id: number) => {
     setInvitations((prev) => prev.filter((invitation) => invitation.id !== id));
   };
 
-  // Ignore Invitation
+  
   const ignoreInvitation = (id: number) => {
     setInvitations((prev) => prev.filter((invitation) => invitation.id !== id));
   };
@@ -66,13 +66,13 @@ const Invitations = () => {
             <div className="flex space-x-2">
               <button
                 onClick={() => ignoreInvitation(invite.id)}
-                className="px-3 py-1 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+                className="px-3 py-1 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white cursor-pointer"
               >
                 Ignore
               </button>
               <button
                 onClick={() => acceptInvitation(invite.id)}
-                className="px-4 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                className="px-4 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 cursor-pointer"
               >
                 Accept
               </button>

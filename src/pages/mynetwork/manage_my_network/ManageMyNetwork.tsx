@@ -24,8 +24,8 @@ const ManageMyNetwork = () => {
           </li>
         ))}
       </ul>
-       //Promotional Banner 
-       <div className="mt-4">
+      
+       <div className="mt-4 cursor-pointer">
         <img
           src="see_who's_hiring.png"
           alt="Promotional Banner"
@@ -33,7 +33,7 @@ const ManageMyNetwork = () => {
         />
       </div>
 
-       //Footer Links 
+      
       <div className="mt-4 text-sm text-gray-500 dark:text-gray-400 text-center space-y-2">
         <div className="flex flex-wrap justify-center gap-4">
           <a href="#" className="hover:underline">About</a>
