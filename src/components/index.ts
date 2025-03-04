@@ -5,5 +5,6 @@ import ScreenWidthListener from "./screen_width_listener/ScreenWidthListener";
 import NavItems from "./nav_bar/NavItems";
 import ThemeListener from "./theme_listener/ThemeListener";
 import Modal from "./modal/Modal";
+import {Accordion,AccordionItem} from './accordion/Accordion'
 
-export {  UserList, WithNavBar, NavBar, ScreenWidthListener, NavItems,ThemeListener,Modal };
+export {  UserList, WithNavBar, NavBar, ScreenWidthListener, NavItems,ThemeListener,Modal,Accordion,AccordionItem };
