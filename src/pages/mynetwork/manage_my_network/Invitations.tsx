@@ -7,6 +7,7 @@ export interface People {
   mutualConnections: string;
   image: string;
   profileUrl: string;
+  coverImage?: string;
 }
 
 const Invitations = () => {
