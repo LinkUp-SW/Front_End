@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "../../store";
 import { closeModal } from "../../slices/modal/modalSlice";
 import AboutModal from "../../pages/user_profile/components/modals/about_modal/AboutModal";
+import AddProfileSectionModal from "../../pages/user_profile/components/modals/add_profile_section_modal/AddProfileSectionModal";
 
 const Modal: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
@@ -36,6 +37,8 @@ const Modal: React.FC = () => {
     switch (modalType) {
       case "about":
         return <AboutModal />; // Add more cases for other modals as needed
+      case "add_profile_section":
+        return <AddProfileSectionModal/>
       // Add other modal cases here
       default:
         return null;
@@ -51,7 +54,7 @@ const Modal: React.FC = () => {
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className={`bg-white dark:bg-gray-900 max-h-md overflow-y-auto overflow-x-hidden rounded-lg p-6 shadow-lg relative transform transition-all duration-300 w-fit
+        className={`bg-white dark:bg-gray-900 max-h-md overflow-y-auto overflow-x-hidden rounded-lg p-6 max-h-[45rem] shadow-lg relative transform transition-all duration-300 w-fit
                     ${
                       animate ? "scale-100 opacity-100" : "scale-95 opacity-0"
                     }`}
