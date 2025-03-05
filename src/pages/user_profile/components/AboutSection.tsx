@@ -1,12 +1,12 @@
 import { BsPencil } from "react-icons/bs";
 import { useDispatch } from "react-redux";
-import { openModal } from "../../../slices/modal/modalSlice";
+import { handleOpenModalType } from "../../../utils";
 
 const AboutSection = () => {
   const dispatch = useDispatch();
 
   const handleOpenModal = () => {
-    dispatch(openModal("about")); // Dispatch a string identifier or an object with modal details
+    dispatch(handleOpenModalType("about")); // Dispatch a string identifier or an object with modal details
   };
 
   return (
