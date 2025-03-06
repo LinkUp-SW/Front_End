@@ -60,6 +60,21 @@ export const SMALL_SCREEN_NAV_ITEMS = [
   },
 ];
 
+
+
+
+export const FILTER_OPTIONS = {
+  ALL: "All",
+  JOB_CHANGES: "Job changes",
+  BIRTHDAYS: "Birthdays",
+  WORK_ANNIVERSARIES: "Work anniversaries",
+  EDUCATION: "Education",
+};
+
+export const FILTERS_LIST = Object.values(FILTER_OPTIONS);
+
+
+
 export const CORE_PROFILE_SECTIONS = [
   {
     id: 1,

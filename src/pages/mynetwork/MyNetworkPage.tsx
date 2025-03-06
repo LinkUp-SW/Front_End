@@ -1,9 +1,9 @@
 import { WithNavBar } from "../../components";
-import ManageMyNetwork from "./manage_my_network/ManageMyNetwork";
-import Invitations from "./manage_my_network/Invitations";
-import ConnectWithPeople from "./manage_my_network/ConnectWithPeople";
-import CatchUp from "./manage_my_network/CatchUp";
-import NetworkNavBar from "./manage_my_network/NetworkNavBar";
+import ManageMyNetwork from "./components/ManageMyNetwork";
+import Invitations from "./components/Invitations";
+import ConnectWithPeople from "./components/ConnectWithPeople";
+import CatchUp from "./components/CatchUp";
+import NetworkNavBar from "./components/NetworkNavBar";
 import { useState } from "react";
 
 const MyNetworkPage = () => {

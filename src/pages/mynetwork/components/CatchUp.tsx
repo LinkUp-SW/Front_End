@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { FaThumbsUp, FaCommentDots } from "react-icons/fa";
+import { FILTERS_LIST } from "../../../constants/index.ts";
 
 const CatchUp = () => {
   const [activeFilter, setActiveFilter] = useState("All");
@@ -55,13 +56,7 @@ const CatchUp = () => {
     <div className="bg-white dark:bg-gray-900 shadow-lg rounded-lg p-4 mt-5 w-full max-w-2xl mx-auto transition-all">
       {/*  Filter Buttons */}
       <div className="flex flex-wrap gap-2 mt-3">
-        {[
-          "All",
-          "Job changes",
-          "Birthdays",
-          "Work anniversaries",
-          "Education",
-        ].map((filter) => (
+        {FILTERS_LIST.map((filter) => (
           <button
             key={filter}
             className={`px-3 py-1 rounded-full text-sm transition-all ${
