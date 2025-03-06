@@ -38,8 +38,8 @@ const Sidebar: React.FC = () => {
         </div>
         
         <div className="mt-4 flex items-center">
-          <span className="text-blue-600 font-bold">LinkedIn</span>
-          <span className="ml-1">LinkedIn Corporation © 2025</span>
+          <span className="text-blue-600 font-bold">Linkedup</span>
+          <span className="ml-1">Linkedup Corporation © 2025</span>
         </div>
       </div>
     </div>

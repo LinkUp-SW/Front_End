@@ -100,6 +100,15 @@ export const JOB_COLLECTIONS = [
   { id: 'more', title: 'More', icon: RiMoreLine }
 ];
 
+export const JOB_CATEGORIES = [
+  "For You", "Easy Apply", "Remote", "Part-time", "Hybrid", "IT", "Sustainability", 
+  "Government", "Healthcare", "Biotech", "Finance", "Construction", "HR", "Education", 
+  "Pharma", "Defense & Space", "Manufacturing", "Hospitality", "Social Impact", 
+  "Small Biz", "Real Estate", "Higher Ed", "Logistics", "Civil Eng", "Human Services", 
+  "Non-Profit", "Career Growth", "Media", "Food & Bev", "Recruiting", "Work Life Balance", 
+  "Marketing", "Fashion", "Retail", "Veterinary Med", "Digital Security"
+];
+
 export const SAMPLE_JOBS = [
   {
     id: '1',

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from "react-router-dom";
 import { FaArrowRight } from "react-icons/fa6"
 import JobCard from './JobCard';
 import { Job } from './JobInterfaces';
@@ -9,6 +10,8 @@ interface TopJobPicksProps {
 }
 
 const TopJobPicks: React.FC<TopJobPicksProps> = ({ jobs, onDismissJob }) => {
+  const navigate = useNavigate(); // Initialize navigation function
+
   return (
     <div className="bg-white rounded-lg shadow mb-6">
       <div className="p-4">
@@ -23,7 +26,9 @@ const TopJobPicks: React.FC<TopJobPicksProps> = ({ jobs, onDismissJob }) => {
       </div>
       
       <div className="p-4 flex justify-center">
-        <button className="flex items-center text-gray-600 hover:text-blue-600">
+        <button 
+        onClick={() => navigate("/collections")} 
+        className="flex items-center text-gray-600 hover:text-blue-600">
           Show all <FaArrowRight size={16} />
         </button>
       </div>
