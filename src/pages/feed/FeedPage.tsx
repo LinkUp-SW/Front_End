@@ -10,14 +10,26 @@ import LinkedInNews from "@/components/feed/LinkedInFooter";
 import { Button } from "@/components/ui/button";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 
+const exampleProfile = {
+  fullWidth: true,
+  coverImage:
+    "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
+  profileImage: "https://github.com/shadcn.png",
+  name: "Amr Doma",
+  headline:
+    "Ex-SWE Intern at Valeo | Ex-Clinical Engineering Intern at As-Salam International Hospital",
+  location: "Qesm el Maadi, Cairo",
+  university: "Cairo University",
+};
+
 const FeedPage = () => {
   const [viewMore, setViewMore] = useState(false);
   return (
     <>
       <div className="hidden md:flex px-0 xl:px-[10%] gap-x-[2%] w-full">
         <div className="flex flex-col h-full w-full max-w-60 relative">
-          <ProfileCard />
-          <StatsCard />
+          <ProfileCard profile={exampleProfile} />
+          <StatsCard profileViewers={27} postImpressions={22} />
           <PremiumBanner />
           <Shortcuts />
         </div>
@@ -173,10 +185,10 @@ Working on Herzenbrücke was a fantastic learning experience, and it gave us val
       {/* COMPACT VIEW */}
       <div className="md:hidden flex px-0 xl:px-[10%] gap-x-[2%] w-full">
         <div className="flex flex-col w-full">
-          <ProfileCard fullWidth />
+          <ProfileCard profile={exampleProfile} fullWidth />
           {viewMore ? (
             <>
-              <StatsCard />
+              <StatsCard profileViewers={27} postImpressions={22} />
               <PremiumBanner />
               <Shortcuts />
             </>

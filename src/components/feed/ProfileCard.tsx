@@ -3,11 +3,24 @@ import { Card, CardContent } from "../ui/card";
 import { FaUniversity } from "react-icons/fa";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
-interface ProfileCardProps {
-  fullWidth?: boolean;
+interface Profile {
+  coverImage: string;
+  profileImage: string;
+  name: string;
+  headline: string;
+  location: string;
+  university: string;
 }
 
-const ProfileCard: React.FC<ProfileCardProps> = ({ fullWidth }) => {
+interface ProfileCardProps {
+  fullWidth?: boolean;
+  profile: Profile;
+}
+
+const ProfileCard: React.FC<ProfileCardProps> = ({ fullWidth, profile }) => {
+  const { coverImage, profileImage, name, headline, location, university } =
+    profile;
+
   return (
     <Card className="mb-2 bg-white border-0">
       <CardContent className="flex flex-col items-center">
@@ -18,25 +31,22 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ fullWidth }) => {
             } -left-6 -top-6 bg-gray-200 rounded-t-xl`}
           >
             <img
-              src="https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png"
+              src={coverImage}
               alt="Cover"
               className="w-full h-full rounded-t-md"
             />
           </div>
           <Avatar className="h-19 w-19">
-            <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-            <AvatarFallback>CN</AvatarFallback>
+            <AvatarImage src={profileImage} alt={name} />
+            <AvatarFallback>{name.charAt(0)}</AvatarFallback>
           </Avatar>
           <div className="absolute border-white border-3 rounded-full h-19 w-19"></div>
-          <h1 className="text-xl font-medium">Amr Doma</h1>
-          <h2 className="text-xs text-ellipsis line-clamp-2">
-            Ex-SWE Intern at Valeo | Ex-Clinical Engineering Intern at As-Salam
-            International Hospital{" "}
-          </h2>
-          <h3 className="text-xs text-gray-500">Qesm el Maadi, Cairo</h3>
+          <h1 className="text-xl font-medium">{name}</h1>
+          <h2 className="text-xs text-ellipsis line-clamp-2">{headline}</h2>
+          <h3 className="text-xs text-gray-500">{location}</h3>
           <div className="flex items-center gap-1 pt-2">
-            <FaUniversity></FaUniversity>
-            <h1 className="text-xs font-semibold">Cairo University</h1>
+            <FaUniversity />
+            <h1 className="text-xs font-semibold">{university}</h1>
           </div>
         </div>
       </CardContent>
