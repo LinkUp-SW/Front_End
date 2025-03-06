@@ -50,7 +50,7 @@ const NavBar = () => {
           <i className="scale-x-[-1]">
             <BsChatDotsFill size={30} />
           </i>
-          <ThemeToggle/>
+          <ThemeToggle />
         </div>
       </nav>
     </header>
