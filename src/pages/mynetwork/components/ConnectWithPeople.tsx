@@ -99,6 +99,10 @@ const ConnectWithPeople = () => {
     setPeople((prev) => prev.filter((person) => person.id !== id));
   };
 
+  if (people.length === 0) {
+    return null;
+  }
+
   return (
     <div className="bg-white dark:bg-gray-900 shadow-lg rounded-lg p-4 mt-5">
       <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 ml-2">
