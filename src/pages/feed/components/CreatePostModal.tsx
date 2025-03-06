@@ -1,6 +1,6 @@
 import React from "react";
 import { FaTimes } from "react-icons/fa";
-import { Button } from "../ui/button";
+import { Button } from "../../../components/ui/button";
 
 interface CreatePostModalProps {
   isOpen: boolean;

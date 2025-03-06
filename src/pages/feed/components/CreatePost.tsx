@@ -1,10 +1,14 @@
 import { FaPencilAlt, FaRegCalendarAlt, FaRegImage } from "react-icons/fa";
-import { Card, CardContent } from "../ui/card";
+import { Card, CardContent } from "../../../components/ui/card";
 import CreatePostModal from "./CreatePostModal";
 import MediaUploadModal from "./MediaUploadModal";
 import { useState } from "react";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { Button } from "../ui/button";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "../../../components/ui/avatar";
+import { Button } from "../../../components/ui/button";
 
 interface CreatePostProps {
   profileImageUrl: string;
@@ -34,7 +38,7 @@ const CreatePost: React.FC<CreatePostProps> = ({ profileImageUrl }) => {
 
   return (
     <>
-      <Card className="mb-4 w-full bg-white border-0">
+      <Card className="mb-4 w-full bg-white border-0 p-4">
         <CardContent>
           <div className="flex space-x-3 justify-start items-start">
             <Avatar className="h-12 w-12">
@@ -54,7 +58,9 @@ const CreatePost: React.FC<CreatePostProps> = ({ profileImageUrl }) => {
               <Button
                 key={index}
                 variant="ghost"
-                className="flex items-center cursor-pointer transition-colors hover:bg-gray-100 hover:text-black"
+                className={`flex items-center ${
+                  index == 0 ? "" : "hidden sm:flex"
+                } cursor-pointer transition-colors hover:bg-gray-100 hover:text-black`}
                 onClick={button.callback}
               >
                 {button.icon} {button.title}
