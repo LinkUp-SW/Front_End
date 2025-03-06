@@ -32,7 +32,9 @@ const FeedPage = () => {
           <StatsCard profileViewers={27} postImpressions={22} />
           <PremiumBanner />
           <Shortcuts />
-          <LinkedInNews />
+          <div className="relative right-3.5">
+            <LinkedInNews />
+          </div>
         </div>
         <div className="flex flex-col w-full ">
           <CreatePost profileImageUrl={exampleProfile.profileImage} />

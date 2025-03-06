@@ -2,7 +2,7 @@ import React from "react";
 
 const LinkedInFooter: React.FC = () => {
   return (
-    <footer className=" text-gray-600 text-xs p-4 right-3 w-64 sticky top-0">
+    <footer className=" text-gray-600 text-xs p-4 right-5 w-64 sticky top-0 h-full">
       <div className="flex flex-wrap justify-center gap-3">
         <a href="#" className="hover:underline">
           About
