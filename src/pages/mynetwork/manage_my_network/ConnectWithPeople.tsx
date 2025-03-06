@@ -104,7 +104,7 @@ const ConnectWithPeople = () => {
             </div>
 
             {/* Card Content */}
-            <div className="mt-12 text-center px-4 pb-4 flex flex-col flex-grow">
+            <div className="mt-12 text-center px-4 pb-4 flex justify-between flex-col flex-grow">
               <a href={person.profileUrl} className="flex flex-col items-center">
                 <p className="text-gray-900 dark:text-white font-semibold">{person.name}</p>
                 <p className="text-sm text-gray-500 dark:text-gray-400">{person.title}</p>
