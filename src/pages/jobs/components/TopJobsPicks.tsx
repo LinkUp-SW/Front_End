@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from "react-router-dom";
 import { FaArrowRight } from "react-icons/fa6"
 import JobCard from './JobCard';
-import { Job } from './JobInterfaces';
+import { Job } from '../types';
 
 interface TopJobPicksProps {
   jobs: Job[];

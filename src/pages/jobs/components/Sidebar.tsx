@@ -1,7 +1,7 @@
 import React from 'react';
 import { FaSortDown } from "react-icons/fa6";
 import { FaEdit } from "react-icons/fa";
-import { SIDEBAR_MENU_ITEMS, FOOTER_LINKS } from '../../constants/index';
+import { SIDEBAR_MENU_ITEMS, FOOTER_LINKS } from '../../../constants/index';
 
 const Sidebar: React.FC = () => {
   return (

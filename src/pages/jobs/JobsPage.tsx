@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { WithNavBar } from '../../components';
-import Sidebar from './Sidebar';
-import TopJobPicks from './TopJobsPicks';
-import JobCollections from './JobCollection';
-import RecentSearches from './RecentSearches';
-import MoreJobs from './MoreJobs';
+import Sidebar from './components/Sidebar';
+import TopJobPicks from './components/TopJobsPicks';
+import JobCollections from './components/JobCollection';
+import RecentSearches from './components/RecentSearches';
+import MoreJobs from './components/MoreJobs';
 import { SAMPLE_JOBS, MORE_JOBS, RECENT_SEARCHES } from '../../constants/index';
-import { Job } from './JobInterfaces';
+import { Job } from './types';
 
 const JobsPage: React.FC = () => {
   // State for job listings
