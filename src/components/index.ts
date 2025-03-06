@@ -6,5 +6,36 @@ import NavItems from "./nav_bar/NavItems";
 import ThemeListener from "./theme_listener/ThemeListener";
 import Modal from "./modal/Modal";
 import {Accordion,AccordionItem} from './accordion/Accordion'
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+} from "@/components/ui/card";
+import ProfileCard from "./profile_card/ProfileCard";
 
-export {  UserList, WithNavBar, NavBar, ScreenWidthListener, NavItems,ThemeListener,Modal,Accordion,AccordionItem };
+export {
+  UserList,
+  WithNavBar,
+  NavBar,
+  ScreenWidthListener,
+  NavItems,
+  ThemeListener,
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+  Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+  ProfileCard,
+  Modal,
+  Accordion,AccordionItem
+};
