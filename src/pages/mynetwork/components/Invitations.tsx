@@ -59,7 +59,7 @@ const Invitations = () => {
         {invitations.map((invite) => (
           <li
             key={invite.id}
-            className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
+            className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg flex-col min-[450px]:flex-row"
           >
             <a
               href={invite.profileUrl}
