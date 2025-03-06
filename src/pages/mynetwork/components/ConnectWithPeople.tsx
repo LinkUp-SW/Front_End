@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { People } from "./Invitations";
-import {  FaUserPlus } from "react-icons/fa";
+import { FaUserPlus } from "react-icons/fa";
 
 const ConnectWithPeople = () => {
   const [people, setPeople] = useState<People[]>([
@@ -9,8 +9,10 @@ const ConnectWithPeople = () => {
       name: "Sama Mohamed",
       title: "Software Engineer at Microsoft",
       mutualConnections: "Ahmed Khaled and 12 other mutual connections",
-      image: "https://www.svgrepo.com/show/382097/female-avatar-girl-face-woman-user-9.svg",
-      coverImage: "https://thingscareerrelated.com/wp-content/uploads/2021/10/default-background-image.png?w=862",
+      image:
+        "https://www.svgrepo.com/show/382097/female-avatar-girl-face-woman-user-9.svg",
+      coverImage:
+        "https://thingscareerrelated.com/wp-content/uploads/2021/10/default-background-image.png?w=862",
       profileUrl: "/profile/Sama-Mohamed",
     },
     {
@@ -18,8 +20,10 @@ const ConnectWithPeople = () => {
       name: "Youssef Afify",
       title: "Machine Learning Researcher",
       mutualConnections: "Mariam Samir is a mutual connection",
-      image: "https://www.svgrepo.com/show/382107/male-avatar-boy-face-man-user-6.svg",
-      coverImage: "https://thingscareerrelated.com/wp-content/uploads/2021/10/default-background-image.png?w=862",
+      image:
+        "https://www.svgrepo.com/show/382107/male-avatar-boy-face-man-user-6.svg",
+      coverImage:
+        "https://thingscareerrelated.com/wp-content/uploads/2021/10/default-background-image.png?w=862",
       profileUrl: "/profile/Youssef-Afify",
     },
     {
@@ -27,8 +31,10 @@ const ConnectWithPeople = () => {
       name: "Amr Doma",
       title: "Cybersecurity Analyst at IBM",
       mutualConnections: "Haneen Mohamed and 8 other mutual connections",
-      image: "https://www.svgrepo.com/show/382107/male-avatar-boy-face-man-user-6.svg",
-      coverImage: "https://thingscareerrelated.com/wp-content/uploads/2021/10/default-background-image.png?w=862",
+      image:
+        "https://www.svgrepo.com/show/382107/male-avatar-boy-face-man-user-6.svg",
+      coverImage:
+        "https://thingscareerrelated.com/wp-content/uploads/2021/10/default-background-image.png?w=862",
       profileUrl: "/profile/Amr-Doma",
     },
     {
@@ -36,18 +42,22 @@ const ConnectWithPeople = () => {
       name: "Habiba Walid",
       title: "Biomedical Data Engineer",
       mutualConnections: "Noor Emad and 5 other mutual connections",
-      image: "https://www.svgrepo.com/show/382097/female-avatar-girl-face-woman-user-9.svg",
-      coverImage: "https://thingscareerrelated.com/wp-content/uploads/2021/10/default-background-image.png?w=862",
+      image:
+        "https://www.svgrepo.com/show/382097/female-avatar-girl-face-woman-user-9.svg",
+      coverImage:
+        "https://thingscareerrelated.com/wp-content/uploads/2021/10/default-background-image.png?w=862",
       profileUrl: "/profile/Habiba-Walid",
     },
-    
+
     {
       id: 5,
       name: "Mohanad Tarek",
       title: "Full Stack Developer",
       mutualConnections: "Noha Adel and 10 other mutual connections",
-      image: "https://www.svgrepo.com/show/382107/male-avatar-boy-face-man-user-6.svg",
-      coverImage: "https://thingscareerrelated.com/wp-content/uploads/2021/10/default-background-image.png?w=862",
+      image:
+        "https://www.svgrepo.com/show/382107/male-avatar-boy-face-man-user-6.svg",
+      coverImage:
+        "https://thingscareerrelated.com/wp-content/uploads/2021/10/default-background-image.png?w=862",
       profileUrl: "/profile/Mohanad-Tarek",
     },
     {
@@ -55,8 +65,10 @@ const ConnectWithPeople = () => {
       name: "Salsabil Mostafa",
       title: "UX/UI Designer",
       mutualConnections: "Karim Nabil and 6 other mutual connections",
-      image: "https://www.svgrepo.com/show/382097/female-avatar-girl-face-woman-user-9.svg",
-      coverImage: "https://thingscareerrelated.com/wp-content/uploads/2021/10/default-background-image.png?w=862",
+      image:
+        "https://www.svgrepo.com/show/382097/female-avatar-girl-face-woman-user-9.svg",
+      coverImage:
+        "https://thingscareerrelated.com/wp-content/uploads/2021/10/default-background-image.png?w=862",
       profileUrl: "/profile/Salsabil-Mostafa",
     },
     {
@@ -64,8 +76,10 @@ const ConnectWithPeople = () => {
       name: "Mehrati Sameh",
       title: "Electrical Engineer",
       mutualConnections: "Nada Omar and 9 other mutual connections",
-      image: "https://www.svgrepo.com/show/382097/female-avatar-girl-face-woman-user-9.svg",
-      coverImage: "https://thingscareerrelated.com/wp-content/uploads/2021/10/default-background-image.png?w=862",
+      image:
+        "https://www.svgrepo.com/show/382097/female-avatar-girl-face-woman-user-9.svg",
+      coverImage:
+        "https://thingscareerrelated.com/wp-content/uploads/2021/10/default-background-image.png?w=862",
       profileUrl: "/profile/Mehrati-Sameh",
     },
     {
@@ -73,8 +87,10 @@ const ConnectWithPeople = () => {
       name: "Mayar Ahmed",
       title: "Cloud Architect at AWS",
       mutualConnections: "Aya Ibrahim is a mutual connection",
-      image: "https://www.svgrepo.com/show/382097/female-avatar-girl-face-woman-user-9.svg",
-      coverImage: "https://thingscareerrelated.com/wp-content/uploads/2021/10/default-background-image.png?w=862",
+      image:
+        "https://www.svgrepo.com/show/382097/female-avatar-girl-face-woman-user-9.svg",
+      coverImage:
+        "https://thingscareerrelated.com/wp-content/uploads/2021/10/default-background-image.png?w=862",
       profileUrl: "/profile/Mayar-Ahmed",
     },
   ]);
@@ -91,24 +107,43 @@ const ConnectWithPeople = () => {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
         {people.map((person) => (
-          <div key={person.id} className="relative bg-white dark:bg-gray-800 rounded-lg shadow-md h-full flex flex-col overflow-hidden">
-            
+          <div
+            key={person.id}
+            className="relative bg-white dark:bg-gray-800 rounded-lg shadow-md h-full flex flex-col overflow-hidden"
+          >
             {/* Cover Image */}
             <div className="relative w-full h-16">
-              <img src={person.coverImage} alt="Cover" className="w-full h-full object-cover" />
+              <img
+                src={person.coverImage}
+                alt="Cover"
+                className="w-full h-full object-cover"
+              />
             </div>
 
             {/* Profile Picture - Positioned over Cover */}
             <div className="absolute top-6 left-1/2 transform -translate-x-1/2">
-              <img src={person.image} alt={person.name} className="w-20 h-20  border-white dark:border-gray-800" />
+              <img
+                src={person.image}
+                alt={person.name}
+                className="w-20 h-20  border-white dark:border-gray-800"
+              />
             </div>
 
             {/* Card Content */}
             <div className="mt-12 text-center px-4 pb-4 flex justify-between flex-col flex-grow">
-              <a href={person.profileUrl} className="flex flex-col items-center">
-                <p className="text-gray-900 dark:text-white font-semibold">{person.name}</p>
-                <p className="text-sm text-gray-500 dark:text-gray-400">{person.title}</p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">{person.mutualConnections}</p>
+              <a
+                href={person.profileUrl}
+                className="flex flex-col items-center"
+              >
+                <p className="text-gray-900 dark:text-white font-semibold">
+                  {person.name}
+                </p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  {person.title}
+                </p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  {person.mutualConnections}
+                </p>
               </a>
 
               {/* Connect Button */}
@@ -128,7 +163,6 @@ const ConnectWithPeople = () => {
             >
               ✕
             </button>
-
           </div>
         ))}
       </div>

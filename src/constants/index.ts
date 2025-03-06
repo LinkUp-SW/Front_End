@@ -58,3 +58,18 @@ export const SMALL_SCREEN_NAV_ITEMS = [
     title: "Jobs",
   },
 ];
+
+
+
+
+export const FILTER_OPTIONS = {
+  ALL: "All",
+  JOB_CHANGES: "Job changes",
+  BIRTHDAYS: "Birthdays",
+  WORK_ANNIVERSARIES: "Work anniversaries",
+  EDUCATION: "Education",
+};
+
+export const FILTERS_LIST = Object.values(FILTER_OPTIONS);
+
+
