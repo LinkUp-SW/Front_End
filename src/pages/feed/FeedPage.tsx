@@ -1,13 +1,14 @@
-import React, { useState } from "react";
-import { UserList, WithNavBar } from "../../components";
-import ProfileCard from "@/components/feed/ProfileCard";
-import StatsCard from "@/pages/feed/components/StatsCard";
-import PremiumBanner from "@/pages/feed/components/PremiumBanner";
-import Shortcuts from "@/pages/feed/components/Shortcuts";
-import CreatePost from "@/pages/feed/components/CreatePost";
-import Post from "@/pages/feed/components/Post";
-import LinkedInNews from "@/pages/feed/components/LinkedInFooter";
-import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import { WithNavBar, ProfileCard, Button } from "../../components";
+import {
+  StatsCard,
+  PremiumBanner,
+  Shortcuts,
+  CreatePost,
+  Post,
+  LinkedInFooter,
+} from "./components";
+//import {Avatar} from ".."
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 
 const exampleProfile = {
@@ -33,7 +34,7 @@ const FeedPage = () => {
           <PremiumBanner />
           <Shortcuts />
           <div className="relative right-3.5">
-            <LinkedInNews />
+            <LinkedInFooter />
           </div>
         </div>
         <div className="flex flex-col w-full ">

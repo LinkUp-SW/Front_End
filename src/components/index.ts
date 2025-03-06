@@ -4,6 +4,34 @@ import NavBar from "./nav_bar/NavBar";
 import ScreenWidthListener from "./screen_width_listener/ScreenWidthListener";
 import NavItems from "./nav_bar/NavItems";
 import ThemeListener from "./theme_listener/ThemeListener";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+} from "@/components/ui/card";
+import ProfileCard from "./profile_card/ProfileCard";
 
-
-export {  UserList, WithNavBar, NavBar, ScreenWidthListener, NavItems,ThemeListener };
+export {
+  UserList,
+  WithNavBar,
+  NavBar,
+  ScreenWidthListener,
+  NavItems,
+  ThemeListener,
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+  Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+  ProfileCard,
+};

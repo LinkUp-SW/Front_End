@@ -1,7 +1,7 @@
 import React from "react";
 import { Card, CardContent } from "../ui/card";
 import { FaUniversity } from "react-icons/fa";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "../../components";
 
 interface Profile {
   coverImage: string;
