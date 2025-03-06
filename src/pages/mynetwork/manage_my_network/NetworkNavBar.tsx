@@ -1,6 +1,10 @@
 import { useState } from "react";
 
-const NetworkNavBar = ({ setActiveTab }: { setActiveTab: (tab: string) => void }) => {
+const NetworkNavBar = ({
+  setActiveTab,
+}: {
+  setActiveTab: (tab: string) => void;
+}) => {
   const [activeTab, setTab] = useState("grow");
 
   const handleTabClick = (tab: string) => {
