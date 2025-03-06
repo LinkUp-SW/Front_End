@@ -34,7 +34,7 @@ const FeedPage = () => {
           <Shortcuts />
         </div>
         <div className="flex flex-col w-full ">
-          <CreatePost />
+          <CreatePost profileImageUrl={exampleProfile.profileImage} />
           <Post
             user={{
               name: "Abdelrahman Elsayed",
@@ -215,7 +215,7 @@ Working on Herzenbrücke was a fantastic learning experience, and it gave us val
             </div>
           </Button>
 
-          <CreatePost />
+          <CreatePost profileImageUrl={exampleProfile.profileImage} />
 
           <Post
             user={{

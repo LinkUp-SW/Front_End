@@ -6,7 +6,11 @@ import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
 
-const CreatePost = () => {
+interface CreatePostProps {
+  profileImageUrl: string;
+}
+
+const CreatePost: React.FC<CreatePostProps> = ({ profileImageUrl }) => {
   const [isPostModalOpen, setPostModalOpen] = useState(false);
   const [isMediaModalOpen, setMediaModalOpen] = useState(false);
 
@@ -30,11 +34,11 @@ const CreatePost = () => {
 
   return (
     <>
-      <Card className=" mb-4 w-full bg-white border-0">
+      <Card className="mb-4 w-full bg-white border-0">
         <CardContent>
           <div className="flex space-x-3 justify-start items-start">
             <Avatar className="h-12 w-12">
-              <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
+              <AvatarImage src={profileImageUrl} alt="Profile" />
               <AvatarFallback>CN</AvatarFallback>
             </Avatar>
             <Button
