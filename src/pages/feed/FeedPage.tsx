@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import { UserList, WithNavBar } from "../../components";
 import ProfileCard from "@/components/feed/ProfileCard";
-import StatsCard from "@/components/feed/StatsCard";
-import PremiumBanner from "@/components/feed/PremiumBanner";
-import Shortcuts from "@/components/feed/Shortcuts";
-import CreatePost from "@/components/feed/CreatePost";
-import Post from "@/components/feed/Post";
-import LinkedInNews from "@/components/feed/LinkedInFooter";
+import StatsCard from "@/pages/feed/components/StatsCard";
+import PremiumBanner from "@/pages/feed/components/PremiumBanner";
+import Shortcuts from "@/pages/feed/components/Shortcuts";
+import CreatePost from "@/pages/feed/components/CreatePost";
+import Post from "@/pages/feed/components/Post";
+import LinkedInNews from "@/pages/feed/components/LinkedInFooter";
 import { Button } from "@/components/ui/button";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 
@@ -32,6 +32,7 @@ const FeedPage = () => {
           <StatsCard profileViewers={27} postImpressions={22} />
           <PremiumBanner />
           <Shortcuts />
+          <LinkedInNews />
         </div>
         <div className="flex flex-col w-full ">
           <CreatePost profileImageUrl={exampleProfile.profileImage} />
@@ -176,9 +177,6 @@ Working on Herzenbrücke was a fantastic learning experience, and it gave us val
               reposts: 4,
             }}
           />
-        </div>
-        <div className="hidden lg:flex flex-col w-[40rem] ">
-          <LinkedInNews />
         </div>
       </div>
 
