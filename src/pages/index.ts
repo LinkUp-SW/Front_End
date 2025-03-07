@@ -7,6 +7,7 @@ import UserProfilePage from "./user_profile/UserProfilePage";
 import MyNetworkPage from "./mynetwork/MyNetworkPage";
 import JobsPage from "./jobs/JobsPage";
 import SeeMorePage from "./jobs/SeeMorePage";
+import Connections from "./mynetwork/components/Connections";
 
 //Export the Imported Pages
-export {LandingPage,FeedPage,UserProfilePage,JobsPage,SeeMorePage,MyNetworkPage}
+export {LandingPage,FeedPage,UserProfilePage,JobsPage,SeeMorePage,MyNetworkPage,Connections};
