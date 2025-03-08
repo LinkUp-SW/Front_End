@@ -4,6 +4,8 @@ import { RouteObject } from 'react-router-dom';
 import { LandingPage, FeedPage,UserProfilePage,  NotificationsPage, MyNetworkPage,JobsPage,SeeMorePage,MessagingPage} from './pages';
 
 import React from 'react';
+import SettingsLayoutPage from './components/hoc/settings_layout/SettingsLayoutPage';
+
 
 // Define your routes as an array of RouteObject (compatible with React Router v6)
 const routes: RouteObject[] = [
