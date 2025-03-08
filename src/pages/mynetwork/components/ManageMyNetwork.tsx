@@ -9,10 +9,12 @@ import {
 
 import { useNavigate } from "react-router-dom";
 
+import { useNavigate } from "react-router-dom";
+
 const ManageMyNetwork = () => {
   const navigate = useNavigate();
   const networkOptions = [
-    { label: "Connections", count: 0, icon: <FaUsers /> },
+    { label: "Connections", count: 0, icon: <FaUsers />, route: "/connections" },
     { label: "Following & followers", count: 0, icon: <FaUserPlus />, route:"/followingfollowers"},
     { label: "Groups", count: 0, icon: <FaLayerGroup /> },
     { label: "Events", count: 0, icon: <FaCalendarAlt /> },
@@ -30,8 +32,8 @@ const ManageMyNetwork = () => {
           <li
             key={index}
             className="flex items-center justify-between p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg cursor-pointer"
-          
-             onClick={() => option.route && navigate(option.route)}>
+            onClick={() => option.route && navigate(option.route)}
+          >
             <div className="flex items-center space-x-3">
               <span className="text-gray-700 dark:text-gray-300">
                 {option.icon}
@@ -49,7 +51,7 @@ const ManageMyNetwork = () => {
 
       <div className="mt-4 cursor-pointer">
         <img
-          src="see_who's_hiring.png"
+          src="./src/assets/see_who's_hiring.jpg"
           alt="Promotional Banner"
           className="rounded-lg shadow-lg w-full object-cover"
         />
