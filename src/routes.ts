@@ -1,7 +1,7 @@
 // src/routes.ts
 
 import { RouteObject } from 'react-router-dom';
-import { LandingPage, FeedPage,UserProfilePage,  NotificationsPage, MyNetworkPage,JobsPage,SeeMorePage,MessagingPage} from './pages';
+import { LandingPage, FeedPage,UserProfilePage,  NotificationsPage, MyNetworkPage,JobsPage,SeeMorePage,Connections,MessagingPage} from './pages';
 
 import React from 'react';
 
@@ -41,6 +41,9 @@ const routes: RouteObject[] = [
     path: '/my-network',
     element: React.createElement(MyNetworkPage)
   },
+  {path:'/connections',
+  element: React.createElement(Connections)
+  }
   
 ];
 
