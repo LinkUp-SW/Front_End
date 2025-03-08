@@ -1,7 +1,7 @@
 // src/routes.ts
 
 import { RouteObject } from 'react-router-dom';
-import { LandingPage, FeedPage,UserProfilePage, MyNetworkPage,JobsPage,SeeMorePage } from './pages';
+import { LandingPage, FeedPage,UserProfilePage,  NotificationsPage, MyNetworkPage,JobsPage,SeeMorePage } from './pages';
 import React from 'react';
 
 // Define your routes as an array of RouteObject (compatible with React Router v6)
@@ -22,6 +22,10 @@ const routes: RouteObject[] = [
   {
     path: '/user-profile/:id',
     element: React.createElement(UserProfilePage)
+  },
+  {
+    path: '/notifications',
+    element: React.createElement(NotificationsPage),
   },
   {
     path: '/collections',
