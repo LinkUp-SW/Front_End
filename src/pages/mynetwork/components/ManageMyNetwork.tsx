@@ -7,10 +7,13 @@ import {
   FaNewspaper,
 } from "react-icons/fa";
 
+import { useNavigate } from "react-router-dom";
+
 const ManageMyNetwork = () => {
+  const navigate = useNavigate();
   const networkOptions = [
     { label: "Connections", count: 0, icon: <FaUsers /> },
-    { label: "Following & followers", count: 0, icon: <FaUserPlus /> },
+    { label: "Following & followers", count: 0, icon: <FaUserPlus />, route:"/followingfollowers"},
     { label: "Groups", count: 0, icon: <FaLayerGroup /> },
     { label: "Events", count: 0, icon: <FaCalendarAlt /> },
     { label: "Pages", count: 0, icon: <FaFileAlt /> },
@@ -27,7 +30,8 @@ const ManageMyNetwork = () => {
           <li
             key={index}
             className="flex items-center justify-between p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg cursor-pointer"
-          >
+          
+             onClick={() => option.route && navigate(option.route)}>
             <div className="flex items-center space-x-3">
               <span className="text-gray-700 dark:text-gray-300">
                 {option.icon}
