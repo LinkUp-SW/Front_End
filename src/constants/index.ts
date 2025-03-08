@@ -316,4 +316,4 @@ export const MORE_JOBS = [
 //   { query: 'project manager', location: 'Riyadh, Saudi Arabia', applyOn: true, alert: true },
 //   { query: 'agile', location: 'Cairo, Egypt', applyOn: false }
 // ];
-///tetttee
+///tetttees
