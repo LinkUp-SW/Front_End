@@ -298,22 +298,13 @@ export const MORE_JOBS = [
   },
   {
     id: '11',
-    title: 'Product Manager',
-    company: 'Azentio',
-    location: 'Cairo, Egypt (Hybrid)',
-    isRemote: false,
-    isSaved: false,
-    logo: '/api/placeholder/60/60',
-    isPromoted: false,
-    hasEasyApply: false,
-    alumniCount: 6,
-    workMode: 'Hybrid',
+  
   }
 ];
 
-// export const RECENT_SEARCHES = [
-//   { query: 'project manager', location: 'Cairo, Egypt', applyOn: true },
-//   { query: 'project manager', location: 'Riyadh, Saudi Arabia', applyOn: true, alert: true },
-//   { query: 'agile', location: 'Cairo, Egypt', applyOn: false }
-// ];
+export const RECENT_SEARCHES = [
+  { query: 'project manager', location: 'Cairo, Egypt', applyOn: true },
+  { query: 'project manager', location: 'Riyadh, Saudi Arabia', applyOn: true, alert: true },
+  { query: 'agile', location: 'Cairo, Egypt', applyOn: false }
+];
 ///tetttee
