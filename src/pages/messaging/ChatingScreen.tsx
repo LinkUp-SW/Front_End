@@ -1,6 +1,3 @@
-import { HiOutlineDotsHorizontal } from "react-icons/hi";
-import { IoIosStarOutline } from "react-icons/io";
-
 /* import { useState ,useEffect} from "react";
 import {getChattingMessages, sendMessage} from "../endpoints/messaging"
  */
@@ -54,19 +51,7 @@ const ChatingScreen = () => {
   return (
     <>
       <div className="h-1/2   ">
-        <div className="h-1/5 border-1 border-[#e8e8e8] flex justify-between items-center ">
-        <div >
-            <p className="pl-3">First Last</p>
-            <p className="text-xs pl-3">Active now</p>
-        </div>
-
-        <div className="mr-3">
-        <HiOutlineDotsHorizontal size={30} className="inline-block ml-3" />
-        <IoIosStarOutline size={30} className="inline-block ml-3" />
-        </div>
-
-
-        </div>
+        <div className="h-1/5 border-1 border-[#e8e8e8] "></div>
 
         <div className="h-4/5 border-1 border-[#e8e8e8] overflow-y-auto  ">
           <p>
