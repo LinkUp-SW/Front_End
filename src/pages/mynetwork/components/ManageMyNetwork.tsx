@@ -7,13 +7,15 @@ import {
   FaNewspaper,
 } from "react-icons/fa";
 
+
+
 import { useNavigate } from "react-router-dom";
 
 const ManageMyNetwork = () => {
   const navigate = useNavigate();
   const networkOptions = [
     { label: "Connections", count: 0, icon: <FaUsers />, route: "/connections" },
-    { label: "Following & followers", count: 0, icon: <FaUserPlus /> },
+    { label: "Following & followers", count: 0, icon: <FaUserPlus />, route:"/followingfollowers"},
     { label: "Groups", count: 0, icon: <FaLayerGroup /> },
     { label: "Events", count: 0, icon: <FaCalendarAlt /> },
     { label: "Pages", count: 0, icon: <FaFileAlt /> },
