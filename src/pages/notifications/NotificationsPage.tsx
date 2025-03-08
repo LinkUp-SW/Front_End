@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import styles from './notifications.module.css';
 import { WithNavBar } from '../../components';
 
-import notificationPicture from "../../assets/notificationpicture.png"; 
-import notificationPicture2 from "../../assets/notificationpicture2.png"; 
+import notificationPicture from "../../assets/notificationpicture.jpeg"; 
+import notificationPicture2 from "../../assets/notificationpicture2.jpeg"; 
 
 interface Notification {
   id: string;
