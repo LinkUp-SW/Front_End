@@ -311,8 +311,8 @@ export const MORE_JOBS = [
   }
 ];
 
-export const RECENT_SEARCHES = [
-  { query: 'project manager', location: 'Cairo, Egypt', applyOn: true },
-  { query: 'project manager', location: 'Riyadh, Saudi Arabia', applyOn: true, alert: true },
-  { query: 'agile', location: 'Cairo, Egypt', applyOn: false }
-];
+// export const RECENT_SEARCHES = [
+//   { query: 'project manager', location: 'Cairo, Egypt', applyOn: true },
+//   { query: 'project manager', location: 'Riyadh, Saudi Arabia', applyOn: true, alert: true },
+//   { query: 'agile', location: 'Cairo, Egypt', applyOn: false }
+// ];
