@@ -10,20 +10,20 @@ interface Connection {
 }
 
 const connections: Connection[] = [
-  { name: "John Doe", title: "Software Engineer at Google", date: "March 5, 2025", image: "/images/john_doe.jpg" },
-  { name: "Jane Smith", title: "Data Scientist at Facebook", date: "March 3, 2025", image: "/images/jane_smith.jpg" },
-  { name: "Robert Johnson", title: "Product Manager at Amazon", date: "March 1, 2025", image: "/images/robert_johnson.jpg" },
-  { name: "Emily Davis", title: "UX Designer at Apple", date: "February 27, 2025", image: "/images/emily_davis.jpg" },
-  { name: "Michael Wilson", title: "Cybersecurity Analyst at Microsoft", date: "February 25, 2025", image: "/images/michael_wilson.jpg" },
+  { name: "John Doe", title: "Software Engineer at Google", date: "March 5, 2025", image: "https://www.svgrepo.com/show/382107/male-avatar-boy-face-man-user-6.svg" },
+  { name: "Jane Smith", title: "Data Scientist at Facebook", date: "March 3, 2025", image: "https://www.svgrepo.com/show/382097/female-avatar-girl-face-woman-user-9.svg" },
+  { name: "Robert Johnson", title: "Product Manager at Amazon", date: "March 1, 2025", image: "https://www.svgrepo.com/show/382107/male-avatar-boy-face-man-user-6.svg" },
+  { name: "Emily Davis", title: "UX Designer at Apple", date: "February 27, 2025", image: "https://www.svgrepo.com/show/382097/female-avatar-girl-face-woman-user-9.svg" },
+  { name: "Michael Wilson", title: "Cybersecurity Analyst at Microsoft", date: "February 25, 2025", image: "https://www.svgrepo.com/show/382107/male-avatar-boy-face-man-user-6.svg" },
 ];
 
 const Connections: React.FC = () => {
   const [search, setSearch] = useState<string>("");
 
   return (
-    <div className="bg-white dark:bg-gray-900 min-h-screen p-6 flex flex-col lg:flex-row gap-6">
-      {/* Left Section - Connections List */}
-      <div className="flex-1">
+    <div className="  min-h-screen p-10 flex flex-col lg:flex-row ">
+      {/* Left Section - Connections List with White Background */}
+      <div className="flex-1 bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
         <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">My Connections</h2>
 
         {/* Search Bar */}
@@ -60,10 +60,28 @@ const Connections: React.FC = () => {
         </div>
       </div>
 
-      {/* Right Section - Ad Image & Footer */}
-      <div className="hidden lg:flex flex-col items-center w-1/4 p-6 bg-white dark:bg-gray-800 ">
-        <img src="/src/assets/see_who's_hiring.png" alt="Ad" className="w-full rounded-lg mb-4" />
-        <p className="text-sm text-gray-600 dark:text-gray-400 text-center">About | Accessibility | Help Center | Privacy & Terms | Ad Choices | Business Services</p>
+      {/* Right Section - Ad Image & Footer with Dark Background */}
+      <div className="hidden lg:flex flex-col items-center w-1/4 p-6">
+        <img src="/src/assets/see_who's_hiring.jpg" alt="Ad" className="w-full rounded-lg mb-4" />
+        <p className="text-sm text-gray-600 dark:text-gray-400 text-center px-3">
+        <a href="#" className="hover:underline">
+            Privacy & Terms
+          </a>
+          <a href="#" className="hover:underline px-3">
+            Ad Choices
+          </a>
+          <a href="#" className="hover:underline px-3">
+            Advertising
+          </a>
+        
+        
+          <a href="#" className="hover:underline px-3">
+            Business Services
+          </a>
+          <a href="#" className="hover:underline px-3">
+            Get the LinkUp app
+          </a>
+        </p>
       </div>
     </div>
   );
