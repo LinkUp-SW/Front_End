@@ -41,7 +41,10 @@ const SendingMessages = () => {
             >
               <div>
                 <div className="relative inline-block h-10 w-10 mr-2 bg-[#56687a]">
-                  <FaFileAlt size={20} className=" text-white absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2   " />
+                  <FaFileAlt
+                    size={20}
+                    className=" text-white absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2   "
+                  />
                 </div>
                 <div className="inline-block">
                   <p>

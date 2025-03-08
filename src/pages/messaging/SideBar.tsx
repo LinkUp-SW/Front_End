@@ -59,7 +59,9 @@ const SideBar = () => {
           <div
             className="relative inset-0 rounded-full w-12 h-12 bg-gray-100"
             onMouseEnter={() => setHovered(true)}
-            onMouseLeave={() => {selectedMessages ? setHovered(true) : setHovered(false)}}
+            onMouseLeave={() => {
+              selectedMessages ? setHovered(true) : setHovered(false);
+            }}
           >
             {!hovered ? (
               <img
@@ -73,10 +75,6 @@ const SideBar = () => {
                 onClick={() => {
                   setSelectedMessages(!selectedMessages);
                   setClose(false);
-                  
-
-                  
-                
                 }}
               >
                 {selectedMessages ? (
