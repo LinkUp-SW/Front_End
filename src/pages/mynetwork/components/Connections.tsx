@@ -60,28 +60,53 @@ const Connections: React.FC = () => {
         </div>
       </div>
 
-      {/* Right Section - Ad Image & Footer with Dark Background */}
+      {/* Right Section - Ad & Footer */}
       <div className="hidden lg:flex flex-col items-center w-1/4 p-6">
-        <img src="/src/assets/see_who's_hiring.jpg" alt="Ad" className="w-full rounded-lg mb-4" />
-        <p className="text-sm text-gray-600 dark:text-gray-400 text-center px-3">
-        <a href="#" className="hover:underline">
-            Privacy & Terms
-          </a>
-          <a href="#" className="hover:underline px-3">
-            Ad Choices
-          </a>
-          <a href="#" className="hover:underline px-3">
-            Advertising
-          </a>
-        
-        
-          <a href="#" className="hover:underline px-3">
-            Business Services
-          </a>
-          <a href="#" className="hover:underline px-3">
-            Get the LinkUp app
-          </a>
-        </p>
+        <img
+          src="/src/assets/see_who's_hiring.jpg"
+          alt="Ad"
+          className="w-full rounded-lg mb-4"
+        />
+
+        <div className="text-sm text-gray-600 dark:text-gray-400 text-center">
+          <div className="flex flex-wrap justify-center space-x-3">
+            <a href="#" className="hover:underline">
+              About
+            </a>
+            <a href="#" className="hover:underline">
+              Accessibility
+            </a>
+            <a href="#" className="hover:underline">
+              Help Center
+            </a>
+          </div>
+
+          <div className="flex flex-wrap justify-center space-x-3 mt-2">
+            <a href="#" className="hover:underline">
+              Privacy & Terms
+            </a>
+            <a href="#" className="hover:underline">
+              Ad Choices
+            </a>
+          </div>
+
+          <div className="flex flex-wrap justify-center space-x-3 mt-2">
+            <a href="#" className="hover:underline">
+              Advertising
+            </a>
+            <a href="#" className="hover:underline">
+              Business Services
+            </a>
+          </div>
+
+          <div className="flex flex-wrap justify-center space-x-3 mt-2">
+            <a href="#" className="hover:underline">
+              Get the LinkedIn app
+            </a>
+          </div>
+
+          <p className="text-xs text-gray-500 mt-4">LinkUp © 2025</p>
+        </div>
       </div>
     </div>
   );

@@ -49,7 +49,7 @@ const ManageMyNetwork = () => {
 
       <div className="mt-4 cursor-pointer">
         <img
-          src="see_who's_hiring.jpg"
+          src="./src/assets/see_who's_hiring.jpg"
           alt="Promotional Banner"
           className="rounded-lg shadow-lg w-full object-cover"
         />
