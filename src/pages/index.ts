@@ -4,9 +4,9 @@
 import LandingPage from "./landing/LandingPage";
 import FeedPage from "./feed/FeedPage";
 import UserProfilePage from "./user_profile/UserProfilePage";
-import NotificationsPage from "./notifications/NotificationsPage";import MyNetworkPage from "./mynetwork/MyNetworkPage";
+import MessagingPage from "./messaging/MessagingPage";import NotificationsPage from "./notifications/NotificationsPage";import MyNetworkPage from "./mynetwork/MyNetworkPage";
 import JobsPage from "./jobs/JobsPage";
 import SeeMorePage from "./jobs/SeeMorePage";
 
 //Export the Imported Pages
-export {LandingPage,FeedPage,UserProfilePage,NotificationsPage,JobsPage,SeeMorePage,MyNetworkPage}
+export {LandingPage,FeedPage,UserProfilePage,MessagingPage,NotificationsPage,JobsPage,SeeMorePage,MyNetworkPage}
