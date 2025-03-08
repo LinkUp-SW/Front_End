@@ -2,17 +2,28 @@ import { useState } from "react";
 import { FaBars, FaTimes } from "react-icons/fa"; // Importing icons from react-icons
 import ThemeToggle from "../../../components/theme_toggle/ThemeToggle";
 import linkUpLogo from "../../../assets/link_up.png";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../store";
 
 const LandingNavBar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const width = useSelector((state: RootState) => state.screen.width);
 
   return (
     <nav className="w-full flex justify-between items-center p-4 dark:bg-gray-900 dark:text-white">
       {/* Logo */}
-      <img src={linkUpLogo} alt="Logo" className="w-32 object-fill pt-1 dark:invert" />
+      <img
+        src={linkUpLogo}
+        alt="Logo"
+        className="w-32 object-fill pt-1 dark:invert"
+      />
 
       {/* Desktop Navigation */}
-      <div className="hidden md:flex space-x-4 items-center">
+      <div
+        className={`${
+          width >= 768 ? "flex" : "hidden"
+        } space-x-4 items-center"`}
+      >
         <button className="text-gray-700 font-semibold cursor-pointer px-5 py-1.5 hover:bg-gray-200 rounded-full transition-all duration-300 ease-in-out dark:text-gray-300 dark:hover:bg-gray-700">
           Join now
         </button>

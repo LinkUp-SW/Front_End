@@ -1,7 +1,7 @@
 // src/routes.ts
 
 import { RouteObject } from 'react-router-dom';
-import { LandingPage,FeedPage, UserProfilePage,MessagingPage} from './pages';
+import { LandingPage, FeedPage,UserProfilePage,  NotificationsPage, MyNetworkPage,JobsPage,SeeMorePage,MessagingPage} from './pages';
 
 import React from 'react';
 
@@ -17,13 +17,30 @@ const routes: RouteObject[] = [
     element: React.createElement(FeedPage),
   },
   {
+    path: '/jobs',
+    element: React.createElement(JobsPage),
+  },
+  {
     path: '/user-profile/:id',
     element: React.createElement(UserProfilePage)
   },
   {
     path:'/messaging',
     element: React.createElement(MessagingPage)
-  }
+  },
+  {
+    path: '/notifications',
+    element: React.createElement(NotificationsPage),
+  },
+  {
+    path: '/collections',
+    element: React.createElement(SeeMorePage)
+  },
+  {
+    path: '/my-network',
+    element: React.createElement(MyNetworkPage)
+  },
+  
 ];
 
 export default routes;
