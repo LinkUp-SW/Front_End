@@ -1,9 +1,10 @@
 // src/routes.ts
 
 import { RouteObject } from 'react-router-dom';
-import { LandingPage, FeedPage,UserProfilePage,  NotificationsPage, MyNetworkPage,JobsPage,SeeMorePage,MessagingPage} from './pages';
+import { LandingPage, FeedPage,UserProfilePage,  NotificationsPage, MyNetworkPage,JobsPage,SeeMorePage,FollowingFollowers,Connections,MessagingPage} from './pages';
 
 import React from 'react';
+
 
 // Define your routes as an array of RouteObject (compatible with React Router v6)
 const routes: RouteObject[] = [
@@ -40,6 +41,14 @@ const routes: RouteObject[] = [
     path: '/my-network',
     element: React.createElement(MyNetworkPage)
   },
+
+  {path:'/followingfollowers',
+    element: React.createElement(FollowingFollowers)
+  },
+
+  {path:'/connections',
+  element: React.createElement(Connections)
+  }
   
 ];
 
