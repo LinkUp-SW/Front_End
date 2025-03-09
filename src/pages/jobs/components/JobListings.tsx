@@ -61,7 +61,7 @@ const JobListingPage: React.FC = () => {
         {/* Left Side - Job List */}
         <div className="w-1/3 overflow-y-auto" style={{ maxHeight: "100vh" }}>
           {/* Top Job Recommendations Header - Fixed */}
-          <div className="bg-white p-4 border-b sticky top-0 z-10">
+          <div className="bg-white p-4 border-b sticky top-0 ">
             <h2 className="text-xl font-bold">Top job picks for you</h2>
             <p className="text-sm text-gray-600">Based on your profile, preferences, and activity like applies, searches, and saves</p>
             <p className="text-sm text-gray-500 mt-1">570 results</p>
