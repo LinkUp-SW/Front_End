@@ -9,7 +9,7 @@ interface Connection {
   image: string;
 }
 
-const connections: Connection[] = [
+ const connections: Connection[] = [
   { name: "John Doe", title: "Software Engineer at Google", date: "March 5, 2025", image: "https://www.svgrepo.com/show/382107/male-avatar-boy-face-man-user-6.svg" },
   { name: "Jane Smith", title: "Data Scientist at Facebook", date: "March 3, 2025", image: "https://www.svgrepo.com/show/382097/female-avatar-girl-face-woman-user-9.svg" },
   { name: "Robert Johnson", title: "Product Manager at Amazon", date: "March 1, 2025", image: "https://www.svgrepo.com/show/382107/male-avatar-boy-face-man-user-6.svg" },
@@ -24,7 +24,7 @@ const Connections: React.FC = () => {
     <div className="  min-h-screen p-10 flex flex-col lg:flex-row ">
       {/* Left Section - Connections List with White Background */}
       <div className="flex-1 bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
-        <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">My Connections</h2>
+        <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4"> {connections.length} connections </h2>
 
         {/* Search Bar */}
         <div className="relative w-full mb-4">
