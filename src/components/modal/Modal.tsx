@@ -4,6 +4,7 @@ import { RootState, AppDispatch } from "../../store";
 import { closeModal } from "../../slices/modal/modalSlice";
 import AboutModal from "../../pages/user_profile/components/modals/about_modal/AboutModal";
 import AddProfileSectionModal from "../../pages/user_profile/components/modals/add_profile_section_modal/AddProfileSectionModal";
+import AddExperienceModal from "@/pages/user_profile/components/modals/experience_modal/AddExperienceModal";
 
 const Modal: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
@@ -38,7 +39,9 @@ const Modal: React.FC = () => {
       case "about":
         return <AboutModal />; // Add more cases for other modals as needed
       case "add_profile_section":
-        return <AddProfileSectionModal/>
+        return <AddProfileSectionModal />;
+      case "experience":
+        return <AddExperienceModal />;
       // Add other modal cases here
       default:
         return null;
