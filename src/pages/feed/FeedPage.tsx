@@ -31,6 +31,7 @@ const FeedPage = () => {
         <div className="flex flex-col h-full w-full max-w-60 relative">
           <div className="relative right-3.5">
             <LinkedInFooter />
+            <Shortcuts />
           </div>
         </div>
         <div className="flex flex-col w-full ">
