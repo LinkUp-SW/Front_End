@@ -29,10 +29,6 @@ const FeedPage = () => {
     <>
       <div className="hidden md:flex px-0 xl:px-[10%] gap-x-[2%] w-full">
         <div className="flex flex-col h-full w-full max-w-60 relative">
-          <ProfileCard profile={exampleProfile} />
-          <StatsCard profileViewers={27} postImpressions={22} />
-          <PremiumBanner />
-          <Shortcuts />
           <div className="relative right-3.5">
             <LinkedInFooter />
           </div>
