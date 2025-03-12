@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FaSearch } from "react-icons/fa";
+import { FaSearch,FaEllipsisH, FaTrash } from "react-icons/fa";
 import { WithNavBar } from "../../../components";
 
 interface Connection {
@@ -19,6 +19,7 @@ interface Connection {
 
 const Connections: React.FC = () => {
   const [search, setSearch] = useState<string>("");
+  const [openDropdown, setOpenDropdown] = useState<number | null>(null);
 
   return (
     <div className="  min-h-screen p-10 flex flex-col lg:flex-row ">
@@ -52,14 +53,41 @@ const Connections: React.FC = () => {
                     <p className="text-xs text-gray-500 dark:text-gray-400">Connected on {conn.date}</p>
                   </div>
                 </div>
-                <button className="px-4 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 shadow-md">
-                  Message
-                </button>
+                {/* Message Button & More Options */}
+                <div className="flex items-center gap-2">
+                  <button className="px-4 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 shadow-md">
+                    Message
+                  </button>
+
+                  <div className="relative">
+                    {/* Three dots button */}
+                    <button
+                      onClick={() =>
+                        setOpenDropdown(openDropdown === index ? null : index)
+                      }
+                      className="p-2 rounded-full text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700"
+                    >
+                      <FaEllipsisH size={20} />
+                    </button>
+
+                    {/* Dropdown menu */}
+                    {openDropdown === index && (
+                      <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 shadow-lg rounded-lg z-10">
+                        <button
+                          className="flex items-center w-full px-4 py-2 text-left text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+                          onClick={() => alert("Remove connection clicked")}
+                        >
+                          <FaTrash className="mr-2 text-red-500" /> Remove connection
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             ))}
         </div>
       </div>
-
+   
       {/* Right Section - Ad & Footer */}
       <div className="hidden lg:flex flex-col items-center w-1/4 p-6">
         <img
