@@ -4,6 +4,10 @@ import { RootState, AppDispatch } from "../../store";
 import { closeModal } from "../../slices/modal/modalSlice";
 import AboutModal from "../../pages/user_profile/components/modals/about_modal/AboutModal";
 import AddProfileSectionModal from "../../pages/user_profile/components/modals/add_profile_section_modal/AddProfileSectionModal";
+import ReactionsModal from "../../pages/feed/components/modals/ReactionsModal";
+import CreatePostModal from "../../pages/feed/components/modals/CreatePostModal";
+import ReportPostModal from "../../pages/feed/components/modals/ReportPostModal";
+import SendPostModal from "../../pages/feed/components/modals/SendPostModal";
 
 const Modal: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
@@ -38,8 +42,15 @@ const Modal: React.FC = () => {
       case "about":
         return <AboutModal />; // Add more cases for other modals as needed
       case "add_profile_section":
-        return <AddProfileSectionModal/>
-      // Add other modal cases here
+        return <AddProfileSectionModal />;
+      case "create_post":
+        return <CreatePostModal />;
+      case "reactions":
+        return <ReactionsModal />;
+      case "report_post":
+        return <ReportPostModal />;
+      case "send_post":
+        return <SendPostModal />;
       default:
         return null;
     }
