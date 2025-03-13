@@ -1,5 +1,5 @@
 import { WithNavBar } from "../../../components";
-import WithAdFooter from "@/components/hoc/WithAdFooter";
+import withSidebarAd from "@/components/hoc/withSidebarAd";
 import { useState } from "react";
 
 const mockFollowing = [
@@ -105,4 +105,4 @@ const FollowingFollowers: React.FC = () => {
   );
 };
 
-export default WithNavBar(WithAdFooter(FollowingFollowers));
+export default WithNavBar(withSidebarAd(FollowingFollowers));

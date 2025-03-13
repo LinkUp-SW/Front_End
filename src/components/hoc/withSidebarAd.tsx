@@ -1,7 +1,7 @@
-// components/WithAdFooter.tsx
+// components/withSidebarAd.tsx
 import React from "react";
 
-const WithAdFooter = <P extends object>(WrappedComponent: React.ComponentType<P>) => {
+const withSidebarAd= <P extends object>(WrappedComponent: React.ComponentType<P>) => {
   return (props: P) => (
     <div className="min-h-screen p-10 flex flex-col lg:flex-row">
       {/* Main Content */}
@@ -45,4 +45,4 @@ const WithAdFooter = <P extends object>(WrappedComponent: React.ComponentType<P>
   );
 };
 
-export default WithAdFooter;
+export default withSidebarAd;

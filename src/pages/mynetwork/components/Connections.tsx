@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { FaSearch } from "react-icons/fa";
 import { WithNavBar } from "../../../components";
-import WithAdFooter from "@/components/hoc/WithAdFooter"; // Import the HOC
+import withSidebarAd from "@/components/hoc/withSidebarAd"; // Import the HOC
 
 interface Connection {
   name: string;
@@ -61,4 +61,4 @@ const Connections: React.FC = () => {
   );
 };
 
-export default WithNavBar(WithAdFooter(Connections));
+export default WithNavBar(withSidebarAd(Connections));
