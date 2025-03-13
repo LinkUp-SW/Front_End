@@ -12,13 +12,17 @@ const PremiumBanner = () => {
   const randomOption =
     premiumOptions[Math.floor(Math.random() * premiumOptions.length)];
   return (
-    <Card className="py-1 bg-white border-0 hover:cursor-pointer">
+    <Card className="py-1 bg-white border-0 hover:cursor-pointer dark:bg-zinc-900">
       <CardContent className="text-gray-700 py-1">
-        <p className="text-xs">{randomOption}</p>
+        <p className="text-xs dark:text-neutral-400 font-medium">
+          {randomOption}
+        </p>
 
         <div className="flex mt-1 text-sm items-center gap-x-1 w-full">
           <PiSquareHalfFill color="orange" />
-          <p className="font-semibold text-sm">Try for EGP0</p>
+          <p className="font-medium text-xs dark:text-neutral-200">
+            Try for EGP0
+          </p>
         </div>
       </CardContent>
     </Card>

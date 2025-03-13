@@ -97,8 +97,8 @@ const Post: React.FC<PostProps> = ({ user, post, stats, action }) => {
     switch (action?.action) {
       case "like":
         return (
-          <span className="text-gray-500 text-xs ">
-            <span className="text-xs font-medium text-black">
+          <span className="text-gray-500 text-xs dark:text-neutral-400 ">
+            <span className="text-xs font-medium text-black dark:text-neutral-200">
               {action.name}
             </span>{" "}
             liked this
@@ -135,14 +135,14 @@ const Post: React.FC<PostProps> = ({ user, post, stats, action }) => {
   };
 
   return (
-    <Card className="p-2 bg-white border-0 mb-4 pl-0">
+    <Card className="p-2 bg-white border-0 mb-4 pl-0 dark:bg-zinc-900 dark:text-neutral-200">
       <CardContent className="flex flex-col items-center">
         {action && (
-          <div className="flex justify-start items-center w-full border-b gap-2 pb-2">
+          <div className="flex justify-start items-center w-full border-b gap-2 pb-2 dark:border-neutral-700">
             <img
               src={action.profileImage}
               alt={action.name}
-              className="w-5 h-5 rounded-full"
+              className="w-7 h-7 rounded-full"
             />
             {actionMessage()}
           </div>
@@ -159,8 +159,14 @@ const Post: React.FC<PostProps> = ({ user, post, stats, action }) => {
                 <h2 className="text-sm font-semibold sm:text-base">
                   {user.name}
                 </h2>
-                <p className="text-lg text-gray-500 font-bold"> ·</p>
-                <p className="text-xs text-gray-500"> {user.degree}</p>
+                <p className="text-lg text-gray-500 dark:text-neutral-400 font-bold">
+                  {" "}
+                  ·
+                </p>
+                <p className="text-xs text-gray-500 dark:text-neutral-400">
+                  {" "}
+                  {user.degree}
+                </p>
               </div>
               <div className="flex relative left-5">
                 <Button
@@ -179,23 +185,23 @@ const Post: React.FC<PostProps> = ({ user, post, stats, action }) => {
                 </Button>
               </div>
             </div>
-            <div className="text-xs text-gray-500 ">
+            <div className="text-xs text-gray-500 dark:text-neutral-400">
               <p className="text-ellipsis line-clamp-1">
                 {user.followers ? user.followers + " followers" : user.headline}
               </p>
 
-              <div className="flex gap-x-1 items-center">
+              <div className="flex gap-x-1 items-center dark:text-neutral-400 text-gray-500">
                 <h2 className="">{timeAgo}</h2>
                 {post.edited && (
                   <>
-                    <p className="text-lg font-bold text-gray-500"> · </p>
-                    <p className=" text-gray-500">Edited </p>
+                    <p className="text-lg font-bold 0"> · </p>
+                    <p>Edited </p>
                   </>
                 )}
                 {post.public && (
                   <>
-                    <p className="text-lg text-gray-500 font-bold"> · </p>
-                    <p className="text-lg text-gray-500">
+                    <p className="text-lg font-bold"> · </p>
+                    <p className="text-lg">
                       <GlobeIcon />
                     </p>
                   </>
@@ -204,12 +210,8 @@ const Post: React.FC<PostProps> = ({ user, post, stats, action }) => {
             </div>
           </div>
         </div>
-        <div className="flex relative pr-5">
-          <p
-            className={`mt-2 text-sm text-gray-800 ${
-              expanded ? "" : "line-clamp-3"
-            }`}
-          >
+        <div className="flex relative text-gray-800 dark:text-neutral-200">
+          <p className={`mt-2 text-sm   ${expanded ? "" : "line-clamp-3"}`}>
             {post.content}
           </p>
           {post.content.split(" ").length > 30 && (
@@ -234,9 +236,12 @@ const Post: React.FC<PostProps> = ({ user, post, stats, action }) => {
           </div>
         )}
         <div className="flex justify-between w-full items-center pt-4">
-          <div className="flex relative text-gray-500 text-sm hover:underline hover:cursor-pointer hover:text-blue-500">
+          <div className="flex relative text-gray-500 dark:text-neutral-400 text-sm hover:underline hover:cursor-pointer hover:text-blue-500">
             {topStats.map((stat, index) => (
-              <div key={index} className="flex items-center text-black text-lg">
+              <div
+                key={index}
+                className="flex items-center text-black dark:text-neutral-200 text-lg"
+              >
                 {stat.icon}
               </div>
             ))}
@@ -244,7 +249,7 @@ const Post: React.FC<PostProps> = ({ user, post, stats, action }) => {
               ? stats.person + " and " + (totalStats - 1) + " others"
               : totalStats}
           </div>
-          <div className="flex text-gray-500 gap-2 text-sm items-center ">
+          <div className="flex text-gray-500 dark:text-neutral-400 gap-2 text-sm items-center ">
             <p className="hover:underline hover:text-blue-600 hover:cursor-pointer">
               {stats.comments} comments
             </p>
@@ -259,7 +264,7 @@ const Post: React.FC<PostProps> = ({ user, post, stats, action }) => {
           </div>
         </div>
         {/* Engagement Buttons */}
-        <div className="mt-3 flex justify-around text-gray-600 text-sm w-full">
+        <div className="mt-3 flex justify-around text-gray-600 dark:text-neutral-400 text-sm w-full">
           {engagementButtons.map((button, index) => (
             <Button
               key={index}

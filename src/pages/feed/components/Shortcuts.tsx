@@ -15,8 +15,8 @@ const Shortcuts = () => {
     { title: "Events", icon: <FaCalendarAlt className="mr-2" />, link: "#" },
   ];
   return (
-    <Card className="py-2 my-2">
-      <CardContent className="text-gray-700  font-medium text-xs my-2">
+    <Card className="py-2 my-2 dark:bg-zinc-900 border-0">
+      <CardContent className="text-gray-700 dark:text-neutral-200 font-medium text-xs my-2">
         <div className="flex flex-col gap-y-4">
           {listItems.map((item, index) => (
             <a
