@@ -61,7 +61,7 @@ const Invitations = () => {
         </h2>
         <button 
           className="text-blue-600 hover:underline cursor-pointer" 
-          onClick={() => navigate("/manage-connections")}
+          onClick={() => navigate("/manage-invitations")}
         >
           Show all
         </button>
