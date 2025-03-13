@@ -35,7 +35,7 @@ const LinkedInFooter: React.FC = () => {
 
       {/* Copyright Section */}
       <div className="mt-2 flex justify-center items-center">
-        <img className="w-5 h-5" src="../../../public/link_up_logo.png"></img>
+        <img className="w-5 h-5" src="/link_up_logo.png"></img>
         <span className="ml-2">LinkUp Corporation © 2025</span>
       </div>
     </footer>
