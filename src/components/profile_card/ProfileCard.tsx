@@ -22,9 +22,12 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ profile }) => {
     profile;
 
   return (
-    <Card className="mb-2 bg-white border-0 dark:bg-zinc-900 dark:text-neutral-200 w-full">
-      <CardContent className="flex flex-col items-center w-full md:px-6 px-0">
-        <div className="flex flex-col gap-y-1 items-start w-full  relative">
+    <Card className="mb-2 bg-white border-0 dark:bg-gray-900 dark:text-neutral-200 w-full">
+      <CardContent className="flex flex-col items-center w-full md:px-6 px-0 ">
+        <a
+          className="flex flex-col gap-y-1 items-start w-full  relative hover:cursor-pointer"
+          href={"#"}
+        >
           <div
             className="absolute md:-left-6 -top-6 h-15 
             md:w-60 w-full  bg-gray-200 rounded-t-xl"
@@ -51,7 +54,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ profile }) => {
               <h1 className="text-xs font-semibold">{university}</h1>
             </div>
           </div>
-        </div>
+        </a>
       </CardContent>
     </Card>
   );

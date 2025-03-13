@@ -11,20 +11,26 @@ const StatsCard: React.FC<StatsCardProps> = ({
   postImpressions,
 }) => {
   return (
-    <Card className="mb-2 bg-white border-0 w-full py-4 dark:bg-zinc-900 ">
+    <Card className="mb-2 bg-white border-0 w-full py-4 dark:bg-gray-900 ">
       <CardContent className="text-gray-900 dark:text-neutral-200 text-xs">
-        <div className="flex justify-between font-medium hover:underline hover:cursor-pointer ">
+        <a
+          className="flex justify-between font-medium hover:underline hover:cursor-pointer "
+          href={"#"}
+        >
           <span>Profile viewers</span>
           <span className="text-blue-600 dark:text-blue-400">
             {profileViewers}
           </span>
-        </div>
-        <div className="flex justify-between mt-2 font-medium hover:underline hover:cursor-pointer">
+        </a>
+        <a
+          className="flex justify-between mt-2 font-medium hover:underline hover:cursor-pointer"
+          href={"#"}
+        >
           <span>Post impressions</span>
           <span className="text-blue-600 dark:text-blue-400">
             {postImpressions}
           </span>
-        </div>
+        </a>
       </CardContent>
     </Card>
   );
