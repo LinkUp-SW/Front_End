@@ -1,5 +1,6 @@
 // src/mocks/handlers.ts
 import { http, HttpResponse } from "msw";
+import { Notification } from "../types";
 
 interface User {
   id: string;
@@ -7,19 +8,6 @@ interface User {
   lastName: string;
 }
 
-// Interface for notification data
-interface Notification {
-  id: string;
-  type: 'job' | 'post' | 'hiring' | 'course' | 'analytics' | 'recommendation';
-  content: string;
-  time: string;
-  profileImg?: string;
-  action?: string;
-  actionLink?: string;
-  location?: string;
-  count?: number;
-  isNew?: boolean;
-}
 
 // Mock user data
 const users: User[] = [

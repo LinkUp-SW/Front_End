@@ -1,28 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import styles from './notifications.module.css';
-import { WithNavBar } from '../../components';
+import { ProfileCard, WithNavBar } from '../../components';
 
 import notificationPicture from "../../assets/notificationpicture.jpeg"; 
 import notificationPicture2 from "../../assets/notificationpicture2.jpeg"; 
-
-interface Notification {
-  id: string;
-  type: 'job' | 'post' | 'hiring' | 'course' | 'analytics' | 'recommendation';
-  content: string;
-  time: string;
-  profileImg?: string;
-  action?: string;
-  actionLink?: string;
-  location?: string;
-  count?: number;
-  isNew?: boolean;
-}
+import { getNotifications, filterNotificationsByTab, setupClickOutsideListener, handleTabChange, handlePostFilterSelection, togglePostDropdown } from '@/endpoints/notifications';
+import { Notification, PostFilter } from '../../types';
 
 // Define tab types for notification filtering
-type Tab = 'all' | 'jobs' | 'posts' | 'mentions';
-
-// Define post filter types
-type PostFilter = 'all' | 'comments' | 'reactions' | 'reposts';
+export type Tab = 'all' | 'jobs' | 'posts' | 'mentions';
 
 const NotificationsPage: React.FC = () => {
   // State for active tab and notifications
@@ -33,20 +19,27 @@ const NotificationsPage: React.FC = () => {
   const [showPostDropdown, setShowPostDropdown] = useState<boolean>(false);
   const [activePostFilter, setActivePostFilter] = useState<PostFilter>('all');
 
-  // Fetch mock notifications data //////
+  // Profile data based on the ProfileCard component structure
+  const profileInfo = {
+    coverImage: "/api/placeholder/800/200",
+    profileImage: "/api/placeholder/150/150",
+    name: "Malak El-Tuny",
+    headline: "Biomedical and Data Engineering Student",
+    location: "Cairo",
+    university: "Cairo University",
+  };
+
+  // Fetch notifications data
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
-        // In a real implementation, this would be an API call
-        const response = await fetch('/api/notifications');
-        const data = await response.json();
-        
-        setNotifications(data);
+        const response = await getNotifications('hfhfhfh');
+        setNotifications(response);
         setLoading(false);
       } catch (error) {
         console.error('Error fetching notifications:', error);
-        // Fallback to mock data if API call fails
-        setNotifications(MOCK_NOTIFICATIONS);
+        // Fallback to empty array if API call fails instead of MOCK_NOTIFICATIONS
+        setNotifications([]);
         setLoading(false);
       }
     };
@@ -56,79 +49,24 @@ const NotificationsPage: React.FC = () => {
 
   // Add click outside listener to close dropdown
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as HTMLElement;
-      if (!target.closest(`.${styles.postsTabContainer}`) && 
-          !target.closest(`.${styles.dropdownArrow}`)) {
-        setShowPostDropdown(false);
-      }
-    };
-
-    document.addEventListener('click', handleClickOutside);
-    return () => {
-      document.removeEventListener('click', handleClickOutside);
-    };
+    const cleanup = setupClickOutsideListener(
+      `.${styles.postsTabContainer}`,
+      `.${styles.dropdownArrow}`,
+      setShowPostDropdown
+    );
+    
+    return cleanup;
   }, []);
 
-  // Filter notifications based on active tab and post filter
-  const getFilteredNotifications = (): Notification[] => {
-    switch (activeTab) {
-      case 'jobs':
-        return notifications.filter(notification => 
-          notification.type === 'job' || notification.type === 'recommendation');
-      case 'posts':
-        // For the posts tab, we'll return an empty array to show the empty state
-        // In a real implementation, you would filter based on posts and the activePostFilter
-        return []; 
-      case 'mentions':
-        return []; // Return empty for mentions tab to match the "No new mentions" screen
-      default:
-        return notifications;
-    }
-  };
-
-  // Handle main tab click
-  const handleTabClick = (tab: Tab) => {
-    setActiveTab(tab);
-    if (tab !== 'posts') {
-      setShowPostDropdown(false);
-    }
-  };
-
-  // Handle arrow click to toggle dropdown
-  const handleArrowClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setShowPostDropdown(!showPostDropdown);
-  };
-
-  // Handle post filter selection
-  const handlePostFilterClick = (filter: PostFilter) => {
-    setActivePostFilter(filter);
-    setShowPostDropdown(false);
-  };
-
   // Filtered notifications based on active tab
-  const filteredNotifications = getFilteredNotifications();
+  const filteredNotifications = filterNotificationsByTab(notifications, activeTab, activePostFilter);
 
   return (
-    <div className={styles.container}>
+    <main className={styles.container}>
       <div className={styles.content}>
-        {/* Left Profile Section */}
+        {/* Left Profile Section - Using ProfileCard component */}
         <div className={styles.leftSidebar}>
-          <div className={styles.profileCard}>
-            <div className={styles.profileHeader}></div>
-            <div className={styles.profileContent}>
-              <div className={styles.profileImage}>
-                <img src="/api/placeholder/150/150" alt="Profile" />
-              </div>
-              <h2 className={styles.profileName}>Malak El-Tuny</h2>
-              <p className={styles.profileTitle}>Biomedical and Data Engineering Student</p>
-              <p className={styles.profileLocation}>Cairo</p>
-              <p className={styles.profileEducation}>
-                <span className={styles.educationIcon}>🏛️</span> Cairo University
-              </p>
-            </div>
-          </div>
+          <ProfileCard fullWidth={true} profile={profileInfo} />
           <div className={styles.notificationSettings}>
             <h3>Manage your notifications</h3>
             <a href="#" className={styles.settingsLink}>View settings</a>
@@ -139,12 +77,24 @@ const NotificationsPage: React.FC = () => {
         <div className={styles.mainContentWrapper}>
           {/* Standalone Tab Navigation */}
           <div className={styles.standaloneTabContainer}>
-            <button type="button" className={`${styles.tabButton} ${activeTab === 'all' ? styles.activeTab : ''}`} onClick={() => handleTabClick('all')}> All</button>
-            <button type="button" className={`${styles.tabButton} ${activeTab === 'jobs' ? styles.activeTab : ''}`} onClick={() => handleTabClick('jobs')}>Jobs</button>
+            <button 
+              type="button" 
+              className={`${styles.tabButton} ${activeTab === 'all' ? styles.activeTab : ''}`} 
+              onClick={() => handleTabChange('all', setActiveTab, setShowPostDropdown)}>All
+            </button>
+            <button 
+              type="button" 
+              className={`${styles.tabButton} ${activeTab === 'jobs' ? styles.activeTab : ''}`} 
+              onClick={() => handleTabChange('jobs', setActiveTab, setShowPostDropdown)}>Jobs
+            </button>
             
             {/* Posts Tab with Dropdown */}
             <div className={styles.postsTabContainer}>
-              <button type="button" className={`${styles.tabButton} ${activeTab === 'posts' ? styles.activeTab : ''}`} onClick={() => handleTabClick('posts')}>My posts <span className={styles.dropdownArrow} onClick={handleArrowClick}>▼</span></button>
+              <button 
+                type="button" 
+                className={`${styles.tabButton} ${activeTab === 'posts' ? styles.activeTab : ''}`} 
+                onClick={() => handleTabChange('posts', setActiveTab, setShowPostDropdown)}>My posts <span className={styles.dropdownArrow} onClick={(e) => togglePostDropdown(e, showPostDropdown, setShowPostDropdown)}>▼</span>
+              </button>
               
               {/* Post Filter Dropdown */}
               {showPostDropdown && (
@@ -152,22 +102,30 @@ const NotificationsPage: React.FC = () => {
                   <div className={styles.dropdownHeader}>
                     Filter post activity
                   </div>
-                  <div className={`${styles.dropdownItem} ${activePostFilter === 'all' ? styles.activeDropdownItem : ''}`}onClick={() => handlePostFilterClick('all')}>
-                    All
+                  <div 
+                    className={`${styles.dropdownItem} ${activePostFilter === 'all' ? styles.activeDropdownItem : ''}`}
+                    onClick={() => handlePostFilterSelection('all', setActivePostFilter, setShowPostDropdown)}>All
                   </div>
-                  <div className={`${styles.dropdownItem} ${activePostFilter === 'comments' ? styles.activeDropdownItem : ''}`}onClick={() => handlePostFilterClick('comments')}>
-                    Comments
+                  <div 
+                    className={`${styles.dropdownItem} ${activePostFilter === 'comments' ? styles.activeDropdownItem : ''}`}
+                    onClick={() => handlePostFilterSelection('comments', setActivePostFilter, setShowPostDropdown)}>Comments
                   </div>
-                  <div className={`${styles.dropdownItem} ${activePostFilter === 'reactions' ? styles.activeDropdownItem : ''}`}onClick={() => handlePostFilterClick('reactions')}>
-                    Reactions
+                  <div 
+                    className={`${styles.dropdownItem} ${activePostFilter === 'reactions' ? styles.activeDropdownItem : ''}`}
+                    onClick={() => handlePostFilterSelection('reactions', setActivePostFilter, setShowPostDropdown)} >Reactions
                   </div>
-                  <div className={`${styles.dropdownItem} ${activePostFilter === 'reposts' ? styles.activeDropdownItem : ''}`}onClick={() => handlePostFilterClick('reposts')}>
-                    Reposts
+                  <div 
+                    className={`${styles.dropdownItem} ${activePostFilter === 'reposts' ? styles.activeDropdownItem : ''}`}
+                    onClick={() => handlePostFilterSelection('reposts', setActivePostFilter, setShowPostDropdown)}>Reposts
                   </div>
                 </div>
               )}
             </div>
-            <button type="button" className={`${styles.tabButton} ${activeTab === 'mentions' ? styles.activeTab : ''}`} onClick={() => handleTabClick('mentions')}>Mentions</button>
+            <button 
+              type="button" 
+              className={`${styles.tabButton} ${activeTab === 'mentions' ? styles.activeTab : ''}`} 
+              onClick={() => handleTabChange('mentions', setActiveTab, setShowPostDropdown)}>Mentions
+            </button>
           </div>
 
           {/* Content Box */}
@@ -228,7 +186,8 @@ const NotificationsPage: React.FC = () => {
             </div>
           </div>
         </div>
-
+        
+        {/* to be implemented in the coming sprint*/}
         {/* Right Sidebar */}
         <div className={styles.rightSidebar}>
           <div className={styles.adContainer}>
@@ -260,96 +219,8 @@ const NotificationsPage: React.FC = () => {
           </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 };
-
-// Mock notifications data for fallback
-const MOCK_NOTIFICATIONS: Notification[] = [
-  {
-    id: '1',
-    type: 'hiring',
-    content: '<b>Malak</b> is hiring.',
-    time: '4h',
-    profileImg: '/api/placeholder/50/50',
-    isNew: true
-  },
-  {
-    id: '2',
-    type: 'analytics',
-    content: 'Your posts got <b>15 impressions</b> last week. View your analytics.',
-    time: '4h',
-    profileImg: '/api/placeholder/50/50',
-    isNew: true
-  },
-  {
-    id: '3',
-    type: 'course',
-    content: 'New from <b>Free Online Courses with Certificates</b> in Free Online Courses: Boost Your Skills with 100 Free Courses and Certificates on Udemy and Coursera',
-    time: '11h',
-    profileImg: '/api/placeholder/50/50',
-    isNew: true
-  },
-  {
-    id: '4',
-    type: 'job',
-    content: 'software engineer: <b>30+ opportunities</b> in Cairo, Egypt',
-    time: '20h',
-    profileImg: '/api/placeholder/50/50',
-    action: 'View jobs',
-    actionLink: '#',
-    isNew: true
-  },
-  {
-    id: '5',
-    type: 'recommendation',
-    content: '<b>ETL Data Analyst</b> at Siemens Digital Industries Software and <b>9 other recommendations</b> for you.',
-    time: '1d',
-    profileImg: '/api/placeholder/50/50',
-    action: 'View jobs',
-    actionLink: '#',
-    isNew: true
-  },
-  {
-    id: '6',
-    type: 'job',
-    content: 'frontend developer: <b>15+ opportunities</b> in Dubai, UAE',
-    time: '1d',
-    profileImg: '/api/placeholder/50/50',
-    action: 'View jobs',
-    actionLink: '#',
-    isNew: false
-  },
-  {
-    id: '7',
-    type: 'job',
-    content: 'product manager: <b>12 opportunities</b> in Riyadh, Saudi Arabia',
-    time: '2d',
-    profileImg: '/api/placeholder/50/50',
-    action: 'View jobs',
-    actionLink: '#',
-    isNew: false
-  },
-  {
-    id: '8',
-    type: 'hiring',
-    content: '<b>Amira</b> is looking for a <b>UX Designer</b>.',
-    time: '3d',
-    profileImg: '/api/placeholder/50/50',
-    action: 'See post',
-    actionLink: '#',
-    isNew: false
-  },
-  {
-    id: '9',
-    type: 'recommendation',
-    content: '<b>Data Scientist</b> at Google and <b>7 other recommendations</b> based on your profile.',
-    time: '3d',
-    profileImg: '/api/placeholder/50/50',
-    action: 'View jobs',
-    actionLink: '#',
-    isNew: false
-  }
-];
 
 export default WithNavBar(NotificationsPage);
