@@ -1,4 +1,9 @@
-const Header = () => {
+import { useState } from "react";
+import { Dispatch, SetStateAction } from "react";
+interface HeaderProps {
+  setSearch: Dispatch<SetStateAction<string>>;
+}
+const Header = ({ setSearch }: HeaderProps) => {
   return (
     <>
       <header className="flex justify-between p-3 pl-5 pr-5 border-1 border-[#e8e8e8] ">
@@ -12,6 +17,7 @@ const Header = () => {
             name="searchMessages"
             placeholder="Search message"
             className="hover:border-black hover:border-2 border-2 border-transparent rounded-sm ml-3 pl-3 bg-[#edf3f7]"
+            onChange={(e) => setSearch(e.target.value)}
           ></input>
         </div>
 
