@@ -16,5 +16,5 @@ export interface Notification {
 }
 
 
-// Define post filter types
+
 export type PostFilter = 'all' | 'comments' | 'reactions' | 'reposts';
