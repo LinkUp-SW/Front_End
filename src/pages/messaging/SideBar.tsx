@@ -15,9 +15,10 @@ import { Dispatch, SetStateAction } from "react"; // For typing setState functio
 // Add types for props
 interface SideBarProps {
   activeFilter: string;
+  search: string;
 }
 
-const SideBar = ({ activeFilter }: SideBarProps) => {
+const SideBar = ({ activeFilter, search }: SideBarProps) => {
   /*const [hovered, setHovered] = useState(false);*/
   const [deleted, setDeleted] = useState(false);
   const [unread, setUnread] = useState(false);
@@ -108,6 +109,11 @@ const SideBar = ({ activeFilter }: SideBarProps) => {
     ),
   };
 
+  const filteredMessages = filterMap[activeFilter].filter(
+    (info) =>
+      info.name.toLowerCase().includes(search.toLowerCase()) ||
+      info.message.toLowerCase().includes(search.toLowerCase())
+  );
   return (
     <>
       <div className="h-full w-2/5 border-1 border-[#e8e8e8] overflow-y-auto ">
@@ -145,7 +151,7 @@ const SideBar = ({ activeFilter }: SideBarProps) => {
           ""
         )}
 
-        {filterMap[activeFilter].map((data) => (
+        {filteredMessages.map((data) => (
           <div key={data.id} className={Blocks}>
             <div
               className="relative inset-0 rounded-full w-12 h-12 bg-gray-100"
