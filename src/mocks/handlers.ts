@@ -24,7 +24,7 @@ const users: User[] = [
 ];
 
 
-// Mock notifications data
+// Mock notifications
 const MOCK_NOTIFICATIONS: Notification[] = [
   {
     id: '1',
