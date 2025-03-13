@@ -1,4 +1,5 @@
 import { WithNavBar } from "../../../components";
+import WithAdFooter from "@/components/hoc/WithAdFooter";
 import { useState } from "react";
 
 const mockFollowing = [
@@ -47,112 +48,61 @@ const FollowingFollowers: React.FC = () => {
   const [activeTab, setActiveTab] = useState("following");
 
   return (
-    <div className="min-h-screen p-10 flex flex-col lg:flex-row">
-      {/* Following and Followers Section */}
-      <div className="flex-1 bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 transition-all flex flex-col max-h-fit">
-        {/* Tabs */}
-        <div className="flex border-b">
-          <button
-            className={`px-4 py-2 text-lg font-semibold transition-colors ${
-              activeTab === "following"
-                ? "border-b-2 border-blue-500 text-blue-500"
-                : "text-gray-500 dark:text-gray-400"
-            }`}
-            onClick={() => setActiveTab("following")}
-          >
-            Following
-          </button>
-          <button
-            className={`px-4 py-2 text-lg font-semibold transition-colors ${
-              activeTab === "followers"
-                ? "border-b-2 border-blue-500 text-blue-500"
-                : "text-gray-500 dark:text-gray-400"
-            }`}
-            onClick={() => setActiveTab("followers")}
-          >
-            Followers
-          </button>
-        </div>
-
-        {/* List */}
-        <div className="space-y-4 p-4 flex-grow min-h-0">
-          {(activeTab === "following" ? mockFollowing : mockFollowers).map(
-            (user, index) => (
-              <div
-                key={index}
-                className="flex items-center p-3 bg-gray-100 dark:bg-gray-700 rounded-lg shadow-sm hover:shadow-md transition-shadow"
-              >
-                <img
-                  src={user.image}
-                  alt={user.name}
-                  className="w-12 h-12 rounded-full border border-gray-300"
-                />
-                <div className="ml-4 flex-1">
-                  <p className="text-lg font-medium text-gray-900 dark:text-white">
-                    {user.name}
-                  </p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    {user.title}
-                  </p>
-                </div>
-                <button className="px-4 py-2 bg-blue-500 text-white rounded-lg flex items-center hover:bg-blue-600 transition-colors">
-                  {activeTab === "following" ? "Following" : "Follow"}
-                </button>
-              </div>
-            )
-          )}
-        </div>
+    <div className="flex-1 bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 transition-all flex flex-col max-h-fit">
+      {/* Tabs */}
+      <div className="flex border-b">
+        <button
+          className={`px-4 py-2 text-lg font-semibold transition-colors ${
+            activeTab === "following"
+              ? "border-b-2 border-blue-500 text-blue-500"
+              : "text-gray-500 dark:text-gray-400"
+          }`}
+          onClick={() => setActiveTab("following")}
+        >
+          Following
+        </button>
+        <button
+          className={`px-4 py-2 text-lg font-semibold transition-colors ${
+            activeTab === "followers"
+              ? "border-b-2 border-blue-500 text-blue-500"
+              : "text-gray-500 dark:text-gray-400"
+          }`}
+          onClick={() => setActiveTab("followers")}
+        >
+          Followers
+        </button>
       </div>
 
-      {/* Right Section - Ad & Footer */}
-      <div className="hidden lg:flex flex-col items-center w-1/4 p-6">
-        <img
-          src="/src/assets/see_who's_hiring.jpg"
-          alt="Ad"
-          className="w-full rounded-lg mb-4"
-        />
-
-        <div className="text-sm text-gray-600 dark:text-gray-400 text-center">
-          <div className="flex flex-wrap justify-center space-x-3">
-            <a href="#" className="hover:underline">
-              About
-            </a>
-            <a href="#" className="hover:underline">
-              Accessibility
-            </a>
-            <a href="#" className="hover:underline">
-              Help Center
-            </a>
-          </div>
-
-          <div className="flex flex-wrap justify-center space-x-3 mt-2">
-            <a href="#" className="hover:underline">
-              Privacy & Terms
-            </a>
-            <a href="#" className="hover:underline">
-              Ad Choices
-            </a>
-          </div>
-
-          <div className="flex flex-wrap justify-center space-x-3 mt-2">
-            <a href="#" className="hover:underline">
-              Advertising
-            </a>
-            <a href="#" className="hover:underline">
-              Business Services
-            </a>
-          </div>
-
-          <div className="flex flex-wrap justify-center space-x-3 mt-2">
-            <a href="#" className="hover:underline">
-              Get the LinkedIn app
-            </a>
-          </div>
-
-          <p className="text-xs text-gray-500 mt-4">LinkUp © 2025</p>
-        </div>
+      {/* List */}
+      <div className="space-y-4 p-4 flex-grow min-h-0">
+        {(activeTab === "following" ? mockFollowing : mockFollowers).map(
+          (user, index) => (
+            <div
+              key={index}
+              className="flex items-center p-3 bg-gray-100 dark:bg-gray-700 rounded-lg shadow-sm hover:shadow-md transition-shadow"
+            >
+              <img
+                src={user.image}
+                alt={user.name}
+                className="w-12 h-12 rounded-full border border-gray-300"
+              />
+              <div className="ml-4 flex-1">
+                <p className="text-lg font-medium text-gray-900 dark:text-white">
+                  {user.name}
+                </p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  {user.title}
+                </p>
+              </div>
+              <button className="px-4 py-2 bg-blue-500 text-white rounded-lg flex items-center hover:bg-blue-600 transition-colors">
+                {activeTab === "following" ? "Following" : "Follow"}
+              </button>
+            </div>
+          )
+        )}
       </div>
     </div>
   );
 };
-export default WithNavBar(FollowingFollowers);
+
+export default WithNavBar(WithAdFooter(FollowingFollowers));
