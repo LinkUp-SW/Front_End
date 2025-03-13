@@ -78,7 +78,7 @@ const JobCategoryBar: React.FC = () => {
   };
 
   return (
-    <div className="flex items-center bg-white border-b border-gray-200 px-0 py-2">
+    <div className="w-full bg-white border-b border-gray-200 px-4 py-2 flex items-center fixed top-15 left-0 z-15">
       {currentIndex > 0 && (
         <button 
           onClick={handlePrev} 
