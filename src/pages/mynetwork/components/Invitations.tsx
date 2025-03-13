@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export interface People {
   id: number;
@@ -42,6 +43,8 @@ const Invitations = () => {
     },
   ]);
 
+  const navigate = useNavigate();
+
   const acceptInvitation = (id: number) => {
     setInvitations((prev) => prev.filter((invitation) => invitation.id !== id));
   };
@@ -52,9 +55,17 @@ const Invitations = () => {
 
   return (
     <div className="bg-white dark:bg-gray-900 shadow-lg rounded-lg p-4">
-      <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-        Invitations ({invitations.length})
-      </h2>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+          Invitations ({invitations.length})
+        </h2>
+        <button 
+          className="text-blue-600 hover:underline cursor-pointer" 
+          onClick={() => navigate("/manage-connections")}
+        >
+          Show all
+        </button>
+      </div>
       <ul className="space-y-4">
         {invitations.map((invite) => (
           <li
