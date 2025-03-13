@@ -33,7 +33,7 @@ const RemoveConnectionModal: React.FC<RemoveConnectionModalProps> = ({
           </button>
           <button
             onClick={() => dispatch(closeModal())}
-            className="px-4 py-2 bg-gray-300 rounded cursor-pointer"
+            className="px-4 py-2 bg-gray-300 rounded cursor-pointer dark:bg-gray-700"
           >
             Cancel
           </button>
