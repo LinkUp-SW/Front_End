@@ -13,7 +13,6 @@ export const getNotifications = async(
     return response.data;
 };
 
-// Filter notifications based on active tab
 export const filterNotificationsByTab = (
     notifications: Notification[], 
     activeTab: Tab, 
