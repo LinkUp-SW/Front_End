@@ -1,4 +1,3 @@
-// src/pages/SeeMorePage/components/JobListings/JobDetail.tsx
 import React from "react";
 import JobHeader from "./JobHeader";
 import JobContent from "./JobContent";

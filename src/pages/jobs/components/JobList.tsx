@@ -1,4 +1,3 @@
-// src/pages/SeeMorePage/components/JobListings/JobList.tsx
 import React from "react";
 import JobListItem from "./JobListItem";
 import { Job } from "../types";

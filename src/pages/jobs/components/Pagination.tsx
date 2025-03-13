@@ -1,4 +1,3 @@
-// src/pages/SeeMorePage/components/JobListings/Pagination.tsx
 import React from 'react';
 
 interface PaginationProps {

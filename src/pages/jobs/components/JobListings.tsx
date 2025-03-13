@@ -1,4 +1,3 @@
-// src/pages/SeeMorePage/components/JobListings/index.tsx
 import React, { useState } from "react";
 import JobList from "./JobList";
 import JobDetail from "./JobDetail";
