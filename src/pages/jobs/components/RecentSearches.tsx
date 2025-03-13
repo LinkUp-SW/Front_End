@@ -1,5 +1,5 @@
 import React from 'react';
-import { RecentSearch } from './JobInterfaces';
+import { RecentSearch } from '../types';
 
 interface RecentSearchesProps {
   searches: RecentSearch[];
