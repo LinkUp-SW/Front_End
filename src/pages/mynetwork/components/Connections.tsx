@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { useDispatch } from "react-redux";
-import { FaSearch, FaTrash } from "react-icons/fa";
+import { FaSearch, FaTimes} from "react-icons/fa";
 import { openModal } from "@/slices/modal/modalSlice";
 
 import { Modal, WithNavBar } from "../../../components";
@@ -69,8 +69,8 @@ const Connections: React.FC = () => {
   }, []);
 
   return (
-    <div className="min-h-screen p-10 flex flex-col lg:flex-row">
-      <div className="flex-1 bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
+    <div className="min-h-screen p-10 flex flex-col lg:flex-row ">
+      <div className="flex-1 bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 max-h-fit">
         <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
           {connections.length} connections
         </h2>
@@ -95,7 +95,7 @@ const Connections: React.FC = () => {
             .map((conn) => (
               <div
                 key={conn.id}
-                className="flex items-center justify-between p-4 bg-gray-100 dark:bg-gray-800 rounded-lg shadow"
+                className="flex items-center justify-between p-4 bg-gray-100 dark:bg-gray-800 rounded-lg shadow cursor-pointer"
               >
                 <div className="flex items-center gap-4">
                   <img
@@ -118,7 +118,7 @@ const Connections: React.FC = () => {
 
                 <div className="flex items-center gap-2">
                   {/* Message Button */}
-                  <button className="px-4 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 shadow-md">
+                  <button className="px-4 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 shadow-md cursor-pointer">
                     Message
                   </button>
 
@@ -134,10 +134,10 @@ const Connections: React.FC = () => {
                         })
                       )
                     }
-                    className="flex items-center px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                    className="flex items-center justify-center  text-gray-700 dark:text-white cursor-pointer transition duration-200"
                     aria-label={`Remove connection with ${conn.name}`}
                   >
-                    <FaTrash className="mr-2  flex-shrink-0" />
+                    <FaTimes className="mr-2  flex-shrink-0" />
                   </button>
                 </div>
               </div>
