@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { useDispatch } from "react-redux";
-import { FaSearch, FaTimes} from "react-icons/fa";
+import { FaSearch, FaTimes } from "react-icons/fa";
 import { openModal } from "@/slices/modal/modalSlice";
 
 import { Modal, WithNavBar } from "../../../components";
