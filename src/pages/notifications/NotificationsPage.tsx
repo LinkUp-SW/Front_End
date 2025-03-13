@@ -187,7 +187,7 @@ const NotificationsPage: React.FC = () => {
           </div>
         </div>
         
-        {/* to be implemented in the coming sprint*/}
+        {/* to be implemented*/}
         {/* Right Sidebar */}
         <div className={styles.rightSidebar}>
           <div className={styles.adContainer}>
