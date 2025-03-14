@@ -1,12 +1,16 @@
 import { useState, useEffect } from "react";
-import { WithNavBar, ProfileCard, Button, Modal } from "../../components";
+import {
+  WithNavBar,
+  ProfileCard,
+  Button,
+  LinkUpFooter,
+} from "../../components";
 import {
   StatsCard,
   PremiumBanner,
   Shortcuts,
   CreatePost,
   Post,
-  LinkedInFooter,
 } from "./components";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { useSelector } from "react-redux";
@@ -55,7 +59,6 @@ const FeedPage = () => {
                 <StatsCard profileViewers={27} postImpressions={22} />
                 <PremiumBanner />
                 <Shortcuts />
-                {screenWidth > 800 && <LinkedInFooter />}
               </>
             )}
           </div>
@@ -73,6 +76,18 @@ const FeedPage = () => {
             ))}
           </div>
           {/* Right Sidebar */}
+          {screenWidth > 991 && (
+            <div className="flex flex-col items-center">
+              <div className="mt-4 cursor-pointer">
+                <img
+                  src="./src/assets/see_who's_hiring.jpg"
+                  alt="Promotional Banner"
+                  className="rounded-lg shadow-lg w-full object-cover"
+                />
+              </div>
+              <LinkUpFooter />
+            </div>
+          )}
         </div>
       </div>
     </>
