@@ -148,7 +148,7 @@ const ManageInvitations: React.FC = () => {
                     {invite.sentDate}
                   </p>
                 </div>
-                <div className="flex justify-end sm:justify-start w-full sm:w-auto">
+                <div className="flex justify-center w-full sm:justify-start sm:w-auto sm:ml-auto">
                   <button className="px-4 py-1 bg-gray-500 text-white rounded-md hover:bg-gray-600 cursor-pointer text-sm sm:text-base">
                     Withdraw
                   </button>
