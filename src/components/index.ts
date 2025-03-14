@@ -5,7 +5,7 @@ import ScreenWidthListener from "./screen_width_listener/ScreenWidthListener";
 import NavItems from "./nav_bar/NavItems";
 import ThemeListener from "./theme_listener/ThemeListener";
 import Modal from "./modal/Modal";
-import {Accordion,AccordionItem} from './accordion/Accordion'
+import { Accordion, AccordionItem } from "./accordion/Accordion";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -17,6 +17,8 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import ProfileCard from "./profile_card/ProfileCard";
+import LinkUpFooter from "./linkup_footer/LinkUpFooter";
+import WhosHiringImage from "./whos_hiring_image/WhosHiringImage";
 
 export {
   UserList,
@@ -37,5 +39,8 @@ export {
   CardFooter,
   ProfileCard,
   Modal,
-  Accordion,AccordionItem
+  Accordion,
+  AccordionItem,
+  LinkUpFooter,
+  WhosHiringImage,
 };

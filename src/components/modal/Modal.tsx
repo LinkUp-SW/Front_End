@@ -4,10 +4,18 @@ import { RootState, AppDispatch } from "../../store";
 import { closeModal } from "../../slices/modal/modalSlice";
 import AboutModal from "../../pages/user_profile/components/modals/about_modal/AboutModal";
 import AddProfileSectionModal from "../../pages/user_profile/components/modals/add_profile_section_modal/AddProfileSectionModal";
+import ReactionsModal from "../../pages/feed/components/modals/ReactionsModal";
+import CreatePostModal from "../../pages/feed/components/modals/CreatePostModal";
+import ReportPostModal from "../../pages/feed/components/modals/ReportPostModal";
+import SendPostModal from "../../pages/feed/components/modals/SendPostModal";
+import RemoveConnectionModal from "@/pages/mynetwork/components/modals/remove_connection_modal/RemoveConnectionModal";
+import { RemoveConnectionData } from "@/types";
 
 const Modal: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
-  const { isOpen, modalType } = useSelector((state: RootState) => state.modal);
+  const { isOpen, modalType, modalData } = useSelector(
+    (state: RootState) => state.modal
+  );
 
   // Local state to control if the modal should be rendered
   const [shouldRender, setShouldRender] = useState(isOpen);
@@ -38,8 +46,43 @@ const Modal: React.FC = () => {
       case "about":
         return <AboutModal />; // Add more cases for other modals as needed
       case "add_profile_section":
-        return <AddProfileSectionModal/>
-      // Add other modal cases here
+        return <AddProfileSectionModal />;
+      case "remove_connection": {
+        if (
+          !modalData ||
+          typeof modalData !== "object" ||
+          !("userInfo" in modalData) ||
+          !("onRemove" in modalData)
+        ) {
+          return null;
+        }
+        const { userInfo, onRemove } = modalData as {
+          userInfo: RemoveConnectionData;
+          onRemove: (userId: number) => void;
+        };
+
+        const handleConfirm = () => {
+          console.log("Removing connection for:", modalData);
+
+          onRemove(userInfo.userId);
+          dispatch(closeModal());
+        };
+
+        return (
+          <RemoveConnectionModal
+            userData={userInfo}
+            onConfirm={handleConfirm}
+          />
+        );
+      }
+      case "create_post":
+        return <CreatePostModal />;
+      case "reactions":
+        return <ReactionsModal />;
+      case "report_post":
+        return <ReportPostModal />;
+      case "send_post":
+        return <SendPostModal />;
       default:
         return null;
     }
