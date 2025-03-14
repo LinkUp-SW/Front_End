@@ -207,7 +207,7 @@ const Post: React.FC<PostProps> = ({ user, post, stats, action }) => {
                       <EllipsisIcon />
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="relative right-30 bg-gray-900 border-gray-700 p-0 pt-1">
+                  <PopoverContent className="relative right-30 dark:bg-gray-900 bg-white border-neutral-200 dark:border-gray-700 p-0 pt-1">
                     <div className="flex flex-col w-full p-0">
                       {menuActions.map((item, index) => (
                         <Button
@@ -216,7 +216,7 @@ const Post: React.FC<PostProps> = ({ user, post, stats, action }) => {
                             item.action();
                             setMenuOpen(false);
                           }}
-                          className="flex justify-start items-center rounded-none h-12 bg-transparent w-full p-0 m-0 dark:hover:bg-gray-600 hover:cursor-pointer"
+                          className="flex justify-start items-center rounded-none h-12 bg-transparent w-full p-0 m-0 hover:bg-neutral-200 text-gray-900 dark:text-neutral-200 dark:hover:bg-gray-600 hover:cursor-pointer"
                         >
                           {item.icon}
                           <span>{item.name}</span>
