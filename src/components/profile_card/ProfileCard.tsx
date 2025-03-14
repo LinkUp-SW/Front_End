@@ -29,7 +29,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ profile }) => {
           className="flex flex-col gap-y-1 items-start w-full  relative hover:cursor-pointer"
           to={"/user-profile/1"}
         >
-          <div
+          <header
             className="absolute md:-left-6 -top-6 h-15 
             md:w-60 w-full  bg-gray-200 rounded-t-xl"
           >
@@ -38,8 +38,8 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ profile }) => {
               alt="Cover"
               className="w-full h-full rounded-t-md "
             />
-          </div>
-          <div className="md:px-0 px-6">
+          </header>
+          <section className="md:px-0 px-6">
             <Avatar className="h-19 w-19">
               <AvatarImage src={profileImage} alt={name} />
               <AvatarFallback>{name.charAt(0)}</AvatarFallback>
@@ -50,11 +50,11 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ profile }) => {
             <h3 className="text-xs text-gray-500 dark:text-neutral-400">
               {location}
             </h3>
-            <div className="flex items-center gap-1 pt-3">
+            <footer className="flex items-center gap-1 pt-3">
               <FaUniversity />
               <h1 className="text-xs font-semibold">{university}</h1>
-            </div>
-          </div>
+            </footer>
+          </section>
         </Link>
       </CardContent>
     </Card>

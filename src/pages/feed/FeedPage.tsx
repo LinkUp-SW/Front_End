@@ -32,9 +32,9 @@ const FeedPage = () => {
   return (
     <>
       <div className="flex justify-center w-full px-0 xl:px-[10%]">
-        <div className="flex w-full gap-4 md:flex-row flex-col">
+        <section className="flex w-full gap-4 md:flex-row flex-col">
           {/* Left Sidebar */}
-          <div className="flex flex-col h-full w-full md:max-w-60">
+          <aside className="flex flex-col h-full w-full md:max-w-60">
             <ProfileCard profile={exampleProfile} />
             <Button
               variant="ghost"
@@ -62,9 +62,9 @@ const FeedPage = () => {
                 <Shortcuts />
               </>
             )}
-          </div>
+          </aside>
           {/* Main Content */}
-          <div className="flex flex-col w-full md:max-w-[34.8rem]">
+          <main className="flex flex-col w-full md:max-w-[34.8rem]">
             <CreatePost profileImageUrl={exampleProfile.profileImage} />
             {examplePosts.map((post, index) => (
               <Post
@@ -75,15 +75,15 @@ const FeedPage = () => {
                 action={post.action}
               />
             ))}
-          </div>
+          </main>
           {/* Right Sidebar */}
           {screenWidth > 991 && (
-            <div className="flex flex-col items-center">
+            <aside className="flex flex-col items-center">
               <WhosHiringImage />
               <LinkUpFooter />
-            </div>
+            </aside>
           )}
-        </div>
+        </section>
       </div>
     </>
   );

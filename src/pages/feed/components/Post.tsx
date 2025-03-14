@@ -156,7 +156,7 @@ const Post: React.FC<PostProps> = ({ user, post, stats, action }) => {
     <Card className="p-2 bg-white border-0 mb-4 pl-0 dark:bg-gray-900 dark:text-neutral-200">
       <CardContent className="flex flex-col items-center">
         {action && (
-          <div className="flex justify-start items-center w-full border-b gap-2 pb-2 dark:border-neutral-700">
+          <header className="flex justify-start items-center w-full border-b gap-2 pb-2 dark:border-neutral-700">
             <img
               src={action.profileImage}
               alt={action.name}
@@ -172,9 +172,9 @@ const Post: React.FC<PostProps> = ({ user, post, stats, action }) => {
               </Link>{" "}
               {actionMappings[action?.action || "error"]}
             </span>
-          </div>
+          </header>
         )}
-        <div className="flex items-center space-x-3 w-full">
+        <header className="flex items-center space-x-3 w-full">
           <img
             src={user.profileImage}
             alt={user.name}
@@ -195,7 +195,7 @@ const Post: React.FC<PostProps> = ({ user, post, stats, action }) => {
                   {user.degree}
                 </p>
               </Link>
-              <div className={`flex relative left-5 ${action && "bottom-10"}`}>
+              <nav className={`flex relative left-5 ${action && "bottom-10"}`}>
                 <Popover open={menuOpen} onOpenChange={setMenuOpen}>
                   <PopoverTrigger>
                     <Button
@@ -233,7 +233,7 @@ const Post: React.FC<PostProps> = ({ user, post, stats, action }) => {
                 >
                   <CloseIcon></CloseIcon>
                 </Button>
-              </div>
+              </nav>
             </div>
             {action && (
               <Button
@@ -255,26 +255,26 @@ const Post: React.FC<PostProps> = ({ user, post, stats, action }) => {
               </Link>
 
               <div className="flex gap-x-1 items-center dark:text-neutral-400 text-gray-500">
-                <h2 className="">{timeAgo}</h2>
+                <time className="">{timeAgo}</time>
                 {post.edited && (
                   <>
                     <p className="text-lg font-bold 0"> · </p>
-                    <p>Edited </p>
+                    <span>Edited </span>
                   </>
                 )}
                 {post.public && (
                   <>
                     <p className="text-lg font-bold"> · </p>
-                    <p className="text-lg">
+                    <span className="text-lg">
                       <GlobeIcon />
-                    </p>
+                    </span>
                   </>
                 )}
               </div>
             </div>
           </div>
-        </div>
-        <div className="flex relative text-gray-800 dark:text-neutral-200">
+        </header>
+        <section className="flex relative text-gray-800 dark:text-neutral-200">
           <p className={`mt-2 text-sm   ${expanded ? "" : "line-clamp-3"}`}>
             {post.content}
           </p>
@@ -287,7 +287,7 @@ const Post: React.FC<PostProps> = ({ user, post, stats, action }) => {
               {expanded ? "less" : "more"}
             </Button>
           )}
-        </div>
+        </section>
 
         {/* Post Image(s) */}
         {post.images && post.images.length > 0 && (
@@ -299,31 +299,31 @@ const Post: React.FC<PostProps> = ({ user, post, stats, action }) => {
             />
           </div>
         )}
-        <div className="flex justify-between w-full items-center pt-4">
-          <div
+        <footer className="flex justify-between w-full items-center pt-4">
+          <button
             onClick={() => handleOpenModal("reactions")}
             className="flex relative text-gray-500 dark:text-neutral-400 text-sm hover:underline hover:cursor-pointer hover:text-blue-600 dark:hover:text-blue-400"
           >
             {topStats.map((stat, index) => (
-              <div
+              <span
                 key={index}
                 className="flex items-center text-black dark:text-neutral-200 text-lg"
               >
                 {stat.icon}
-              </div>
+              </span>
             ))}
             {stats.person
               ? stats.person + " and " + (totalStats - 1) + " others"
               : totalStats}
-          </div>
+          </button>
           <div className="flex text-gray-500 dark:text-neutral-400 gap-2 text-sm items-center ">
             <p className="hover:underline hover:text-blue-600 dark:hover:text-blue-400 hover:cursor-pointer">
               {stats.comments} comments
             </p>
           </div>
-        </div>
+        </footer>
         {/* Engagement Buttons */}
-        <div className="mt-3 flex justify-around text-gray-600 dark:text-neutral-400 text-sm w-full">
+        <footer className="mt-3 flex justify-around text-gray-600 dark:text-neutral-400 text-sm w-full">
           {engagementButtons.map((button, index) => (
             <Button
               key={index}
@@ -340,7 +340,7 @@ const Post: React.FC<PostProps> = ({ user, post, stats, action }) => {
               {button.name}
             </Button>
           ))}
-        </div>
+        </footer>
       </CardContent>
     </Card>
   );
