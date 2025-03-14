@@ -57,7 +57,7 @@ const Modal: React.FC = () => {
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className={`bg-white dark:bg-gray-900 max-h-md overflow-y-auto overflow-x-hidden rounded-lg p-6 max-h-[45rem] shadow-lg relative transform transition-all duration-300 w-fit
+        className={`bg-white dark:bg-gray-900 max-h-md overflow-y-auto overflow-x-hidden rounded-lg p-6 max-h-[45rem] shadow-lg relative transform transition-all duration-300 w-full sm:w-fit
                     ${
                       animate ? "scale-100 opacity-100" : "scale-95 opacity-0"
                     }`}
