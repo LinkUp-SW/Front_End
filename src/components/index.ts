@@ -30,6 +30,8 @@ import FormSelect from "./form/form_select/FormSelect";
 import FormCheckbox from "./form/form_checkbox/FormCheckbox";
 import DatePicker from "./date_picker/DatePicker";
 import FormTextarea from "./form/form_text_area/FormTextarea";
+import LinkUpFooter from "./linkup_footer/LinkUpFooter";
+import WhosHiringImage from "./whos_hiring_image/WhosHiringImage";
 
 export {
   UserList,
@@ -51,7 +53,10 @@ export {
   ProfileCard,
   Modal,
   Accordion,
+  
   AccordionItem,
+  LinkUpFooter,
+  WhosHiringImage,
   Select,
   SelectContent,
   SelectItem,

@@ -1,59 +1,71 @@
-import React, { useState } from "react";
-import { PiCaretCircleLeftThin, PiCaretCircleRightThin } from "react-icons/pi";
+import React, { useState, useEffect } from "react";
+import { IoChevronBackCircleOutline, IoChevronForwardCircleOutline } from "react-icons/io5";
 import { 
-  FaStar, FaBriefcase, FaLaptop, FaClock, FaBuilding, 
-  FaCode, FaLeaf, FaUniversity, FaNotesMedical, 
-  FaFlask, FaChartLine, FaHardHat, FaUserTie, 
-  FaGraduationCap, FaPills, FaShieldAlt, FaIndustry, 
-  FaHotel, FaHandHoldingHeart, FaStore, 
-  FaHome, FaUniversity as FaHigherEd, FaTruck, 
-  FaRoad, FaUsers, FaHandsHelping, FaChartPie, 
-  FaNewspaper, FaCoffee, FaClipboardList, 
-  FaBalanceScale, FaTshirt, FaShoppingBag, 
-  FaPaw, FaShieldVirus 
-} from "react-icons/fa";
+  IoStar, IoBriefcase, IoLaptopOutline, IoTimeOutline, IoBusinessOutline,
+  IoCodeSlashOutline, IoLeafOutline, IoSchoolOutline, IoMedicalOutline,
+  IoFlaskOutline, IoTrendingUpOutline, IoHammerOutline, IoPeopleOutline,
+  IoBookOutline, IoMedkitOutline, IoRocketOutline, IoConstructOutline,
+  IoRestaurantOutline, IoHeartOutline, IoStorefrontOutline,
+  IoHomeOutline, IoLibraryOutline, IoCarOutline,
+  IoCompassOutline, IoPersonOutline, IoHandLeftOutline, IoBarChartOutline,
+  IoNewspaperOutline, IoCafeOutline, IoDocumentTextOutline,
+  IoScaleOutline, IoMegaphoneOutline, IoShirtOutline, IoCartOutline,
+  IoPawOutline, IoShieldOutline
+} from "react-icons/io5";
 
 const ICONS = {
-  "For You": FaStar,
-  "Easy Apply": FaBriefcase,
-  "Remote": FaLaptop,
-  "Part-time": FaClock,
-  "Hybrid": FaBuilding,
-  "IT": FaCode,
-  "Sustainability": FaLeaf,
-  "Government": FaUniversity,
-  "Healthcare": FaNotesMedical,
-  "Biotech": FaFlask,
-  "Finance": FaChartLine,
-  "Construction": FaHardHat,
-  "HR": FaUserTie,
-  "Education": FaGraduationCap,
-  "Pharma": FaPills,
-  "Defense & Space": FaShieldAlt,
-  "Manufacturing": FaIndustry,
-  "Hospitality": FaHotel,
-  "Social Impact": FaHandHoldingHeart,
-  "Small Biz": FaStore,
-  "Real Estate": FaHome,
-  "Higher Ed": FaHigherEd,
-  "Logistics": FaTruck,
-  "Civil Eng": FaRoad,
-  "Human Services": FaUsers,
-  "Non-Profit": FaHandsHelping,
-  "Career Growth": FaChartPie,
-  "Media": FaNewspaper,
-  "Food & Bev": FaCoffee,
-  "Recruiting": FaClipboardList,
-  "Work Life Balance": FaBalanceScale,
-  "Marketing": FaTshirt,
-  "Fashion": FaTshirt,
-  "Retail": FaShoppingBag,
-  "Veterinary Med": FaPaw,
-  "Digital Security": FaShieldVirus
+  "For You": IoStar,
+  "Easy Apply": IoBriefcase,
+  "Remote": IoLaptopOutline,
+  "Part-time": IoTimeOutline,
+  "Hybrid": IoBusinessOutline,
+  "IT": IoCodeSlashOutline,
+  "Sustainability": IoLeafOutline,
+  "Government": IoSchoolOutline,
+  "Healthcare": IoMedicalOutline,
+  "Biotech": IoFlaskOutline,
+  "Finance": IoTrendingUpOutline,
+  "Construction": IoHammerOutline,
+  "HR": IoPeopleOutline,
+  "Education": IoBookOutline,
+  "Pharma": IoMedkitOutline,
+  "Defense & Space": IoRocketOutline,
+  "Manufacturing": IoConstructOutline,
+  "Hospitality": IoRestaurantOutline,
+  "Social Impact": IoHeartOutline,
+  "Small Biz": IoStorefrontOutline,
+  "Real Estate": IoHomeOutline,
+  "Higher Ed": IoLibraryOutline,
+  "Logistics": IoCarOutline,
+  "Civil Eng": IoCompassOutline,
+  "Human Services": IoPersonOutline,
+  "Non-Profit": IoHandLeftOutline,
+  "Career Growth": IoBarChartOutline,
+  "Media": IoNewspaperOutline,
+  "Food & Bev": IoCafeOutline,
+  "Recruiting": IoDocumentTextOutline,
+  "Work Life Balance": IoScaleOutline,
+  "Marketing": IoMegaphoneOutline,
+  "Fashion": IoShirtOutline,
+  "Retail": IoCartOutline,
+  "Veterinary Med": IoPawOutline,
+  "Digital Security": IoShieldOutline
 };
 
-const JobCategoryBar: React.FC = () => {
-  const categories = [
+// Define type for the icons object
+type IconsType = typeof ICONS;
+
+// Define the props interface for the component
+interface JobCategoryBarProps {
+  selectedCategory: string;
+  onCategorySelect: (category: string) => void;
+}
+
+const JobCategoryBar: React.FC<JobCategoryBarProps> = ({ 
+  selectedCategory, 
+  onCategorySelect 
+}) => {
+  const categories: string[] = [
     "For You", "Easy Apply", "Remote", "Part-time", "Hybrid", "IT", "Sustainability",
     "Government", "Healthcare", "Biotech", "Finance", "Construction", "HR", "Education",
     "Pharma", "Defense & Space", "Manufacturing", "Hospitality", "Social Impact",
@@ -62,29 +74,47 @@ const JobCategoryBar: React.FC = () => {
     "Marketing", "Fashion", "Retail", "Veterinary Med", "Digital Security"
   ];
 
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const visibleCategories = 5;
+  const [currentIndex, setCurrentIndex] = useState<number>(0);
+  const visibleCategories: number = 5;
 
-  const handleNext = () => {
+  const handleNext = (): void => {
     setCurrentIndex((prevIndex) => 
       Math.min(prevIndex + 1, categories.length - visibleCategories)
     );
   };
 
-  const handlePrev = () => {
+  const handlePrev = (): void => {
     setCurrentIndex((prevIndex) => 
       Math.max(prevIndex - 1, 0)
     );
   };
 
+  // Function to find category index
+  const findCategoryIndex = (category: string): number => {
+    return categories.indexOf(category);
+  };
+
+  // Ensure selected category is visible
+  useEffect(() => {
+    const selectedIndex = findCategoryIndex(selectedCategory);
+    if (selectedIndex !== -1) {
+      if (selectedIndex < currentIndex) {
+        setCurrentIndex(selectedIndex);
+      } else if (selectedIndex >= currentIndex + visibleCategories) {
+        setCurrentIndex(selectedIndex - visibleCategories + 1);
+      }
+    }
+  }, [selectedCategory]);
+
   return (
-    <div className="w-full bg-white border-b border-gray-200 px-4 py-2 flex items-center fixed top-15 left-0 z-15">
+    <div className="w-full bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-4 py-2 flex items-center fixed top-15 left-0 z-13">
       {currentIndex > 0 && (
         <button 
           onClick={handlePrev} 
-          className="text-gray-600 hover:text-blue-600 px-2"
+          className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 px-2 transition-colors duration-200"
+          aria-label="Previous categories"
         >
-          <PiCaretCircleLeftThin size={24} />
+          <IoChevronBackCircleOutline size={26} />
         </button>
       )}
       
@@ -96,23 +126,40 @@ const JobCategoryBar: React.FC = () => {
             transition: 'transform 0.3s ease'
           }}
         >
-          {categories.map((category) => {
-            const Icon = ICONS[category as keyof typeof ICONS] || FaBriefcase;
+          {categories.map((category: string) => {
+            const Icon = ICONS[category as keyof IconsType] || IoBriefcase;
+            const isSelected = category === selectedCategory;
+            
             return (
               <div 
                 key={category} 
-                className="flex-shrink-0 flex flex-col items-center justify-center cursor-pointer group"
+                className={`flex-shrink-0 flex flex-col items-center justify-center cursor-pointer group px-2 py-1 ${
+                  isSelected ? 'text-blue-600 dark:text-blue-400' : ''
+                }`}
                 style={{
                   width: `${100 / visibleCategories}%`
                 }}
+                onClick={() => onCategorySelect(category)}
               >
-                <div className="w-8 h-8 flex items-center justify-center mb-1">
+                <div className={`w-10 h-10 flex items-center justify-center mb-1 rounded-full ${
+                  isSelected 
+                    ? 'bg-blue-100 dark:bg-blue-900/40' 
+                    : 'bg-gray-50 dark:bg-gray-700 group-hover:bg-blue-50 dark:group-hover:bg-blue-900/30'
+                } transition-colors duration-200`}>
                   <Icon 
-                    className="text-gray-600 group-hover:text-blue-600 transition-colors" 
-                    size={20} 
+                    className={`${
+                      isSelected 
+                        ? 'text-blue-600 dark:text-blue-400' 
+                        : 'text-gray-600 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400'
+                    } transition-colors duration-200`} 
+                    size={22} 
                   />
                 </div>
-                <span className="text-xs text-gray-600 group-hover:text-blue-600 transition-colors text-center">
+                <span className={`text-xs ${
+                  isSelected 
+                    ? 'text-blue-600 dark:text-blue-400 font-medium' 
+                    : 'text-gray-600 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400'
+                } transition-colors duration-200 text-center`}>
                   {category}
                 </span>
               </div>
@@ -124,9 +171,10 @@ const JobCategoryBar: React.FC = () => {
       {currentIndex < categories.length - visibleCategories && (
         <button 
           onClick={handleNext} 
-          className="text-gray-600 hover:text-blue-600 px-2"
+          className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 px-2 transition-colors duration-200"
+          aria-label="Next categories"
         >
-          <PiCaretCircleRightThin size={24} />
+          <IoChevronForwardCircleOutline size={26} />
         </button>
       )}
     </div>
