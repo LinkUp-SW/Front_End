@@ -1,6 +1,7 @@
 import { Card, CardContent } from "../../../components/ui/card";
 import { Button } from "../../../components/ui/button";
 import { PiSquareHalfFill } from "react-icons/pi";
+import { Link } from "react-router-dom";
 
 const PremiumBanner = () => {
   const premiumOptions = [
@@ -13,7 +14,7 @@ const PremiumBanner = () => {
     premiumOptions[Math.floor(Math.random() * premiumOptions.length)];
   return (
     <Card className="py-1 bg-white border-0 hover:cursor-pointer dark:bg-gray-900">
-      <a href={"#"}>
+      <Link to={"#"}>
         <CardContent className=" py-1 hover:text-blue-600 ">
           <p className="text-xs dark:text-neutral-400 font-medium text-gray-700">
             {randomOption}
@@ -26,7 +27,7 @@ const PremiumBanner = () => {
             </p>
           </div>
         </CardContent>
-      </a>
+      </Link>
     </Card>
   );
 };

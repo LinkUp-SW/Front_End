@@ -2,6 +2,7 @@ import React from "react";
 import { Card, CardContent } from "../ui/card";
 import { FaUniversity } from "react-icons/fa";
 import { Avatar, AvatarFallback, AvatarImage } from "../../components";
+import { Link } from "react-router-dom";
 
 interface Profile {
   coverImage: string;
@@ -24,9 +25,9 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ profile }) => {
   return (
     <Card className="mb-2 bg-white border-0 dark:bg-gray-900 dark:text-neutral-200 w-full">
       <CardContent className="flex flex-col items-center w-full md:px-6 px-0 ">
-        <a
+        <Link
           className="flex flex-col gap-y-1 items-start w-full  relative hover:cursor-pointer"
-          href={"#"}
+          to={"/user-profile/1"}
         >
           <div
             className="absolute md:-left-6 -top-6 h-15 
@@ -54,7 +55,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ profile }) => {
               <h1 className="text-xs font-semibold">{university}</h1>
             </div>
           </div>
-        </a>
+        </Link>
       </CardContent>
     </Card>
   );

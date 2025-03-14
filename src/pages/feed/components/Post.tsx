@@ -30,6 +30,7 @@ import { LiaEllipsisHSolid as EllipsisIcon } from "react-icons/lia";
 import { IoMdClose as CloseIcon } from "react-icons/io";
 import { useDispatch } from "react-redux";
 import { handleOpenModalType } from "@/utils";
+import { Link } from "react-router-dom";
 
 interface PostProps {
   user: {
@@ -163,12 +164,12 @@ const Post: React.FC<PostProps> = ({ user, post, stats, action }) => {
             />
 
             <span className="text-gray-500 text-xs dark:text-neutral-400">
-              <a
-                href="#"
+              <Link
+                to="#"
                 className="text-xs font-medium text-black dark:text-neutral-200 hover:cursor-pointer hover:underline hover:text-blue-600 dark:hover:text-blue-400"
               >
                 {action.name}
-              </a>{" "}
+              </Link>{" "}
               {actionMappings[action?.action || "error"]}
             </span>
           </div>
@@ -181,7 +182,7 @@ const Post: React.FC<PostProps> = ({ user, post, stats, action }) => {
           />
           <div className="flex flex-col gap-0 w-full relative">
             <div className="flex justify-between">
-              <a href="#" className="flex gap-1 items-center">
+              <Link to="#" className="flex gap-1 items-center">
                 <h2 className="text-sm font-semibold sm:text-base hover:cursor-pointer hover:underline hover:text-blue-600 dark:hover:text-blue-400">
                   {user.name}
                 </h2>
@@ -193,7 +194,7 @@ const Post: React.FC<PostProps> = ({ user, post, stats, action }) => {
                   {" "}
                   {user.degree}
                 </p>
-              </a>
+              </Link>
               <div className={`flex relative left-5 ${action && "bottom-10"}`}>
                 <Popover open={menuOpen} onOpenChange={setMenuOpen}>
                   <PopoverTrigger>
@@ -246,12 +247,12 @@ const Post: React.FC<PostProps> = ({ user, post, stats, action }) => {
               </Button>
             )}
             <div className="text-xs text-gray-500 dark:text-neutral-400">
-              <a
-                href="#"
+              <Link
+                to="#"
                 className={`text-ellipsis line-clamp-1 ${action && "pr-20"}`}
               >
                 {user.followers ? user.followers + " followers" : user.headline}
-              </a>
+              </Link>
 
               <div className="flex gap-x-1 items-center dark:text-neutral-400 text-gray-500">
                 <h2 className="">{timeAgo}</h2>

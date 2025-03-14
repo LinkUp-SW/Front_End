@@ -1,5 +1,6 @@
 import React from "react";
 import { Card, CardContent } from "../../../components/ui/card";
+import { Link } from "react-router-dom";
 
 interface StatsCardProps {
   profileViewers: number;
@@ -13,24 +14,24 @@ const StatsCard: React.FC<StatsCardProps> = ({
   return (
     <Card className="mb-2 bg-white border-0 w-full py-4 dark:bg-gray-900 ">
       <CardContent className="text-gray-900 dark:text-neutral-200 text-xs">
-        <a
+        <Link
           className="flex justify-between font-medium hover:underline hover:cursor-pointer "
-          href={"#"}
+          to={"#"}
         >
           <span>Profile viewers</span>
           <span className="text-blue-600 dark:text-blue-400">
             {profileViewers}
           </span>
-        </a>
-        <a
+        </Link>
+        <Link
           className="flex justify-between mt-2 font-medium hover:underline hover:cursor-pointer"
-          href={"#"}
+          to={"#"}
         >
           <span>Post impressions</span>
           <span className="text-blue-600 dark:text-blue-400">
             {postImpressions}
           </span>
-        </a>
+        </Link>
       </CardContent>
     </Card>
   );
