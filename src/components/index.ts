@@ -17,6 +17,19 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import ProfileCard from "./profile_card/ProfileCard";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import FormInput from "./form/form_input/FormInput";
+import FormSelect from "./form/form_select/FormSelect";
+import FormCheckbox from "./form/form_checkbox/FormCheckbox";
+import DatePicker from "./date_picker/DatePicker";
+import FormTextarea from "./form/form_text_area/FormTextarea";
 import LinkUpFooter from "./linkup_footer/LinkUpFooter";
 import WhosHiringImage from "./whos_hiring_image/WhosHiringImage";
 
@@ -40,7 +53,19 @@ export {
   ProfileCard,
   Modal,
   Accordion,
+  
   AccordionItem,
   LinkUpFooter,
   WhosHiringImage,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  Checkbox,
+  FormInput,
+  FormSelect,
+  FormCheckbox,
+  DatePicker,
+  FormTextarea,
 };

@@ -10,6 +10,7 @@ import { RxHamburgerMenu } from "react-icons/rx";
 import styles from "./styles.module.css"; // Import your CSS module
 import { convertStringsArrayToLowerCase } from "../../../../../utils";
 import { IoMdAdd } from "react-icons/io";
+import Header from "../components/Header";
 
 const AboutModal = () => {
   const [wordCount, setWordCount] = useState<number>(0);
@@ -140,9 +141,9 @@ const AboutModal = () => {
     // Always remove the event listeners
     document.removeEventListener("touchmove", handleDocumentTouchMove);
     document.removeEventListener("touchend", handleDocumentTouchEnd);
-    
+
     if (draggingIndex === null) return;
-    
+
     measurePositions();
     const finalY = e.changedTouches[0].clientY;
     let dropIndex: number | null = null;
@@ -164,7 +165,6 @@ const AboutModal = () => {
     setDraggingIndex(null);
     touchStartY.current = null;
   };
-  
 
   // Touch start handler on the draggable item
   const handleTouchStart = (
@@ -184,10 +184,7 @@ const AboutModal = () => {
 
   return (
     <div className="max-w-5xl md:w-[40rem] w-full">
-      <div className="flex flex-col mb-4">
-        <h2 className="text-xl font-semibold">Edit About</h2>
-        <div className="w-full bg-gray-800 dark:bg-gray-300 h-[0.1rem] rounded-2xl" />
-      </div>
+      <Header title="Edit About" />
       <section className="grid grid-cols-1 gap-1 relative pb-7">
         <p className="text-sm text-gray-500 dark:text-gray-300">
           You can write about your years of experience, industry, or skills.
