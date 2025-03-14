@@ -83,7 +83,14 @@ const AddExperienceModal: React.FC = () => {
   };
   return (
     <div className="max-w-5xl sm:w-[35rem] w-full">
-      <form onSubmit={handleSubmit}>
+      <form
+        onSubmit={handleSubmit}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+          }
+        }}
+      >
         <Header title="Add Experience" />
         <p className="text-sm text-gray-500 dark:text-gray-400">
           *Indicates required
@@ -182,7 +189,7 @@ const AddExperienceModal: React.FC = () => {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="bg-blue-600 disabled:opacity-70 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-all duration-300"
+            className="bg-blue-600 disabled:opacity-70 cursor-pointer ease-in-out text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-all duration-300"
           >
             {isSubmitting ? "Submitting..." : "Save Experience"}
           </button>
