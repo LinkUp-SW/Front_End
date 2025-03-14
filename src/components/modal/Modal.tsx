@@ -4,6 +4,10 @@ import { RootState, AppDispatch } from "../../store";
 import { closeModal } from "../../slices/modal/modalSlice";
 import AboutModal from "../../pages/user_profile/components/modals/about_modal/AboutModal";
 import AddProfileSectionModal from "../../pages/user_profile/components/modals/add_profile_section_modal/AddProfileSectionModal";
+import ReactionsModal from "../../pages/feed/components/modals/ReactionsModal";
+import CreatePostModal from "../../pages/feed/components/modals/CreatePostModal";
+import ReportPostModal from "../../pages/feed/components/modals/ReportPostModal";
+import SendPostModal from "../../pages/feed/components/modals/SendPostModal";
 import RemoveConnectionModal from "@/pages/mynetwork/components/modals/remove_connection_modal/RemoveConnectionModal";
 import { RemoveConnectionData } from "@/types";
 
@@ -71,6 +75,14 @@ const Modal: React.FC = () => {
           />
         );
       }
+      case "create_post":
+        return <CreatePostModal />;
+      case "reactions":
+        return <ReactionsModal />;
+      case "report_post":
+        return <ReportPostModal />;
+      case "send_post":
+        return <SendPostModal />;
       default:
         return null;
     }
