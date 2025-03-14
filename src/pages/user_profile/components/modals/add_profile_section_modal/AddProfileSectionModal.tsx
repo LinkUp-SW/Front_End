@@ -2,15 +2,13 @@ import { Fragment } from "react";
 import { Accordion, AccordionItem } from "../../../../../components";
 import { CORE_PROFILE_SECTIONS } from "../../../../../constants";
 import { useDispatch } from "react-redux";
+import Header from "../components/Header";
 
 const AddProfileSectionModal = () => {
   const dispatch = useDispatch();
   return (
     <div className="max-w-5xl md:w-[30rem] w-full">
-      <div className="flex flex-col mb-4">
-        <h2 className="text-xl font-semibold">Add To Profile</h2>
-        <div className="w-full bg-gray-800 dark:bg-gray-300 h-[0.1rem] rounded-2xl" />
-      </div>
+      <Header title="Add To Profile" />
       <Accordion>
         <AccordionItem title="Core" defaultOpen>
           <p className="text-xs">
