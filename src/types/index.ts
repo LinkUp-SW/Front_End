@@ -1,6 +1,11 @@
-export interface test{
-    name:string
+export interface test {
+  name: string;
 }
+export interface RemoveConnectionData {
+  userId: number;
+  userName: string;
+}
+
 
 export interface Notification {
   id: string;
