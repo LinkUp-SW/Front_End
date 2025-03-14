@@ -4,6 +4,7 @@ import {
   ProfileCard,
   Button,
   LinkUpFooter,
+  WhosHiringImage,
 } from "../../components";
 import {
   StatsCard,
@@ -78,13 +79,7 @@ const FeedPage = () => {
           {/* Right Sidebar */}
           {screenWidth > 991 && (
             <div className="flex flex-col items-center">
-              <div className="mt-4 cursor-pointer">
-                <img
-                  src="./src/assets/see_who's_hiring.jpg"
-                  alt="Promotional Banner"
-                  className="rounded-lg shadow-lg w-full object-cover"
-                />
-              </div>
+              <WhosHiringImage />
               <LinkUpFooter />
             </div>
           )}

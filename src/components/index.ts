@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/card";
 import ProfileCard from "./profile_card/ProfileCard";
 import LinkUpFooter from "./linkup_footer/LinkUpFooter";
+import WhosHiringImage from "./whos_hiring_image/WhosHiringImage";
 
 export {
   UserList,
@@ -41,4 +42,5 @@ export {
   Accordion,
   AccordionItem,
   LinkUpFooter,
+  WhosHiringImage,
 };
