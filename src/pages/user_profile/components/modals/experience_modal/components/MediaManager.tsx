@@ -86,7 +86,7 @@ const MediaManager: React.FC<MediaManagerProps> = ({ media, setMedia }) => {
             <button
               type="button"
               onClick={() => removeMedia(item.id)}
-              className="absolute top-0 right-0 bg-red-600 text-white rounded-full px-2"
+              className="absolute top-0 right-0 bg-red-600 text-white rounded-full px-2 cursor-pointer"
             >
               x
             </button>
