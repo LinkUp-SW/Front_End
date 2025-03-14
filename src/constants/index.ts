@@ -8,6 +8,7 @@ import { HiOutlineDocumentText } from "react-icons/hi";
 import { BsBarChartLine } from "react-icons/bs";
 import { CgTimelapse } from "react-icons/cg";
 import { RiMoreLine } from "react-icons/ri";
+import { ALL } from "dns";
 
 export const LARGE_SCREEN_NAV_ITEMS = [
   {
@@ -64,6 +65,16 @@ export const SMALL_SCREEN_NAV_ITEMS = [
     title: "Jobs",
   },
 ];
+
+export const FILTER_OPTIONS_MESSAGES = {
+  FOCUSED: "Focused",
+  UNREAD: "Unread",
+  MY_CONNECTIONS: "My Connections",
+  INMAIL: "InMail",
+  STARRED: "Starred",
+};
+
+export const FILTERS_LIST_MESSAGES = Object.values(FILTER_OPTIONS_MESSAGES);
 
 export const FILTER_OPTIONS = {
   ALL: "All",
