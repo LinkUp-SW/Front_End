@@ -1,7 +1,7 @@
 import { useState } from "react";
 import withSidebarAd from "@/components/hoc/withSidebarAd";
 
-const mockReceivedInvitations = [
+const initialReceivedInvitations = [
   {
     id: 1,
     name: "Alice Johnson",
@@ -20,7 +20,7 @@ const mockReceivedInvitations = [
   },
 ];
 
-const mockSentInvitations = [
+const initialSentInvitations = [
   {
     id: 3,
     name: "Charlie Brown",
@@ -41,18 +41,31 @@ const mockSentInvitations = [
 
 const ManageInvitations: React.FC = () => {
   const [activeTab, setActiveTab] = useState("received");
+  const [receivedInvitations, setReceivedInvitations] = useState(
+    initialReceivedInvitations
+  );
+  const [sentInvitations, setSentInvitations] = useState(
+    initialSentInvitations
+  );
 
   const ignoreInvitation = (id: number) => {
-    console.log(`Ignored invitation with ID: ${id}`);
+    setReceivedInvitations(
+      receivedInvitations.filter((invite) => invite.id !== id)
+    );
   };
 
   const acceptInvitation = (id: number) => {
-    console.log(`Accepted invitation with ID: ${id}`);
+    setReceivedInvitations(
+      receivedInvitations.filter((invite) => invite.id !== id)
+    );
+  };
+
+  const withdrawInvitation = (id: number) => {
+    setSentInvitations(sentInvitations.filter((invite) => invite.id !== id));
   };
 
   return (
     <div className="flex-1 bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 transition-all flex flex-col max-h-fit">
-      {/* Heading inside card */}
       <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
         Manage Invitations
       </h2>
@@ -84,7 +97,7 @@ const ManageInvitations: React.FC = () => {
       {/* List */}
       <div className="space-y-4 p-4 flex-grow min-h-0 cursor-pointer">
         {activeTab === "received"
-          ? mockReceivedInvitations.map((invite) => (
+          ? receivedInvitations.map((invite) => (
               <div
                 key={invite.id}
                 className="flex flex-col sm:flex-row items-center p-3 bg-gray-100 dark:bg-gray-700 rounded-lg shadow-sm hover:shadow-md transition-shadow space-y-3 sm:space-y-0 sm:space-x-4"
@@ -127,7 +140,7 @@ const ManageInvitations: React.FC = () => {
                 </div>
               </div>
             ))
-          : mockSentInvitations.map((invite) => (
+          : sentInvitations.map((invite) => (
               <div
                 key={invite.id}
                 className="flex flex-col sm:flex-row items-center p-3 bg-gray-100 dark:bg-gray-700 rounded-lg shadow-sm hover:shadow-md transition-shadow space-y-3 sm:space-y-0 sm:space-x-4"
@@ -149,7 +162,10 @@ const ManageInvitations: React.FC = () => {
                   </p>
                 </div>
                 <div className="flex justify-center w-full sm:justify-start sm:w-auto sm:ml-auto">
-                  <button className="px-4 py-1 bg-gray-500 text-white rounded-md hover:bg-gray-600 cursor-pointer text-sm sm:text-base">
+                  <button
+                    onClick={() => withdrawInvitation(invite.id)}
+                    className="px-4 py-1 bg-gray-500 text-white rounded-md hover:bg-gray-600 cursor-pointer text-sm sm:text-base"
+                  >
                     Withdraw
                   </button>
                 </div>
