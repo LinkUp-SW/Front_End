@@ -9,50 +9,50 @@ const JobContent: React.FC<JobContentProps> = ({ job }) => {
   return (
     <>
       <div className="mb-6">
-        <h2 className="text-lg font-semibold mb-2">How your profile and resume fit this job</h2>
-        <p className="text-sm text-gray-700">Get AI-powered advice on this job and more exclusive features with Premium. 
-          <span className="text-blue-600 ml-1 font-medium">Retry Premium for EGP0</span>
+        <h2 className="text-lg font-semibold mb-2 dark:text-white">How your profile and resume fit this job</h2>
+        <p className="text-sm text-gray-700 dark:text-gray-400">Get AI-powered advice on this job and more exclusive features with Premium. 
+          <span className="text-blue-600 dark:text-blue-400 ml-1 font-medium">Retry Premium for EGP0</span>
         </p>
         
         <div className="flex space-x-3 mt-3 overflow-x-auto">
-          <button className="border border-gray-300 rounded-full px-4 py-2 text-sm flex items-center whitespace-nowrap">
-            <span className="text-amber-500 mr-2">★</span>
+          <button className="border border-gray-300 dark:border-gray-600 rounded-full px-4 py-2 text-sm flex items-center whitespace-nowrap dark:text-gray-300">
+            <span className="text-amber-500 dark:text-amber-400 mr-2">★</span>
             <span>Tailor my resume to this job</span>
           </button>
-          <button className="border border-gray-300 rounded-full px-4 py-2 text-sm flex items-center whitespace-nowrap">
-            <span className="text-amber-500 mr-2">★</span>
+          <button className="border border-gray-300 dark:border-gray-600 rounded-full px-4 py-2 text-sm flex items-center whitespace-nowrap dark:text-gray-300">
+            <span className="text-amber-500 dark:text-amber-400 mr-2">★</span>
             <span>Am I a good fit for this job?</span>
           </button>
-          <button className="w-8 h-8 flex items-center justify-center border border-gray-300 rounded-full ml-2">
+          <button className="w-8 h-8 flex items-center justify-center border border-gray-300 dark:border-gray-600 rounded-full ml-2 dark:text-gray-300">
             <span>›</span>
           </button>
         </div>
       </div>
       
       <div className="mb-6">
-        <h2 className="text-lg font-semibold mb-3">People you can reach out to</h2>
-        <div className="flex items-center justify-between border border-gray-200 rounded-lg p-3">
+        <h2 className="text-lg font-semibold mb-3 dark:text-white">People you can reach out to</h2>
+        <div className="flex items-center justify-between border border-gray-200 dark:border-gray-700 rounded-lg p-3">
           <div className="flex items-center">
-            <div className="w-8 h-8 bg-amber-100 flex items-center justify-center rounded-md mr-2">
-              <span className="text-amber-800">🎓</span>
+            <div className="w-8 h-8 bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center rounded-md mr-2">
+              <span className="text-amber-800 dark:text-amber-400">🎓</span>
             </div>
-            <span className="text-sm">School alumni from Cairo University</span>
+            <span className="text-sm dark:text-gray-300">School alumni from Cairo University</span>
           </div>
-          <button className="border border-gray-300 rounded-full px-4 py-1 text-sm">
+          <button className="border border-gray-300 dark:border-gray-600 rounded-full px-4 py-1 text-sm dark:text-gray-300">
             Show all
           </button>
         </div>
       </div>
       
       <div>
-        <h2 className="text-lg font-semibold mb-2">About the job</h2>
-        <p className="text-sm text-gray-700">
+        <h2 className="text-lg font-semibold mb-2 dark:text-white">About the job</h2>
+        <p className="text-sm text-gray-700 dark:text-gray-400">
           Managing the Product Backlog: Keep the product backlog organized...
         </p>
         
         <div className="mt-6">
-          <h3 className="font-semibold mb-2">Responsibilities:</h3>
-          <ul className="list-disc pl-5 text-sm text-gray-700 space-y-2">
+          <h3 className="font-semibold mb-2 dark:text-white">Responsibilities:</h3>
+          <ul className="list-disc pl-5 text-sm text-gray-700 dark:text-gray-400 space-y-2">
             <li>Develop and maintain the product roadmap</li>
             <li>Collaborate with stakeholders to gather requirements</li>
             <li>Prioritize features and enhancements</li>
@@ -64,8 +64,8 @@ const JobContent: React.FC<JobContentProps> = ({ job }) => {
           </ul>
         </div>
         <div className="mt-6">
-          <h3 className="font-semibold mb-2">Qualifications:</h3>
-          <ul className="list-disc pl-5 text-sm text-gray-700 space-y-2">
+          <h3 className="font-semibold mb-2 dark:text-white">Qualifications:</h3>
+          <ul className="list-disc pl-5 text-sm text-gray-700 dark:text-gray-400 space-y-2">
             <li>5+ years of experience in product management</li>
             <li>Strong understanding of fintech industry</li>
             <li>Experience with agile methodologies</li>
@@ -76,8 +76,8 @@ const JobContent: React.FC<JobContentProps> = ({ job }) => {
           </ul>
         </div>
         <div className="mt-6 mb-12">
-          <h3 className="font-semibold mb-2">Benefits:</h3>
-          <ul className="list-disc pl-5 text-sm text-gray-700 space-y-2">
+          <h3 className="font-semibold mb-2 dark:text-white">Benefits:</h3>
+          <ul className="list-disc pl-5 text-sm text-gray-700 dark:text-gray-400 space-y-2">
             <li>Competitive salary package</li>
             <li>Health insurance</li>
             <li>Annual bonus opportunities</li>
