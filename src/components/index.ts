@@ -39,6 +39,7 @@ import {
   InputOTPSlot,
   InputOTPSeparator,
 } from "./ui/input-otp";
+import UserAuthLayout from "./hoc/UserAuthLayout";
 
 export {
   UserList,
@@ -79,4 +80,5 @@ export {
   InputOTPGroup,
   InputOTPSlot,
   InputOTPSeparator,
+  UserAuthLayout,
 };
