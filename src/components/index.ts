@@ -32,6 +32,13 @@ import DatePicker from "./date_picker/DatePicker";
 import FormTextarea from "./form/form_text_area/FormTextarea";
 import LinkUpFooter from "./linkup_footer/LinkUpFooter";
 import WhosHiringImage from "./whos_hiring_image/WhosHiringImage";
+import { Toaster } from "./ui/sonner";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+  InputOTPSeparator,
+} from "./ui/input-otp";
 
 export {
   UserList,
@@ -53,7 +60,7 @@ export {
   ProfileCard,
   Modal,
   Accordion,
-  
+  Toaster,
   AccordionItem,
   LinkUpFooter,
   WhosHiringImage,
@@ -68,4 +75,8 @@ export {
   FormCheckbox,
   DatePicker,
   FormTextarea,
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+  InputOTPSeparator,
 };
