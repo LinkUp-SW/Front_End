@@ -8,7 +8,7 @@ export const convertStringsArrayToLowerCase = (arr: string[]): string[] => {
 // Annotate the function so TypeScript can infer the generic type properly.
 export const handleOpenModalType = <T>(
   modalType: string,
-  modalData: T
+  modalData: T|null=null
 ): ReturnType<typeof openModal> => {
   return openModal({ modalType, modalData });
 };
