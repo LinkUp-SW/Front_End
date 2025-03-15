@@ -41,9 +41,12 @@ const HomePage = () => {
                 <span>Continue with Microsoft</span>
               </button>
 
-              <button className="flex h-12 w-full items-center justify-center transition-all duration-300 ease-in-out cursor-pointer space-x-2 rounded-full border border-[#D1D5DB] bg-white py-3 px-6 text-base font-semibold text-[#000000E6] hover:bg-[#00000008] dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700">
+              <Link
+                to={"/login"}
+                className="flex h-12 w-full items-center justify-center transition-all duration-300 ease-in-out cursor-pointer space-x-2 rounded-full border border-[#D1D5DB] bg-white py-3 px-6 text-base font-semibold text-[#000000E6] hover:bg-[#00000008] dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700"
+              >
                 Sign in with email
-              </button>
+              </Link>
             </div>
 
             {/* Footer */}
@@ -65,7 +68,10 @@ const HomePage = () => {
 
             <p className="mt-8 text-center text-sm text-[#00000099] dark:text-gray-300">
               New to LinkUp?{" "}
-              <Link to={"/"} className="font-semibold text-[#0A66C2] underline dark:text-blue-400">
+              <Link
+                to={"/"}
+                className="font-semibold text-[#0A66C2] underline dark:text-blue-400"
+              >
                 Join now
               </Link>
             </p>

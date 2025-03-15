@@ -4,6 +4,7 @@ import ThemeToggle from "../../../components/theme_toggle/ThemeToggle";
 import linkUpLogo from "../../../assets/link_up.png";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../store";
+import { Link } from "react-router-dom";
 
 const LandingNavBar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -27,9 +28,12 @@ const LandingNavBar = () => {
         <button className="text-gray-700 font-semibold cursor-pointer px-5 py-1.5 hover:bg-gray-200 rounded-full transition-all duration-300 ease-in-out dark:text-gray-300 dark:hover:bg-gray-700">
           Join now
         </button>
-        <button className="border border-blue-600 font-semibold cursor-pointer text-blue-600 px-4 py-2 rounded-full hover:text-blue-700 hover:bg-blue-100 transition-all duration-300 ease-in-out dark:border-blue-400 dark:text-blue-400 dark:hover:bg-blue-500/20">
+        <Link
+          to={"/login"}
+          className="border border-blue-600 font-semibold cursor-pointer text-blue-600 px-4 py-2 rounded-full hover:text-blue-700 hover:bg-blue-100 transition-all duration-300 ease-in-out dark:border-blue-400 dark:text-blue-400 dark:hover:bg-blue-500/20"
+        >
           Sign in
-        </button>
+        </Link>
         <ThemeToggle />
       </div>
 
@@ -54,9 +58,12 @@ const LandingNavBar = () => {
           <button className="w-full text-gray-700 font-semibold cursor-pointer px-5 py-1.5 hover:bg-gray-200 rounded-full transition-all duration-300 ease-in-out dark:text-gray-300 dark:hover:bg-gray-700">
             Join now
           </button>
-          <button className="w-full border border-blue-600 font-semibold cursor-pointer text-blue-600 px-4 py-2 rounded-full hover:text-blue-700 hover:bg-blue-100 transition-all duration-300 ease-in-out dark:border-blue-400 dark:text-blue-400 dark:hover:bg-blue-500/20">
+          <Link
+            to={"/login"}
+            className="w-full border border-blue-600 font-semibold cursor-pointer text-blue-600 px-4 py-2 rounded-full hover:text-blue-700 hover:bg-blue-100 transition-all duration-300 ease-in-out dark:border-blue-400 dark:text-blue-400 dark:hover:bg-blue-500/20"
+          >
             Sign in
-          </button>
+          </Link>
         </div>
       </div>
     </nav>
