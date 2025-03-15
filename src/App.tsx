@@ -23,7 +23,7 @@ const App: React.FC = () => {
           })}
         </Routes>
       </Router>
-      <Toaster richColors theme={theme} />
+      <Toaster position="top-right" richColors theme={theme} />
     </>
   );
 };
