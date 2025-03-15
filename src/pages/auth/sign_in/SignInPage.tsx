@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import googleSvg from "@/assets/google.svg";
 import ReCAPTCHA from "react-google-recaptcha";
 import { toast } from "sonner";
+import { signin } from "@/endpoints/userAuth";
 
 const SignInPage: React.FC = () => {
   const [identifier, setIdentifier] = useState<string>("");
@@ -13,66 +14,90 @@ const SignInPage: React.FC = () => {
   const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
   const { isSubmitting, startSubmitting, stopSubmitting } = useFormStatus();
 
+  // Helper function to validate the identifier (email or phone)
+  const validateIdentifier = (identifier: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const phoneRegex = /^\+?\d{7,15}$/;
+    return emailRegex.test(identifier) || phoneRegex.test(identifier);
+  };
+
+  // Helper function to validate the form
+  const validateForm = (
+    identifier: string,
+    password: string,
+    recaptchaToken: string | null
+  ) => {
+    if (!validateIdentifier(identifier)) {
+      toast.error("Please enter a valid email address or phone number.");
+      return false;
+    }
+    if (password.length === 0) {
+      toast.error("Please enter your password");
+      return false;
+    }
+    if (!recaptchaToken) {
+      toast.error("Please complete the captcha.");
+      return false;
+    }
+    return true;
+  };
+
+  // Function to handle the form submission
   const handleSubmit = async (
-    event: FormEvent<HTMLFormElement>
+    event: FormEvent<HTMLFormElement>,
+    identifier: string,
+    password: string,
+    recaptchaToken: string | null,
+    startSubmitting: () => void,
+    stopSubmitting: () => void
   ): Promise<void> => {
     event.preventDefault();
 
-    // Regex to validate email addresses
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    // Regex to validate phone numbers (optional "+" prefix, 7-15 digits)
-    const phoneRegex = /^\+?\d{7,15}$/;
-
-    // Validate identifier
-    if (!emailRegex.test(identifier) && !phoneRegex.test(identifier)) {
-      toast.error("Please enter a valid email address or phone number.");
-      return;
-    }
-
-    // Ensure reCAPTCHA has been completed
-    if (!recaptchaToken) {
-      toast.error("Please complete the captcha.");
-      return;
-    }
-
-    startSubmitting();
     try {
+      if (
+        !validateForm(identifier, password, recaptchaToken) ||
+        !recaptchaToken
+      ) {
+        return;
+      }
+      startSubmitting();
+      // toast.success('heheeee')
+      // toast.loading('qwqwdqd')
+
+      //?testing using fake promise
       // const fakePromise = new Promise<void>((resolve, reject) => {
-      //   // Simulate a 2-second asynchronous operation.
-      //   setTimeout(() => {
-      //     // Uncomment one of the following lines to simulate success or error:
-      //     resolve();
-      //     // reject("Error");
-      //   }, 2000);
-      // });
-      // // Pass the promise directly to toast.promise
-      // const toastResult = toast.promise(fakePromise, {
-      //   loading: "Loading...",
-      //   success: "Login successfully",
-      //   error: "Sign in failed. Please try again.",
-      // });
-      // // Await the promise using the unwrap() method.
-      // await toastResult.unwrap();
-      // Create the fetch promise for your actual endpoint
-      // const serverPromise = fetch("/api/signin", {
-      //   method: "POST",
-      //   headers: { "Content-Type": "application/json" },
-      //   body: JSON.stringify({ identifier, password, recaptchaToken }),
-      // }).then((res) => {
-      //   if (!res.ok) {
-      //     throw new Error("Sign in failed. Please try again.");
-      //   }
-      //   return res.json();
-      // });
-      // // Wrap the promise with toast.promise and await its result using unwrap()
-      // const toastResult = toast.promise(serverPromise, {
-      //   loading: "Signing in...",
-      //   success: "Signed in successfully!",
-      //   error: "Sign in failed. Please try again.",
-      // });
-      // const data = await toastResult.unwrap();
-      //     console.log("Submitted", data);
+      //     // Simulate a 2-second asynchronous operation.
+      //     setTimeout(() => {
+      //       // Uncomment one of the following lines to simulate success or error:
+      //       // resolve();
+      //       reject("Error");
+      //     }, 2000);
+      //   });
+      //   // Pass the promise directly to toast.promise
+      //   const toastResult = toast.promise(fakePromise, {
+      //     loading: "Loading...",
+      //     success: "Login successfully",
+      //     error: "Sign in failed. Please try again.",
+      //   });
+      //   // Await the promise using the unwrap() method.
+      //   await toastResult.unwrap();
+
+      //using real server endpoint
+      // Wrap the signin method with toast.promise for success/error handling
+      const toastResult = toast.promise(
+        signin(identifier, password, recaptchaToken), // Using the axios signin method
+        {
+          loading: "Signing in...",
+          success: "Signed in successfully!",
+          error: "Sign in failed. Please try again.",
+        }
+      );
+
+      // Await the result of the toast promise
+      const data = await toastResult.unwrap();
+      console.log("Submitted", data);
     } catch (error) {
+      toast.error("Sign in failed. Please try again.");
       console.error("Sign in error:", error);
     } finally {
       stopSubmitting();
@@ -86,13 +111,11 @@ const SignInPage: React.FC = () => {
           Sign in to your account
         </h2>
         <button className="flex h-9 w-full items-center justify-center space-x-2 rounded-full cursor-pointer hover:opacity-85 transition-all duration-300 ease-in-out bg-blue-500 text-white py-3 px-6 text-base font-semibold dark:bg-blue-600">
-          <i>
-            <img
-              src={googleSvg}
-              alt="Google Logo"
-              className="w-7 aspect-square object-contain bg-white p-1 rounded-full dark:bg-gray-100"
-            />
-          </i>
+          <img
+            src={googleSvg}
+            alt="Google Logo"
+            className="w-7 aspect-square object-contain bg-white p-1 rounded-full dark:bg-gray-100"
+          />
           <span>Continue with Google</span>
         </button>
         <div className="flex gap-2 items-center">
@@ -102,7 +125,19 @@ const SignInPage: React.FC = () => {
         </div>
       </div>
       <div className="sm:w-full">
-        <form onSubmit={handleSubmit} className="space-y-2">
+        <form
+          onSubmit={(event) =>
+            handleSubmit(
+              event,
+              identifier,
+              password,
+              recaptchaToken,
+              startSubmitting,
+              stopSubmitting
+            )
+          }
+          className="space-y-2"
+        >
           <FormInput
             label="Email or Phone"
             placeholder="Enter your email or phone number"
@@ -139,7 +174,7 @@ const SignInPage: React.FC = () => {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex disabled:opacity-75 cursor-pointer w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:bg-indigo-700 dark:hover:bg-indigo-600 transition-all duration-300 ease-in-out"
+              className="flex disabled:opacity-75 disabled:bg-indigo-500 disabled:cursor-not-allowed cursor-pointer w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:bg-indigo-700 dark:hover:bg-indigo-600 transition-all duration-300 ease-in-out"
             >
               {isSubmitting ? "Signing in..." : "Sign in"}
             </button>
