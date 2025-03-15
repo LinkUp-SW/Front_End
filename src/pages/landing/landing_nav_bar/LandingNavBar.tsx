@@ -25,9 +25,9 @@ const LandingNavBar = () => {
           width >= 768 ? "flex" : "hidden"
         } space-x-4 items-center"`}
       >
-        <button className="text-gray-700 font-semibold cursor-pointer px-5 py-1.5 hover:bg-gray-200 rounded-full transition-all duration-300 ease-in-out dark:text-gray-300 dark:hover:bg-gray-700">
+        <Link to={'/signup'} className="text-gray-700 font-semibold cursor-pointer px-5 py-1.5 hover:bg-gray-200 rounded-full transition-all duration-300 ease-in-out dark:text-gray-300 dark:hover:bg-gray-700">
           Join now
-        </button>
+        </Link>
         <Link
           to={"/login"}
           className="border border-blue-600 font-semibold cursor-pointer text-blue-600 px-4 py-2 rounded-full hover:text-blue-700 hover:bg-blue-100 transition-all duration-300 ease-in-out dark:border-blue-400 dark:text-blue-400 dark:hover:bg-blue-500/20"
@@ -55,12 +55,12 @@ const LandingNavBar = () => {
       >
         <div className="m-4 p-4 flex flex-col space-y-3 items-center">
           <ThemeToggle />
-          <button className="w-full text-gray-700 font-semibold cursor-pointer px-5 py-1.5 hover:bg-gray-200 rounded-full transition-all duration-300 ease-in-out dark:text-gray-300 dark:hover:bg-gray-700">
+          <Link to={'/signup'} className="w-full text-gray-700 font-semibold cursor-pointer px-5 py-1.5 hover:bg-gray-200 rounded-full transition-all duration-300 ease-in-out dark:text-gray-300 dark:hover:bg-gray-700">
             Join now
-          </button>
+          </Link>
           <Link
             to={"/login"}
-            className="w-full border border-blue-600 font-semibold cursor-pointer text-blue-600 px-4 py-2 rounded-full hover:text-blue-700 hover:bg-blue-100 transition-all duration-300 ease-in-out dark:border-blue-400 dark:text-blue-400 dark:hover:bg-blue-500/20"
+            className="w-full border text-center border-blue-600 font-semibold cursor-pointer text-blue-600 px-4 py-2 rounded-full hover:text-blue-700 hover:bg-blue-100 transition-all duration-300 ease-in-out dark:border-blue-400 dark:text-blue-400 dark:hover:bg-blue-500/20"
           >
             Sign in
           </Link>
