@@ -1,7 +1,7 @@
 // src/routes.ts
 
 import { RouteObject } from 'react-router-dom';
-import { LandingPage, FeedPage,UserProfilePage,  NotificationsPage, MyNetworkPage,JobsPage,SeeMorePage,FollowingFollowers,Connections,MessagingPage, InvitationsManagerPage} from './pages';
+import { LandingPage, FeedPage,UserProfilePage,  NotificationsPage, MyNetworkPage,JobsPage,SeeMorePage,FollowingFollowers,Connections,MessagingPage, InvitationsManagerPage,SignInPage} from './pages';
 
 import React from 'react';
 
@@ -54,6 +54,10 @@ const routes: RouteObject[] = [
     path: "/manage-invitations",
     element:  React.createElement(InvitationsManagerPage)
   },
+  {
+    path:'/login',
+    element:React.createElement(SignInPage)
+  }
   
 ];
 
