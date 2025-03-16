@@ -15,6 +15,7 @@ import {
   InvitationsManagerPage,
   SignInPage,
   SignUpPage,
+  LocationPage,
 } from "./pages";
 
 import React from "react";
@@ -73,6 +74,10 @@ const routes: RouteObject[] = [
   {
     path: "/signup",
     element: React.createElement(SignUpPage),
+  },
+  {
+    path: "/signup/location",
+    element: React.createElement(LocationPage),
   },
 ];
 

@@ -13,7 +13,7 @@ import FollowingFollowers from "./mynetwork/components/FollowingFollowers";
 import Connections from "./mynetwork/components/Connections";
 import InvitationsManagerPage from "./mynetwork/InvitationsManagerPage";
 import SignInPage from "./auth/sign_in/SignInPage";
-import SignUpPage from "./auth/sign_up/SignUpPage";
+import { SignUpPage,LocationPage } from "./auth/sign_up";
 
 //Export the Imported Pages
 export {
@@ -29,5 +29,6 @@ export {
   NotificationsPage,
   InvitationsManagerPage,
   SignInPage,
-  SignUpPage
+  SignUpPage,
+  LocationPage
 };
