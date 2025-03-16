@@ -28,6 +28,32 @@ const SignUpPage = () => {
     setUserCredentials((prev) => ({ ...prev, ...fields }));
   };
 
+  const saveCredentials = () => {
+    const savedCredential = localStorage.getItem("user-signup-credentials");
+
+    if (!savedCredential) {
+      const toBeStoredUserCredentials = JSON.stringify(userCredentials);
+      return localStorage.setItem(
+        "user-signup-credentials",
+        toBeStoredUserCredentials
+      );
+    }
+
+    // Convert the string from localStorage into an object
+    const parsedCredentials = JSON.parse(savedCredential);
+    // Merge the parsed credentials with the new userCredentials
+    const newToBeStoredCredentials = {
+      ...parsedCredentials,
+      ...userCredentials,
+    };
+
+    // Save the updated credentials back to localStorage as a string
+    localStorage.setItem(
+      "user-signup-credentials",
+      JSON.stringify(newToBeStoredCredentials)
+    );
+  };
+
   // Initialize the multi-step form without passing nextStep to the element.
   const multiStepForm = useMultiStepForm([
     <EmailPasswordForm
@@ -38,7 +64,7 @@ const SignUpPage = () => {
     <FirstNameLastNameForm
       {...userCredentials}
       updateFields={updateFields}
-      saveCredentials={() => {}}
+      saveCredentials={saveCredentials}
       key="firstNameLastNameForm"
     />,
   ]);
