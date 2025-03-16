@@ -7,6 +7,7 @@ import googleSvg from "@/assets/google.svg";
 import ReCAPTCHA from "react-google-recaptcha";
 import { toast } from "sonner";
 import { signin } from "@/endpoints/userAuth";
+import { validateEmail } from "@/utils";
 
 const SignInPage: React.FC = () => {
   const [identifier, setIdentifier] = useState<string>("");
@@ -16,9 +17,9 @@ const SignInPage: React.FC = () => {
 
   // Helper function to validate the identifier (email or phone)
   const validateIdentifier = (identifier: string): boolean => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    // const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const phoneRegex = /^\+?\d{7,15}$/;
-    return emailRegex.test(identifier) || phoneRegex.test(identifier);
+    return validateEmail(identifier) || phoneRegex.test(identifier);
   };
 
   // Helper function to validate the form
