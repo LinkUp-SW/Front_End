@@ -10,6 +10,7 @@ export function getErrorMessage(error: unknown): string {
     return (
       error.response?.data?.message || // API-provided message
       error.response?.statusText || // HTTP status text
+      error.message||
       "An error occurred while fetching data" // Default fallback
     );
   }
