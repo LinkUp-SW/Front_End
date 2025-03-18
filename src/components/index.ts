@@ -40,6 +40,7 @@ import {
   InputOTPSeparator,
 } from "./ui/input-otp";
 import UserAuthLayout from "./hoc/UserAuthLayout";
+import { Switch } from "./ui/switch";
 
 export {
   UserList,
@@ -81,4 +82,5 @@ export {
   InputOTPSlot,
   InputOTPSeparator,
   UserAuthLayout,
+  Switch
 };
