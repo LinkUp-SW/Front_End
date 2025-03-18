@@ -6,8 +6,9 @@ import { Link } from "react-router-dom";
 import googleSvg from "@/assets/google.svg";
 import ReCAPTCHA from "react-google-recaptcha";
 import { toast } from "sonner";
-import { signin } from "@/endpoints/userAuth";
+import { initiateGoogleAuth, signin } from "@/endpoints/userAuth";
 import { validateEmail } from "@/utils";
+import { getErrorMessage } from "@/utils/errorHandler";
 
 const SignInPage: React.FC = () => {
   const [identifier, setIdentifier] = useState<string>("");
@@ -86,7 +87,7 @@ const SignInPage: React.FC = () => {
       //using real server endpoint
       // Wrap the signin method with toast.promise for success/error handling
       const toastResult = toast.promise(
-        signin(identifier, password, recaptchaToken), // Using the axios signin method
+        signin(identifier, password), // Using the axios signin method
         {
           loading: "Signing in...",
           success: "Signed in successfully!",
@@ -98,8 +99,9 @@ const SignInPage: React.FC = () => {
       const data = await toastResult.unwrap();
       console.log("Submitted", data);
     } catch (error) {
-      toast.error("Sign in failed. Please try again.");
-      console.error("Sign in error:", error);
+      const err = getErrorMessage(error);
+      toast.error(`Sign in failed. Please try again.${err}`);
+      console.error("Sign in error:", error, err);
     } finally {
       stopSubmitting();
     }
@@ -111,7 +113,11 @@ const SignInPage: React.FC = () => {
         <h2 className="text-center text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
           Sign in to your account
         </h2>
-        <button className="flex h-9 w-full items-center justify-center space-x-2 rounded-full cursor-pointer hover:opacity-85 transition-all duration-300 ease-in-out bg-blue-500 text-white py-3 px-6 text-base font-semibold dark:bg-blue-600">
+        <button
+          id="continue-with-google-button"
+          onClick={initiateGoogleAuth}
+          className="flex h-9 w-full items-center justify-center space-x-2 rounded-full cursor-pointer hover:opacity-85 transition-all duration-300 ease-in-out bg-blue-500 text-white py-3 px-6 text-base font-semibold dark:bg-blue-600"
+        >
           <img
             src={googleSvg}
             alt="Google Logo"
@@ -147,6 +153,8 @@ const SignInPage: React.FC = () => {
               setIdentifier(e.target.value)
             }
             type="text"
+            id="email-phone-identifier"
+            name="emailPhoneIdentifier"
           />
           <div className="w-full relative">
             <FormInput
@@ -157,9 +165,12 @@ const SignInPage: React.FC = () => {
                 setPassword(e.target.value)
               }
               type="password"
+              id="password"
+              name="password"
             />
             <Link
               to="#"
+              id="forget-password-link"
               className="text-sm absolute top-5 right-0 font-semibold text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300"
             >
               Forgot password?
@@ -174,6 +185,7 @@ const SignInPage: React.FC = () => {
           <div>
             <button
               type="submit"
+              id="login-button"
               disabled={isSubmitting}
               className="flex disabled:opacity-75 disabled:bg-indigo-500 disabled:cursor-not-allowed cursor-pointer w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:bg-indigo-700 dark:hover:bg-indigo-600 transition-all duration-300 ease-in-out"
             >
@@ -184,6 +196,7 @@ const SignInPage: React.FC = () => {
         <p className="mt-5 text-center text-sm text-gray-500 dark:text-gray-400">
           Not a LinkUp member?{" "}
           <Link
+          id="join-now-link"
             to="/signup"
             className="font-semibold text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300"
           >
