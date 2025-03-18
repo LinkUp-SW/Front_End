@@ -3,19 +3,10 @@ import { Card, CardContent } from "../ui/card";
 import { FaUniversity } from "react-icons/fa";
 import { Avatar, AvatarFallback, AvatarImage } from "../../components";
 import { Link } from "react-router-dom";
-
-interface Profile {
-  coverImage: string;
-  profileImage: string;
-  name: string;
-  headline: string;
-  location: string;
-  university: string;
-}
+import { ProfileCardType } from "@/types";
 
 interface ProfileCardProps {
-  fullWidth?: boolean;
-  profile: Profile;
+  profile: ProfileCardType;
 }
 
 const ProfileCard: React.FC<ProfileCardProps> = ({ profile }) => {
