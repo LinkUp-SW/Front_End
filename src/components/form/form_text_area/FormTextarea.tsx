@@ -4,6 +4,8 @@ interface FormTextareaProps {
   value: string;
   onChange: React.ChangeEventHandler<HTMLTextAreaElement>;
   maxLength: number;
+  id: string;
+  name: string;
 }
 const FormTextarea: React.FC<FormTextareaProps> = ({
   label,
@@ -11,10 +13,14 @@ const FormTextarea: React.FC<FormTextareaProps> = ({
   value,
   onChange,
   maxLength,
+  id,
+  name,
 }) => (
   <div className="flex flex-col gap-2 pt-5">
     <p className="text-sm text-gray-500 dark:text-gray-400">{label}</p>
     <textarea
+      id={id}
+      name={name}
       placeholder={placeholder}
       value={value}
       onChange={onChange}

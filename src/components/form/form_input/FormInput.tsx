@@ -1,3 +1,5 @@
+import { cn } from "@/lib/utils";
+
 interface FormInputProps {
   label: string;
   placeholder: string;
@@ -6,6 +8,9 @@ interface FormInputProps {
   helperText?: string;
   helperTextType?: string;
   type?: string;
+  extraClassName?: string;
+  id: string;
+  name: string;
 }
 const FormInput: React.FC<FormInputProps> = ({
   label,
@@ -15,10 +20,15 @@ const FormInput: React.FC<FormInputProps> = ({
   helperText,
   helperTextType,
   type,
+  extraClassName,
+  id,
+  name,
 }) => (
-  <div className="flex flex-col gap-2 pt-5">
+  <div className={cn("flex flex-col gap-2 pt-5", extraClassName)}>
     <p className="text-sm text-gray-500 dark:text-gray-400">{label}</p>
     <input
+      id={id}
+      name={name}
       type={type || "text"}
       placeholder={placeholder}
       value={value}
