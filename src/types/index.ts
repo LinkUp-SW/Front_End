@@ -6,10 +6,9 @@ export interface RemoveConnectionData {
   userName: string;
 }
 
-
 export interface Notification {
   id: string;
-  type: 'job' | 'post' | 'hiring' | 'course' | 'analytics' | 'recommendation';
+  type: "job" | "post" | "hiring" | "course" | "analytics" | "recommendation";
   content: string;
   time: string;
   profileImg?: string;
@@ -20,9 +19,7 @@ export interface Notification {
   isNew?: boolean;
 }
 
-
-
-export type PostFilter = 'all' | 'comments' | 'reactions' | 'reposts';
+export type PostFilter = "all" | "comments" | "reactions" | "reposts";
 export interface Experience {
   _id: string;
   title: string;
@@ -52,4 +49,32 @@ export interface Skill {
 export interface Media {
   image: string[];
   video: string[];
+}
+
+export enum JobTypeEnum {
+  full_time = "Full-time",
+  part_time = "Part-time",
+  contract = "Contract",
+  temporary = "Temporary",
+  other = "Other",
+  volunteer = "Volunteer",
+  internship = "Internship",
+}
+
+export interface UserStarterInterface {
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  country: string;
+  city: string;
+  isStudent: boolean;
+  jobTitle?: string;
+  school?: string;
+  schoolStarterYear?: string;
+  schoolEndYear?: string;
+  is16OrAbove?: boolean;
+  employeeType?: string;
+  recentCompany?: string;
+  birthDate?: Date;
 }
