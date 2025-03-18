@@ -3,9 +3,12 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import routes from "./routes";
-import { ScreenWidthListener, ThemeListener } from "./components";
+import { ScreenWidthListener, ThemeListener, Toaster } from "./components";
+import { useSelector } from "react-redux";
+import { RootState } from "./store";
 
 const App: React.FC = () => {
+  const theme = useSelector((state: RootState) => state.theme.theme);
   return (
     <>
       <ScreenWidthListener />
@@ -20,6 +23,7 @@ const App: React.FC = () => {
           })}
         </Routes>
       </Router>
+      <Toaster position="top-right" richColors theme={theme} />
     </>
   );
 };

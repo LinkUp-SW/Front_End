@@ -11,6 +11,7 @@ import JobsPage from "./jobs/JobsPage";
 import SeeMorePage from "./jobs/SeeMorePage";
 import FollowingFollowers from "./mynetwork/components/FollowingFollowers";
 import Connections from "./mynetwork/components/Connections";
+import InvitationsManagerPage from "./mynetwork/InvitationsManagerPage";
 
 //Export the Imported Pages
 export {
@@ -24,4 +25,5 @@ export {
   FollowingFollowers,
   Connections,
   NotificationsPage,
+  InvitationsManagerPage,
 };

@@ -4,6 +4,7 @@ import { RootState, AppDispatch } from "../../store";
 import { closeModal } from "../../slices/modal/modalSlice";
 import AboutModal from "../../pages/user_profile/components/modals/about_modal/AboutModal";
 import AddProfileSectionModal from "../../pages/user_profile/components/modals/add_profile_section_modal/AddProfileSectionModal";
+import AddExperienceModal from "@/pages/user_profile/components/modals/experience_modal/AddExperienceModal";
 import ReactionsModal from "../../pages/feed/components/modals/ReactionsModal";
 import CreatePostModal from "../../pages/feed/components/modals/CreatePostModal";
 import ReportPostModal from "../../pages/feed/components/modals/ReportPostModal";
@@ -47,6 +48,8 @@ const Modal: React.FC = () => {
         return <AboutModal />; // Add more cases for other modals as needed
       case "add_profile_section":
         return <AddProfileSectionModal />;
+        case "experience":
+          return <AddExperienceModal />;
       case "remove_connection": {
         if (
           !modalData ||
@@ -97,7 +100,7 @@ const Modal: React.FC = () => {
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className={`bg-white dark:bg-gray-900 max-h-md overflow-y-auto overflow-x-hidden rounded-lg p-6 max-h-[45rem] shadow-lg relative transform transition-all duration-300 w-fit
+        className={`bg-white dark:bg-gray-900 max-h-md overflow-y-auto overflow-x-hidden rounded-lg p-6 max-h-[45rem] shadow-lg relative transform transition-all duration-300 w-full sm:w-fit
                     ${
                       animate ? "scale-100 opacity-100" : "scale-95 opacity-0"
                     }`}

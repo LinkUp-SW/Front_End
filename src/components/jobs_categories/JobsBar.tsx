@@ -89,8 +89,6 @@ const JobCategoryBar: React.FC<JobCategoryBarProps> = ({
     );
   };
 
- 
-
   // Function to find category index
   const findCategoryIndex = (category: string): number => {
     return categories.indexOf(category);
@@ -109,11 +107,11 @@ const JobCategoryBar: React.FC<JobCategoryBarProps> = ({
   }, [selectedCategory]);
 
   return (
-    <div className="w-full bg-white border-b border-gray-200 px-4 py-2 flex items-center fixed top-15 left-0 z-15">
+    <div className="w-full bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-4 py-2 flex items-center fixed top-15 left-0 z-13">
       {currentIndex > 0 && (
         <button 
           onClick={handlePrev} 
-          className="text-gray-600 hover:text-blue-600 px-2 transition-colors duration-200"
+          className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 px-2 transition-colors duration-200"
           aria-label="Previous categories"
         >
           <IoChevronBackCircleOutline size={26} />
@@ -136,7 +134,7 @@ const JobCategoryBar: React.FC<JobCategoryBarProps> = ({
               <div 
                 key={category} 
                 className={`flex-shrink-0 flex flex-col items-center justify-center cursor-pointer group px-2 py-1 ${
-                  isSelected ? 'text-blue-600' : ''
+                  isSelected ? 'text-blue-600 dark:text-blue-400' : ''
                 }`}
                 style={{
                   width: `${100 / visibleCategories}%`
@@ -145,22 +143,22 @@ const JobCategoryBar: React.FC<JobCategoryBarProps> = ({
               >
                 <div className={`w-10 h-10 flex items-center justify-center mb-1 rounded-full ${
                   isSelected 
-                    ? 'bg-blue-100' 
-                    : 'bg-gray-50 group-hover:bg-blue-50'
+                    ? 'bg-blue-100 dark:bg-blue-900/40' 
+                    : 'bg-gray-50 dark:bg-gray-700 group-hover:bg-blue-50 dark:group-hover:bg-blue-900/30'
                 } transition-colors duration-200`}>
                   <Icon 
                     className={`${
                       isSelected 
-                        ? 'text-blue-600' 
-                        : 'text-gray-600 group-hover:text-blue-600'
+                        ? 'text-blue-600 dark:text-blue-400' 
+                        : 'text-gray-600 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400'
                     } transition-colors duration-200`} 
                     size={22} 
                   />
                 </div>
                 <span className={`text-xs ${
                   isSelected 
-                    ? 'text-blue-600 font-medium' 
-                    : 'text-gray-600 group-hover:text-blue-600'
+                    ? 'text-blue-600 dark:text-blue-400 font-medium' 
+                    : 'text-gray-600 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400'
                 } transition-colors duration-200 text-center`}>
                   {category}
                 </span>
@@ -173,7 +171,7 @@ const JobCategoryBar: React.FC<JobCategoryBarProps> = ({
       {currentIndex < categories.length - visibleCategories && (
         <button 
           onClick={handleNext} 
-          className="text-gray-600 hover:text-blue-600 px-2 transition-colors duration-200"
+          className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 px-2 transition-colors duration-200"
           aria-label="Next categories"
         >
           <IoChevronForwardCircleOutline size={26} />

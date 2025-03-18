@@ -60,7 +60,7 @@ const FeedPage = () => {
   return (
     <>
       <div className="flex justify-center w-full px-0 xl:px-[10%]">
-        <section className="flex w-full gap-4 md:flex-row flex-col">
+        <section className="flex w-full justify-center gap-4 md:flex-row flex-col">
           {/* Left Sidebar */}
           <aside className="flex flex-col h-full w-full md:max-w-60">
             {profile && <ProfileCard profile={profile} />}
