@@ -39,6 +39,8 @@ const FirstNameLastNameForm = ({
             updateFields({ firstName: e.target.value });
           }}
           type="text"
+          id="first-name"
+          name="firstName"
         />
         <div className="w-full relative">
           <FormInput
@@ -48,11 +50,14 @@ const FirstNameLastNameForm = ({
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
               updateFields({ lastName: e.target.value });
             }}
+            id="last-name"
+            name="lastName"
           />
         </div>
         <div>
           <button
             type="button"
+            id="continue-button"
             onClick={handleFirstnameLastnameSubmit}
             className="flex disabled:opacity-75 disabled:bg-indigo-500 disabled:cursor-not-allowed cursor-pointer w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:bg-indigo-700 dark:hover:bg-indigo-600 transition-all duration-300 ease-in-out"
           >

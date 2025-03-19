@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { UserAuthLayout } from "@/components";
 import { useMultiStepForm } from "@/hooks/useMultistepForm";
 import { EmailPasswordForm, FirstNameLastNameForm } from "./multi_step";
 import { GrFormPrevious } from "react-icons/gr";
+import { handleSaveCredentials } from "@/utils";
+import { Link } from "react-router-dom";
 
 type FormData = {
   firstName: string;
@@ -23,35 +25,17 @@ const SignUpPage = () => {
     INITIAL_USER_CREDENTIALS
   );
 
+  useEffect(() => {
+    localStorage.removeItem("user-signup-credentials");
+  }, []);
+
   // Update the user credentials state with new field values.
   const updateFields = (fields: Partial<FormData>) => {
     setUserCredentials((prev) => ({ ...prev, ...fields }));
   };
 
   const saveCredentials = () => {
-    const savedCredential = localStorage.getItem("user-signup-credentials");
-
-    if (!savedCredential) {
-      const toBeStoredUserCredentials = JSON.stringify(userCredentials);
-      return localStorage.setItem(
-        "user-signup-credentials",
-        toBeStoredUserCredentials
-      );
-    }
-
-    // Convert the string from localStorage into an object
-    const parsedCredentials = JSON.parse(savedCredential);
-    // Merge the parsed credentials with the new userCredentials
-    const newToBeStoredCredentials = {
-      ...parsedCredentials,
-      ...userCredentials,
-    };
-
-    // Save the updated credentials back to localStorage as a string
-    localStorage.setItem(
-      "user-signup-credentials",
-      JSON.stringify(newToBeStoredCredentials)
-    );
+    handleSaveCredentials(userCredentials);
   };
 
   // Initialize the multi-step form without passing nextStep to the element.
@@ -87,6 +71,7 @@ const SignUpPage = () => {
     <main className="flex min-h-full w-full max-w-md flex-col justify-center relative pt-4">
       {!multiStepForm.isFirstStep && (
         <button
+          id="navigate-back-button"
           onClick={multiStepForm.previousStep}
           className="cursor-pointer absolute text-lg dark:text-gray-300 font-semibold top-[-1.5rem] inline-flex items-center"
         >
@@ -99,6 +84,16 @@ const SignUpPage = () => {
         </h2>
       </header>
       {currentStepWithProps}
+      <p className="mt-5 text-center text-sm text-gray-500 dark:text-gray-400">
+        Already a member?{" "}
+        <Link
+          id="login-now-link"
+          to="/login"
+          className="font-semibold text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300"
+        >
+          Login Now
+        </Link>
+      </p>
     </main>
   );
 };
