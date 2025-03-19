@@ -16,6 +16,8 @@ import {
   SignInPage,
   SignUpPage,
   LocationPage,
+  OrganizationPage,
+  EmailVerification,
 } from "./pages";
 
 import React from "react";
@@ -78,6 +80,14 @@ const routes: RouteObject[] = [
   {
     path: "/signup/location",
     element: React.createElement(LocationPage),
+  },
+  {
+    path: "/signup/organization",
+    element: React.createElement(OrganizationPage),
+  },
+  {
+    path: "/email-verification",
+    element: React.createElement(EmailVerification),
   },
 ];
 
