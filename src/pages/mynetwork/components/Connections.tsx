@@ -1,28 +1,17 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import { useDispatch } from "react-redux";
 import { FaSearch, FaTimes } from "react-icons/fa";
 import { openModal } from "@/slices/modal/modalSlice";
 import withSidebarAd from "@/components/hoc/withSidebarAd"; // Import the HOC
 import { Modal, WithNavBar } from "../../../components";
-
-interface Connection {
-  id: number;
-  name: string;
-  title: string;
-  date: string;
-  image: string;
-}
-
-
+import { fetchConnections, Connection } from "@/endpoints/myNetwork";
 
 const Connections: React.FC = () => {
   const dispatch = useDispatch();
   const [search, setSearch] = useState("");
-  const [connections, setConnections] =
-    useState<Connection[]>([]);
+  const [connections, setConnections] = useState<Connection[]>([]);
 
   const [loading, setLoading] = useState(true);
-
 
   const handleRemoveConnection = useCallback((userId: number) => {
     setConnections((prevConnections) =>
@@ -30,30 +19,28 @@ const Connections: React.FC = () => {
     );
   }, []);
 
-  useEffect(() => {
-    const fetchConnections = async () => {
-      setLoading(true);
-      try {
-        const response = await fetch("/api/connections");
-        const data = await response.json();
-        setConnections(data);
-      } catch (error) {
-        console.error("Error fetching connections:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchConnections();
+  // Fetch using callback and manual trigger
+  const loadConnections = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await fetchConnections();
+      setConnections(data);
+    } catch (error) {
+      console.error("Error fetching connections:", error);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-
+  useState(() => {
+    loadConnections();
+  });
 
   return (
     <div className="min-h-screen p-10 flex flex-col lg:flex-row ">
       <div className="flex-1 bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 max-h-fit">
         <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
-        {loading ? "Loading..." : `${connections.length} connections`}
+          {loading ? "Loading..." : `${connections.length} connections`}
         </h2>
 
         <div className="relative w-full mb-4">
@@ -125,8 +112,6 @@ const Connections: React.FC = () => {
             ))}
         </div>
       </div>
-
-      
 
       <Modal />
     </div>
