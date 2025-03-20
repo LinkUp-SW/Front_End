@@ -112,6 +112,51 @@ const MOCK_NOTIFICATIONS: Notification[] = [
   }
 ];
 
+
+// Add mock connections 
+const MOCK_CONNECTIONS = [
+  {
+    id: 1,
+    name: "John Doe",
+    title: "Software Engineer at Google",
+    date: "March 5, 2025",
+    image:
+      "https://www.svgrepo.com/show/382107/male-avatar-boy-face-man-user-6.svg",
+  },
+  {
+    id: 2,
+    name: "Jane Smith",
+    title: "Data Scientist at Facebook",
+    date: "March 3, 2025",
+    image:
+      "https://www.svgrepo.com/show/382097/female-avatar-girl-face-woman-user-9.svg",
+  },
+  {
+    id: 3,
+    name: "Robert Johnson",
+    title: "Product Manager at Amazon",
+    date: "March 1, 2025",
+    image:
+      "https://www.svgrepo.com/show/382107/male-avatar-boy-face-man-user-6.svg",
+  },
+  {
+    id: 4,
+    name: "Emily Davis",
+    title: "UX Designer at Apple",
+    date: "February 27, 2025",
+    image:
+      "https://www.svgrepo.com/show/382097/female-avatar-girl-face-woman-user-9.svg",
+  },
+  {
+    id: 5,
+    name: "Michael Wilson",
+    title: "Cybersecurity Analyst at Microsoft",
+    date: "February 25, 2025",
+    image:
+      "https://www.svgrepo.com/show/382107/male-avatar-boy-face-man-user-6.svg",
+  },
+];
+
 export const handlers = [
   // Get all users
   http.get("/get-users", async () => {
@@ -136,4 +181,10 @@ export const handlers = [
     console.log("[MSW] Intercepted GET /api/notifications");
     return HttpResponse.json<Notification[]>(MOCK_NOTIFICATIONS);
   }),
+
+  http.get("/api/connections",async()=>
+  {
+    console.log("[MSW] Intercepted GET /api/connections");
+    return HttpResponse.json(MOCK_CONNECTIONS);
+  })
 ];
