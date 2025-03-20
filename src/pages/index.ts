@@ -15,6 +15,9 @@ import InvitationsManagerPage from "./mynetwork/InvitationsManagerPage";
 import SignInPage from "./auth/sign_in/SignInPage";
 import { SignUpPage, LocationPage, OrganizationPage } from "./auth/sign_up";
 import EmailVerification from "./auth/email_verification/EmailVerification";
+import ForgetPasswordPage from "./auth/forget_password/ForgetPasswordPage";
+import ResetPasswordPage from "./auth/reset_password/ResetPasswordPage";
+import NotFoundPage from "./404/NotFoundPage";
 
 //Export the Imported Pages
 export {
@@ -33,5 +36,8 @@ export {
   SignUpPage,
   LocationPage,
   OrganizationPage,
-  EmailVerification
+  EmailVerification,
+  ForgetPasswordPage,
+  ResetPasswordPage,
+  NotFoundPage,
 };

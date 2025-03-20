@@ -18,6 +18,9 @@ import {
   LocationPage,
   OrganizationPage,
   EmailVerification,
+  ForgetPasswordPage,
+  ResetPasswordPage,
+  NotFoundPage
 } from "./pages";
 
 import React from "react";
@@ -88,6 +91,18 @@ const routes: RouteObject[] = [
   {
     path: "/email-verification",
     element: React.createElement(EmailVerification),
+  },
+  {
+    path: "/forget-password",
+    element: React.createElement(ForgetPasswordPage),
+  },
+  {
+    path:'/reset-password/:token',
+    element:React.createElement(ResetPasswordPage)
+  },
+  {
+    path: "*",
+    element: React.createElement(NotFoundPage),
   },
 ];
 
