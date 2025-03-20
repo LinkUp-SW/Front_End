@@ -47,3 +47,25 @@ export const verifyOTP = async (otp: string) => {
 export const initiateGoogleAuth = () => {
   window.location.href = "http://localhost:3000/auth/google";
 };
+
+export const initiateForgetPassword = async (email: string) => {
+  const response = await axios.post(
+    "http://localhost:3000/api/v1/user/forget-password",
+    {
+      email,
+    }
+  );
+
+  return response.data;
+};
+
+export const resetPassword = async (password: string, token: string) => {
+  const response = await axios.patch(
+    "http://localhost:3000/api/v1/user/reset-password",
+    {
+      password: password,
+      token: token,
+    }
+  );
+  return response.data;
+};
