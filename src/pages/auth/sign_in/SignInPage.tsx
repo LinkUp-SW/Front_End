@@ -169,7 +169,7 @@ const SignInPage: React.FC = () => {
               name="password"
             />
             <Link
-              to="#"
+              to="/forget-password"
               id="forget-password-link"
               className="text-sm absolute top-5 right-0 font-semibold text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300"
             >
