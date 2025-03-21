@@ -4,63 +4,14 @@ import { FaSearch, FaTimes } from "react-icons/fa";
 import { openModal } from "@/slices/modal/modalSlice";
 import withSidebarAd from "@/components/hoc/withSidebarAd"; // Import the HOC
 import { Modal, WithNavBar } from "../../../components";
-
-interface Connection {
-  id: number;
-  name: string;
-  title: string;
-  date: string;
-  image: string;
-}
-
-const initialConnections: Connection[] = [
-  {
-    id: 1,
-    name: "John Doe",
-    title: "Software Engineer at Google",
-    date: "March 5, 2025",
-    image:
-      "https://www.svgrepo.com/show/382107/male-avatar-boy-face-man-user-6.svg",
-  },
-  {
-    id: 2,
-    name: "Jane Smith",
-    title: "Data Scientist at Facebook",
-    date: "March 3, 2025",
-    image:
-      "https://www.svgrepo.com/show/382097/female-avatar-girl-face-woman-user-9.svg",
-  },
-  {
-    id: 3,
-    name: "Robert Johnson",
-    title: "Product Manager at Amazon",
-    date: "March 1, 2025",
-    image:
-      "https://www.svgrepo.com/show/382107/male-avatar-boy-face-man-user-6.svg",
-  },
-  {
-    id: 4,
-    name: "Emily Davis",
-    title: "UX Designer at Apple",
-    date: "February 27, 2025",
-    image:
-      "https://www.svgrepo.com/show/382097/female-avatar-girl-face-woman-user-9.svg",
-  },
-  {
-    id: 5,
-    name: "Michael Wilson",
-    title: "Cybersecurity Analyst at Microsoft",
-    date: "February 25, 2025",
-    image:
-      "https://www.svgrepo.com/show/382107/male-avatar-boy-face-man-user-6.svg",
-  },
-];
+import { fetchConnections, Connection } from "@/endpoints/myNetwork";
 
 const Connections: React.FC = () => {
   const dispatch = useDispatch();
   const [search, setSearch] = useState("");
-  const [connections, setConnections] =
-    useState<Connection[]>(initialConnections);
+  const [connections, setConnections] = useState<Connection[]>([]);
+
+  const [loading, setLoading] = useState(true);
 
   const handleRemoveConnection = useCallback((userId: number) => {
     setConnections((prevConnections) =>
@@ -68,11 +19,28 @@ const Connections: React.FC = () => {
     );
   }, []);
 
+  // Fetch using callback and manual trigger
+  const loadConnections = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await fetchConnections();
+      setConnections(data);
+    } catch (error) {
+      console.error("Error fetching connections:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useState(() => {
+    loadConnections();
+  });
+
   return (
     <div className="min-h-screen p-10 flex flex-col lg:flex-row ">
       <div className="flex-1 bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 max-h-fit">
         <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
-          {connections.length} connections
+          {loading ? "Loading..." : `${connections.length} connections`}
         </h2>
 
         <div className="relative w-full mb-4">
@@ -144,8 +112,6 @@ const Connections: React.FC = () => {
             ))}
         </div>
       </div>
-
-      
 
       <Modal />
     </div>

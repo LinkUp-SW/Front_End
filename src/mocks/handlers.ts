@@ -142,7 +142,7 @@ Hi everyone, I'm excited to share a project my team and I recently completed for
     },
     action: {
       name: "Panda",
-      action: "like" as "like",
+      action: "like" as const,
       profileImage:
         "https://gratisography.com/wp-content/uploads/2024/11/gratisography-augmented-reality-800x525.jpg",
     },
@@ -174,7 +174,7 @@ Hi everyone, I'm excited to share a project my team and I recently completed for
     },
     action: {
       name: "Panda",
-      action: "like" as "like",
+      action: "like" as const,
       profileImage:
         "https://gratisography.com/wp-content/uploads/2024/11/gratisography-augmented-reality-800x525.jpg",
     },
@@ -206,7 +206,7 @@ Hi everyone, I'm excited to share a project my team and I recently completed for
     },
     action: {
       name: "Panda",
-      action: "like" as "like",
+      action: "like" as const,
       profileImage:
         "https://gratisography.com/wp-content/uploads/2024/11/gratisography-augmented-reality-800x525.jpg",
     },
@@ -238,7 +238,7 @@ Hi everyone, I'm excited to share a project my team and I recently completed for
     },
     action: {
       name: "Panda",
-      action: "like" as "like",
+      action: "like" as const,
       profileImage:
         "https://gratisography.com/wp-content/uploads/2024/11/gratisography-augmented-reality-800x525.jpg",
     },
@@ -329,6 +329,54 @@ const MOCK_COMMENTS: CommentType[] = [
   },
 ];
 
+
+// mock connections 
+const MOCK_CONNECTIONS = [
+  {
+    id: 1,
+    name: "John Doe",
+    title: "Software Engineer at Google",
+    date: "March 5, 2025",
+    image:
+      "https://www.svgrepo.com/show/382107/male-avatar-boy-face-man-user-6.svg",
+  },
+  {
+    id: 2,
+    name: "Jane Smith",
+    title: "Data Scientist at Facebook",
+    date: "March 3, 2025",
+    image:
+      "https://www.svgrepo.com/show/382097/female-avatar-girl-face-woman-user-9.svg",
+  },
+  {
+    id: 3,
+    name: "Robert Johnson",
+    title: "Product Manager at Amazon",
+    date: "March 1, 2025",
+    image:
+      "https://www.svgrepo.com/show/382107/male-avatar-boy-face-man-user-6.svg",
+  },
+  {
+    id: 4,
+    name: "Emily Davis",
+    title: "UX Designer at Apple",
+    date: "February 27, 2025",
+    image:
+      "https://www.svgrepo.com/show/382097/female-avatar-girl-face-woman-user-9.svg",
+  },
+  {
+    id: 5,
+    name: "Michael Wilson",
+    title: "Cybersecurity Analyst at Microsoft",
+    date: "February 25, 2025",
+    image:
+      "https://www.svgrepo.com/show/382107/male-avatar-boy-face-man-user-6.svg",
+  },
+];
+
+
+
+
 export const handlers = [
   // Get all users
   http.get("/get-users", async () => {
@@ -356,9 +404,8 @@ export const handlers = [
     console.log("[MSW] Intercepted GET /api/notifications");
     return HttpResponse.json<Notification[]>(MOCK_NOTIFICATIONS);
   }),
-
-  // Handler for posts
-  http.get("/api/posts", async () => {
+   // Handler for posts
+   http.get("/api/posts", async () => {
     console.log("[MSW] Intercepted GET /api/posts");
     return HttpResponse.json<PostType[]>(MOCK_POSTS);
   }),
@@ -373,4 +420,9 @@ export const handlers = [
     console.log("[MSW] Intercepted GET /api/postComments");
     return HttpResponse.json<CommentType[]>(MOCK_COMMENTS);
   }),
+  http.get("/api/connections",async()=>
+    {
+      console.log("[MSW] Intercepted GET /api/connections");
+      return HttpResponse.json(MOCK_CONNECTIONS);
+    })
 ];
