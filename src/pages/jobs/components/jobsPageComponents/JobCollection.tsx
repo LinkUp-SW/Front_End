@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { FaArrowRight } from "react-icons/fa6";
 import JobCard from "./JobCard";
-import { Job } from "../types";
-import { JOB_COLLECTIONS } from "../../../constants/index";
+import { Job } from "../../types";
+import { JOB_COLLECTIONS } from "../../../../constants/index";
 
 interface JobCollectionsProps {
   jobs: Job[];

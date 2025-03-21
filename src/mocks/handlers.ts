@@ -114,6 +114,48 @@ const MOCK_NOTIFICATIONS: Notification[] = [
   },
 ];
 
+const MOCK_FOLLOWERS = [
+  {
+    name: "Jessica Brown",
+    title: "UX Designer at Apple",
+    image:
+      "https://www.svgrepo.com/show/382097/female-avatar-girl-face-woman-user-9.svg",
+  },
+  {
+    name: "Daniel Wilson",
+    title: "Backend Developer at Microsoft",
+    image:
+      "https://www.svgrepo.com/show/382107/male-avatar-boy-face-man-user-6.svg",
+  },
+  {
+    name: "Sophia Martinez",
+    title: "Marketing Specialist at Tesla",
+    image:
+      "https://www.svgrepo.com/show/382097/female-avatar-girl-face-woman-user-9.svg",
+  },
+];
+
+const MOCK_FOLLOWING = [
+  {
+    name: "John Doe",
+    title: "Software Engineer at Google",
+    image:
+      "https://www.svgrepo.com/show/382107/male-avatar-boy-face-man-user-6.svg",
+  },
+  {
+    name: "Emily Smith",
+    title: "Product Manager at Facebook",
+    image:
+      "https://www.svgrepo.com/show/382097/female-avatar-girl-face-woman-user-9.svg",
+  },
+  {
+    name: "Michael Johnson",
+    title: "Data Scientist at Amazon",
+    image:
+      "https://www.svgrepo.com/show/382107/male-avatar-boy-face-man-user-6.svg",
+  },
+];
+
 const MOCK_POSTS: PostType[] = [
   {
     user: {
@@ -396,6 +438,10 @@ export const handlers = [
         status: 404,
         statusText: "User Not Found",
       });
+      return new HttpResponse(null, {
+        status: 404,
+        statusText: "User Not Found",
+      });
     }
     return HttpResponse.json<User>(user);
   }),
@@ -403,6 +449,16 @@ export const handlers = [
   http.get("/api/notifications", async () => {
     console.log("[MSW] Intercepted GET /api/notifications");
     return HttpResponse.json<Notification[]>(MOCK_NOTIFICATIONS);
+  }),
+  // New handler for followers
+  http.get("/api/followers", async () => {
+    console.log("[MSW] Intercepted GET /api/followers");
+    return HttpResponse.json(MOCK_FOLLOWERS);
+  }),
+
+  http.get("/api/following", async () => {
+    console.log("[MSW] Intercepted GET /api/following");
+    return HttpResponse.json(MOCK_FOLLOWING);
   }),
    // Handler for posts
    http.get("/api/posts", async () => {
