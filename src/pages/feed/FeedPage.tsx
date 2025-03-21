@@ -16,10 +16,38 @@ import {
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
+import { CommentType, PostType, ProfileCardType } from "@/types";
+import { getFeedPosts, getPostComments } from "@/endpoints/feed";
+import { getProfileCardData } from "@/endpoints/userProfile";
 
 const FeedPage = () => {
   const [viewMore, setViewMore] = useState(true);
   const screenWidth = useSelector((state: RootState) => state.screen.width);
+
+  const [posts, setPosts] = useState<PostType[]>([]);
+  const [profile, setProfile] = useState<ProfileCardType>();
+  const [comments, setComments] = useState<CommentType[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Call both endpoints concurrently
+        const [fetchedPosts, fetchedProfile, fetchedComments] =
+          await Promise.all([
+            getFeedPosts(),
+            getProfileCardData(),
+            getPostComments(),
+          ]);
+        setPosts(fetchedPosts);
+        setProfile(fetchedProfile);
+        setComments(fetchedComments);
+      } catch (error) {
+        console.error("Error fetching feed data", error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   useEffect(() => {
     if (screenWidth < 768) {
@@ -35,7 +63,7 @@ const FeedPage = () => {
         <section className="flex w-full justify-center gap-4 md:flex-row flex-col">
           {/* Left Sidebar */}
           <aside className="flex flex-col h-full w-full md:max-w-60">
-            <ProfileCard profile={exampleProfile} />
+            {profile && <ProfileCard profile={profile} />}
             <Button
               variant="ghost"
               className="block md:hidden hover:cursor-pointer hover:bg-stone-200 w-full transition-colors my-2"
@@ -65,15 +93,9 @@ const FeedPage = () => {
           </aside>
           {/* Main Content */}
           <main className="flex flex-col w-full md:max-w-[34.8rem]">
-            <CreatePost profileImageUrl={exampleProfile.profileImage} />
-            {examplePosts.map((post, index) => (
-              <Post
-                key={index}
-                user={post.user}
-                post={post.post}
-                stats={post.stats}
-                action={post.action}
-              />
+            <CreatePost profileImageUrl={profile?.profileImage || ""} />
+            {posts.map((post, index) => (
+              <Post key={index} postData={post} comments={comments} />
             ))}
           </main>
           {/* Right Sidebar */}
@@ -90,146 +112,3 @@ const FeedPage = () => {
 };
 
 export default WithNavBar(FeedPage);
-
-const exampleProfile = {
-  fullWidth: true,
-  coverImage:
-    "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
-  profileImage: "https://github.com/shadcn.png",
-  name: "Amr Doma",
-  headline:
-    "Ex-SWE Intern at Valeo | Ex-Clinical Engineering Intern at As-Salam International Hospital",
-  location: "Qesm el Maadi, Cairo",
-  university: "Cairo University",
-};
-
-const examplePosts = [
-  {
-    user: {
-      name: "Abdelrahman Elsayed",
-      headline:
-        "Student at German University in cairo Student at German University in cairo Student at German University in cairo",
-      profileImage:
-        "https://gratisography.com/wp-content/uploads/2024/11/gratisography-augmented-reality-800x525.jpg",
-      degree: "Following",
-    },
-    post: {
-      content: `
-    University Project Showcase: Herzenbrücke Donation Website
-
-Hi everyone, I'm excited to share a project my team and I recently completed for our university...`,
-      date: 0,
-      public: true,
-      edited: true,
-    },
-    stats: {
-      likes: 15,
-      love: 2,
-      support: 1,
-      celebrate: 1,
-      comments: 4,
-    },
-    action: {
-      name: "Panda",
-      action: "like" as "like",
-      profileImage:
-        "https://gratisography.com/wp-content/uploads/2024/11/gratisography-augmented-reality-800x525.jpg",
-    },
-  },
-  {
-    user: {
-      name: "Abdelrahman Elsayed",
-      headline:
-        "Student at German University in cairo Student at German University in cairo Student at German University in cairo",
-      profileImage:
-        "https://gratisography.com/wp-content/uploads/2024/11/gratisography-augmented-reality-800x525.jpg",
-      degree: "Following",
-    },
-    post: {
-      content: `
-    University Project Showcase: Herzenbrücke Donation Website
-
-Hi everyone, I'm excited to share a project my team and I recently completed for our university...`,
-      date: 0,
-      public: true,
-      edited: true,
-    },
-    stats: {
-      likes: 15,
-      love: 2,
-      support: 1,
-      celebrate: 1,
-      comments: 4,
-    },
-    action: {
-      name: "Panda",
-      action: "like" as "like",
-      profileImage:
-        "https://gratisography.com/wp-content/uploads/2024/11/gratisography-augmented-reality-800x525.jpg",
-    },
-  },
-  {
-    user: {
-      name: "Abdelrahman Elsayed",
-      headline:
-        "Student at German University in cairo Student at German University in cairo Student at German University in cairo",
-      profileImage:
-        "https://gratisography.com/wp-content/uploads/2024/11/gratisography-augmented-reality-800x525.jpg",
-      degree: "Following",
-    },
-    post: {
-      content: `
-    University Project Showcase: Herzenbrücke Donation Website
-
-Hi everyone, I'm excited to share a project my team and I recently completed for our university...`,
-      date: 0,
-      public: true,
-      edited: true,
-    },
-    stats: {
-      likes: 15,
-      love: 2,
-      support: 1,
-      celebrate: 1,
-      comments: 4,
-    },
-    action: {
-      name: "Panda",
-      action: "like" as "like",
-      profileImage:
-        "https://gratisography.com/wp-content/uploads/2024/11/gratisography-augmented-reality-800x525.jpg",
-    },
-  },
-  {
-    user: {
-      name: "Abdelrahman Elsayed",
-      headline:
-        "Student at German University in cairo Student at German University in cairo Student at German University in cairo",
-      profileImage:
-        "https://gratisography.com/wp-content/uploads/2024/11/gratisography-augmented-reality-800x525.jpg",
-      degree: "Following",
-    },
-    post: {
-      content: `
-    University Project Showcase: Herzenbrücke Donation Website
-
-Hi everyone, I'm excited to share a project my team and I recently completed for our university...`,
-      date: 0,
-      public: true,
-      edited: true,
-    },
-    stats: {
-      likes: 15,
-      love: 2,
-      support: 1,
-      celebrate: 1,
-      comments: 4,
-    },
-    action: {
-      name: "Panda",
-      action: "like" as "like",
-      profileImage:
-        "https://gratisography.com/wp-content/uploads/2024/11/gratisography-augmented-reality-800x525.jpg",
-    },
-  },
-];
