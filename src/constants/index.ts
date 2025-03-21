@@ -355,3 +355,13 @@ export const RECENT_SEARCHES = [
   },
   { query: "agile", location: "Cairo, Egypt", applyOn: false },
 ];
+
+export const POST_ACTIONS: Record<string, string> = {
+  like: "likes this",
+  comment: "commented on this",
+  repost: "reposted this",
+  love: "loves this",
+  insightful: "finds this insightful",
+  celebrate: "celebrates this",
+  error: "no action",
+};
