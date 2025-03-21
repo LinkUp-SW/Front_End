@@ -6,10 +6,9 @@ export interface RemoveConnectionData {
   userName: string;
 }
 
-
 export interface Notification {
   id: string;
-  type: 'job' | 'post' | 'hiring' | 'course' | 'analytics' | 'recommendation';
+  type: "job" | "post" | "hiring" | "course" | "analytics" | "recommendation";
   content: string;
   time: string;
   profileImg?: string;
@@ -20,9 +19,74 @@ export interface Notification {
   isNew?: boolean;
 }
 
+export interface PostType {
+  user: {
+    name: string;
+    profileImage: string;
+    headline?: string;
+    followers?: string;
+    degree: string;
+  };
+  post: {
+    content: string;
+    date: number;
+    images?: string[];
+    public: boolean;
+    edited?: boolean;
+  };
+  stats: {
+    likes?: number;
+    comments?: number;
+    celebrate?: number;
+    love?: number;
+    insightful?: number;
+    support?: number;
+    funny?: number;
+    person?: string;
+  };
+  action?: {
+    name?: string;
+    profileImage?: string;
+    action?: "like" | "comment" | "repost" | "love";
+  };
+}
 
+export interface ProfileCardType {
+  coverImage: string;
+  profileImage: string;
+  name: string;
+  headline: string;
+  location: string;
+  university: string;
+}
 
-export type PostFilter = 'all' | 'comments' | 'reactions' | 'reposts';
+export interface CommentType {
+  user: {
+    profileImage: string;
+    name: string;
+    degree: string;
+    followers?: string;
+    headline?: string;
+  };
+  comment: {
+    text: string;
+    image?: string;
+    edited?: boolean;
+  };
+  stats: {
+    likes?: number;
+    replies?: number;
+    celebrate?: number;
+    love?: number;
+    insightful?: number;
+    support?: number;
+    funny?: number;
+    person?: string;
+  };
+}
+
+export type PostFilter = "all" | "comments" | "reactions" | "reposts";
+
 export interface Experience {
   _id: string;
   title: string;
