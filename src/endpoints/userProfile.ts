@@ -1,4 +1,5 @@
-import axios  from "axios";
+import { ProfileCardType } from "@/types";
+import axios from "axios";
 
 interface User {
   id: string;
@@ -18,8 +19,24 @@ export const getUserInfoByID = async (id: string): Promise<User> => {
   } catch (error) {
     if (axios.isAxiosError(error)) {
       console.error("Axios Error:", error.response?.data || error.message);
-      throw new Error(error.response?.statusText || "Failed to fetch user info");
+      throw new Error(
+        error.response?.statusText || "Failed to fetch user info"
+      );
     }
     throw new Error("Unexpected error occurred");
+  }
+};
+
+export const getProfileCardData = async (): Promise<ProfileCardType> => {
+  try {
+    const response = await axios.get(
+      import.meta.env.VITE_NODE_ENV === "DEV"
+        ? "/api/profile"
+        : "actual api endpoint"
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    throw error;
   }
 };

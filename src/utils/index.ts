@@ -1,9 +1,14 @@
-import { openModal } from "../slices/modal/modalSlice";
+import { openModal } from "@/slices/modal/modalSlice";
 
-export const convertStringsArrayToLowerCase = (arr: string[]) => {
+// Example utility function to convert an array of strings to lowercase
+export const convertStringsArrayToLowerCase = (arr: string[]): string[] => {
   return arr.map((el) => el.toLocaleLowerCase());
 };
 
-export const handleOpenModalType = (modalType: string) => {
-  return openModal(modalType);
+// Annotate the function so TypeScript can infer the generic type properly.
+export const handleOpenModalType = <T>(
+  modalType: string,
+  modalData: T|null=null
+): ReturnType<typeof openModal> => {
+  return openModal({ modalType, modalData });
 };

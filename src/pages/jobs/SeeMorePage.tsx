@@ -1,13 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { WithNavBar } from '../../components';
 import JobCategoryBar from "../../components/jobs_categories/JobsBar";
 import JobListings from "./components/JobListings";
 
-const SeeMorePage = () => {
+const SeeMorePage: React.FC = () => {
+  const [selectedCategory, setSelectedCategory] = useState<string>("For You");
+
+  const handleCategorySelect = (category: string): void => {
+    setSelectedCategory(category);
+  };
+
   return (
     <div>
-      <JobCategoryBar />
-      <JobListings />
+      <JobCategoryBar selectedCategory={selectedCategory} onCategorySelect={handleCategorySelect} />
+      {selectedCategory === "For You" && <JobListings />}
     </div>
   );
 };
