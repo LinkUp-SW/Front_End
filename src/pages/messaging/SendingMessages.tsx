@@ -1,22 +1,25 @@
+import { useDispatch } from "react-redux";
+import { sendMessage } from "../../slices/messaging/messagingSlice";
+
 import { FaRegImage } from "react-icons/fa6";
 import { MdOutlineEmojiEmotions } from "react-icons/md";
 import { MdAttachFile } from "react-icons/md";
 import { IoIosClose } from "react-icons/io";
 import { FaFileAlt } from "react-icons/fa";
-
 import { useState } from "react";
 import EmojiPicker from "emoji-picker-react";
 import { handleRequest } from "msw";
 
 const SendingMessages = () => {
+  const dispatch = useDispatch();
   const [selectedImage, setSelectedMessages] = useState(false);
   const [selectedEmoji, setSelectedEmoji] = useState(false);
-  const [message, setMessage] = useState("");
+  const [text, setText] = useState("");
   const [files, setFiles] = useState<File[]>([]);
   const [selectedFile, setSelectedFile] = useState(false);
 
   const handleEmojiRequest = (emoji: any) => {
-    setMessage((prevMessage) => prevMessage + emoji.emoji);
+    setText((prevMessage) => prevMessage + emoji.emoji);
     setSelectedEmoji(false);
   };
 
@@ -29,6 +32,24 @@ const SendingMessages = () => {
 
   const removeFile = (index: number) => {
     setFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
+  };
+
+  const handleSendMessage = () => {
+    if (!text.trim()) return; // Prevent sending empty messages
+
+    dispatch(
+      sendMessage({
+        id: Date.now(),
+        profileImg:
+          "https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg",
+        name: "Mohanad Tarek",
+        message: text,
+        date: new Date().toLocaleTimeString(),
+        type: ["focused"],  
+      })
+    );
+
+    setText(""); // Clear text after sending
   };
   return (
     <>
@@ -68,40 +89,52 @@ const SendingMessages = () => {
         <div className="h-1/2 border border-[#e8e8e8] flex justify-center items-center">
           <input
             type="text"
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
+            value={text}
+            onChange={(e) => setText(e.target.value)}
             placeholder="Write a message.."
             className="bg-[#f5f3f0] w-[92%] h-[85%] border border-gray-300 rounded-md p-3 overflow-y-auto"
           />
         </div>
 
-        <div className="h-1/2 border-1 border-[#e8e8e8] flex relative">
-          <FaRegImage />
-          <label htmlFor="uploadFolder">
-            <MdAttachFile onClick={() => setSelectedFile(!selectedFile)} />
-          </label>
-          {selectedFile ? (
-            <input
-              type="file"
-              multiple
-              id="uploadFolder"
-              onChange={handleFileRequest}
-              className="hidden"
-            ></input>
-          ) : (
-            ""
-          )}
+        <div className="h-1/2 border-1 border-[#e8e8e8] flex relative justify-between">
+          <div className=" flex p-5">
+            <FaRegImage />
+            <label htmlFor="uploadFolder">
+              <MdAttachFile onClick={() => setSelectedFile(!selectedFile)} />
+            </label>
+            {selectedFile ? (
+              <input
+                type="file"
+                multiple
+                id="uploadFolder"
+                onChange={handleFileRequest}
+                className="hidden"
+              ></input>
+            ) : (
+              ""
+            )}
 
-          <MdOutlineEmojiEmotions
-            onClick={() => setSelectedEmoji(!selectedEmoji)}
-          />
-          {selectedEmoji ? (
-            <div className="absolute bottom-30 left-10 h-50 overflow-auto">
-              <EmojiPicker onEmojiClick={handleEmojiRequest} />
-            </div>
-          ) : (
-            ""
-          )}
+            <MdOutlineEmojiEmotions
+              onClick={() => setSelectedEmoji(!selectedEmoji)}
+            />
+            {selectedEmoji ? (
+              <div className="absolute bottom-30 left-10 h-50 overflow-auto">
+                <EmojiPicker onEmojiClick={handleEmojiRequest} />
+              </div>
+            ) : (
+              ""
+            )}
+          </div>
+
+          <button
+            onClick={handleSendMessage}
+            disabled={!text.trim()}
+            className={`m-5 h-5 w-15 align-middle rounded-md text-white ${
+              text.trim() ? "bg-blue-500" : "bg-gray-300"
+            }`}
+          >
+            send
+          </button>
         </div>
       </div>
     </>
