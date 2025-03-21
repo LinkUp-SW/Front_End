@@ -29,6 +29,7 @@ export interface Job {
   postedTime?: string;
   workMode?: string;
   companyInfo?: CompanyInfo;  
+  description?: string;
 }
 
 export interface RecentSearch {

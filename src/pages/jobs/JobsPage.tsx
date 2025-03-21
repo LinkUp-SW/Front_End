@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { WithNavBar } from '../../components';
-import Sidebar from './components/Sidebar';
-import TopJobPicks from './components/TopJobsPicks';
-import JobCollections from './components/JobCollection';
-import RecentSearches from './components/RecentSearches';
-import MoreJobs from './components/MoreJobs';
+import Sidebar from './components/jobsPageComponents/Sidebar';
+import TopJobPicks from './components/jobsPageComponents/TopJobsPicks';
+import JobCollections from './components/jobsPageComponents/JobCollection';
+import RecentSearches from './components/jobsPageComponents/RecentSearches';
+import MoreJobs from './components/jobsPageComponents/MoreJobs';
 import { SAMPLE_JOBS, MORE_JOBS, RECENT_SEARCHES } from '../../constants/index';
 import { Job } from './types';
 

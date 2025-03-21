@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import JobList from "./JobList";
 import JobDetail from "./JobDetail";
 import Pagination from "./Pagination";
-import { Job } from "../types";
-import { FOOTER_LINKS } from '../../../constants/index';
+import { Job } from "../../types";
+import { FOOTER_LINKS } from '../../../../constants/index';
 import { FaSortDown } from "react-icons/fa6";
 
 
