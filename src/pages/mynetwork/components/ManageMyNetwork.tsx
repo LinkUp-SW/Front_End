@@ -6,16 +6,23 @@ import {
   FaFileAlt,
   FaNewspaper,
 } from "react-icons/fa";
-
-
-
 import { useNavigate } from "react-router-dom";
 
 const ManageMyNetwork = () => {
   const navigate = useNavigate();
   const networkOptions = [
-    { label: "Connections", count: 0, icon: <FaUsers />, route: "/connections" },
-    { label: "Following & followers", count: 0, icon: <FaUserPlus />, route:"/followingfollowers"},
+    {
+      label: "Connections",
+      count: 0,
+      icon: <FaUsers />,
+      route: "/connections",
+    },
+    {
+      label: "Following & followers",
+      count: 0,
+      icon: <FaUserPlus />,
+      route: "/followingfollowers",
+    },
     { label: "Groups", count: 0, icon: <FaLayerGroup /> },
     { label: "Events", count: 0, icon: <FaCalendarAlt /> },
     { label: "Pages", count: 0, icon: <FaFileAlt /> },
@@ -49,7 +56,8 @@ const ManageMyNetwork = () => {
         ))}
       </ul>
 
-      <div className="mt-4 cursor-pointer">
+      {/* Promotional Banner  */}
+      <div className="mt-4 cursor-pointer hidden lg:block">
         <img
           src="./src/assets/see_who's_hiring.jpg"
           alt="Promotional Banner"
@@ -57,7 +65,8 @@ const ManageMyNetwork = () => {
         />
       </div>
 
-      <div className="mt-4 text-sm text-gray-500 dark:text-gray-400 text-center space-y-2">
+      {/* Footer links */}
+      <div className="mt-4 text-sm text-gray-500 dark:text-gray-400 text-center space-y-2 hidden lg:block">
         <div className="flex flex-wrap justify-center gap-4">
           <a href="#" className="hover:underline">
             About
