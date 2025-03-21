@@ -142,7 +142,7 @@ Hi everyone, I'm excited to share a project my team and I recently completed for
     },
     action: {
       name: "Panda",
-      action: "like" as "like",
+      action: "like" as const,
       profileImage:
         "https://gratisography.com/wp-content/uploads/2024/11/gratisography-augmented-reality-800x525.jpg",
     },
@@ -174,7 +174,7 @@ Hi everyone, I'm excited to share a project my team and I recently completed for
     },
     action: {
       name: "Panda",
-      action: "like" as "like",
+      action: "like" as const,
       profileImage:
         "https://gratisography.com/wp-content/uploads/2024/11/gratisography-augmented-reality-800x525.jpg",
     },
@@ -206,7 +206,7 @@ Hi everyone, I'm excited to share a project my team and I recently completed for
     },
     action: {
       name: "Panda",
-      action: "like" as "like",
+      action: "like" as const,
       profileImage:
         "https://gratisography.com/wp-content/uploads/2024/11/gratisography-augmented-reality-800x525.jpg",
     },
@@ -238,7 +238,7 @@ Hi everyone, I'm excited to share a project my team and I recently completed for
     },
     action: {
       name: "Panda",
-      action: "like" as "like",
+      action: "like" as const,
       profileImage:
         "https://gratisography.com/wp-content/uploads/2024/11/gratisography-augmented-reality-800x525.jpg",
     },
