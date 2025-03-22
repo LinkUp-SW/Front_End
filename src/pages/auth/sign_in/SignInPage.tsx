@@ -1,4 +1,4 @@
-import React, { useState, FormEvent, ChangeEvent } from "react";
+import React, { useState, FormEvent, ChangeEvent, useEffect } from "react";
 import { UserAuthLayout } from "@/components";
 import { FormInput } from "@/components";
 import { useFormStatus } from "@/hooks/useFormStatus";
@@ -15,6 +15,10 @@ const SignInPage: React.FC = () => {
   const [password, setPassword] = useState<string>("");
   const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
   const { isSubmitting, startSubmitting, stopSubmitting } = useFormStatus();
+
+  useEffect(() => {
+    localStorage.removeItem("user-email");
+  }, []);
 
   // Helper function to validate the identifier (email or phone)
   const validateIdentifier = (identifier: string): boolean => {
@@ -63,26 +67,6 @@ const SignInPage: React.FC = () => {
         return;
       }
       startSubmitting();
-      // toast.success('heheeee')
-      // toast.loading('qwqwdqd')
-
-      //?testing using fake promise
-      // const fakePromise = new Promise<void>((resolve, reject) => {
-      //     // Simulate a 2-second asynchronous operation.
-      //     setTimeout(() => {
-      //       // Uncomment one of the following lines to simulate success or error:
-      //       // resolve();
-      //       reject("Error");
-      //     }, 2000);
-      //   });
-      //   // Pass the promise directly to toast.promise
-      //   const toastResult = toast.promise(fakePromise, {
-      //     loading: "Loading...",
-      //     success: "Login successfully",
-      //     error: "Sign in failed. Please try again.",
-      //   });
-      //   // Await the promise using the unwrap() method.
-      //   await toastResult.unwrap();
 
       //using real server endpoint
       // Wrap the signin method with toast.promise for success/error handling
@@ -90,17 +74,26 @@ const SignInPage: React.FC = () => {
         signin(identifier, password), // Using the axios signin method
         {
           loading: "Signing in...",
-          success: "Signed in successfully!",
-          error: "Sign in failed. Please try again.",
         }
       );
 
       // Await the result of the toast promise
       const data = await toastResult.unwrap();
       console.log("Submitted", data);
+      if (!data.user.isVerified) {
+        localStorage.setItem("user-email", data.user.email);
+        return window.location.replace("/email-verification");
+      }
+      toast.success("Signed in successfully!");
+      setTimeout(() => {
+        window.location.replace("/feed");
+      }, 2000);
     } catch (error) {
       const err = getErrorMessage(error);
-      toast.error(`Sign in failed. Please try again.${err}`);
+      setTimeout(() => {
+        toast.error(`${err}`);
+      }, 500);
+      // toast.error(`${err}`);
       console.error("Sign in error:", error, err);
     } finally {
       stopSubmitting();
@@ -196,7 +189,7 @@ const SignInPage: React.FC = () => {
         <p className="mt-5 text-center text-sm text-gray-500 dark:text-gray-400">
           Not a LinkUp member?{" "}
           <Link
-          id="join-now-link"
+            id="join-now-link"
             to="/signup"
             className="font-semibold text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300"
           >
