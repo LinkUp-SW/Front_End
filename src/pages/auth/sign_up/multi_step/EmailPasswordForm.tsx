@@ -28,7 +28,7 @@ const EmailPasswordForm = ({
       return toast.error("please enter a valid email ");
 
     try {
-      await verifyEmail(email);
+      await verifyEmail(email.toLowerCase());
     } catch (error) {
       return toast.error(getErrorMessage(error));
     }
@@ -47,7 +47,7 @@ const EmailPasswordForm = ({
           placeholder="Enter your Email"
           value={email}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-            updateFields({ email: e.target.value });
+            updateFields({ email: e.target.value.toLowerCase() });
           }}
           type="text"
           id="email"
