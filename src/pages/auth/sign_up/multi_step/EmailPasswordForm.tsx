@@ -25,7 +25,10 @@ const EmailPasswordForm = ({
   const handleNextStep = async () => {
     if (email.length === 0) return toast.error("please enter your email");
     if (!validateEmail(email))
+    {
+      console.log("Invalid Email");
       return toast.error("please enter a valid email ");
+    }
 
     try {
       await verifyEmail(email.toLowerCase());
