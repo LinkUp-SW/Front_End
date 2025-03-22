@@ -12,7 +12,7 @@ import React, { useEffect, useState } from "react";
 
 interface SchoolFormData {
   school: string;
-  schoolStarterYear: string;
+  schoolStartYear: string;
   schoolEndYear: string;
   birthDate?: Date;
 }
@@ -29,7 +29,7 @@ const StudentForm: React.FC<StudentFormProps> = ({
   const [is16OrAbove, setIs16OrAbove] = useState(true);
   const [formData, setFormData] = useState<SchoolFormData>({
     school: "",
-    schoolStarterYear: "",
+    schoolStartYear: "",
     schoolEndYear: "",
     birthDate: undefined,
   });
@@ -73,8 +73,8 @@ const StudentForm: React.FC<StudentFormProps> = ({
 
   // Generate an array of years from current year to current year - 49 for school years.
   const currentYear = new Date().getFullYear();
-  const schoolYears = Array.from({ length: 50 }, (_, i) =>
-    String(currentYear - i)
+  const schoolYears = Array.from({ length: 60 }, (_, i) =>
+    String(currentYear + 10 - i)
   );
 
   // Options for birth date fields.
@@ -99,9 +99,9 @@ const StudentForm: React.FC<StudentFormProps> = ({
 
       <div className="flex w-full min-[26rem]:flex-row flex-col gap-4 mt-4">
         <Select
-          value={formData.schoolStarterYear}
+          value={formData.schoolStartYear}
           onValueChange={(value: string) =>
-            handleChange("schoolStarterYear", value)
+            handleChange("schoolStartYear", value)
           }
         >
           <SelectTrigger
