@@ -2,13 +2,11 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { UserAuthLayout } from "@/components";
 import { REGEXP_ONLY_DIGITS_AND_CHARS } from "input-otp";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components";
-import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { sendOTP, verifyOTP } from "@/endpoints/userAuth";
 import { getErrorMessage } from "@/utils/errorHandler";
 
 const EmailVerification = () => {
-  const navigate = useNavigate();
   const [otp, setOtp] = useState("");
   const [isResending, setIsResending] = useState(false);
   const [resendTimer, setResendTimer] = useState(0);
@@ -31,8 +29,7 @@ const EmailVerification = () => {
         // Parsing failed – fallback to storedUserEmail
         console.log(error);
       }
-    }
-    if (storedUserEmail) {
+    } else if (storedUserEmail) {
       setUserEmail(storedUserEmail);
     } else {
       // If neither source is available, navigate back.
@@ -66,14 +63,17 @@ const EmailVerification = () => {
   // When OTP is complete, call verifyOTP to validate the code.
   const handleOTPComplete = async (value: string) => {
     try {
-      const response = await verifyOTP(value);
-      if (response.success) {
-        toast.success("Email verified successfully!");
-        navigate("/dashboard");
-      } else {
-        toast.error("Invalid code. Please try again.");
-        setOtp("");
-      }
+      const response = toast.promise(verifyOTP(value, userEmail), {
+        loading: "verifying OTP",
+      });
+      const data = await response.unwrap();
+
+      toast.success(`${data.message}`);
+      localStorage.removeItem("user-email");
+      localStorage.removeItem("user-signup-credentials");
+      setTimeout(() => {
+        window.location.replace("/feed");
+      }, 1500);
     } catch (error) {
       const err = getErrorMessage(error);
       toast.error(`Error: ${err}`);
@@ -125,12 +125,12 @@ const EmailVerification = () => {
         <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
           We sent a code to <span className="font-semibold">{userEmail}</span>
         </p>
-        <button
+        {/* <button
           id="edit-email-button"
           className="mt-2 text-sm font-semibold text-indigo-600 hover:underline"
         >
           Edit Email
-        </button>
+        </button> */}
       </header>
       <div className="w-full flex justify-center mb-6">
         <InputOTP
