@@ -61,6 +61,16 @@ export enum JobTypeEnum {
   internship = "Internship",
 }
 
+
+export interface UserLoginResponse {
+  message: string;
+  user: {
+    email: string;
+    id: string;
+    isVerified: boolean;
+  };
+}
+
 export interface UserStarterInterface {
   email: string;
   password: string;
@@ -71,10 +81,11 @@ export interface UserStarterInterface {
   isStudent: boolean;
   jobTitle?: string;
   school?: string;
-  schoolStarterYear?: string;
+  schoolStartYear?: string;
   schoolEndYear?: string;
   is16OrAbove?: boolean;
   employeeType?: string;
   recentCompany?: string;
   birthDate?: Date;
+  is_verified:boolean
 }
