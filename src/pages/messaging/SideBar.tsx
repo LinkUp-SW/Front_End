@@ -1,16 +1,13 @@
+import * as Popover from "@radix-ui/react-popover";
+import { FaStar } from "react-icons/fa";
+import { HiOutlineDotsHorizontal } from "react-icons/hi";
 import { FaCheckSquare } from "react-icons/fa";
 import { IoIosClose } from "react-icons/io";
 import { MdOutlineMarkAsUnread } from "react-icons/md";
 import { IoArchiveOutline } from "react-icons/io5";
 import { MdOutlineDelete } from "react-icons/md";
-import {
-  FILTER_OPTIONS_MESSAGES,
-  FILTERS_LIST_MESSAGES,
-} from "../../constants/index.ts";
-import Buttons from "./Buttons";
-
-import { useEffect, useState } from "react";
-import { Dispatch, SetStateAction } from "react"; // For typing setState functions
+import { FILTER_OPTIONS_MESSAGES } from "../../constants/index.ts";
+import { useState } from "react";
 
 // Add types for props
 interface SideBarProps {
@@ -19,13 +16,11 @@ interface SideBarProps {
 }
 
 const SideBar = ({ activeFilter, search }: SideBarProps) => {
-  /*const [hovered, setHovered] = useState(false);*/
   const [deleted, setDeleted] = useState(false);
   const [unread, setUnread] = useState(false);
   const [hoveredItems, setHoveredItems] = useState<number[]>([]);
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
-
-  const dataInfo = [
+  const [dataInfo, setDataInfo] = useState([
     {
       id: 1,
       profileImg:
@@ -33,7 +28,7 @@ const SideBar = ({ activeFilter, search }: SideBarProps) => {
       name: "Mohanad Tarek",
       message: " you: Lorem ipsum dolor ...",
       date: "2h ago",
-      type: "myconnections",
+      type: ["myconnections"],
     },
     {
       id: 2,
@@ -42,7 +37,7 @@ const SideBar = ({ activeFilter, search }: SideBarProps) => {
       name: "Youssef afifi",
       message: " you: Lorem ipsum dolor ...",
       date: "2h ago",
-      type: "inmail",
+      type: ["inmail"],
     },
     {
       id: 3,
@@ -51,7 +46,7 @@ const SideBar = ({ activeFilter, search }: SideBarProps) => {
       name: "Aly Mohamed unread",
       message: " you: Lorem ipsum dolor ...",
       date: "2h ago",
-      type: "unread",
+      type: ["unread"],
     },
     {
       id: 4,
@@ -60,7 +55,7 @@ const SideBar = ({ activeFilter, search }: SideBarProps) => {
       name: "Amr Doma",
       message: " you: Lorem ipsum dolor ...",
       date: "2h ago",
-      type: "starred",
+      type: ["starred"],
     },
     {
       id: 5,
@@ -69,7 +64,7 @@ const SideBar = ({ activeFilter, search }: SideBarProps) => {
       name: "Amr Doma",
       message: " you: Lorem ipsum dolor ...",
       date: "2h ago",
-      type: "starred",
+      type: ["starred"],
     },
     {
       id: 6,
@@ -78,7 +73,7 @@ const SideBar = ({ activeFilter, search }: SideBarProps) => {
       name: "Amr Doma",
       message: " you: Lorem ipsum dolor ...",
       date: "2h ago",
-      type: "starred",
+      type: ["starred"],
     },
     {
       id: 7,
@@ -87,25 +82,23 @@ const SideBar = ({ activeFilter, search }: SideBarProps) => {
       name: "Amr Doma",
       message: " you: Lorem ipsum dolor ...",
       date: "2h ago",
-      type: "starred",
+      type: ["starred"],
     },
-  ];
+  ]);
 
-  const Blocks =
-    "relative flex h-1/5 items-center p-3 border-1 border-[#e8e8e8] hover:bg-gray-300 hover:cursor-pointer ";
   const filterMap = {
     [FILTER_OPTIONS_MESSAGES.FOCUSED]: dataInfo,
-    [FILTER_OPTIONS_MESSAGES.UNREAD]: dataInfo.filter(
-      (info) => info.type === "unread"
+    [FILTER_OPTIONS_MESSAGES.UNREAD]: dataInfo.filter((info) =>
+      info.type.includes("unread")
     ),
-    [FILTER_OPTIONS_MESSAGES.MY_CONNECTIONS]: dataInfo.filter(
-      (info) => info.type === "myconnections"
+    [FILTER_OPTIONS_MESSAGES.MY_CONNECTIONS]: dataInfo.filter((info) =>
+      info.type.includes("myconnections")
     ),
-    [FILTER_OPTIONS_MESSAGES.INMAIL]: dataInfo.filter(
-      (info) => info.type === "inmail"
+    [FILTER_OPTIONS_MESSAGES.INMAIL]: dataInfo.filter((info) =>
+      info.type.includes("inmail")
     ),
-    [FILTER_OPTIONS_MESSAGES.STARRED]: dataInfo.filter(
-      (info) => info.type === "starred"
+    [FILTER_OPTIONS_MESSAGES.STARRED]: dataInfo.filter((info) =>
+      info.type.includes("starred")
     ),
   };
 
@@ -152,57 +145,152 @@ const SideBar = ({ activeFilter, search }: SideBarProps) => {
         )}
 
         {filteredMessages.map((data) => (
-          <div key={data.id} className={Blocks}>
-            <div
-              className="relative inset-0 rounded-full w-12 h-12 bg-gray-100"
-              onMouseEnter={() =>
-                !selectedItems.includes(data.id) &&
-                setHoveredItems((prevItems) => [...prevItems, data.id])
-              }
-              onMouseLeave={() => {
-                hoveredItems.includes(data.id) &&
-                  setHoveredItems((prevItems) =>
-                    prevItems.filter((id) => id !== data.id)
-                  );
-              }}
-            >
-              {hoveredItems.includes(data.id) ||
-              selectedItems.includes(data.id) ? (
-                <button
-                  className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2  rounded-md w-6 h-6 border hover:border-2 hover:bg-gray-200 hover:cursor-pointer"
-                  onClick={() => {
-                    // Toggle selected item in the array
-                    setSelectedItems((prevItems) =>
-                      prevItems.includes(data.id)
-                        ? prevItems.filter((id) => id !== data.id)
-                        : [...prevItems, data.id]
+          <button
+            key={data.id}
+            className={`relative flex h-1/5 w-full items-center p-3 border-1 border-[#e8e8e8] hover:cursor-pointer ${
+              data.type.includes("unread")
+                ? "bg-[#d7e8fa]  hover:bg-[#b1d1fffe]"
+                : " hover:bg-gray-300"
+            }`}
+          >
+            <div className="flex">
+              <div
+                className="relative inset-0 rounded-full w-12 h-12 bg-gray-100"
+                onMouseEnter={() =>
+                  !selectedItems.includes(data.id) &&
+                  setHoveredItems((prevItems) => [...prevItems, data.id])
+                }
+                onMouseLeave={() => {
+                  hoveredItems.includes(data.id) &&
+                    setHoveredItems((prevItems) =>
+                      prevItems.filter((id) => id !== data.id)
                     );
-                  }}
-                >
-                  {selectedItems.includes(data.id) ? (
-                    <FaCheckSquare className="bg-white text-green-800 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2  rounded-md w-6 h-6 border hover:border-2" />
-                  ) : (
-                    ""
-                  )}
+                }}
+              >
+                {hoveredItems.includes(data.id) ||
+                selectedItems.includes(data.id) ? (
+                  <button
+                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2  rounded-md w-6 h-6 border hover:border-2 hover:bg-gray-200 hover:cursor-pointer"
+                    onClick={() => {
+                      // Toggle selected item in the array
+                      setSelectedItems((prevItems) =>
+                        prevItems.includes(data.id)
+                          ? prevItems.filter((id) => id !== data.id)
+                          : [...prevItems, data.id]
+                      );
+                    }}
+                  >
+                    {selectedItems.includes(data.id) ? (
+                      <FaCheckSquare className="bg-white text-green-800 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2  rounded-md w-6 h-6 border hover:border-2" />
+                    ) : (
+                      ""
+                    )}
+                  </button>
+                ) : (
+                  <img
+                    className="rounded-full w-12 h-12 "
+                    src={data.profileImg}
+                    alt="profile"
+                  />
+                )}
+              </div>
+
+              <div className="flex-1 p-3 text-left pt-0">
+                <p className="font-semibold text-sm">{data.name}</p>
+                <p className="text-xs text-gray-600 truncate">{data.message}</p>
+              </div>
+            </div>
+            <Popover.Root>
+              <Popover.Trigger asChild>
+                <button className="absolute top-2 right-3 text-xs text-gray-600">
+                  <HiOutlineDotsHorizontal
+                    size={15}
+                    className="inline-block ml-3"
+                  />
                 </button>
+              </Popover.Trigger>
+              <Popover.Portal>
+                <Popover.Content
+                  className="bg-white shadow-lg rounded-lg p-2 w-45 border border-gray-200"
+                  sideOffset={5}
+                >
+                  <button className="block w-full text-left p-2 hover:bg-gray-100">
+                    Move to Other
+                  </button>
+                  <button className="block w-full text-left p-2 hover:bg-gray-100">
+                    Label as Jobs
+                  </button>
+                  <button
+                    className="block w-full text-left p-2 hover:bg-gray-100"
+                    onClick={() =>
+                      setDataInfo((prevData) =>
+                        prevData.map((message) =>
+                          message.id === data.id
+                            ? {
+                                ...message,
+                                type: message.type.includes("unread")
+                                  ? message.type.filter((t) => t !== "unread")
+                                  : [...message.type, "unread"],
+                              }
+                            : message
+                        )
+                      )
+                    }
+                  >
+                    {data.type.includes("unread")
+                      ? "Mark as read"
+                      : "Mark as unread"}
+                  </button>
+                  <button
+                    className="block w-full text-left p-2 hover:bg-gray-100"
+                    onClick={() =>
+                      setDataInfo((prevData) =>
+                        prevData.map((message) =>
+                          message.id === data.id
+                            ? {
+                                ...message,
+                                type: message.type.includes("starred")
+                                  ? message.type.filter((t) => t !== "starred")
+                                  : [...message.type, "starred"],
+                              }
+                            : message
+                        )
+                      )
+                    }
+                  >
+                    {data.type.includes("starred") ? "Remove Star" : "Star"}
+                  </button>
+
+                  <button className="block w-full text-left p-2 hover:bg-gray-100">
+                    Mute
+                  </button>
+                  <button className="block w-full text-left p-2 hover:bg-gray-100">
+                    Archive
+                  </button>
+                  <button className="block w-full text-left p-2 hover:bg-gray-100">
+                    Delete conversation
+                  </button>
+                  <button className="block w-full text-left p-2 hover:bg-gray-100">
+                    Manage settings
+                  </button>
+                </Popover.Content>
+              </Popover.Portal>
+            </Popover.Root>
+            <div className=" flex absolute bottom-2 right-3">
+              {data.type.includes("starred") ? (
+                <FaStar size={15} className=" text-yellow-600 m-1" />
               ) : (
-                <img
-                  className="rounded-full w-12 h-12 "
-                  src={data.profileImg}
-                  alt="profile"
-                />
+                ""
+              )}
+              {data.type.includes("unread") ? (
+                <span className="text-xs rounded-full m-1 text-white w-4 h-4 bg-blue-600 ">
+                  1
+                </span>
+              ) : (
+                ""
               )}
             </div>
-
-            <div className="flex-1 p-3">
-              <p className="font-semibold text-sm">{data.name}</p>
-              <p className="text-xs text-gray-600 truncate">{data.message}</p>
-            </div>
-
-            <p className="absolute top-2 right-3 text-xs text-gray-600">
-              {data.date}
-            </p>
-          </div>
+          </button>
         ))}
       </div>
     </>

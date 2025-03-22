@@ -1,7 +1,7 @@
 import React from "react";
 import JobHeader from "./JobHeader";
 import JobContent from "./JobContent";
-import { Job } from "../types";
+import { Job } from "../../types";
 
 interface JobDetailProps {
   job: Job;

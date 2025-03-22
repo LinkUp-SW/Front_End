@@ -11,16 +11,9 @@ import SkillsManager from "./components/SkillsManager";
 import MediaManager from "./components/MediaManager";
 import { MediaItem } from "./types";
 import Header from "../components/Header";
+import { JobTypeEnum } from "@/types";
 
-enum JobTypeEnum {
-  full_time = "Full-time",
-  part_time = "Part-time",
-  contract = "Contract",
-  temporary = "Temporary",
-  other = "Other",
-  volunteer = "Volunteer",
-  internship = "Internship",
-}
+
 
 export interface ExperienceFormData {
   title: string;
@@ -101,6 +94,8 @@ const AddExperienceModal: React.FC = () => {
           placeholder="Ex: Retail Sales Manager"
           value={formData.title}
           onChange={(e) => handleChange("title", e.target.value)}
+          id="experience-job-title"
+          name="experienceJobTitle"
         />
         <FormSelect
           label="Employment Type*"
@@ -108,12 +103,16 @@ const AddExperienceModal: React.FC = () => {
           value={formData.employmentType}
           onValueChange={(value) => handleChange("employmentType", value)}
           options={Object.values(JobTypeEnum)}
+          id="employment-type"
+          name="employmentType"
         />
         <FormInput
           label="Company or Organization*"
           placeholder="Ex: Microsoft"
           value={formData.company}
           onChange={(e) => handleChange("company", e.target.value)}
+          id='company-name'
+          name="company"
         />
         <FormCheckbox
           label="I am currently working in this role"
@@ -121,6 +120,8 @@ const AddExperienceModal: React.FC = () => {
           onCheckedChange={(checked) =>
             handleChange("currentlyWorking", checked)
           }
+          id="currently-working"
+          name="currentlyWorking"
         />
         <DatePicker
           label="Start date*"
@@ -142,6 +143,8 @@ const AddExperienceModal: React.FC = () => {
           placeholder="Ex: London, United Kingdom"
           value={formData.location}
           onChange={(e) => handleChange("location", e.target.value)}
+          id="job-location"
+          name="jobLocation"
         />
         <FormSelect
           label="Location type"
@@ -149,6 +152,8 @@ const AddExperienceModal: React.FC = () => {
           value={formData.locationType}
           onValueChange={(value) => handleChange("locationType", value)}
           options={["remote", "hybrid", "onsite", "flexible"]}
+          id="location-type"
+          name="locationType"
         />
         <FormTextarea
           label="Description"
@@ -156,6 +161,8 @@ const AddExperienceModal: React.FC = () => {
           value={formData.description}
           onChange={(e) => handleChange("description", e.target.value)}
           maxLength={2000}
+          id="job-description"
+          name="jobDescription"
         />
         <FormInput
           label="Profile headline"
@@ -163,6 +170,8 @@ const AddExperienceModal: React.FC = () => {
           value={formData.profileHeadline}
           onChange={(e) => handleChange("profileHeadline", e.target.value)}
           helperText="Appears below your name at the top of the profile"
+          id="profile-headline"
+          name="profileHeadline"
         />
         <FormSelect
           label="Where did you find this job?"
@@ -170,6 +179,8 @@ const AddExperienceModal: React.FC = () => {
           value={formData.jobSource}
           onValueChange={(value) => handleChange("jobSource", value)}
           options={["linkedin", "company-website", "referral", "other"]}
+          id="job-source"
+          name="jobSource"
         />
 
         {/* Skills Manager */}

@@ -1,9 +1,18 @@
 import React from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { FaSortDown } from "react-icons/fa6";
 import { FaEdit } from "react-icons/fa";
-import { SIDEBAR_MENU_ITEMS, FOOTER_LINKS } from '../../../constants/index';
+import { SIDEBAR_MENU_ITEMS, FOOTER_LINKS } from '../../../../constants/index';
 
 const Sidebar: React.FC = () => {
+  const navigate = useNavigate();
+  
+  const handleMenuItemClick = (label: string) => {
+    if (label === "My jobs") {
+      navigate('/saved-jobs');
+    }
+  };
+  
   return (
     <div className="w-full md:w-1/4 md:sticky md:top-20 md:self-start">
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow dark:shadow-gray-700 p-4 transition-colors">
@@ -11,6 +20,7 @@ const Sidebar: React.FC = () => {
           <div 
             key={index} 
             className="flex items-center gap-2 p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded cursor-pointer transition-colors"
+            onClick={() => handleMenuItemClick(item.label)}
           >
             <span className="text-gray-600 dark:text-gray-300">
               {React.createElement(item.icon, { size: 20 })}

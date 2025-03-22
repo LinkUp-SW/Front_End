@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { WithNavBar } from '../../components';
 import JobCategoryBar from "../../components/jobs_categories/JobsBar";
-import JobListings from "./components/JobListings";
+import JobListings from "./components/seeMorePageComponents/JobListings";
 
 const SeeMorePage: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>("For You");
