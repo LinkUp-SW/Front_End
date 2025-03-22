@@ -6,19 +6,41 @@ import {
   SelectValue,
   UserAuthLayout,
 } from "@/components";
-import {  handleSaveCredentials } from "@/utils";
-import { useState } from "react";
+import { handleSaveCredentials } from "@/utils";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { useInterceptBackNavigation } from "@/hooks/useInterceptBackNavigation";
 import { COUNTRY_CITY_MAP } from "@/constants";
+import Cookies from "js-cookie";
 
 const LocationPage = () => {
   const [selectedCountry, setSelectedCountry] = useState<string>("");
   const [selectedCity, setSelectedCity] = useState<string>("");
   const navigate = useNavigate();
+  const savedCredential =
+    localStorage.getItem("user-signup-credentials") ||
+    Cookies.get("linkup_user_data");
+
   useInterceptBackNavigation();
 
+  useEffect(() => {
+    if (!savedCredential) {
+      window.location.replace("/");
+    } else {
+      try {
+        const parsedSavedCredentials = JSON.parse(savedCredential);
+        localStorage.setItem('user-signup-credentials',JSON.stringify(parsedSavedCredentials))
+        // // If you need to update localStorage, stringify the object again:
+        Cookies.remove('linkup_user_data')
+      } catch (error) {
+        console.error("Error parsing saved credentials:", error);
+        // // Optionally, handle the error (e.g., clear the invalid credential)
+        window.location.replace("/");
+      }
+    }
+  }, []);
+  
 
   const verifyLocationCredentials = () => {
     return selectedCity.length !== 0 && selectedCountry.length !== 0;
@@ -30,8 +52,10 @@ const LocationPage = () => {
     }
     handleSaveCredentials({ country: selectedCountry, city: selectedCity });
 
-    return navigate('/signup/organization')
+    return navigate("/signup/organization");
   };
+
+  if (!savedCredential) return null;
 
   return (
     <main className="flex min-h-full w-full max-w-md flex-col justify-center relative pt-4">
@@ -52,7 +76,11 @@ const LocationPage = () => {
             setSelectedCity("");
           }}
         >
-          <SelectTrigger id="country" name="country" className="flex-grow w-full border-gray-600 outline-gray-600">
+          <SelectTrigger
+            id="country"
+            name="country"
+            className="flex-grow w-full border-gray-600 outline-gray-600"
+          >
             <SelectValue placeholder="Country" />
           </SelectTrigger>
           <SelectContent className="dark:bg-gray-900 dark:border-gray-600 dark:text-white">
@@ -70,7 +98,11 @@ const LocationPage = () => {
           onValueChange={(value: string) => setSelectedCity(value)}
           disabled={!selectedCountry}
         >
-          <SelectTrigger id="city" name="city" className="flex-grow w-full border-gray-600 outline-gray-600">
+          <SelectTrigger
+            id="city"
+            name="city"
+            className="flex-grow w-full border-gray-600 outline-gray-600"
+          >
             <SelectValue placeholder="City" />
           </SelectTrigger>
           <SelectContent className="dark:bg-gray-900 dark:border-gray-600 dark:text-white">
