@@ -18,6 +18,7 @@ import EmailVerification from "./auth/email_verification/EmailVerification";
 import ForgetPasswordPage from "./auth/forget_password/ForgetPasswordPage";
 import ResetPasswordPage from "./auth/reset_password/ResetPasswordPage";
 import NotFoundPage from "./404/NotFoundPage";
+import SavedJobsPage from "./jobs/SavedJobsPage";
 
 //Export the Imported Pages
 export {
@@ -40,4 +41,5 @@ export {
   ForgetPasswordPage,
   ResetPasswordPage,
   NotFoundPage,
+  SavedJobsPage,
 };

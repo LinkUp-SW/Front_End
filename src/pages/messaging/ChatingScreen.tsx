@@ -1,3 +1,5 @@
+import { useSelector } from "react-redux";
+import { RootState } from "@/store"; // Import RootState from store.ts
 import { HiOutlineDotsHorizontal } from "react-icons/hi";
 import { IoIosStarOutline } from "react-icons/io";
 
@@ -51,6 +53,7 @@ const ChatingScreen = () => {
     }
  */
 
+  const messages = useSelector((state: RootState) => state.messaging.messages);
   return (
     <>
       <div className="h-1/2   ">
@@ -69,26 +72,21 @@ const ChatingScreen = () => {
         </div>
 
         <div className="h-4/5 border-1 border-[#e8e8e8] overflow-y-auto  ">
-          <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Atque,
-            nulla cupiditate debitis dolore fuga eos pariatur nesciunt,
-            accusamus sequi quos suscipit consequuntur ea non nostrum, laborum
-            quasi! Quod, temporibus architecto. Lorem ipsum dolor sit amet
-            consectetur adipisicing elit. Atque laudantium illo nam, ab facere
-            aliquam ut, consequuntur veniam animi doloremque molestias
-            explicabo. Minima ullam adipisci facilis aut nostrum, ipsa ratione.
-            Lorem ipsum, dolor sit amet consectetur adipisicing elit. Incidunt
-            quia repellat, quo soluta consectetur cum nesciunt ipsum. Neque in
-            ea amet aspernatur, porro quaerat enim maiores, quae, officiis
-            provident minus? Lorem ipsum, dolor sit amet consectetur adipisicing
-            elit. Exercitationem nisi consequatur deserunt dolore molestias,
-            autem tempora odit voluptates, ratione amet non eos asperiores natus
-            qui delectus dolores placeat nesciunt vero. Lorem ipsum dolor sit
-            amet consectetur adipisicing elit. Hic quibusdam harum sed explicabo
-            natus ullam, debitis assumenda ipsam ea? Maxime tempora amet
-            cupiditate, aliquid consectetur harum molestiae beatae sed
-            voluptatibus?
-          </p>
+         {messages.map((msg)=>(
+          
+          <div>
+            <div className="flex mt-1">
+              <div className="rounded-full w-12 h-12 bg-gray-100 inline-block">
+                
+              </div>
+              <p className="ml-2 mt-2 font-semibold">{msg.name} <span className=" font-light text-xs text-gray-500">. {msg.date}</span></p>
+              </div>
+          <div className="pl-20 hover:bg-gray-200">
+            {msg.message}
+          </div>
+          </div>
+         )
+        )} 
         </div>
       </div>
     </>

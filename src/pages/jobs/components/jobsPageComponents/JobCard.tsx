@@ -1,7 +1,7 @@
 import React from 'react';
 import { HiOutlineXMark } from "react-icons/hi2";
 import { FaCheck } from "react-icons/fa6";
-import { Job } from '../types';
+import { Job } from '../../types';
 
 interface JobCardProps {
   job: Job;

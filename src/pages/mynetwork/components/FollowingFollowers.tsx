@@ -1,51 +1,44 @@
 import { WithNavBar } from "../../../components";
 import withSidebarAd from "@/components/hoc/withSidebarAd";
-import { useState } from "react";
-
-const mockFollowing = [
-  {
-    name: "John Doe",
-    title: "Software Engineer at Google",
-    image:
-      "https://www.svgrepo.com/show/382107/male-avatar-boy-face-man-user-6.svg",
-  },
-  {
-    name: "Emily Smith",
-    title: "Product Manager at Facebook",
-    image:
-      "https://www.svgrepo.com/show/382097/female-avatar-girl-face-woman-user-9.svg",
-  },
-  {
-    name: "Michael Johnson",
-    title: "Data Scientist at Amazon",
-    image:
-      "https://www.svgrepo.com/show/382107/male-avatar-boy-face-man-user-6.svg",
-  },
-];
-
-const mockFollowers = [
-  {
-    name: "Jessica Brown",
-    title: "UX Designer at Apple",
-    image:
-      "https://www.svgrepo.com/show/382097/female-avatar-girl-face-woman-user-9.svg",
-  },
-  {
-    name: "Daniel Wilson",
-    title: "Backend Developer at Microsoft",
-    image:
-      "https://www.svgrepo.com/show/382107/male-avatar-boy-face-man-user-6.svg",
-  },
-  {
-    name: "Sophia Martinez",
-    title: "Marketing Specialist at Tesla",
-    image:
-      "https://www.svgrepo.com/show/382097/female-avatar-girl-face-woman-user-9.svg",
-  },
-];
+import { useState, useCallback } from "react";
+import {
+  fetchFollowers,
+  fetchFollowing,
+  FollowingFollowers as User,
+} from "@/endpoints/myNetwork";
 
 const FollowingFollowers: React.FC = () => {
-  const [activeTab, setActiveTab] = useState("following");
+  const [activeTab, setActiveTab] = useState<"following" | "followers">(
+    "following"
+  );
+  const [following, setFollowing] = useState<User[]>([]);
+  const [followers, setFollowers] = useState<User[]>([]);
+
+  // Fetch following
+  const loadFollowing = useCallback(async () => {
+    try {
+      const data = await fetchFollowing();
+      setFollowing(data);
+    } catch (error) {
+      console.error("Error fetching following list:", error);
+    }
+  }, []);
+
+  // Fetch followers
+  const loadFollowers = useCallback(async () => {
+    try {
+      const data = await fetchFollowers();
+      setFollowers(data);
+    } catch (error) {
+      console.error("Error fetching followers list:", error);
+    }
+  }, []);
+
+  // Initial manual triggers with useState callbacks
+  useState(() => {
+    loadFollowing();
+    loadFollowers();
+  });
 
   return (
     <div className="flex-1 bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 transition-all flex flex-col max-h-fit">
@@ -75,7 +68,7 @@ const FollowingFollowers: React.FC = () => {
 
       {/* List */}
       <div className="space-y-4 p-4 flex-grow min-h-0">
-        {(activeTab === "following" ? mockFollowing : mockFollowers).map(
+        {(activeTab === "following" ? following : followers).map(
           (user, index) => (
             <div
               key={index}

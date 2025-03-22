@@ -21,7 +21,7 @@ import {
   ForgetPasswordPage,
   ResetPasswordPage,
   NotFoundPage
-} from "./pages";
+, SavedJobsPage} from "./pages";
 
 import React from "react";
 
@@ -72,6 +72,12 @@ const routes: RouteObject[] = [
     path: "/manage-invitations",
     element: React.createElement(InvitationsManagerPage),
   },
+
+  {
+    path: "/saved-jobs",
+    element:  React.createElement(SavedJobsPage)
+  },
+
   {
     path: "/login",
     element: React.createElement(SignInPage),
