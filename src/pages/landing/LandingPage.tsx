@@ -10,7 +10,7 @@ const HomePage = () => {
       <header className="max-w-[70rem] w-full">
         <LandingNavBar />
       </header>
-      <section className="grid md:grid-cols-2 gap-10 place-items-center px-10 md:py-0 py-10 grid-cols-1 w-full">
+      <section className="grid md:grid-cols-2 gap-10 place-items-center md:px-10 md:py-0 py-10 grid-cols-1 w-full">
         <article className="flex flex-col items-center w-full">
           <div className="flex w-full max-w-xl flex-col items-center">
             <h1 className="mb-10 lg:text-left text-center text-[2rem] leading-[1.25] text-gray-700 lg:text-[3rem] dark:text-gray-100">
