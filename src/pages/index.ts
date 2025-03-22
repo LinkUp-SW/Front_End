@@ -12,6 +12,12 @@ import SeeMorePage from "./jobs/SeeMorePage";
 import FollowingFollowers from "./mynetwork/components/FollowingFollowers";
 import Connections from "./mynetwork/components/Connections";
 import InvitationsManagerPage from "./mynetwork/InvitationsManagerPage";
+import SignInPage from "./auth/sign_in/SignInPage";
+import { SignUpPage, LocationPage, OrganizationPage } from "./auth/sign_up";
+import EmailVerification from "./auth/email_verification/EmailVerification";
+import ForgetPasswordPage from "./auth/forget_password/ForgetPasswordPage";
+import ResetPasswordPage from "./auth/reset_password/ResetPasswordPage";
+import NotFoundPage from "./404/NotFoundPage";
 import SavedJobsPage from "./jobs/SavedJobsPage";
 
 //Export the Imported Pages
@@ -27,5 +33,13 @@ export {
   Connections,
   NotificationsPage,
   InvitationsManagerPage,
+  SignInPage,
+  SignUpPage,
+  LocationPage,
+  OrganizationPage,
+  EmailVerification,
+  ForgetPasswordPage,
+  ResetPasswordPage,
+  NotFoundPage,
   SavedJobsPage,
 };

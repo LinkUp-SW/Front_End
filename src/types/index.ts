@@ -117,3 +117,42 @@ export interface Media {
   image: string[];
   video: string[];
 }
+
+export enum JobTypeEnum {
+  full_time = "Full-time",
+  part_time = "Part-time",
+  contract = "Contract",
+  temporary = "Temporary",
+  other = "Other",
+  volunteer = "Volunteer",
+  internship = "Internship",
+}
+
+
+export interface UserLoginResponse {
+  message: string;
+  user: {
+    email: string;
+    id: string;
+    isVerified: boolean;
+  };
+}
+
+export interface UserStarterInterface {
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  country: string;
+  city: string;
+  isStudent: boolean;
+  jobTitle?: string;
+  school?: string;
+  schoolStartYear?: string;
+  schoolEndYear?: string;
+  is16OrAbove?: boolean;
+  employeeType?: string;
+  recentCompany?: string;
+  birthDate?: Date;
+  is_verified:boolean
+}
