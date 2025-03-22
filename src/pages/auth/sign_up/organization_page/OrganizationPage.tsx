@@ -1,5 +1,5 @@
 import { UserAuthLayout } from "@/components";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import StudentForm from "./components/StudentForm";
 import JobForm from "./components/JobForm";
 import { handleSaveCredentials } from "@/utils";
@@ -18,7 +18,12 @@ const OrganizationPage = () => {
     Partial<UserStarterInterface>
   >({});
   const { isSubmitting, startSubmitting, stopSubmitting } = useFormStatus();
+  const savedCredential = localStorage.getItem("user-signup-credentials");
   useInterceptBackNavigation();
+
+  useEffect(() => {
+    if (!savedCredential) window.location.replace("/");
+  }, []);
 
   // Helper function to extract only the desired fields from stored credentials.
   const extractUserData = (data: Partial<UserStarterInterface>) => {
@@ -48,10 +53,18 @@ const OrganizationPage = () => {
     if (isStudent) {
       if (
         !partialUserStarterData.school ||
-        !partialUserStarterData.schoolStarterYear ||
+        !partialUserStarterData.schoolStartYear ||
         !partialUserStarterData.schoolEndYear
       ) {
         toast.error("Please complete all required fields in the student form.");
+        return;
+      }
+
+      if (
+        Number(partialUserStarterData.schoolStartYear) >
+        Number(partialUserStarterData.schoolEndYear)
+      ) {
+        toast.error("School start year cannot be after the school end year.");
         return;
       }
       if (
@@ -88,13 +101,11 @@ const OrganizationPage = () => {
     // Start submitting to mimic API request.
     startSubmitting();
 
-    const savedCredential = localStorage.getItem("user-signup-credentials");
     if (!savedCredential) {
       navigate("/signup");
       stopSubmitting();
       return;
     }
-    //clean this code later!!
 
     const parsedCredentials = JSON.parse(savedCredential);
     const extractedData = extractUserData(parsedCredentials);
@@ -111,8 +122,9 @@ const OrganizationPage = () => {
       "user-signup-credentials"
     );
     if (!savedCredentialToBeSent) return;
-    const parsedCredentialsToBeSent = JSON.parse(savedCredentialToBeSent);
-    console.log(parsedCredentialsToBeSent)
+    const parsedCredentialsToBeSent = JSON.parse(
+      savedCredentialToBeSent
+    ) as UserStarterInterface;
 
     try {
       const toastResult = toast.promise(
@@ -129,6 +141,14 @@ const OrganizationPage = () => {
       console.log("Submitted", data);
       if (data) {
         // Mimic API request delay.
+        localStorage.removeItem("user-signup-credentials");
+        if (data.user.isVerified) {
+          return setTimeout(() => {
+            window.location.replace("/feed");
+            stopSubmitting();
+          }, 2000);
+        }
+        localStorage.setItem("user-email", parsedCredentialsToBeSent.email);
         setTimeout(() => {
           navigate("/email-verification");
           stopSubmitting();
@@ -140,7 +160,6 @@ const OrganizationPage = () => {
       console.error("Sign in error:", error, err);
     } finally {
       stopSubmitting();
-      // navigate("/email-verification");
     }
   }, [
     navigate,
@@ -150,6 +169,8 @@ const OrganizationPage = () => {
     startSubmitting,
     stopSubmitting,
   ]);
+
+  if (!savedCredential) return null;
 
   return (
     <main className="flex min-h-full w-full max-w-md flex-col justify-center relative pt-4">
@@ -165,7 +186,7 @@ const OrganizationPage = () => {
       )}
       <div className="w-full space-y-2">
         <button
-        id="i-am-student-button"
+          id="i-am-student-button"
           onClick={() => setIsStudent((prev) => !prev)}
           className="w-full py-2 cursor-pointer px-4 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-800 dark:text-gray-100 font-semibold rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none transition-colors duration-200"
         >
