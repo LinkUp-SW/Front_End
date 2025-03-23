@@ -5,6 +5,9 @@ import {
   Dialog,
   DialogContent,
   DialogTrigger,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
   Modal,
   WithNavBar,
 } from "@/components";
@@ -107,6 +110,12 @@ const Connections: React.FC = () => {
                         userData={{ userName: conn.name, userId: conn.id }}
                         onConfirm={() => handleRemoveConnection(conn.id)}
                       />
+                      <DialogHeader>
+                        <DialogTitle></DialogTitle>
+                        <DialogDescription>
+                          
+                        </DialogDescription>
+                      </DialogHeader>
                     </DialogContent>
                   </Dialog>
                 </div>
