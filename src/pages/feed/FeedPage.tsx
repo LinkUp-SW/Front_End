@@ -59,14 +59,14 @@ const FeedPage = () => {
 
   return (
     <>
-      <div className="flex justify-center w-full px-0 xl:px-[10%]">
-        <section className="flex w-full justify-center gap-4 md:flex-row flex-col">
+      <div className="flex justify-center w-full px-0 ">
+        <section className="flex w-full justify-center gap-4 lg:flex-row flex-col">
           {/* Left Sidebar */}
-          <aside className="flex flex-col h-full w-full md:max-w-60">
+          <aside className="flex flex-col h-full w-full lg:max-w-60">
             {profile && <ProfileCard />}
             <Button
               variant="ghost"
-              className="block md:hidden hover:cursor-pointer hover:bg-stone-200 w-full transition-colors my-2"
+              className="block lg:hidden hover:cursor-pointer hover:bg-stone-200 w-full transition-colors my-2"
               onClick={() => setViewMore(!viewMore)}
             >
               <div className="flex justify-center gap-x-2 items-center">
@@ -92,14 +92,14 @@ const FeedPage = () => {
             )}
           </aside>
           {/* Main Content */}
-          <main className="flex flex-col w-full md:max-w-[34.8rem]">
+          <main className="flex flex-col w-full lg:max-w-[34.8rem]">
             <CreatePost profileImageUrl={profile?.profileImage || ""} />
             {posts.map((post, index) => (
               <Post key={index} postData={post} comments={comments} />
             ))}
           </main>
           {/* Right Sidebar */}
-          {screenWidth > 991 && (
+          {screenWidth > 1158 && (
             <aside className="flex flex-col items-center">
               <WhosHiringImage />
               <LinkUpFooter />

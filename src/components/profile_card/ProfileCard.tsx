@@ -60,14 +60,14 @@ const ProfileCard: React.FC = () => {
 
   return (
     <Card className="mb-2 bg-white border-0 dark:bg-gray-900 dark:text-neutral-200 w-full">
-      <CardContent className="flex flex-col items-center w-full md:px-6 px-0 ">
+      <CardContent className="flex flex-col items-center w-full relative md:px-6 px-0 ">
         <Link
-          className="flex flex-col gap-y-1 items-start w-full  relative hover:cursor-pointer"
+          className="flex flex-col gap-y-1 items-start w-full   hover:cursor-pointer"
           to={"/user-profile/1"}
         >
           <header
-            className="absolute md:-left-6 -top-6 h-15 
-            md:w-60 w-full  bg-gray-200 rounded-t-xl"
+            className="absolute md:-left-0 -top-6 h-15 
+            w-full  bg-gray-200 rounded-t-xl"
           >
             <img
               src={data?.coverImage}
