@@ -4,7 +4,7 @@ import { FormInput } from "@/components";
 import { useFormStatus } from "@/hooks/useFormStatus";
 import { Link } from "react-router-dom";
 import googleSvg from "@/assets/google.svg";
-import ReCAPTCHA from "react-google-recaptcha";
+// import ReCAPTCHA from "react-google-recaptcha";
 import { toast } from "sonner";
 import { initiateGoogleAuth, signin } from "@/endpoints/userAuth";
 import { validateEmail } from "@/utils";
@@ -13,7 +13,7 @@ import { getErrorMessage } from "@/utils/errorHandler";
 const SignInPage: React.FC = () => {
   const [identifier, setIdentifier] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
+  // const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
   const { isSubmitting, startSubmitting, stopSubmitting } = useFormStatus();
 
   useEffect(() => {
@@ -31,7 +31,7 @@ const SignInPage: React.FC = () => {
   const validateForm = (
     identifier: string,
     password: string,
-    recaptchaToken: string | null
+    
   ) => {
     if (!validateIdentifier(identifier)) {
       toast.error("Please enter a valid email address or phone number.");
@@ -41,10 +41,7 @@ const SignInPage: React.FC = () => {
       toast.error("Please enter your password");
       return false;
     }
-    if (!recaptchaToken) {
-      toast.error("Please complete the captcha.");
-      return false;
-    }
+    
     return true;
   };
 
@@ -53,7 +50,7 @@ const SignInPage: React.FC = () => {
     event: FormEvent<HTMLFormElement>,
     identifier: string,
     password: string,
-    recaptchaToken: string | null,
+    
     startSubmitting: () => void,
     stopSubmitting: () => void
   ): Promise<void> => {
@@ -61,8 +58,7 @@ const SignInPage: React.FC = () => {
 
     try {
       if (
-        !validateForm(identifier, password, recaptchaToken) ||
-        !recaptchaToken
+        !validateForm(identifier, password) 
       ) {
         return;
       }
@@ -131,7 +127,7 @@ const SignInPage: React.FC = () => {
               event,
               identifier,
               password,
-              recaptchaToken,
+          
               startSubmitting,
               stopSubmitting
             )
@@ -169,12 +165,7 @@ const SignInPage: React.FC = () => {
               Forgot password?
             </Link>
           </div>
-          <div className="flex items-center justify-between">
-            <ReCAPTCHA
-              sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
-              onChange={(token: string | null) => setRecaptchaToken(token)}
-            />
-          </div>
+          
           <div>
             <button
               type="submit"
