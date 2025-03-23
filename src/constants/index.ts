@@ -65,7 +65,6 @@ export const SMALL_SCREEN_NAV_ITEMS = [
 ];
 
 export const FILTER_OPTIONS_MESSAGES = {
-  FOCUSED: "Focused",
   UNREAD: "Unread",
   MY_CONNECTIONS: "My Connections",
   INMAIL: "InMail",

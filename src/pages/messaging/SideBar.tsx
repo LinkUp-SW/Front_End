@@ -1,3 +1,6 @@
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "@/store";
+import { selectMessage } from "../../slices/messaging/messagingSlice";
 import * as Popover from "@radix-ui/react-popover";
 import { FaStar } from "react-icons/fa";
 import { HiOutlineDotsHorizontal } from "react-icons/hi";
@@ -9,85 +12,100 @@ import { MdOutlineDelete } from "react-icons/md";
 import { FILTER_OPTIONS_MESSAGES } from "../../constants/index.ts";
 import { useState } from "react";
 
-// Add types for props
-interface SideBarProps {
-  activeFilter: string;
-  search: string;
-}
+const SideBar = () => {
+  const dispatch = useDispatch();
+  const activeFilter = useSelector(
+    (state: RootState) => state.messaging.activeFilter
+  );
+  const search = useSelector((state: RootState) => state.messaging.search);
 
-const SideBar = ({ activeFilter, search }: SideBarProps) => {
-  const [deleted, setDeleted] = useState(false);
+  /*const [deleted, setDeleted] = useState(false);*/
   const [unread, setUnread] = useState(false);
   const [hoveredItems, setHoveredItems] = useState<number[]>([]);
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
+  const [SelectedConversationStyle, setSelectedConversationStyle] =
+    useState<number>();
   const [dataInfo, setDataInfo] = useState([
     {
-      id: 1,
+      conversationID: 1,
+      recieverID: 1,
+      senderID: 10,
       profileImg:
         "https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg",
-      name: "Mohanad Tarek",
-      message: " you: Lorem ipsum dolor ...",
-      date: "2h ago",
+      messages: {
+        id: 100,
+        Img: "https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg",
+        name: "Mohanad Tarek",
+        message: " you: Lorem ipsum dolor ...",
+        date: "1h ago",
+      },
       type: ["myconnections"],
     },
     {
-      id: 2,
+      conversationID: 2,
+      recieverID: 2,
+      senderID: 11,
       profileImg:
         "https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg",
-      name: "Youssef afifi",
-      message: " you: Lorem ipsum dolor ...",
-      date: "2h ago",
+      messages: {
+        id: 3,
+        Img: "https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg",
+        name: "Aly Mohamed unread",
+        message: " you: Lorem ipsum dolor ...",
+        date: "2h ago",
+        type: ["unread"],
+      },
       type: ["inmail"],
     },
     {
-      id: 3,
+      conversationID: 3,
+      recieverID: 3,
+      senderID: 13,
       profileImg:
         "https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg",
-      name: "Aly Mohamed unread",
-      message: " you: Lorem ipsum dolor ...",
-      date: "2h ago",
-      type: ["unread"],
+      messages: {
+        id: 103,
+        Img: "https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg",
+        name: "Mohanad Tarek",
+        message: " you: Lorem ipsum dolor ...",
+        date: "2h ago",
+      },
+      type: ["myconnections"],
     },
     {
-      id: 4,
+      conversationID: 4,
+      recieverID: 4,
+      senderID: 14,
       profileImg:
         "https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg",
-      name: "Amr Doma",
-      message: " you: Lorem ipsum dolor ...",
-      date: "2h ago",
+      messages: {
+        id: 104,
+        Img: "https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg",
+        name: "Amr Doma",
+        message: " you: Lorem ipsum dolor ...",
+        date: "2h ago",
+      },
       type: ["starred"],
     },
     {
-      id: 5,
+      conversationID: 5,
+      recieverID: 5,
+      senderID: 15,
       profileImg:
         "https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg",
-      name: "Amr Doma",
-      message: " you: Lorem ipsum dolor ...",
-      date: "2h ago",
-      type: ["starred"],
-    },
-    {
-      id: 6,
-      profileImg:
-        "https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg",
-      name: "Amr Doma",
-      message: " you: Lorem ipsum dolor ...",
-      date: "2h ago",
-      type: ["starred"],
-    },
-    {
-      id: 7,
-      profileImg:
-        "https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg",
-      name: "Amr Doma",
-      message: " you: Lorem ipsum dolor ...",
-      date: "2h ago",
+      messages: {
+        id: 105,
+        Img: "https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg",
+        name: "Amr Doma2",
+        message: " you: Lorem ipsum dolor ...",
+        date: "2h ago",
+      },
       type: ["starred"],
     },
   ]);
 
-  const filterMap = {
-    [FILTER_OPTIONS_MESSAGES.FOCUSED]: dataInfo,
+  const filterButtonData = {
+    Focused: dataInfo,
     [FILTER_OPTIONS_MESSAGES.UNREAD]: dataInfo.filter((info) =>
       info.type.includes("unread")
     ),
@@ -102,11 +120,84 @@ const SideBar = ({ activeFilter, search }: SideBarProps) => {
     ),
   };
 
-  const filteredMessages = filterMap[activeFilter].filter(
+  const filteredMessagesSearch = filterButtonData[activeFilter].filter(
     (info) =>
-      info.name.toLowerCase().includes(search.toLowerCase()) ||
-      info.message.toLowerCase().includes(search.toLowerCase())
+      info.messages.name.toLowerCase().includes(search.toLowerCase()) ||
+      info.messages.message.toLowerCase().includes(search.toLowerCase())
   );
+
+  const handleSelectConversation = (
+    conversationID: number,
+    dataType: string[]
+  ) => {
+    dispatch(selectMessage(conversationID.toString()));
+    if (dataType.includes("unread")) {
+      setDataInfo((prevData) =>
+        prevData.map((message) =>
+          message.conversationID === conversationID
+            ? {
+                ...message,
+                type: message.type.filter((t) => t !== "unread"),
+              }
+            : message
+        )
+      );
+    }
+    setSelectedConversationStyle(conversationID);
+  };
+
+  const handleHoverEnter = (conversationID: number) => {
+    if (!selectedItems.includes(conversationID)) {
+      setHoveredItems((prevItems) => [...prevItems, conversationID]);
+    }
+  };
+
+  const handleHoverLeave = (conversationID: number) => {
+    if (hoveredItems.includes(conversationID)) {
+      setHoveredItems((prevItems) =>
+        prevItems.filter((id) => id !== conversationID)
+      );
+    }
+  };
+
+  const toggleSelectedConversation = (conversationID: number) => {
+    setSelectedItems((prevItems) =>
+      prevItems.includes(conversationID)
+        ? prevItems.filter((id) => id !== conversationID)
+        : [...prevItems, conversationID]
+    );
+  };
+
+  const unreadFiltering = (conversationID: number) => {
+    setDataInfo((prevData) =>
+      prevData.map((message) =>
+        message.conversationID === conversationID
+          ? {
+              ...message,
+              type: message.type.includes("unread")
+                ? message.type.filter((t) => t !== "unread")
+                : [...message.type, "unread"],
+            }
+          : message
+      )
+    );
+  };
+
+  const starredFiltering = (conversationID: number) => {
+    setDataInfo((prevData) =>
+      prevData.map((message) =>
+        message.conversationID === conversationID
+          ? {
+              ...message,
+              type: message.type.includes("starred")
+                ? message.type.filter((t) => t !== "starred")
+                : [...message.type, "starred"],
+            }
+          : message
+      )
+    );
+  };
+
   return (
     <>
       <div className="h-full w-2/5 border-1 border-[#e8e8e8] overflow-y-auto ">
@@ -132,7 +223,7 @@ const SideBar = ({ activeFilter, search }: SideBarProps) => {
               <MdOutlineDelete
                 size={25}
                 className="inline-block mr-3 hover:cursor-pointer hover:bg-gray-200 hover:rounded-full"
-                onClick={() => setDeleted(true)}
+                
               />
               <IoArchiveOutline
                 size={25}
@@ -144,11 +235,16 @@ const SideBar = ({ activeFilter, search }: SideBarProps) => {
           ""
         )}
 
-        {filteredMessages.map((data) => (
+        {filteredMessagesSearch.map((data) => (
           <button
-            key={data.id}
+            onClick={() => {
+              handleSelectConversation(data.conversationID, data.type);
+            }}
+            key={data.conversationID}
             className={`relative flex h-1/5 w-full items-center p-3 border-1 border-[#e8e8e8] hover:cursor-pointer ${
-              data.type.includes("unread")
+              SelectedConversationStyle === data.conversationID
+                ? "bg-[#edf3f8] hover:bg-gray-300"
+                : data.type.includes("unread")
                 ? "bg-[#d7e8fa]  hover:bg-[#b1d1fffe]"
                 : " hover:bg-gray-300"
             }`}
@@ -156,31 +252,18 @@ const SideBar = ({ activeFilter, search }: SideBarProps) => {
             <div className="flex">
               <div
                 className="relative inset-0 rounded-full w-12 h-12 bg-gray-100"
-                onMouseEnter={() =>
-                  !selectedItems.includes(data.id) &&
-                  setHoveredItems((prevItems) => [...prevItems, data.id])
-                }
-                onMouseLeave={() => {
-                  hoveredItems.includes(data.id) &&
-                    setHoveredItems((prevItems) =>
-                      prevItems.filter((id) => id !== data.id)
-                    );
-                }}
+                onMouseEnter={() => handleHoverEnter(data.conversationID)}
+                onMouseLeave={() => handleHoverLeave(data.conversationID)}
               >
-                {hoveredItems.includes(data.id) ||
-                selectedItems.includes(data.id) ? (
+                {hoveredItems.includes(data.conversationID) ||
+                selectedItems.includes(data.conversationID) ? (
                   <button
                     className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2  rounded-md w-6 h-6 border hover:border-2 hover:bg-gray-200 hover:cursor-pointer"
-                    onClick={() => {
-                      // Toggle selected item in the array
-                      setSelectedItems((prevItems) =>
-                        prevItems.includes(data.id)
-                          ? prevItems.filter((id) => id !== data.id)
-                          : [...prevItems, data.id]
-                      );
-                    }}
+                    onClick={() =>
+                      toggleSelectedConversation(data.conversationID)
+                    }
                   >
-                    {selectedItems.includes(data.id) ? (
+                    {selectedItems.includes(data.conversationID) ? (
                       <FaCheckSquare className="bg-white text-green-800 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2  rounded-md w-6 h-6 border hover:border-2" />
                     ) : (
                       ""
@@ -196,8 +279,10 @@ const SideBar = ({ activeFilter, search }: SideBarProps) => {
               </div>
 
               <div className="flex-1 p-3 text-left pt-0">
-                <p className="font-semibold text-sm">{data.name}</p>
-                <p className="text-xs text-gray-600 truncate">{data.message}</p>
+                <p className="font-semibold text-sm">{data.messages.name}</p>
+                <p className="text-xs text-gray-600 truncate">
+                  {data.messages.message}
+                </p>
               </div>
             </div>
             <Popover.Root>
@@ -222,20 +307,7 @@ const SideBar = ({ activeFilter, search }: SideBarProps) => {
                   </button>
                   <button
                     className="block w-full text-left p-2 hover:bg-gray-100"
-                    onClick={() =>
-                      setDataInfo((prevData) =>
-                        prevData.map((message) =>
-                          message.id === data.id
-                            ? {
-                                ...message,
-                                type: message.type.includes("unread")
-                                  ? message.type.filter((t) => t !== "unread")
-                                  : [...message.type, "unread"],
-                              }
-                            : message
-                        )
-                      )
-                    }
+                    onClick={() => unreadFiltering(data.conversationID)}
                   >
                     {data.type.includes("unread")
                       ? "Mark as read"
@@ -243,20 +315,7 @@ const SideBar = ({ activeFilter, search }: SideBarProps) => {
                   </button>
                   <button
                     className="block w-full text-left p-2 hover:bg-gray-100"
-                    onClick={() =>
-                      setDataInfo((prevData) =>
-                        prevData.map((message) =>
-                          message.id === data.id
-                            ? {
-                                ...message,
-                                type: message.type.includes("starred")
-                                  ? message.type.filter((t) => t !== "starred")
-                                  : [...message.type, "starred"],
-                              }
-                            : message
-                        )
-                      )
-                    }
+                    onClick={() => starredFiltering(data.conversationID)}
                   >
                     {data.type.includes("starred") ? "Remove Star" : "Star"}
                   </button>
