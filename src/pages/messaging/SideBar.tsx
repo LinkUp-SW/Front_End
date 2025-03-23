@@ -19,7 +19,7 @@ const SideBar = () => {
   );
   const search = useSelector((state: RootState) => state.messaging.search);
 
-  const [deleted, setDeleted] = useState(false);
+  /*const [deleted, setDeleted] = useState(false);*/
   const [unread, setUnread] = useState(false);
   const [hoveredItems, setHoveredItems] = useState<number[]>([]);
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
@@ -223,7 +223,7 @@ const SideBar = () => {
               <MdOutlineDelete
                 size={25}
                 className="inline-block mr-3 hover:cursor-pointer hover:bg-gray-200 hover:rounded-full"
-                onClick={() => setDeleted(true)}
+                
               />
               <IoArchiveOutline
                 size={25}

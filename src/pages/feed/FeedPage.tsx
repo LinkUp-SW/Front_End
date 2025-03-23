@@ -63,7 +63,7 @@ const FeedPage = () => {
         <section className="flex w-full justify-center gap-4 md:flex-row flex-col">
           {/* Left Sidebar */}
           <aside className="flex flex-col h-full w-full md:max-w-60">
-            {profile && <ProfileCard profile={profile} />}
+            {profile && <ProfileCard />}
             <Button
               variant="ghost"
               className="block md:hidden hover:cursor-pointer hover:bg-stone-200 w-full transition-colors my-2"

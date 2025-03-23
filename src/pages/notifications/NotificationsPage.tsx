@@ -19,15 +19,7 @@ const NotificationsPage: React.FC = () => {
   const [showPostDropdown, setShowPostDropdown] = useState<boolean>(false);
   const [activePostFilter, setActivePostFilter] = useState<PostFilter>('all');
 
-  // Profile data based on the ProfileCard component structure
-  const profileInfo = {
-    coverImage: "/api/placeholder/800/200",
-    profileImage: "/api/placeholder/150/150",
-    name: "Malak El-Tuny",
-    headline: "Biomedical and Data Engineering Student",
-    location: "Cairo",
-    university: "Cairo University",
-  };
+
 
   // Fetch notifications data
   useEffect(() => {
@@ -66,7 +58,7 @@ const NotificationsPage: React.FC = () => {
       <div className={styles.content}>
         {/* Left Profile Section - Using ProfileCard component */}
         <div className={styles.leftSidebar}>
-          <ProfileCard fullWidth={true} profile={profileInfo} />
+          <ProfileCard   />
           <div className={styles.notificationSettings}>
             <h3>Manage your notifications</h3>
             <a href="#" className={styles.settingsLink}>View settings</a>
