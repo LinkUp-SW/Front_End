@@ -112,9 +112,7 @@ const Connections: React.FC = () => {
                       />
                       <DialogHeader>
                         <DialogTitle></DialogTitle>
-                        <DialogDescription>
-                          
-                        </DialogDescription>
+                        <DialogDescription></DialogDescription>
                       </DialogHeader>
                     </DialogContent>
                   </Dialog>
