@@ -20,7 +20,7 @@ import ResetPasswordPage from "./auth/reset_password/ResetPasswordPage";
 import NotFoundPage from "./404/NotFoundPage";
 import SavedJobsPage from "./jobs/SavedJobsPage";
 import ConnectionsPage from "./mynetwork/ConnectionsPage";
-
+import FollowingFollowersPage from "./mynetwork/FollowingFollowersPage";
 //Export the Imported Pages
 export {
   LandingPage,
@@ -43,5 +43,6 @@ export {
   ResetPasswordPage,
   NotFoundPage,
   SavedJobsPage,
-  ConnectionsPage
+  ConnectionsPage,
+  FollowingFollowersPage,
 };

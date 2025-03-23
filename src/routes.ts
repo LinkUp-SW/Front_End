@@ -9,7 +9,6 @@ import {
   MyNetworkPage,
   JobsPage,
   SeeMorePage,
-  FollowingFollowers,
   MessagingPage,
   InvitationsManagerPage,
   SignInPage,
@@ -22,10 +21,10 @@ import {
   NotFoundPage,
   SavedJobsPage,
   ConnectionsPage,
+  FollowingFollowersPage,
 } from "./pages";
 
 import React from "react";
-
 
 // Define your routes as an array of RouteObject (compatible with React Router v6)
 const routes: RouteObject[] = [
@@ -65,7 +64,7 @@ const routes: RouteObject[] = [
 
   {
     path: "/followingfollowers",
-    element: React.createElement(FollowingFollowers),
+    element: React.createElement(FollowingFollowersPage),
   },
 
   { path: "/connections", element: React.createElement(ConnectionsPage) },
