@@ -19,6 +19,7 @@ import ForgetPasswordPage from "./auth/forget_password/ForgetPasswordPage";
 import ResetPasswordPage from "./auth/reset_password/ResetPasswordPage";
 import NotFoundPage from "./404/NotFoundPage";
 import SavedJobsPage from "./jobs/SavedJobsPage";
+import ConnectionsPage from "./mynetwork/ConnectionsPage";
 
 //Export the Imported Pages
 export {
@@ -42,4 +43,5 @@ export {
   ResetPasswordPage,
   NotFoundPage,
   SavedJobsPage,
+  ConnectionsPage
 };

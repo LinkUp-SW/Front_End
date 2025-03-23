@@ -10,7 +10,6 @@ import {
   JobsPage,
   SeeMorePage,
   FollowingFollowers,
-  Connections,
   MessagingPage,
   InvitationsManagerPage,
   SignInPage,
@@ -20,10 +19,13 @@ import {
   EmailVerification,
   ForgetPasswordPage,
   ResetPasswordPage,
-  NotFoundPage
-, SavedJobsPage} from "./pages";
+  NotFoundPage,
+  SavedJobsPage,
+  ConnectionsPage,
+} from "./pages";
 
 import React from "react";
+
 
 // Define your routes as an array of RouteObject (compatible with React Router v6)
 const routes: RouteObject[] = [
@@ -66,7 +68,7 @@ const routes: RouteObject[] = [
     element: React.createElement(FollowingFollowers),
   },
 
-  { path: "/connections", element: React.createElement(Connections) },
+  { path: "/connections", element: React.createElement(ConnectionsPage) },
 
   {
     path: "/manage-invitations",
@@ -75,7 +77,7 @@ const routes: RouteObject[] = [
 
   {
     path: "/saved-jobs",
-    element:  React.createElement(SavedJobsPage)
+    element: React.createElement(SavedJobsPage),
   },
 
   {
@@ -103,8 +105,8 @@ const routes: RouteObject[] = [
     element: React.createElement(ForgetPasswordPage),
   },
   {
-    path:'/reset-password/:token',
-    element:React.createElement(ResetPasswordPage)
+    path: "/reset-password/:token",
+    element: React.createElement(ResetPasswordPage),
   },
   {
     path: "*",

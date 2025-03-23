@@ -9,7 +9,6 @@ import {
   DialogTitle,
   DialogDescription,
   Modal,
-  WithNavBar,
 } from "@/components";
 import { fetchConnections, Connection } from "@/endpoints/myNetwork";
 import RemoveConnectionModal from "./modals/remove_connection_modal/RemoveConnectionModal";
@@ -127,4 +126,4 @@ const Connections: React.FC = () => {
   );
 };
 
-export default WithNavBar(withSidebarAd(Connections));
+export default withSidebarAd(Connections);
