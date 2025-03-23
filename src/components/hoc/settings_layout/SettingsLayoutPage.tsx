@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import styles from './settingsLayoutPage.module.css';
-import linkUpLogo from '../../assets/link_up.png';
 
 // Icons 
 import { FaUser, FaLock, FaEye, FaShieldAlt, FaBullhorn, FaBell } from 'react-icons/fa';

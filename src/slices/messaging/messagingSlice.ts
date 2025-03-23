@@ -1,4 +1,3 @@
-import SendingMessages from "@/pages/messaging/SendingMessages";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface Message {
