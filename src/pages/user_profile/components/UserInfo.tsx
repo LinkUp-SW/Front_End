@@ -1,12 +1,16 @@
-import { useDispatch } from "react-redux";
-import { handleOpenModalType } from "../../../utils";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components";
+import Header from "./modals/components/Header";
+import AddProfileSectionModal from "./modals/add_profile_section_modal/AddProfileSectionModal";
 
 const UserInfo = () => {
-  const dispatch = useDispatch();
 
-  const handleOpenModal = () => {
-    dispatch(handleOpenModalType('add_profile_section')); // Dispatch a string identifier or an object with modal details
-  };
   return (
     <section className="bg-white dark:bg-gray-900 rounded-lg shadow-md overflow-hidden">
       {/* Cover Photo */}
@@ -52,9 +56,22 @@ const UserInfo = () => {
           <button className="bg-blue-600 flex-grow text-white cursor-pointer hover:bg-blue-800 transition-all duration-300 ease-in-out px-4 py-2 rounded-full text-sm font-medium">
             Open to work
           </button>
-          <button onClick={handleOpenModal} className=" border-blue-600 flex-grow text-blue-600 font-semibold border-2 cursor-pointer hover:bg-blue-600 hover:text-white dark:text-blue-300 dark:border-blue-300 dark:hover:bg-blue-300 dark:hover:text-gray-700 transition-all duration-300 ease-in-out px-4 py-2 rounded-full text-sm ">
-            Add profile section
-          </button>
+          <Dialog>
+            <DialogTrigger asChild>
+              <button className=" border-blue-600 flex-grow text-blue-600 font-semibold border-2 cursor-pointer hover:bg-blue-600 hover:text-white dark:text-blue-300 dark:border-blue-300 dark:hover:bg-blue-300 dark:hover:text-gray-700 transition-all duration-300 ease-in-out px-4 py-2 rounded-full text-sm ">
+                Add profile section
+              </button>
+            </DialogTrigger>
+            <DialogContent className="!max-w-5xl gap-0 md:!w-[33rem] overflow-y-auto overflow-x-hidden rounded-lg p-6 max-h-[45rem] !w-full">
+              <DialogHeader>
+                <DialogTitle>
+                  <Header title="Add To Profile" />
+                </DialogTitle>
+              </DialogHeader>
+              <DialogDescription className="text-sm text-gray-500 dark:text-gray-300"></DialogDescription>
+              <AddProfileSectionModal />
+            </DialogContent>
+          </Dialog>
           <button className=" border-blue-600 flex-grow text-blue-600 font-semibold border-2 cursor-pointer hover:bg-blue-600 hover:text-white dark:text-blue-300 dark:border-blue-300 dark:hover:bg-blue-300 dark:hover:text-gray-700 transition-all duration-300 ease-in-out px-4 py-2 rounded-full text-sm ">
             Enhance Profile
           </button>
