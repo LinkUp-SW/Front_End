@@ -1,7 +1,4 @@
-import {
-  FILTER_OPTIONS_MESSAGES,
-  FILTERS_LIST_MESSAGES,
-} from "../../constants/index.ts";
+import { FILTERS_LIST_MESSAGES } from "../../constants/index.ts";
 import { useState } from "react";
 import { Dispatch, SetStateAction } from "react"; // For typing setState functions
 
@@ -12,71 +9,6 @@ interface ButtonsProps {
 }
 
 const Buttons = ({ activeFilter, setActiveFilter }: ButtonsProps) => {
-  const dataInfo = [
-    {
-      id: 1,
-      profileImg:
-        "https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg",
-      name: "Mohanad Tarek",
-      message: " you: Lorem ipsum dolor ...",
-      date: "2h ago",
-      type: "myconnections",
-    },
-    {
-      id: 2,
-      profileImg:
-        "https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg",
-      name: "Youssef afifi",
-      message: " you: Lorem ipsum dolor ...",
-      date: "2h ago",
-      type: "inmail",
-    },
-    {
-      id: 3,
-      profileImg:
-        "https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg",
-      name: "Aly Mohamed",
-      message: " you: Lorem ipsum dolor ...",
-      date: "2h ago",
-      type: "unread",
-    },
-    {
-      id: 4,
-      profileImg:
-        "https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg",
-      name: "Amr Doma",
-      message: " you: Lorem ipsum dolor ...",
-      date: "2h ago",
-      type: "starred",
-    },
-    {
-      id: 5,
-      profileImg:
-        "https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg",
-      name: "Amr Doma",
-      message: " you: Lorem ipsum dolor ...",
-      date: "2h ago",
-      type: "starred",
-    },
-    {
-      id: 6,
-      profileImg:
-        "https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg",
-      name: "Amr Doma",
-      message: " you: Lorem ipsum dolor ...",
-      date: "2h ago",
-      type: "starred",
-    },
-    {
-      id: 7,
-      profileImg:
-        "https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg",
-      name: "Amr Doma",
-      message: " you: Lorem ipsum dolor ...",
-      date: "2h ago",
-      type: "starred",
-    },
-  ];
   const BUTTON_STYLE =
     "text-center hover:bg-gray-100 hover:border-1 hover:border-gray-800  hover:cursor-pointer text-black rounded-2xl border-1 border-gray-400 border-1 pr-2 pl-2 pt-1 pb-1 mr-3 ";
   const MAIN_BUTTON_OPTIONS = "bg-white text-black";

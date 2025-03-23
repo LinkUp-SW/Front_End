@@ -8,12 +8,9 @@ import { Link } from "react-router-dom";
 import { LiaEllipsisHSolid as EllipsisIcon } from "react-icons/lia";
 import { Button } from "@/components/ui/button";
 import {
-  FaBan,
-  FaBookmark,
   FaEyeSlash,
   FaFlag,
   FaLink,
-  FaUserSlash,
 } from "react-icons/fa";
 import { PiHandsClapping as CelebrateIcon } from "react-icons/pi";
 import { FcLike as LoveIcon } from "react-icons/fc";
@@ -22,9 +19,7 @@ import { HiOutlineLightBulb as InsightfulIcon } from "react-icons/hi";
 import { PiHandPalmBold as SupportIcon } from "react-icons/pi";
 import {
   AiOutlineLike as LikeIcon,
-  AiFillLike as LikedIcon,
 } from "react-icons/ai";
-import { FaRegCommentDots as CommentIcon } from "react-icons/fa";
 
 interface CommentProps {
   user: {
@@ -53,7 +48,7 @@ interface CommentProps {
 
 const Comment: React.FC<CommentProps> = ({ user, comment, stats }) => {
   const { profileImage, name, degree } = user;
-  const { text, image, edited } = comment;
+  const { text,  edited } = comment;
   const [commentMenuOpen, setCommentMenuOpen] = useState(false);
 
   const statsArray = [
@@ -100,6 +95,7 @@ const Comment: React.FC<CommentProps> = ({ user, comment, stats }) => {
   ];
 
   function handleOpenModal(arg0: string): void {
+    console.log(arg0)
     throw new Error("Function not implemented.");
   }
 
