@@ -4,22 +4,15 @@ import SideBar from "./SideBar";
 import ChatingScreen from "./ChatingScreen";
 import SendingMessages from "./SendingMessages";
 import { WithNavBar } from "../../components";
-import { useState } from "react";
 
 const MessagingPage = () => {
-  const [activeFilter, setActiveFilter] = useState<string>("Focused");
-  const [search, setSearch] = useState<string>("");
   return (
     <>
       <div className="bg-white">
-        <Header setSearch={setSearch} />
-        <Buttons
-          activeFilter={activeFilter}
-          setActiveFilter={setActiveFilter}
-        />
-
+        <Header />
+        <Buttons />
         <div className="flex">
-          <SideBar activeFilter={activeFilter} search={search} />
+          <SideBar />
           <div className=" w-3/5 border-1 border-[#e8e8e8] ">
             <ChatingScreen />
             <SendingMessages />

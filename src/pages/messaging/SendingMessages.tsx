@@ -1,6 +1,7 @@
 import { useDispatch } from "react-redux";
 import { sendMessage } from "../../slices/messaging/messagingSlice";
-
+import { useSelector } from "react-redux";
+import { RootState } from "@/store";
 import { FaRegImage } from "react-icons/fa6";
 import { MdOutlineEmojiEmotions } from "react-icons/md";
 import { MdAttachFile } from "react-icons/md";
@@ -8,13 +9,15 @@ import { IoIosClose } from "react-icons/io";
 import { FaFileAlt } from "react-icons/fa";
 import { useState } from "react";
 import EmojiPicker from "emoji-picker-react";
-import { handleRequest } from "msw";
 
 const SendingMessages = () => {
+  const selectedConvID = useSelector(
+    (state: RootState) => state.messaging.selectedMessages
+  );
   const dispatch = useDispatch();
-  const [selectedImage, setSelectedMessages] = useState(false);
+  /* const [selectedImage, setSelectedMessages] = useState("");*/
   const [selectedEmoji, setSelectedEmoji] = useState(false);
-  const [text, setText] = useState("");
+  const [text, setText] = useState<string>("");
   const [files, setFiles] = useState<File[]>([]);
   const [selectedFile, setSelectedFile] = useState(false);
 
@@ -35,21 +38,26 @@ const SendingMessages = () => {
   };
 
   const handleSendMessage = () => {
-    if (!text.trim()) return; // Prevent sending empty messages
+    if (!text.trim()) return;
+    const newMessage = {
+      id: new Date().toISOString(),
+      Img: "https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg",
+      name: "You", // You can adjust this based on logged-in user
+      message: text,
+      date: Date.now(),
+    };
 
     dispatch(
       sendMessage({
-        id: Date.now(),
+        senderID: "10",
         profileImg:
           "https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg",
-        name: "Mohanad Tarek",
-        message: text,
-        date: new Date().toLocaleTimeString(),
-        type: ["focused"],  
+        convID: selectedConvID,
+        message: newMessage,
       })
     );
 
-    setText(""); // Clear text after sending
+    setText("");
   };
   return (
     <>
