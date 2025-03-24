@@ -21,6 +21,7 @@ import PostFooter from "./PostFooter";
 import { getEngagementButtons, getMenuActions } from "./menus";
 import { Dialog, DialogContent, DialogTrigger } from "@/components";
 import ReactionsModal from "./modals/ReactionsModal";
+import TruncatedText from "./TruncatedText";
 
 interface PostProps {
   postData: PostType;
@@ -41,25 +42,17 @@ const Post: React.FC<PostProps> = ({ postData, comments }) => {
     setSortingState(selectedState);
   };
 
-  const dispatch = useDispatch();
+  const words = post.content.split(" ");
+  const isLong = words.length > 40;
 
-  const handleOpenModal = (modalName: string) => {
-    dispatch(handleOpenModalType(modalName)); // Dispatch a string identifier or an object with modal details
-  };
+  // If not expanded, show only 40 words + ...
+  const truncatedText = isLong ? words.slice(0, 40).join(" ") : post.content;
 
-  const menuActions = getMenuActions(handleOpenModal);
+  const menuActions = getMenuActions();
 
-  const engagementButtons = getEngagementButtons(
-    liked,
-    () => setLiked(!liked),
-    handleOpenModal
-  );
+  const engagementButtons = getEngagementButtons(liked, () => setLiked(!liked));
 
   const timeAgo = moment(post.date).fromNow();
-
-  useEffect(() => {
-    console.log(postMenuOpen);
-  }, [postMenuOpen]);
 
   const statsArray = [
     { name: "celebrate", count: stats.celebrate, icon: <CelebrateIcon /> },
@@ -117,20 +110,7 @@ const Post: React.FC<PostProps> = ({ postData, comments }) => {
           timeAgo={timeAgo}
           post={post}
         />
-        <section className="flex relative text-gray-800 dark:text-neutral-200">
-          <p className={`mt-2 text-sm   ${expanded ? "" : "line-clamp-3"}`}>
-            {post.content}
-          </p>
-          {post.content.split(" ").length > 30 && (
-            <Button
-              variant="ghost"
-              className="text-gray-500 absolute -bottom-2 transition-all -right-6 hover:bg-transparent hover:cursor-pointer"
-              onClick={() => setExpanded(!expanded)}
-            >
-              {expanded ? "less" : "more"}
-            </Button>
-          )}
-        </section>
+        <TruncatedText content={post.content} lineCount={3} />
 
         {/* Post Image(s) */}
         {post.images && post.images.length > 0 && (
