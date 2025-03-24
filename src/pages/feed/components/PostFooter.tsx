@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, memo } from "react";
 import {
   Popover,
   PopoverContent,
@@ -12,7 +12,9 @@ import { CommentType } from "@/types";
 import { GoFileMedia as MediaIcon } from "react-icons/go";
 import CommentWithReplies from "./CommentWithReplies";
 import { MdOutlineEmojiEmotions } from "react-icons/md";
-import EmojiPicker from "emoji-picker-react";
+import EmojiPicker, { Theme } from "emoji-picker-react";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store";
 
 interface SortingMenuItem {
   name: string;
@@ -62,16 +64,21 @@ const PostFooter: React.FC<PostFooterProps> = ({
   // Create a ref for the horizontally scrollable container
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [commentInput, setCommentInput] = useState("");
-  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [selected, setSelectedImage] = useState<File | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const darkMode = useSelector((state: RootState) => state.theme.theme);
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      console.log(selected);
       setSelectedImage(file);
     }
   };
+
+  const MemoizedEmojiPicker = memo(EmojiPicker);
 
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -146,19 +153,27 @@ const PostFooter: React.FC<PostFooterProps> = ({
               placeholder="Add a comment..."
               value={commentInput}
               onChange={(e) => setCommentInput(e.target.value)}
-              className=" w-full h-11 border p-4 focus:ring-1 transition-colors hover:text-gray-950 dark:hover:text-neutral-300 rounded-full border-gray-400 font-normal text-sm text-black  text-left dark:text-neutral-300"
+              className=" w-full h-11 dark:focus:ring-0 dark:focus:border-0 border p-4 focus:ring-1 transition-colors dark:hover:bg-gray-800 hover:text-gray-950 dark:hover:text-neutral-300 rounded-full border-gray-400 font-normal text-sm text-black  text-left dark:text-neutral-300"
             />
             <Popover>
-              <PopoverTrigger asChild>
+              <PopoverTrigger asChild onClick={() => console.log("hi")}>
                 <Button
                   variant="ghost"
-                  className="absolute right-10 bottom-1 hover:cursor-pointer rounded-full"
+                  className="absolute right-10 bottom-1 hover:cursor-pointer rounded-full dark:hover:bg-gray-800 dark:hover:text-neutral-200"
                 >
                   <MdOutlineEmojiEmotions />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent>
-                <EmojiPicker onEmojiClick={handleEmojiRequest} />
+              <PopoverContent
+                forceMount
+                className="dark:bg-gray-900 w-fit p-0 dark:border-gray-600"
+              >
+                <MemoizedEmojiPicker
+                  className="dark:bg-gray-900 w-full p-0"
+                  theme={darkMode === "dark" ? Theme.DARK : Theme.LIGHT}
+                  width={"full"}
+                  onEmojiClick={handleEmojiRequest}
+                />
               </PopoverContent>
             </Popover>
 
@@ -172,7 +187,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
             <Button
               variant="ghost"
               onClick={() => fileInputRef.current?.click()}
-              className="absolute right-1 hover:cursor-pointer rounded-full"
+              className="absolute right-1 hover:cursor-pointer rounded-full dark:hover:bg-gray-800 dark:hover:text-neutral-200"
             >
               <MediaIcon />
             </Button>
@@ -183,14 +198,14 @@ const PostFooter: React.FC<PostFooterProps> = ({
         <Popover open={sortingMenu} onOpenChange={setSortingMenu}>
           <PopoverTrigger
             asChild
-            className="rounded-full dark:hover:bg-zinc-700 hover:cursor-pointer dark:hover:text-neutral-200 h-8 gap-1.5 px-3"
+            className="rounded-full z-10 dark:hover:bg-zinc-700 hover:cursor-pointer dark:hover:text-neutral-200 h-8 gap-1.5 px-3"
           >
             <div className="flex items-center gap-1 text-gray-500 text-sm font-medium ">
               <p>{sortingState}</p>
               <FaChevronDown />
             </div>
           </PopoverTrigger>
-          <PopoverContent className="relative dark:bg-gray-900 bg-white border-neutral-200 dark:border-gray-700 p-0 pt-1">
+          <PopoverContent className="relative  dark:bg-gray-900 bg-white border-neutral-200 dark:border-gray-700 p-0 pt-1">
             <div className="flex flex-col w-full p-0">
               {COMMENT_SORTING_MENU.map((item, index) => (
                 <Button
@@ -200,13 +215,15 @@ const PostFooter: React.FC<PostFooterProps> = ({
                     setSortingMenu(false);
                     item.action();
                   }}
-                  className="flex justify-start items-center rounded-none bg-transparent w-full h-16 pt-4 py-4 hover:bg-neutral-200 text-gray-900 dark:text-neutral-200 dark:hover:bg-gray-600 hover:cursor-pointer"
+                  className="flex justify-start items-center rounded-none bg-transparent w-full h-16 pt-4 py-4 hover:bg-neutral-200 text-gray-900  dark:hover:bg-gray-600 dark:hover:text-white hover:cursor-pointer"
                 >
-                  <div className="flex justify-start w-full text-gray-600">
-                    <div className="p-4 pl-0">{item.icon}</div>
+                  <div className="flex justify-start w-full  text-gray-600 dark:text-neutral-200">
+                    <div className="p-4 pl-0 ">{item.icon}</div>
                     <div className="flex flex-col items-start justify-center">
                       <span className="font-medium">{item.name}</span>
-                      <span className="text-xs">{item.subtext}</span>
+                      <span className="text-xs text-wrap text-left font-normal">
+                        {item.subtext}
+                      </span>
                     </div>
                   </div>
                 </Button>
