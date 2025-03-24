@@ -86,9 +86,8 @@ const PostHeader: React.FC<PostHeaderProps> = ({
                   <div className="flex flex-col w-full p-0">
                     {menuActions.map((item: any, index: number) =>
                       item.name == "Report Post" ? (
-                        <DialogTrigger asChild>
+                        <DialogTrigger asChild key={index}>
                           <Button
-                            key={index}
                             onClick={() => {
                               item.action();
                               setPostMenuOpen(!postMenuOpen);
