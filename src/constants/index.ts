@@ -2,7 +2,6 @@ import { GoHomeFill } from "react-icons/go";
 import { FaPeopleGroup } from "react-icons/fa6";
 import { FaBell, FaBriefcase, FaUserAlt, FaBookmark } from "react-icons/fa";
 import { BsChatDotsFill } from "react-icons/bs";
-import { handleOpenModalType } from "../utils";
 import { BiSliderAlt } from "react-icons/bi";
 import { HiOutlineDocumentText } from "react-icons/hi";
 import { BsBarChartLine } from "react-icons/bs";
@@ -66,7 +65,6 @@ export const SMALL_SCREEN_NAV_ITEMS = [
 ];
 
 export const FILTER_OPTIONS_MESSAGES = {
-  FOCUSED: "Focused",
   UNREAD: "Unread",
   MY_CONNECTIONS: "My Connections",
   INMAIL: "InMail",
@@ -89,37 +87,37 @@ export const CORE_PROFILE_SECTIONS = [
   {
     id: 1,
     title: "Add profile photo",
-    onClickEvent: handleOpenModalType("profile_photo"),
+    key: "profile_photo",
   },
   {
     id: 2,
     title: "Add about",
-    onClickEvent: handleOpenModalType("about"),
+    key: "about",
   },
   {
     id: 3,
     title: "Add education",
-    onClickEvent: handleOpenModalType("education"),
+    key: "education",
   },
   {
     id: 4,
     title: "Add experience",
-    onClickEvent: handleOpenModalType("experience"),
+    key: "experience",
   },
   {
     id: 5,
     title: "Add services",
-    onClickEvent: handleOpenModalType("services"),
+    key: "services",
   },
   {
     id: 6,
     title: "Add career break",
-    onClickEvent: handleOpenModalType("career_break"),
+    key: "career_break",
   },
   {
     id: 7,
     title: "Add skills",
-    onClickEvent: handleOpenModalType("skills"),
+    key: "skills",
   },
 ];
 
@@ -443,17 +441,6 @@ export const COUNTRY_CITY_MAP: { [key: string]: string[] } = {
     "Karak",
   ],
   Lebanon: ["Beirut", "Tripoli", "Sidon", "Tyre", "Zahle", "Byblos", "Jounieh"],
-  Israel: [
-    "Jerusalem",
-    "Tel Aviv",
-    "Haifa",
-    "Rishon LeZion",
-    "Petah Tikva",
-    "Ashdod",
-    "Netanya",
-    "Beersheba",
-    "Holon",
-  ],
   Iraq: [
     "Baghdad",
     "Basra",

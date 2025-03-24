@@ -1,4 +1,3 @@
-import { WithNavBar } from "../../../components";
 import withSidebarAd from "@/components/hoc/withSidebarAd";
 import { useState, useCallback } from "react";
 import {
@@ -98,4 +97,4 @@ const FollowingFollowers: React.FC = () => {
   );
 };
 
-export default WithNavBar(withSidebarAd(FollowingFollowers));
+export default withSidebarAd(FollowingFollowers);

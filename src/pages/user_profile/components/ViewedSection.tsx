@@ -1,5 +1,3 @@
-import React from "react";
-
 const ViewedSection = () => {
   return (
     <section className="bg-white dark:bg-gray-900  p-6 rounded-lg shadow">

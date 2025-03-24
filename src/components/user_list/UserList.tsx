@@ -1,10 +1,9 @@
 // src/components/UserList.tsx
 import React from "react";
-import { getHomePageData } from "../../endpoints/home";
 import useFetchData from "../../hooks/useFetchData";
 
 const UserList: React.FC = () => {
-  const { data, loading, error } = useFetchData(() => getHomePageData(), []);
+  const { data, loading, error } = useFetchData(async () => {}, []);
 
   if (loading) return <div>Loading...</div>;
 
@@ -14,7 +13,7 @@ const UserList: React.FC = () => {
 
   return (
     <div>
-      {data.firstName} {data.lastName}
+      {/* {data.firstName} {data.lastName} */}
     </div>
   );
 };

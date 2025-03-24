@@ -1,19 +1,26 @@
-import React, { useCallback, useState } from "react";
-import { useDispatch } from "react-redux";
+import React, { useEffect, useState } from "react";
 import { BsPencil } from "react-icons/bs";
 import { GoPlus } from "react-icons/go";
 import { IoIosBriefcase } from "react-icons/io";
-import { handleOpenModalType } from "../../../utils";
 import { Experience } from "@/types";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components";
+import AddExperienceModal from "./modals/experience_modal/AddExperienceModal";
+import Header from "./modals/components/Header";
 
 const ExperienceSection: React.FC = () => {
   const [experiences, setExperiences] = useState<Experience[]>([]);
-  const dispatch = useDispatch();
   const isEmpty = experiences.length === 0;
 
-  const handleOpenModal = useCallback(() => {
-    dispatch(handleOpenModalType("experience"));
-  }, [dispatch]);
+  useEffect(() => {
+    setExperiences([]);
+  }, []);
 
   const EmptyExperience = () => (
     <div className="grid gap-2">
@@ -27,12 +34,24 @@ const ExperienceSection: React.FC = () => {
           <p className="text-sm">2023 - present</p>
         </div>
       </div>
-      <button
-        onClick={handleOpenModal}
-        className="w-fit py-1.5 px-4 border-2 rounded-full dark:border-blue-400 font-semibold text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-600 dark:hover:bg-blue-400 hover:text-white transition-all duration-300 ease-in-out border-blue-600 cursor-pointer"
-      >
-        Add Experience
-      </button>
+      <Dialog>
+        <DialogTrigger asChild>
+          <button className="w-fit py-1.5 px-4 border-2 rounded-full dark:border-blue-400 font-semibold text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-600 dark:hover:bg-blue-400 hover:text-white transition-all duration-300 ease-in-out border-blue-600 cursor-pointer">
+            Add Experience
+          </button>
+        </DialogTrigger>
+        <DialogContent className="max-h-[45rem] overflow-y-auto overflow-x-hidden !max-w-5xl sm:!w-[38.5rem] !w-full">
+          <DialogHeader>
+            <DialogTitle>
+              <Header title="Add Experience" />
+            </DialogTitle>
+            <DialogDescription className="text-sm text-gray-500 dark:text-gray-300">
+              *Indicates required
+            </DialogDescription>
+          </DialogHeader>
+          <AddExperienceModal />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 
@@ -76,20 +95,51 @@ const ExperienceSection: React.FC = () => {
         </div>
         {!isEmpty && (
           <div className="flex items-center gap-2">
-            <button
-              onClick={handleOpenModal}
-              aria-label="Add Experience"
-              className="hover:bg-gray-300 dark:hover:text-black rounded-full transition-all duration-200 ease-in-out"
-            >
-              <GoPlus size={30} />
-            </button>
-            <button
-              onClick={handleOpenModal}
-              aria-label="Edit Experience"
-              className="hover:bg-gray-300 dark:hover:text-black p-2 rounded-full transition-all duration-200 ease-in-out"
-            >
-              <BsPencil size={20} />
-            </button>
+            {/* Add Experience Button */}
+            <Dialog>
+              <DialogTrigger asChild>
+                <button
+                  aria-label="Add Experience"
+                  className="hover:bg-gray-300 dark:hover:text-black rounded-full transition-all duration-200 ease-in-out"
+                >
+                  <GoPlus size={30} />
+                </button>
+              </DialogTrigger>
+              <DialogContent className="max-h-[45rem] overflow-y-auto overflow-x-hidden !max-w-5xl sm:!w-[38.5rem] !w-full">
+                <DialogHeader>
+                  <DialogTitle>
+                    <Header title="Add Experience" />
+                  </DialogTitle>
+                  <DialogDescription className="text-sm text-gray-500 dark:text-gray-300">
+                    *Indicates required
+                  </DialogDescription>
+                </DialogHeader>
+                <AddExperienceModal />
+              </DialogContent>
+            </Dialog>
+            {/* Edit Experience Button */}
+            <Dialog>
+              <DialogTrigger asChild>
+                <button
+                  aria-label="Edit Experience"
+                  className="hover:bg-gray-300 dark:hover:text-black p-2 rounded-full transition-all duration-200 ease-in-out"
+                >
+                  <BsPencil size={20} />
+                </button>
+              </DialogTrigger>
+              <DialogContent className="max-h-[45rem] overflow-y-auto overflow-x-hidden !max-w-5xl sm:!w-[38.5rem] !w-full">
+                <DialogHeader>
+                  <DialogTitle>
+                    <Header title="Edit Experience" />
+                  </DialogTitle>
+                  <DialogDescription className="text-sm text-gray-500 dark:text-gray-300">
+                    *Indicates required
+                  </DialogDescription>
+                </DialogHeader>
+                {/* Reuse the same modal content for editing or swap with an EditExperienceModal */}
+                <AddExperienceModal />
+              </DialogContent>
+            </Dialog>
           </div>
         )}
       </header>

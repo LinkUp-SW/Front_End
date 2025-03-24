@@ -10,10 +10,7 @@ import { useFormStatus } from "@/hooks/useFormStatus";
 import SkillsManager from "./components/SkillsManager";
 import MediaManager from "./components/MediaManager";
 import { MediaItem } from "./types";
-import Header from "../components/Header";
 import { JobTypeEnum } from "@/types";
-
-
 
 export interface ExperienceFormData {
   title: string;
@@ -84,11 +81,6 @@ const AddExperienceModal: React.FC = () => {
           }
         }}
       >
-        <Header title="Add Experience" />
-        <p className="text-sm text-gray-500 dark:text-gray-400">
-          *Indicates required
-        </p>
-
         <FormInput
           label="Title*"
           placeholder="Ex: Retail Sales Manager"
@@ -111,7 +103,7 @@ const AddExperienceModal: React.FC = () => {
           placeholder="Ex: Microsoft"
           value={formData.company}
           onChange={(e) => handleChange("company", e.target.value)}
-          id='company-name'
+          id="company-name"
           name="company"
         />
         <FormCheckbox

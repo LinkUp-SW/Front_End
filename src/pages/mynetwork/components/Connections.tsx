@@ -1,13 +1,19 @@
 import { useState, useCallback } from "react";
-import { useDispatch } from "react-redux";
 import { FaSearch, FaTimes } from "react-icons/fa";
-import { openModal } from "@/slices/modal/modalSlice";
 import withSidebarAd from "@/components/hoc/withSidebarAd"; // Import the HOC
-import { Modal, WithNavBar } from "../../../components";
+import {
+  Dialog,
+  DialogContent,
+  DialogTrigger,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  Modal,
+} from "@/components";
 import { fetchConnections, Connection } from "@/endpoints/myNetwork";
+import RemoveConnectionModal from "./modals/remove_connection_modal/RemoveConnectionModal";
 
 const Connections: React.FC = () => {
-  const dispatch = useDispatch();
   const [search, setSearch] = useState("");
   const [connections, setConnections] = useState<Connection[]>([]);
 
@@ -89,24 +95,26 @@ const Connections: React.FC = () => {
                   <button className="px-4 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 shadow-md cursor-pointer">
                     Message
                   </button>
-
-                  <button
-                    onClick={() =>
-                      dispatch(
-                        openModal({
-                          modalType: "remove_connection",
-                          modalData: {
-                            userInfo: { userId: conn.id, userName: conn.name },
-                            onRemove: handleRemoveConnection,
-                          },
-                        })
-                      )
-                    }
-                    className="flex items-center justify-center  text-gray-700 dark:text-white cursor-pointer transition duration-200"
-                    aria-label={`Remove connection with ${conn.name}`}
-                  >
-                    <FaTimes className="mr-2  flex-shrink-0" />
-                  </button>
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <button
+                        className="flex items-center justify-center  text-gray-700 dark:text-white cursor-pointer transition duration-200"
+                        aria-label={`Remove connection with ${conn.name}`}
+                      >
+                        <FaTimes className="mr-2  flex-shrink-0" />
+                      </button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <RemoveConnectionModal
+                        userData={{ userName: conn.name, userId: conn.id }}
+                        onConfirm={() => handleRemoveConnection(conn.id)}
+                      />
+                      <DialogHeader>
+                        <DialogTitle></DialogTitle>
+                        <DialogDescription></DialogDescription>
+                      </DialogHeader>
+                    </DialogContent>
+                  </Dialog>
                 </div>
               </div>
             ))}
@@ -118,4 +126,4 @@ const Connections: React.FC = () => {
   );
 };
 
-export default WithNavBar(withSidebarAd(Connections));
+export default withSidebarAd(Connections);

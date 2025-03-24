@@ -3,7 +3,7 @@ import { initiateForgetPassword } from "@/endpoints/userAuth";
 import { useFormStatus } from "@/hooks/useFormStatus";
 import { validateEmail } from "@/utils";
 import { getErrorMessage } from "@/utils/errorHandler";
-import React, { useState } from "react";
+import  { useState } from "react";
 import { toast } from "sonner";
 
 const ForgetPasswordPage = () => {

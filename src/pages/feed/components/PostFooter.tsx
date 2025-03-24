@@ -4,12 +4,13 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { FaChevronDown } from "react-icons/fa";
-import { COMMENT_SORTING_MENU } from "./menus";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Comment } from "@/pages/feed/components";
 import { Button } from "@/components";
 import { Link } from "react-router-dom";
 import { CommentType } from "@/types";
+import { COMMENT_SORTING_MENU } from "./menus";
 
 export default function PostFooter(
   user: {

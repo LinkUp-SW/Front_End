@@ -18,6 +18,7 @@ export const filterNotificationsByTab = (
     activeTab: Tab, 
     activePostFilter?: PostFilter
 ): Notification[] => {
+  console.log(activePostFilter)
     switch (activeTab) {
       case 'jobs':
         return notifications.filter(notification => 

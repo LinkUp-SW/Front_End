@@ -16,9 +16,11 @@ import { Link } from "react-router-dom";
 import { CommentType, PostType } from "@/types";
 
 import { POST_ACTIONS } from "@/constants";
-import { getEngagementButtons, getMenuActions } from "./menus";
 import PostHeader from "./PostHeader";
 import PostFooter from "./PostFooter";
+import { getEngagementButtons, getMenuActions } from "./menus";
+import { Dialog, DialogContent, DialogTrigger } from "@/components";
+import ReactionsModal from "./modals/ReactionsModal";
 
 interface PostProps {
   postData: PostType;
@@ -145,22 +147,26 @@ const Post: React.FC<PostProps> = ({ postData, comments }) => {
           </div>
         )}
         <footer className="flex justify-between w-full items-center pt-4">
-          <button
-            onClick={() => handleOpenModal("reactions")}
-            className="flex relative text-gray-500 dark:text-neutral-400 text-sm hover:underline hover:cursor-pointer hover:text-blue-600 dark:hover:text-blue-400"
-          >
-            {topStats.map((stat, index) => (
-              <span
-                key={index}
-                className="flex items-center text-black dark:text-neutral-200 text-lg"
-              >
-                {stat.icon}
-              </span>
-            ))}
-            {stats.person
-              ? stats.person + " and " + (totalStats - 1) + " others"
-              : totalStats}
-          </button>
+          <Dialog>
+            <DialogTrigger asChild>
+              <button className="flex relative text-gray-500 dark:text-neutral-400 text-sm hover:underline hover:cursor-pointer hover:text-blue-600 dark:hover:text-blue-400">
+                {topStats.map((stat, index) => (
+                  <span
+                    key={index}
+                    className="flex items-center text-black dark:text-neutral-200 text-lg"
+                  >
+                    {stat.icon}
+                  </span>
+                ))}
+                {stats.person
+                  ? stats.person + " and " + (totalStats - 1) + " others"
+                  : totalStats}
+              </button>
+            </DialogTrigger>
+            <DialogContent>
+              <ReactionsModal />
+            </DialogContent>
+          </Dialog>
           <div className="flex text-gray-500 dark:text-neutral-400 gap-2 text-sm items-center ">
             <p className="hover:underline hover:text-blue-600 dark:hover:text-blue-400 hover:cursor-pointer">
               {stats.comments} comments
