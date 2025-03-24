@@ -8,7 +8,8 @@ import { Link } from "react-router-dom";
 import { HiGlobeEuropeAfrica as GlobeIcon } from "react-icons/hi2";
 import { LiaEllipsisHSolid as EllipsisIcon } from "react-icons/lia";
 import { IoMdClose as CloseIcon } from "react-icons/io";
-import { Button } from "@/components";
+import { Button, Dialog, DialogTrigger, DialogContent } from "@/components";
+import ReportPostModal from "./modals/ReportPostModal";
 
 interface User {
   name: string;
@@ -74,29 +75,51 @@ const PostHeader: React.FC<PostHeaderProps> = ({
             </p>
           </Link>
           <nav className={`flex relative left-5 ${action ? "bottom-10" : ""}`}>
-            <Popover open={postMenuOpen} onOpenChange={setPostMenuOpen}>
-              <PopoverTrigger className="rounded-full z-10 dark:hover:bg-zinc-700 hover:cursor-pointer dark:hover:text-neutral-200 h-8 gap-1.5 px-3 has-[>svg]:px-2.5">
-                <EllipsisIcon />
-              </PopoverTrigger>
-              <PopoverContent className="relative right-30 dark:bg-gray-900 bg-white border-neutral-200 dark:border-gray-700 p-0 pt-1">
-                <div className="flex flex-col w-full p-0">
-                  {menuActions.map((item: any, index: number) => (
-                    <Button
-                      key={index}
-                      onClick={() => {
-                        item.action();
-                        setPostMenuOpen(!postMenuOpen);
-                      }}
-                      className="flex justify-start items-center rounded-none h-12 bg-transparent w-full p-0 m-0 hover:bg-neutral-200 text-gray-900 dark:text-neutral-200 dark:hover:bg-gray-600 hover:cursor-pointer"
-                    >
-                      {item.icon}
-                      <span>{item.name}</span>
-                    </Button>
-                  ))}
-                </div>
-              </PopoverContent>
-            </Popover>
-
+            <Dialog>
+              <Popover open={postMenuOpen} onOpenChange={setPostMenuOpen}>
+                <PopoverTrigger className="rounded-full z-10 dark:hover:bg-zinc-700 hover:cursor-pointer dark:hover:text-neutral-200 h-8 gap-1.5 px-3 has-[>svg]:px-2.5">
+                  <EllipsisIcon
+                    onClick={() => setPostMenuOpen(!postMenuOpen)}
+                  />
+                </PopoverTrigger>
+                <PopoverContent className="relative right-30 dark:bg-gray-900 bg-white border-neutral-200 dark:border-gray-700 p-0 pt-1">
+                  <div className="flex flex-col w-full p-0">
+                    {menuActions.map((item: any, index: number) =>
+                      item.name == "Report Post" ? (
+                        <DialogTrigger asChild>
+                          <Button
+                            key={index}
+                            onClick={() => {
+                              item.action();
+                              setPostMenuOpen(!postMenuOpen);
+                            }}
+                            className="flex justify-start items-center rounded-none h-12 bg-transparent w-full p-0 m-0 hover:bg-neutral-200 text-gray-900 dark:text-neutral-200 dark:hover:bg-gray-600 hover:cursor-pointer"
+                          >
+                            {item.icon}
+                            <span>{item.name}</span>
+                          </Button>
+                        </DialogTrigger>
+                      ) : (
+                        <Button
+                          key={index}
+                          onClick={() => {
+                            item.action();
+                            setPostMenuOpen(!postMenuOpen);
+                          }}
+                          className="flex justify-start items-center rounded-none h-12 bg-transparent w-full p-0 m-0 hover:bg-neutral-200 text-gray-900 dark:text-neutral-200 dark:hover:bg-gray-600 hover:cursor-pointer"
+                        >
+                          {item.icon}
+                          <span>{item.name}</span>
+                        </Button>
+                      )
+                    )}
+                  </div>
+                </PopoverContent>
+              </Popover>
+              <DialogContent>
+                <ReportPostModal />
+              </DialogContent>
+            </Dialog>
             <Button
               className="rounded-full dark:hover:bg-zinc-700 hover:cursor-pointer dark:hover:text-neutral-200"
               variant="ghost"
