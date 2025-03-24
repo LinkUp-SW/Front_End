@@ -45,7 +45,8 @@ const EmailVerification = () => {
 
     const handleSendOTP = async () => {
       try {
-        await sendOTP(userEmail);
+        const response = await sendOTP(userEmail);
+        console.log(response.otp);
       } catch (error) {
         const err = getErrorMessage(error);
         toast.error(`Error: ${err}`);
@@ -87,7 +88,8 @@ const EmailVerification = () => {
 
     setIsResending(true);
     try {
-      await sendOTP(userEmail);
+      const response = await sendOTP(userEmail);
+      console.log(response.otp);
       toast.success("A new verification code has been sent to your email!");
       setResendTimer(30);
     } catch (error) {
