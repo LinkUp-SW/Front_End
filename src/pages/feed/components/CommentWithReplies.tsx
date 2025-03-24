@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import Comment, { CommentProps } from "./Comment";
 import Reply from "./Reply";
-import EmojiPicker from "emoji-picker-react";
 
 interface CommentWithRepliesProps extends CommentProps {
   replies?: CommentProps[];
@@ -11,7 +10,7 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
   replies,
   ...commentProps
 }) => {
-  const [showReplies, setShowReplies] = useState(true);
+  const [showReplies] = useState(true);
   const [mainCommentHeight, setMainCommentHeight] = useState(0);
   const [replyHeights, setReplyHeights] = useState(0);
 
@@ -45,7 +44,7 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
     <div className="flex flex-col relative">
       {/* Border element whose height is adjusted based on the main comment and replies */}
       <div
-        className="border-b-2 border-l-2 rounded-lg absolute w-10 z-0 left-4"
+        className="border-b-2 border-l-2 dark:border-gray-700 rounded-lg absolute w-10 left-4"
         style={{
           height: (mainCommentHeight + replyHeights) * 16 - 90, // converting back to px if needed
         }}
@@ -81,7 +80,7 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
                   className="relative"
                 >
                   {/* You can adjust or add your border for each reply if needed */}
-                  <div className="w-12 h-full rounded-full z-0 absolute bg-white left-8" />
+                  <div className="w-12 h-full rounded-full absolute bg-white dark:bg-gray-900 left-8" />
                   <Reply {...reply} />
                 </div>
               ))}

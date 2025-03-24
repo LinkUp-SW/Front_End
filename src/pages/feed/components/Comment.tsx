@@ -100,7 +100,7 @@ const Comment: React.FC<CommentProps> = ({ user, comment, stats }) => {
           alt={name}
           className="w-8 h-8 rounded-full relative z-10"
         />
-        <div className="w-12 h-16 rounded-full z-0 bg-white absolute" />
+        <div className="w-12 h-16 rounded-full z-0 bg-white dark:bg-gray-900 absolute" />
 
         <div className="flex flex-col gap-0 w-full relative">
           <section className="flex justify-between">
