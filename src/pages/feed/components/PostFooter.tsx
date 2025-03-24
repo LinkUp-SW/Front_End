@@ -1,31 +1,63 @@
+import React from "react";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { FaChevronDown } from "react-icons/fa";
-
+import { FaChevronDown, FaRocket, FaClock } from "react-icons/fa";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Comment } from "@/pages/feed/components";
+import Comment from "@/pages/feed/components/Comment";
 import { Button } from "@/components";
 import { Link } from "react-router-dom";
 import { CommentType } from "@/types";
-import { COMMENT_SORTING_MENU } from "./menus";
 
-export default function PostFooter(
+// Define an interface for the sorting menu items
+interface SortingMenuItem {
+  name: string;
+  subtext: string;
+  action: () => void;
+  icon: React.ReactNode;
+}
+
+// Example constant sorting menu from your menus file if needed
+export const COMMENT_SORTING_MENU: SortingMenuItem[] = [
+  {
+    name: "Most relevant",
+    subtext: "See the most relevant comments",
+    action: () => console.log("Most relevant pressed"),
+    icon: <FaRocket className="mr-2" />,
+  },
+  {
+    name: "Most recent",
+    subtext: "See all the comments, the most recent comments are first",
+    action: () => console.log("Most Recent pressed"),
+    icon: <FaClock className="mr-2" />,
+  },
+];
+
+interface PostFooterProps {
   user: {
     name: string;
     profileImage: string;
     headline?: string;
     followers?: string;
     degree: string;
-  },
-  sortingMenu: boolean,
-  setSortingMenu: React.Dispatch<React.SetStateAction<boolean>>,
-  sortingState: string,
-  handleSortingState: () => void,
-  comments: CommentType[]
-) {
+  };
+  sortingMenu: boolean;
+  setSortingMenu: React.Dispatch<React.SetStateAction<boolean>>;
+  sortingState: string;
+  handleSortingState: (selectedState: string) => void;
+  comments: CommentType[];
+}
+
+const PostFooter: React.FC<PostFooterProps> = ({
+  user,
+  sortingMenu,
+  setSortingMenu,
+  sortingState,
+  handleSortingState,
+  comments,
+}) => {
   return (
     <section className="flex flex-col w-full gap-4">
       <div className="flex gap-1 z-10 overflow-x-clip">
@@ -39,9 +71,10 @@ export default function PostFooter(
           "I appreciate this!",
           "Congratulations!",
           "Useful takeaway",
-        ].map((text) => (
+        ].map((text, index) => (
           <Button
-            variant={"outline"}
+            key={index}
+            variant="outline"
             className="bg-transparent light:border-gray-600 light:hover:border-2 dark:hover:text-neutral-200 dark:hover:bg-transparent hover:cursor-pointer dark:text-blue-300 dark:border-blue-300 rounded-full"
           >
             {text}
@@ -58,16 +91,16 @@ export default function PostFooter(
           </Link>
           <input
             placeholder="Add a comment..."
-            className="w-full h-11 border p-4 focus:ring-1 transition-colors hover:text-gray-950 dark:hover:text-neutral-200 rounded-full border-gray-400 font-medium text-black focus:outline-none text-left dark:text-neutral-300"
-          ></input>
+            className="w-full h-11 border p-4 focus:ring-1 transition-colors hover:text-gray-950 dark:hover:text-neutral-300 rounded-full border-gray-400 font-medium text-black focus:outline-none text-left dark:text-neutral-300"
+          />
         </div>
       </div>
       <div className="flex relative -left-5">
         <Popover open={sortingMenu} onOpenChange={setSortingMenu}>
-          <PopoverTrigger className="rounded-full dark:hover:bg-zinc-700 hover:cursor-pointer dark:hover:text-neutral-200 h-8 gap-1.5 px-3 has-[>svg]:px-2.5">
+          <PopoverTrigger className="rounded-full dark:hover:bg-zinc-700 hover:cursor-pointer dark:hover:text-neutral-200 h-8 gap-1.5 px-3">
             <div className="flex items-center gap-1 text-gray-500 text-sm font-medium ">
               <p>{sortingState}</p>
-              <FaChevronDown />{" "}
+              <FaChevronDown />
             </div>
           </PopoverTrigger>
           <PopoverContent className="relative dark:bg-gray-900 bg-white border-neutral-200 dark:border-gray-700 p-0 pt-1">
@@ -76,8 +109,11 @@ export default function PostFooter(
                 <Button
                   key={index}
                   onClick={() => {
-                    handleSortingState();
+                    // Call handleSortingState with the selected state
+                    handleSortingState(item.name);
                     setSortingMenu(false);
+                    // Optionally, call the item's action if needed
+                    item.action();
                   }}
                   className="flex justify-start items-center rounded-none bg-transparent w-full h-16 pt-4 py-4 hover:bg-neutral-200 text-gray-900 dark:text-neutral-200 dark:hover:bg-gray-600 hover:cursor-pointer"
                 >
@@ -106,4 +142,6 @@ export default function PostFooter(
       </div>
     </section>
   );
-}
+};
+
+export default PostFooter;

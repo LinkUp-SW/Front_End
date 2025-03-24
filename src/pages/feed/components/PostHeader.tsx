@@ -1,3 +1,4 @@
+import React from "react";
 import {
   Popover,
   PopoverContent,
@@ -8,33 +9,48 @@ import { HiGlobeEuropeAfrica as GlobeIcon } from "react-icons/hi2";
 import { LiaEllipsisHSolid as EllipsisIcon } from "react-icons/lia";
 import { IoMdClose as CloseIcon } from "react-icons/io";
 import { Button } from "@/components";
-export default function PostHeader(
-  user: {
-    name: string;
-    profileImage: string;
-    headline?: string;
-    followers?: string;
-    degree: string;
-  },
-  action:
-    | {
-        name?: string;
-        profileImage?: string;
-        action?: "like" | "comment" | "repost" | "love";
-      }
-    | undefined,
-  postMenuOpen: boolean,
-  setPostMenuOpen: React.Dispatch<React.SetStateAction<boolean>>,
-  menuActions: any,
-  timeAgo: string,
-  post: {
-    content: string;
-    date: number;
-    images?: string[];
-    public: boolean;
-    edited?: boolean;
-  }
-) {
+
+interface User {
+  name: string;
+  profileImage: string;
+  headline?: string;
+  followers?: string;
+  degree: string;
+}
+
+interface Action {
+  name?: string;
+  profileImage?: string;
+  action?: "like" | "comment" | "repost" | "love";
+}
+
+interface PostData {
+  content: string;
+  date: number;
+  images?: string[];
+  public: boolean;
+  edited?: boolean;
+}
+
+interface PostHeaderProps {
+  user: User;
+  action?: Action;
+  postMenuOpen: boolean;
+  setPostMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  menuActions: any[]; // You can replace `any` with a more specific type if available
+  timeAgo: string;
+  post: PostData;
+}
+
+const PostHeader: React.FC<PostHeaderProps> = ({
+  user,
+  action,
+  postMenuOpen,
+  setPostMenuOpen,
+  menuActions,
+  timeAgo,
+  post,
+}) => {
   return (
     <header className="flex items-center space-x-3 w-full">
       <img
@@ -57,7 +73,7 @@ export default function PostHeader(
               {user.degree}
             </p>
           </Link>
-          <nav className={`flex relative left-5 ${action && "bottom-10"}`}>
+          <nav className={`flex relative left-5 ${action ? "bottom-10" : ""}`}>
             <Popover open={postMenuOpen} onOpenChange={setPostMenuOpen}>
               <PopoverTrigger className="rounded-full z-10 dark:hover:bg-zinc-700 hover:cursor-pointer dark:hover:text-neutral-200 h-8 gap-1.5 px-3 has-[>svg]:px-2.5">
                 <EllipsisIcon />
@@ -86,7 +102,7 @@ export default function PostHeader(
               variant="ghost"
               size="sm"
             >
-              <CloseIcon></CloseIcon>
+              <CloseIcon />
             </Button>
           </nav>
         </div>
@@ -95,7 +111,7 @@ export default function PostHeader(
             variant="ghost"
             className="absolute -right-3 top-1 hover:cursor-pointer hover:bg-blue-50 dark:hover:bg-slate-800"
           >
-            <div className="flex items-center gap-2 text-blue-700  dark:text-blue-400 text-[1rem]">
+            <div className="flex items-center gap-2 text-blue-700 dark:text-blue-400 text-[1rem]">
               <p>+</p>
               <p>Follow</p>
             </div>
@@ -104,7 +120,7 @@ export default function PostHeader(
         <div className="text-xs text-gray-500 dark:text-neutral-400">
           <Link
             to="#"
-            className={`text-ellipsis line-clamp-1 ${action && "pr-20"}`}
+            className={`text-ellipsis line-clamp-1 ${action ? "pr-20" : ""}`}
           >
             {user.followers ? user.followers + " followers" : user.headline}
           </Link>
@@ -113,7 +129,7 @@ export default function PostHeader(
             <time className="">{timeAgo}</time>
             {post.edited && (
               <>
-                <p className="text-lg font-bold 0"> · </p>
+                <p className="text-lg font-bold"> · </p>
                 <span>Edited </span>
               </>
             )}
@@ -130,4 +146,6 @@ export default function PostHeader(
       </div>
     </header>
   );
-}
+};
+
+export default PostHeader;
