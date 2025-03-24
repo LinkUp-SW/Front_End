@@ -37,12 +37,8 @@ const Post: React.FC<PostProps> = ({ postData, comments }) => {
   const [sortingMenu, setSortingMenu] = useState(false);
   const [sortingState, setSortingState] = useState("Most relevant");
 
-  const handleSortingState = () => {
-    if (sortingState == "Most relevant") {
-      setSortingState("Most recent");
-    } else {
-      setSortingState("Most relevant");
-    }
+  const handleSortingState = (selectedState: string) => {
+    setSortingState(selectedState);
   };
 
   const dispatch = useDispatch();
@@ -112,15 +108,15 @@ const Post: React.FC<PostProps> = ({ postData, comments }) => {
             </span>
           </header>
         )}
-        {PostHeader(
-          user,
-          action,
-          postMenuOpen,
-          setPostMenuOpen,
-          menuActions,
-          timeAgo,
-          post
-        )}
+        <PostHeader
+          user={user}
+          action={action}
+          postMenuOpen={postMenuOpen}
+          setPostMenuOpen={setPostMenuOpen}
+          menuActions={menuActions}
+          timeAgo={timeAgo}
+          post={post}
+        />
         <section className="flex relative text-gray-800 dark:text-neutral-200">
           <p className={`mt-2 text-sm   ${expanded ? "" : "line-clamp-3"}`}>
             {post.content}
@@ -194,14 +190,14 @@ const Post: React.FC<PostProps> = ({ postData, comments }) => {
         </footer>
       </CardContent>
       <CardFooter>
-        {PostFooter(
-          user,
-          sortingMenu,
-          setSortingMenu,
-          sortingState,
-          handleSortingState,
-          comments
-        )}
+        <PostFooter
+          user={user}
+          sortingMenu={sortingMenu}
+          setSortingMenu={setSortingMenu}
+          sortingState={sortingState}
+          handleSortingState={handleSortingState}
+          comments={comments}
+        />
       </CardFooter>
     </Card>
   );
