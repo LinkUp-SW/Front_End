@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import moment from "moment";
 import { Button } from "../../../components/ui/button";
 
@@ -10,8 +10,6 @@ import { FcLike as LoveIcon } from "react-icons/fc";
 import { FaRegFaceLaughSquint as LaughIcon } from "react-icons/fa6";
 import { HiOutlineLightBulb as InsightfulIcon } from "react-icons/hi";
 import { PiHandPalmBold as SupportIcon } from "react-icons/pi";
-import { useDispatch } from "react-redux";
-import { handleOpenModalType } from "@/utils";
 import { Link } from "react-router-dom";
 import { CommentType, PostType } from "@/types";
 
@@ -32,7 +30,6 @@ const Post: React.FC<PostProps> = ({ postData, comments }) => {
   const { user, post, stats, action } = postData;
 
   const [liked, setLiked] = useState(false);
-  const [expanded, setExpanded] = useState(false);
 
   const [postMenuOpen, setPostMenuOpen] = useState(false);
   const [sortingMenu, setSortingMenu] = useState(false);
@@ -42,11 +39,7 @@ const Post: React.FC<PostProps> = ({ postData, comments }) => {
     setSortingState(selectedState);
   };
 
-  const words = post.content.split(" ");
-  const isLong = words.length > 40;
-
   // If not expanded, show only 40 words + ...
-  const truncatedText = isLong ? words.slice(0, 40).join(" ") : post.content;
 
   const menuActions = getMenuActions();
 
