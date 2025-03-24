@@ -11,10 +11,25 @@ const MOCK_POSTS: PostType[] = [
       degree: "Following",
     },
     post: {
-      content: `
-      University Project Showcase: Herzenbrücke Donation Website
-  
-  Hi everyone, I'm excited to share a project my team and I recently completed for our university...`,
+      content: `𝗛𝗶𝗿𝗶𝗻𝗴 𝗮 𝗷𝘂𝗻𝗶𝗼𝗿 𝗱𝗲𝘃 𝗶𝘀 𝗡𝗢𝗧 𝗲𝗮𝘀𝘆. 😵 😵😵
+
+Recently, I started conducting interviews for Junior/Entry-Level-Mid Software Engineering positions.
+
+Here’s my honest reflection on this challenge.
+
+Hiring a strong junior is NOT easy. It’s not just about asking technical questions and noting answers.
+
+It’s about making the right assessment—evaluating current knowledge, problem-solving ability, potential to figure things out later, adaptability, and reasoning skills.
+
+Entry-level candidates won’t know all the answers, and that’s normal. The challenge is distinguishing between someone who simply can’t do the job and someone who may struggle initially but can become knowledgeable in a few hours. How good is their communication? How much is it affected by stress? How will it evolve with confidence?
+
+Lastly, what’s their level of critical thinking? Are they open to admitting they don’t know? Can they reflect on past projects? How much exposure have they had to different technologies, and what does that say about them?
+
+I find these aspects far more important than details of a particular garbage collection implementation in framework X or Z—or what a hashmap is.
+
+In junior interviews, you assess potential, not just skills or experience. That’s why it’s so hard and requires both judgment and instinct.
+
+Always happy to know your thoughts on this 👇`,
       date: 0,
       public: true,
       edited: true,
@@ -43,10 +58,40 @@ const MOCK_POSTS: PostType[] = [
       degree: "Following",
     },
     post: {
-      content: `
-      University Project Showcase: Herzenbrücke Donation Website
-  
-  Hi everyone, I'm excited to share a project my team and I recently completed for our university...`,
+      content: `"Software Engineer" in your LinkedIn headline? 🚩 Big mistake.
+
+That’s why recruiters aren’t finding you.
+
+Here’s how they actually search for candidates:
+
+When hiring a React developer, they type:
+- "React Engineer"
+- "React Developer"
+- "Frontend Developer React"
+
+🚫 They won't search for:
+- "Software Engineer"
+- "Developer"
+- "Programmer"
+
+Your broad title is burying your profile in search results!
+
+✅ Example: "Software Engineer" — low visibility
+🔎 Headline: "Frontend Developer | TypeScript" — Top of search results
+
+Think of LinkedIn like SEO:
+• The right keywords get you noticed.
+• Vague titles keep you invisible.
+• Recruiters filter faster, not slower.
+
+🔎 Better Headline Example:
+React | JavaScript | TypeScript
+Backend Engineer | Node.js | TypeScript | Nest.js
+Full-Stack Developer: React.js | Node.js | TypeScript
+
+Grab the job you want. Get specific. Get found.
+
+What's your current headline? Let's optimize it!`,
       date: 0,
       public: true,
       edited: true,
@@ -75,10 +120,40 @@ const MOCK_POSTS: PostType[] = [
       degree: "Following",
     },
     post: {
-      content: `
-      University Project Showcase: Herzenbrücke Donation Website
-  
-  Hi everyone, I'm excited to share a project my team and I recently completed for our university...`,
+      content: `"Software Engineer" in your LinkedIn headline? 🚨 Big mistake.
+
+That’s why recruiters aren’t finding you.
+
+Here’s how they actually search for candidates:
+
+🔎 When hiring a React developer, they type:
+ ✅ "React Engineer"
+ ✅ "React Developer"
+ ✅ "Frontend Developer React"
+
+They don’t search for:
+ ❌ "Software Engineer"
+ ❌ "Developer"
+ ❌ "Programmer"
+
+Your broad title is burying your profile in search results.
+For example:
+ 🚫 Headline: Software Engineer → Low visibility
+ ✅ Headline: Frontend Developer | React | TypeScript → Top of search results
+
+Think of LinkedIn like SEO:
+ 📌 The right keywords get you noticed.
+ 📌 Vague titles keep you invisible.
+ 📌 Recruiters filter first, read later.
+
+Better headline ideas:
+ ✨ Frontend Developer | React | JavaScript | TypeScript
+ ✨ Backend Engineer | Node.js | TypeScript | Nest.js
+ ✨ Full-Stack Developer | React | Node.js | TypeScript
+
+Ditch the generic title. Be specific. Get found.
+
+What’s your current headline? Let’s optimize it!`,
       date: 0,
       public: true,
       edited: true,
@@ -107,10 +182,25 @@ const MOCK_POSTS: PostType[] = [
       degree: "Following",
     },
     post: {
-      content: `
-      University Project Showcase: Herzenbrücke Donation Website
-  
-  Hi everyone, I'm excited to share a project my team and I recently completed for our university...`,
+      content: `𝗛𝗶𝗿𝗶𝗻𝗴 𝗮 𝗷𝘂𝗻𝗶𝗼𝗿 𝗱𝗲𝘃 𝗶𝘀 𝗡𝗢𝗧 𝗲𝗮𝘀𝘆. 😵 😵😵
+
+Recently, I started conducting interviews for Junior/Entry-Level-Mid Software Engineering positions.
+
+Here’s my honest reflection on this challenge.
+
+Hiring a strong junior is NOT easy. It’s not just about asking technical questions and noting answers.
+
+It’s about making the right assessment—evaluating current knowledge, problem-solving ability, potential to figure things out later, adaptability, and reasoning skills.
+
+Entry-level candidates won’t know all the answers, and that’s normal. The challenge is distinguishing between someone who simply can’t do the job and someone who may struggle initially but can become knowledgeable in a few hours. How good is their communication? How much is it affected by stress? How will it evolve with confidence?
+
+Lastly, what’s their level of critical thinking? Are they open to admitting they don’t know? Can they reflect on past projects? How much exposure have they had to different technologies, and what does that say about them?
+
+I find these aspects far more important than details of a particular garbage collection implementation in framework X or Z—or what a hashmap is.
+
+In junior interviews, you assess potential, not just skills or experience. That’s why it’s so hard and requires both judgment and instinct.
+
+Always happy to know your thoughts on this 👇`,
       date: 0,
       public: true,
       edited: true,
