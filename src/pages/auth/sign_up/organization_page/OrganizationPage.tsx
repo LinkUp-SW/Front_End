@@ -64,6 +64,7 @@ const OrganizationPage = () => {
         Number(partialUserStarterData.schoolStartYear) >
         Number(partialUserStarterData.schoolEndYear)
       ) {
+        console.log("Invalid school year");
         toast.error("School start year cannot be after the school end year.");
         return;
       }
@@ -90,6 +91,7 @@ const OrganizationPage = () => {
       partialUserStarterData.birthDate &&
       isUserBelow16(partialUserStarterData.birthDate)
     ) {
+      console.log("Under 16");
       toast.error("You must be at least 16 years old to use this service.");
       localStorage.removeItem("user-signup-credentials");
       setTimeout(() => {

@@ -33,6 +33,7 @@ const EmailPasswordForm = ({
     try {
       await verifyEmail(email.toLowerCase());
     } catch (error) {
+      console.log("Already Exists")
       return toast.error(getErrorMessage(error));
     }
     if (password.length === 0) return toast.error("please enter your password");
