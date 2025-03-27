@@ -3,27 +3,30 @@ import React from "react";
 const people = [
   {
     name: "Nada Salem",
-    title: "Planning/BIM Engineer at Pearls Construction, MSc Student...",
+    title: "Front end developer",
     location: "Giza",
     mutualConnections: "Ahmed Khattab, Yousef Gilany, and 19 other mutual connections",
     avatar: "https://via.placeholder.com/50",
     isConnected: true,
+    industry: "Front end",
   },
   {
     name: "Nada Khaled",
-    title: "Biomedical Engineering Student at Cairo University",
+    title: "Front end developer",
     location: "Cairo, Egypt",
     mutualConnections: "Marwan Abdellah, AbdEl-Monem El-Sharkawy, PhD, and 70 other mutual connections",
     avatar: "https://via.placeholder.com/50",
     isConnected: true,
+    industry:"Front end",
   },
   {
     name: "Nada Zayed",
-    title: "Intern @Ejada | Computer engineering student...",
+    title: "Front end developer",
     location: "Alexandria, Egypt",
-    mutualConnections: "2K followers • Ahmed Neiazy, Ibrahim Sobh, PhD, and 47 other mutual connections",
+    mutualConnections: " Ibrahim Sobh, PhD, and 47 other mutual connections",
     avatar: "https://via.placeholder.com/50",
     isConnected: false,
+    industry:"Front end",
   },
 ];
 
