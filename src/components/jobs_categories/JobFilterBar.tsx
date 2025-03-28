@@ -3,20 +3,24 @@ import { MdArrowDropDown, MdMenu, MdClose } from 'react-icons/md';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { JobFilters } from '../../../src/pages/jobs/types';
 
-// Type for filter options to improve type safety
-interface FilterOption {
-  label: string;
-  component?: React.ReactNode;
-  options?: string[];
+interface JobFilterBarProps {
+  onFiltersChange: (filters: JobFilters) => void;
 }
 
-const JobFilterBar: React.FC = () => {
+const JobFilterBar: React.FC<JobFilterBarProps> = ({ onFiltersChange }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activePopover, setActivePopover] = useState<string | null>(null);
   const [searchCompany, setSearchCompany] = useState('');
   const [searchLocation, setSearchLocation] = useState('');
-  const [selectedExperienceLevels, setSelectedExperienceLevels] = useState<string[]>([]);
+  const [filters, setFilters] = useState<JobFilters>({
+    locations: [],
+    company: [],
+    experienceLevels: [],
+    workModes: [],
+    salaryRanges: []
+  });
 
   const experienceLevels = [
     'Internship',
@@ -28,11 +32,35 @@ const JobFilterBar: React.FC = () => {
   ];
 
   const locations = ['Egypt', 'United States', 'Saudi Arabia', 'United Kingdom'];
-  const companyTypes = ['Fortune 500', 'Startup', 'Public', 'Private', 'Non-profit'];
+  const company = ['Fortune 500', 'Orascom', 'Health Insights', 'Vodafone', 'Microsoft'];
   const remoteOptions = ['On-site', 'Remote', 'Hybrid'];
   const salaryRanges = ['1000-5000', '5000-10000', '10000+'];
 
-  const filterOptions: FilterOption[] = [
+  // Update filters based on search inputs
+  const updateSearchFilters = (type: 'locations' | 'company', searchTerm: string) => {
+    const newFilters = {
+      ...filters,
+      [type]: searchTerm ? [searchTerm] : []
+    };
+    
+    setFilters(newFilters);
+    onFiltersChange(newFilters);
+  };
+
+  // Update specific filter
+  const updateFilter = (filterType: keyof JobFilters, value: string, isChecked: boolean) => {
+    const newFilters = {
+      ...filters,
+      [filterType]: isChecked 
+        ? [...filters[filterType], value] 
+        : filters[filterType].filter(item => item !== value)
+    };
+    
+    setFilters(newFilters);
+    onFiltersChange(newFilters);
+  };
+
+  const filterOptions = [
     {
       label: 'Location',
       component: (
@@ -40,16 +68,27 @@ const JobFilterBar: React.FC = () => {
           <Input
             placeholder="Search Location..."
             value={searchLocation}
-            onChange={(e) => setSearchLocation(e.target.value)}
+            onChange={(e) => {
+              const value = e.target.value;
+              setSearchLocation(value);
+              updateSearchFilters('locations', value);
+            }}
             className="mb-2 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600"
           />
+          <div className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+            Suggestions:
+          </div>
           {locations
             .filter((loc) => loc.toLowerCase().includes(searchLocation.toLowerCase()))
             .map((loc) => (
               <Button 
                 key={loc} 
                 variant="ghost" 
-                className="w-full justify-start dark:text-gray-200 dark:hover:bg-gray-700"
+                onClick={() => {
+                  setSearchLocation(loc);
+                  updateSearchFilters('locations', loc);
+                }}
+                className={`w-full justify-start dark:text-gray-200 dark:hover:bg-gray-700`}
               >
                 {loc}
               </Button>
@@ -64,16 +103,27 @@ const JobFilterBar: React.FC = () => {
           <Input
             placeholder="Search Company..."
             value={searchCompany}
-            onChange={(e) => setSearchCompany(e.target.value)}
+            onChange={(e) => {
+              const value = e.target.value;
+              setSearchCompany(value);
+              updateSearchFilters('company', value);
+            }}
             className="mb-2 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600"
           />
-          {companyTypes
+          <div className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+            Suggestions:
+          </div>
+          {company
             .filter((comp) => comp.toLowerCase().includes(searchCompany.toLowerCase()))
             .map((comp) => (
               <Button 
                 key={comp} 
                 variant="ghost" 
-                className="w-full justify-start dark:text-gray-300 dark:hover:bg-gray-700"
+                onClick={() => {
+                  setSearchCompany(comp);
+                  updateSearchFilters('company', comp);
+                }}
+                className={`w-full justify-start dark:text-gray-300 dark:hover:bg-gray-700`}
               >
                 {comp}
               </Button>
@@ -93,14 +143,8 @@ const JobFilterBar: React.FC = () => {
               <input 
                 type="checkbox" 
                 id={level}
-                checked={selectedExperienceLevels.includes(level)}
-                onChange={(e) => {
-                  setSelectedExperienceLevels(prev => 
-                    e.target.checked 
-                      ? [...prev, level] 
-                      : prev.filter(l => l !== level)
-                  );
-                }}
+                checked={filters.experienceLevels.includes(level)}
+                onChange={(e) => updateFilter('experienceLevels', level, e.target.checked)}
                 className="w-4 h-4 mr-3 accent-green-800 border-gray-300 rounded dark:bg-gray-600 dark:border-gray-500"
               />
               <label 
@@ -116,11 +160,57 @@ const JobFilterBar: React.FC = () => {
     },
     {
       label: 'Remote',
-      options: remoteOptions,
+      component: (
+        <div className="w-64 bg-white dark:bg-gray-800">
+          {remoteOptions.map((option) => (
+            <div 
+              key={option} 
+              className="flex items-center p-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+            >
+              <input 
+                type="checkbox" 
+                id={option}
+                checked={filters.workModes.includes(option)}
+                onChange={(e) => updateFilter('workModes', option, e.target.checked)}
+                className="w-4 h-4 mr-3 accent-green-800 border-gray-300 rounded dark:bg-gray-600 dark:border-gray-500"
+              />
+              <label 
+                htmlFor={option} 
+                className="text-sm flex-grow cursor-pointer dark:text-gray-200"
+              >
+                {option}
+              </label>
+            </div>
+          ))}
+        </div>
+      ),
     },
     {
       label: 'Salary range',
-      options: salaryRanges,
+      component: (
+        <div className="w-64 bg-white dark:bg-gray-800">
+          {salaryRanges.map((range) => (
+            <div 
+              key={range} 
+              className="flex items-center p-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+            >
+              <input 
+                type="checkbox" 
+                id={range}
+                checked={filters.salaryRanges.includes(range)}
+                onChange={(e) => updateFilter('salaryRanges', range, e.target.checked)}
+                className="w-4 h-4 mr-3 accent-green-800 border-gray-300 rounded dark:bg-gray-600 dark:border-gray-500"
+              />
+              <label 
+                htmlFor={range} 
+                className="text-sm flex-grow cursor-pointer dark:text-gray-200"
+              >
+                {range}
+              </label>
+            </div>
+          ))}
+        </div>
+      ),
     },
   ];
 
@@ -183,19 +273,7 @@ const JobFilterBar: React.FC = () => {
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-64 p-0 border-none shadow-lg dark:bg-gray-800">
-                      {filter.component || (
-                        <div className="flex flex-col">
-                          {filter.options?.map((option) => (
-                            <Button 
-                              key={option} 
-                              variant="ghost" 
-                              className="justify-start px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 w-full text-left dark:text-gray-300"
-                            >
-                              {option}
-                            </Button>
-                          ))}
-                        </div>
-                      )}
+                      {filter.component}
                     </PopoverContent>
                   </Popover>
                 ))}
