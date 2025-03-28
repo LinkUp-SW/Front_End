@@ -1,95 +1,94 @@
 import { useSelector } from "react-redux";
-import { RootState } from "@/store"; // Import RootState from store.ts
+import { RootState } from "@/store";
 import { HiOutlineDotsHorizontal } from "react-icons/hi";
 import { IoIosStarOutline } from "react-icons/io";
 
-/* import { useState ,useEffect} from "react";
-import {getChattingMessages, sendMessage} from "../endpoints/messaging"
- */
-/* interface Message{
-    id: string;               // Unique message ID
-    conversationId: string;   // ID of the conversation this message belongs to
-    senderId: string;         // ID of the user who sent the message
-    text: string;             // Message content (can be empty if it's an attachment)
-    timestamp: string;        // Time the message was sent (ISO format)
-    messageType: "text" | "image" | "video" | "document" | "audio" | "sticker"; // Type of message
-    attachments?: string[];   // URLs of attached files (if any)
-    status: "sent" | "delivered" | "read"; // Message status
-    isDeleted?: boolean;      // Indicates if the message was deleted
-  
-  }
- */
-
 const ChatingScreen = () => {
-  /* const [Messages, setMessages] = useState<Message[]>([]);
-    const [newMessage, setNewMessage] = useState("");
-    const conversationId = "conv-1"; // Example conversation
-    const senderId = "c7b3d8e0-5e0b-4b0f-8b3a-3b9f4b3d3b3d";
+  const selectedConvID = useSelector(
+    (state: RootState) => state.messaging.selectedMessages
+  );
 
+  // Find conversation based on selected ID
+  const conversation = useSelector((state: RootState) =>
+    state.messaging.conversations.find(
+      (conv) => conv.conversationID === selectedConvID
+    )
+  );
 
-    useEffect(()=>{
-        const loadMessages=async()=>{
-            try{
-                const data=await getChattingMessages(conversationId);
-                setMessages(data);
-            }
-            catch(error){
-                console.error("Error fetching messages:", error)
-            }
-        }
-        loadMessages();
-    },[])
+  const messages = conversation ? conversation.messages : [];
 
-    const handleSending= async()=>{
-        try{
-            const message=await sendMessage(conversationId, senderId, newMessage)
-            setMessages((prevMessages)=>[...prevMessages,message]);
-            setNewMessage("");
-        }
-        catch(error)
-        {
-            console.error("Error fetching messages:", error);
-        }
-    }
- */
+  const shouldShowProfile = (index: number) => {
+    if (index === 0) return true;
+    const prevMessage = messages[index - 1];
+    const currentMessage = messages[index];
 
-  const messages = useSelector((state: RootState) => state.messaging.messages);
+    if (!prevMessage || !currentMessage) return true;
+
+    const prevMsgTime = new Date(prevMessage.date).getTime();
+    const currentMsgTime = new Date(currentMessage.date).getTime();
+    return currentMsgTime - prevMsgTime > 60 * 1000;
+  };
+
   return (
     <>
-      <div className="h-1/2   ">
-        <div className="h-1/5 border-1 border-[#e8e8e8] flex justify-between items-center ">
-        <div >
-            <p className="pl-3">First Last</p>
-            <p className="text-xs pl-3">Active now</p>
-        </div>
-
-        <div className="mr-3">
-        <HiOutlineDotsHorizontal size={30} className="inline-block ml-3" />
-        <IoIosStarOutline size={30} className="inline-block ml-3" />
-        </div>
-
-
-        </div>
-
-        <div className="h-4/5 border-1 border-[#e8e8e8] overflow-y-auto  ">
-         {messages.map((msg)=>(
-          
+      <div className="h-1/2">
+        {/* Chat Header */}
+        <div className="h-1/5 border border-[#e8e8e8] flex justify-between items-center px-3 py-6">
           <div>
-            <div className="flex mt-1">
-              <div className="rounded-full w-12 h-12 bg-gray-100 inline-block">
-                
-              </div>
-              <p className="ml-2 mt-2 font-semibold">{msg.name} <span className=" font-light text-xs text-gray-500">. {msg.date}</span></p>
-              </div>
-          <div className="pl-20 hover:bg-gray-200">
-            {msg.message}
+            <p className="font-semibold">Mohanad Tarek</p>
+            <p className="text-xs text-gray-500">Active now</p>
           </div>
+          <div className="flex space-x-4">
+            <HiOutlineDotsHorizontal
+              size={30}
+              className="hover:rounded-full hover:bg-gray-200 hover:cursor-pointer"
+            />
+            <IoIosStarOutline
+              size={30}
+              className="hover:rounded-full hover:bg-gray-200 hover:cursor-pointer"
+            />
           </div>
-         )
-        )} 
+        </div>
+
+        {/* Messages Section */}
+        <div className="h-4/5 border border-[#e8e8e8] overflow-y-auto p-3">
+          {messages.length === 0 ? (
+            <p className="text-center text-gray-500">No messages yet</p>
+          ) : (
+            messages.map((msg, index) => (
+              <div key={msg.id}>
+                {shouldShowProfile(index) ? (
+                  <div className="mt-2">
+                    <div className="flex items-center">
+                      <img
+                        className="rounded-full w-10 h-10"
+                        src={msg.Img}
+                        alt="Profile"
+                      />
+                      <p className="pl-3 font-semibold">
+                        {msg.name}
+                        <span className="text-xs text-gray-500">
+                          {" "}
+                          · {new Date(msg.date).toLocaleTimeString()}
+                        </span>
+                      </p>
+                    </div>
+                    <div className="ml-14 hover:bg-gray-200 p-2 rounded-lg">
+                      {msg.message}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="ml-14 hover:bg-gray-200 p-2 rounded-lg">
+                    {msg.message}
+                  </div>
+                )}
+              </div>
+            ))
+          )}
         </div>
       </div>
     </>
   );
 };
+
 export default ChatingScreen;

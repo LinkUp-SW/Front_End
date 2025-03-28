@@ -41,6 +41,19 @@ import {
 } from "./ui/input-otp";
 import UserAuthLayout from "./hoc/UserAuthLayout";
 import { Switch } from "./ui/switch";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogOverlay,
+  DialogPortal,
+  DialogTitle,
+  DialogTrigger,
+} from "./ui/dialog";
+
 
 export {
   UserList,
@@ -82,5 +95,15 @@ export {
   InputOTPSlot,
   InputOTPSeparator,
   UserAuthLayout,
-  Switch
+  Switch,
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogOverlay,
+  DialogPortal,
+  DialogTitle,
+  DialogTrigger,
 };

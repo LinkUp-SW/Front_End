@@ -1,5 +1,3 @@
-import React from "react";
-
 const WhosHiringImage = () => {
   return (
     <div className="mt-4 cursor-pointer h-fit">

@@ -112,7 +112,7 @@ const SignInPage: React.FC = () => {
             alt="Google Logo"
             className="w-7 aspect-square object-contain bg-white p-1 rounded-full dark:bg-gray-100"
           />
-          <span>Continue with Google</span>
+          <span className="sm:text-base text-xs">Continue with Google</span>
         </button>
         <div className="flex gap-2 items-center">
           <div className="w-full h-[0.15rem] bg-gray-500 dark:bg-gray-400 rounded-full" />
