@@ -26,7 +26,7 @@ pipeline {
                  echo 'Linting...'  
                  sh '''
                     cd mywork
-                    
+                    npm run lint
                  '''
             }
         }
