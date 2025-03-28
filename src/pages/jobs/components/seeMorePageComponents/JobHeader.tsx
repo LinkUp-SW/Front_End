@@ -77,7 +77,7 @@ const JobHeader: React.FC<JobHeaderProps> = ({ job }) => {
       
       <h1 className="text-xl md:text-2xl font-bold mb-1 text-gray-900 dark:text-white">{job.title}</h1>
       <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
-        {job.location} · {job.postedTime || job.timePosted}
+        {job.location} · { job.postedTime}
       </p>
       
       <div className="flex flex-wrap items-center gap-2 mb-3">
