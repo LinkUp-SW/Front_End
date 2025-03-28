@@ -5,12 +5,14 @@ import { Avatar, AvatarFallback, AvatarImage, Button } from "../../components";
 import { Link } from "react-router-dom";
 import useFetchData from "@/hooks/useFetchData";
 import { getProfileCardData } from "@/endpoints/userProfile";
+import Cookies from "js-cookie";
 
 const ProfileCard: React.FC = () => {
   const { data, loading, error, refetch } = useFetchData(
     () => getProfileCardData(),
     []
   );
+  const userId = Cookies.get("linkup_user_id");
 
   if (error) {
     return (
@@ -63,7 +65,7 @@ const ProfileCard: React.FC = () => {
       <CardContent className="flex flex-col items-center w-full relative md:px-6 px-0 ">
         <Link
           className="flex flex-col gap-y-1 items-start w-full   hover:cursor-pointer"
-          to={"/user-profile/1"}
+          to={`/user-profile/${userId}`}
         >
           <header
             className="absolute md:-left-0 -top-6 h-15 
