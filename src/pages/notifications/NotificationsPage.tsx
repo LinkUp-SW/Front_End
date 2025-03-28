@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import styles from './notifications.module.css';
-import { ProfileCard, WithNavBar } from '../../components';
-
-import notificationPicture from "../../assets/notificationpicture.jpeg"; 
+import { ProfileCard, WithNavBar, LinkUpFooter, WhosHiringImage } from '../../components';
+import { RootState } from '../../store';
 import notificationPicture2 from "../../assets/notificationpicture2.jpeg"; 
 import { getNotifications, filterNotificationsByTab, setupClickOutsideListener, handleTabChange, handlePostFilterSelection, togglePostDropdown } from '@/endpoints/notifications';
 import { Notification, PostFilter } from '../../types';
@@ -15,11 +15,19 @@ const NotificationsPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<Tab>('all');
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  
   // State for post dropdown
   const [showPostDropdown, setShowPostDropdown] = useState<boolean>(false);
   const [activePostFilter, setActivePostFilter] = useState<PostFilter>('all');
+  
+  // State for read notifications
+  const [readNotifications, setReadNotifications] = useState<string[]>([]);
 
+  // State for mobile responsiveness
+  const [isMobile, setIsMobile] = useState<boolean>(window.innerWidth <= 768);
 
+  // Get dark mode state from Redux
+  const isDarkMode = useSelector((state: RootState) => state.theme.theme === 'dark');
 
   // Fetch notifications data
   useEffect(() => {
@@ -30,13 +38,22 @@ const NotificationsPage: React.FC = () => {
         setLoading(false);
       } catch (error) {
         console.error('Error fetching notifications:', error);
-        // Fallback to empty array if API call fails instead of MOCK_NOTIFICATIONS
         setNotifications([]);
         setLoading(false);
       }
     };
 
     fetchNotifications();
+  }, []);
+
+  // Responsive check
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   // Add click outside listener to close dropdown
@@ -50,15 +67,23 @@ const NotificationsPage: React.FC = () => {
     return cleanup;
   }, []);
 
+  // Function to handle notification click and mark as read
+  const handleNotificationClick = (notificationId: string) => {
+    // Add the notification ID to the read notifications list if not already read
+    if (!readNotifications.includes(notificationId)) {
+      setReadNotifications(prev => [...prev, notificationId]);
+    }
+  };
+
   // Filtered notifications based on active tab
   const filteredNotifications = filterNotificationsByTab(notifications, activeTab, activePostFilter);
 
   return (
-    <main className={styles.container}>
+    <main className={`${styles.container} ${isDarkMode ? styles.darkMode : ''}`}>
       <div className={styles.content}>
         {/* Left Profile Section - Using ProfileCard component */}
         <div className={styles.leftSidebar}>
-          <ProfileCard   />
+          <ProfileCard />
           <div className={styles.notificationSettings}>
             <h3>Manage your notifications</h3>
             <a href="#" className={styles.settingsLink}>View settings</a>
@@ -72,12 +97,14 @@ const NotificationsPage: React.FC = () => {
             <button 
               type="button" 
               className={`${styles.tabButton} ${activeTab === 'all' ? styles.activeTab : ''}`} 
-              onClick={() => handleTabChange('all', setActiveTab, setShowPostDropdown)}>All
+              onClick={() => handleTabChange('all', setActiveTab, setShowPostDropdown)}>
+              All
             </button>
             <button 
               type="button" 
               className={`${styles.tabButton} ${activeTab === 'jobs' ? styles.activeTab : ''}`} 
-              onClick={() => handleTabChange('jobs', setActiveTab, setShowPostDropdown)}>Jobs
+              onClick={() => handleTabChange('jobs', setActiveTab, setShowPostDropdown)}>
+              Jobs
             </button>
             
             {/* Posts Tab with Dropdown */}
@@ -85,30 +112,39 @@ const NotificationsPage: React.FC = () => {
               <button 
                 type="button" 
                 className={`${styles.tabButton} ${activeTab === 'posts' ? styles.activeTab : ''}`} 
-                onClick={() => handleTabChange('posts', setActiveTab, setShowPostDropdown)}>My posts <span className={styles.dropdownArrow} onClick={(e) => togglePostDropdown(e, showPostDropdown, setShowPostDropdown)}>▼</span>
+                onClick={() => handleTabChange('posts', setActiveTab, setShowPostDropdown)}>
+                My posts <span 
+                  className={styles.dropdownArrow} 
+                  onClick={(e) => togglePostDropdown(e, showPostDropdown, setShowPostDropdown)}>
+                  ▼
+                </span>
               </button>
               
-              {/* Post Filter Dropdown */}
+              {/* Post Filter Dropdown for Desktop and Mobile */}
               {showPostDropdown && (
-                <div className={styles.postDropdown}>
+                <div className={`${styles.postDropdown} ${isMobile ? styles.mobilePostDropdown : ''}`}>
                   <div className={styles.dropdownHeader}>
                     Filter post activity
                   </div>
                   <div 
                     className={`${styles.dropdownItem} ${activePostFilter === 'all' ? styles.activeDropdownItem : ''}`}
-                    onClick={() => handlePostFilterSelection('all', setActivePostFilter, setShowPostDropdown)}>All
+                    onClick={() => handlePostFilterSelection('all', setActivePostFilter, setShowPostDropdown)}>
+                    All
                   </div>
                   <div 
                     className={`${styles.dropdownItem} ${activePostFilter === 'comments' ? styles.activeDropdownItem : ''}`}
-                    onClick={() => handlePostFilterSelection('comments', setActivePostFilter, setShowPostDropdown)}>Comments
+                    onClick={() => handlePostFilterSelection('comments', setActivePostFilter, setShowPostDropdown)}>
+                    Comments
                   </div>
                   <div 
                     className={`${styles.dropdownItem} ${activePostFilter === 'reactions' ? styles.activeDropdownItem : ''}`}
-                    onClick={() => handlePostFilterSelection('reactions', setActivePostFilter, setShowPostDropdown)} >Reactions
+                    onClick={() => handlePostFilterSelection('reactions', setActivePostFilter, setShowPostDropdown)}>
+                    Reactions
                   </div>
                   <div 
                     className={`${styles.dropdownItem} ${activePostFilter === 'reposts' ? styles.activeDropdownItem : ''}`}
-                    onClick={() => handlePostFilterSelection('reposts', setActivePostFilter, setShowPostDropdown)}>Reposts
+                    onClick={() => handlePostFilterSelection('reposts', setActivePostFilter, setShowPostDropdown)}>
+                    Reposts
                   </div>
                 </div>
               )}
@@ -116,7 +152,8 @@ const NotificationsPage: React.FC = () => {
             <button 
               type="button" 
               className={`${styles.tabButton} ${activeTab === 'mentions' ? styles.activeTab : ''}`} 
-              onClick={() => handleTabChange('mentions', setActiveTab, setShowPostDropdown)}>Mentions
+              onClick={() => handleTabChange('mentions', setActiveTab, setShowPostDropdown)}>
+              Mentions
             </button>
           </div>
 
@@ -128,8 +165,16 @@ const NotificationsPage: React.FC = () => {
                 <div className={styles.loading}>Loading notifications...</div>
               ) : filteredNotifications.length > 0 ? (
                 filteredNotifications.map(notification => (
-                  <div key={notification.id} className={styles.notificationItem}>
-                    <div className={styles.notificationIndicator}></div>
+                  <div 
+                    key={notification.id} 
+                    className={`${styles.notificationItem} ${
+                      !readNotifications.includes(notification.id) ? styles.unreadNotification : styles.readNotification
+                    }`}
+                    onClick={() => handleNotificationClick(notification.id)}
+                  >
+                    {!readNotifications.includes(notification.id) && (
+                      <div className={styles.notificationIndicator}></div>
+                    )}
                     <div className={styles.notificationImage}>
                       <img src={notification.profileImg || "/api/placeholder/50/50"} alt="Notification" />
                     </div>
@@ -179,35 +224,13 @@ const NotificationsPage: React.FC = () => {
           </div>
         </div>
         
-        {/* to be implemented*/}
         {/* Right Sidebar */}
         <div className={styles.rightSidebar}>
           <div className={styles.adContainer}>
-            <div className={styles.hiringAd}>
-              <img src={notificationPicture} alt="LinkedIn hiring" />
-            </div>
+            <WhosHiringImage/>
           </div>
           <div className={styles.footerLinks}>
-            <div className={styles.linkRow}>
-              <a href="#">About</a>
-              <a href="#">Accessibility</a>
-              <a href="#">Help Center</a>
-            </div>
-            <div className={styles.linkRow}>
-              <a href="#">Privacy & Terms</a>
-              <a href="#">Ad Choices</a>
-            </div>
-            <div className={styles.linkRow}>
-              <a href="#">Advertising</a>
-              <a href="#">Business Services</a>
-            </div>
-            <div className={styles.linkRow}>
-              <a href="#">Get the LinkedIn app</a>
-              <a href="#">More</a>
-            </div>
-            <div className={styles.copyright}>
-              <span className={styles.linkedInLogo}>Link UP</span> Link Up Corporation © 2025
-            </div>
+            <LinkUpFooter/>
           </div>
         </div>
       </div>
