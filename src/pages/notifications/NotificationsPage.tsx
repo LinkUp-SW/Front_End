@@ -5,7 +5,7 @@ import { ProfileCard, WithNavBar, LinkUpFooter, WhosHiringImage } from '../../co
 import { RootState } from '../../store';
 import notificationPicture2 from "../../assets/notificationpicture2.jpeg"; 
 import { getNotifications, filterNotificationsByTab, setupClickOutsideListener, handleTabChange, handlePostFilterSelection, togglePostDropdown } from '@/endpoints/notifications';
-import { Notification, PostFilter } from '../../types';
+import { Notification, PostFilter } from '../../types'
 
 // Define tab types for notification filtering
 export type Tab = 'all' | 'jobs' | 'posts' | 'mentions';
