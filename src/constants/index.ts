@@ -144,7 +144,7 @@ export const FOOTER_LINKS = [
   { text: "Ad Choices", url: "#" },
   { text: "Advertising", url: "#" },
   { text: "Business Services", url: "#", hasArrow: true },
-  { text: "Get the LinkedIn app", url: "#" },
+  { text: "Get the LinkUp app", url: "#" },
   { text: "More", url: "#" },
 ];
 
