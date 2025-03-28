@@ -9,7 +9,26 @@ export const convertStringsArrayToLowerCase = (arr: string[]): string[] => {
 };
 
 export const validateEmail = (email: string): boolean => {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  // Check each character to ensure it is within the ASCII range (0-127)
+  for (let i = 0; i < email.length; i++) {
+    if (email.charCodeAt(i) > 127) {
+      return false;
+    }
+  }
+
+  // Strict email validation regex:
+  // (?=.{1,254}$)         --> Total length of email must be 1 to 254 characters.
+  // (?=.{1,64}@)          --> Local part (before the @) must be 1 to 64 characters.
+  // [A-Za-z0-9!#$%&'*+/=?^_`{|}~-]+
+  //                        --> Valid characters for the local part.
+  // (?:\.[A-Za-z0-9!#$%&'*+/=?^_`{|}~-]+)*
+  //                        --> Allows dot-separated parts in the local part.
+  // @                     --> The @ symbol.
+  // (?:(?!-)[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,})
+  //                        --> Domain part: labels can’t start with a hyphen, and the TLD must be at least 2 letters.
+  const emailRegex =
+    /^(?=.{1,254}$)(?=[^@]{1,64}@)[a-zA-Z0-9][a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]*(?:\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:(?=[a-z0-9-]{1,63}\.)[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+(?=[a-z0-9-]{2,63}$)[a-z0-9](?!.*--)(?:[a-z0-9-]{0,61}[a-z0-9])?$/i;
+
   return emailRegex.test(email);
 };
 
@@ -40,29 +59,30 @@ export const handleOpenModalType = <T>(
   return openModal({ modalType, modalData });
 };
 
-export const handleSaveCredentials = (userCredentials:Partial<UserStarterInterface>) => {
-    const savedCredential = localStorage.getItem("user-signup-credentials");
+export const handleSaveCredentials = (
+  userCredentials: Partial<UserStarterInterface>
+) => {
+  const savedCredential = localStorage.getItem("user-signup-credentials");
 
-    if (!savedCredential) {
-      const toBeStoredUserCredentials = JSON.stringify(userCredentials);
-      return localStorage.setItem(
-        "user-signup-credentials",
-        toBeStoredUserCredentials
-      );
-    }
-
-    // Convert the string from localStorage into an object
-    const parsedCredentials = JSON.parse(savedCredential);
-    // Merge the parsed credentials with the new userCredentials
-    const newToBeStoredCredentials = {
-      ...parsedCredentials,
-      ...userCredentials,
-    };
-
-    // Save the updated credentials back to localStorage as a string
-    localStorage.setItem(
+  if (!savedCredential) {
+    const toBeStoredUserCredentials = JSON.stringify(userCredentials);
+    return localStorage.setItem(
       "user-signup-credentials",
-      JSON.stringify(newToBeStoredCredentials)
+      toBeStoredUserCredentials
     );
+  }
+
+  // Convert the string from localStorage into an object
+  const parsedCredentials = JSON.parse(savedCredential);
+  // Merge the parsed credentials with the new userCredentials
+  const newToBeStoredCredentials = {
+    ...parsedCredentials,
+    ...userCredentials,
   };
 
+  // Save the updated credentials back to localStorage as a string
+  localStorage.setItem(
+    "user-signup-credentials",
+    JSON.stringify(newToBeStoredCredentials)
+  );
+};

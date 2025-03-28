@@ -6,6 +6,7 @@ import { NotFoundPage } from "@/pages"; // adjust the path as necessary
 import { getErrorMessage } from "@/utils/errorHandler";
 import { toast } from "sonner";
 import { resetPassword } from "@/endpoints/userAuth";
+import { validatePassword } from "@/utils";
 
 const ResetPasswordPage = () => {
   const [newPassword, setNewPassword] = useState("");
@@ -16,6 +17,12 @@ const ResetPasswordPage = () => {
   const handleResetPassword = async () => {
     if (newPassword.length === 0)
       return toast.error("please enter your new password");
+
+    const passwordError = validatePassword(newPassword);
+    if (passwordError) {
+      return toast.error(passwordError);
+    }
+
     if (confirmPassword.length === 0)
       return toast.error("please confirm your password");
     if (newPassword !== confirmPassword)
