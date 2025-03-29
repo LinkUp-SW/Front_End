@@ -4,7 +4,7 @@ import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components";
 import { toast } from "sonner";
 import { sendOTP, verifyOTP } from "@/endpoints/userAuth";
 import { getErrorMessage } from "@/utils/errorHandler";
-import EmailVerificationLayout from "./EmailVerificationLayout";
+import EmailVerificationLayout from "../components/EmailVerificationLayout";
 
 const EmailVerification = () => {
   const [otp, setOtp] = useState("");
