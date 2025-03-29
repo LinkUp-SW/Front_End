@@ -53,7 +53,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "./ui/dialog";
-
+import PhoneNumberBanner from "./phonenumber_banner/PhoneNumberBanner";
 
 export {
   UserList,
@@ -106,4 +106,5 @@ export {
   DialogPortal,
   DialogTitle,
   DialogTrigger,
+  PhoneNumberBanner,
 };
