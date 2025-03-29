@@ -1,7 +1,6 @@
 import linkUpLogo from "/link_up_logo.png";
-import SearchInput from "./SearchInput";
-import NavItems from "./NavItems";
 import { BsChatDotsFill, BsFillGrid3X3GapFill } from "react-icons/bs";
+import NavItems from "./NavItems";
 import { FaPlusSquare } from "react-icons/fa";
 import { MdArrowDropDown } from "react-icons/md";
 import ThemeToggle from "../theme_toggle/ThemeToggle";
@@ -10,7 +9,14 @@ import { getErrorMessage } from "@/utils/errorHandler";
 import { toast } from "sonner";
 import { userLogOut } from "@/endpoints/userAuth";
 
+import SearchInput from "./SearchInput";
+
 const NavBar = () => {
+ 
+
+  
+
+  
   const handleLogout = async () => {
     try {
       await userLogOut();
@@ -23,15 +29,13 @@ const NavBar = () => {
       toast.error(err);
     }
   };
+
   return (
     <header className="w-full border-b bg-white border-b-gray-400 dark:bg-gray-900 dark:border-gray-700 flex items-center justify-center">
       <nav className="max-w-[85rem] px-5 py-2 flex lg:justify-between items-center gap-2 w-full">
-        <div className="flex gap-2 items-center lg:w-fit w-full">
-          <img
-            src={linkUpLogo}
-            alt="LinkUp-Logo"
-            className="aspect-square w-9 dark:invert"
-          />
+        <div className="flex gap-2 items-center lg:w-fit w-full relative">
+          <img src={linkUpLogo} alt="LinkUp-Logo" className="w-9 dark:invert" />
+          
           <SearchInput />
         </div>
         <div className="lg:flex items-center gap-4 hidden w-full max-w-[35rem]">
@@ -51,12 +55,12 @@ const NavBar = () => {
             </PopoverTrigger>
             <PopoverContent className="w-40 p-2 mt-2 rounded-md shadow-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
               <div className="grid gap-2">
-                <button
-                  onClick={handleLogout}
+              <button
+                onClick={handleLogout}
                   className="w-full cursor-pointer text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 p-2 rounded-md transition-all duration-300 ease-in-out"
-                >
-                  Sign Out
-                </button>
+              >
+                Sign Out
+              </button>
               </div>
             </PopoverContent>
           </Popover>
@@ -72,10 +76,10 @@ const NavBar = () => {
         </div>
         <div className="lg:hidden flex items-center gap-2 text-gray-500 dark:text-gray-300">
           <i>
-            <FaPlusSquare size={30} />
+          <FaPlusSquare size={30} />
           </i>
           <i className="scale-x-[-1]">
-            <BsChatDotsFill size={30} />
+          <BsChatDotsFill size={30} />
           </i>
           <ThemeToggle />
         </div>

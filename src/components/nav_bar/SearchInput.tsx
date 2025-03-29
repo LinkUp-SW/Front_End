@@ -1,8 +1,41 @@
 import { useState } from "react";
 import { ImSearch } from "react-icons/im";
+import { useNavigate } from "react-router-dom";
+
+const sampleData: { name: string; industry: string }[] = [
+  { name: "Nada Salem", industry: "Front end" },
+  { name: "Nada Khaled", industry: "Front end" },
+  { name: "Nada Zayed", industry: "Backend" },
+];
 
 const SearchInput = () => {
+  const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredResults, setFilteredResults] = useState<{ name: string; industry: string }[]>([]);
   const [open, setOpen] = useState(false);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const query = e.target.value;
+    setSearchTerm(query);
+    
+    if (query) {
+      const results = sampleData.filter(
+        (item) =>
+          item.name.toLowerCase().includes(query.toLowerCase()) ||
+          item.industry.toLowerCase().includes(query.toLowerCase())
+      );
+      setFilteredResults(results);
+    } else {
+      setFilteredResults([]);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && searchTerm) {
+      navigate(`/search/${searchTerm}`);
+      setFilteredResults([]);
+    }
+  };
 
   return (
     <div className="relative w-full">
@@ -11,50 +44,21 @@ const SearchInput = () => {
       </div>
       <input
         type="search"
-        id="default-search"
         placeholder="Search"
+        value={searchTerm}
+        onChange={handleSearchChange}
+        onKeyDown={handleKeyDown}
         onFocus={() => setOpen(true)}
-        onBlur={() => setTimeout(() => setOpen(false), 150)} // Add slight delay to allow clicks inside dropdown
+        onBlur={() => setTimeout(() => setOpen(false), 150)}
         className="block lg:w-[350px] w-full p-2 ps-10 text-sm text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800 outline-none focus:ring-blue-500 focus:border-blue-500"
       />
-
-      {open && (
+      {open && filteredResults.length > 0 && (
         <div className="absolute z-10 mt-1 w-full bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg shadow-lg p-4">
-          <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-            Recent
-          </h4>
-          <div className="flex gap-4 overflow-x-auto mb-4">
-            {[
-              { name: "James Carter", avatar: "https://placehold.co/40" },
-              { name: "Olivia Bennett", avatar: "https://placehold.co/40" },
-              { name: "Grace Morgan", avatar: "https://placehold.co/40" },
-              { name: "Lily Adams", avatar: "https://placehold.co/40" },
-            ].map((item, index) => (
-              <div key={index} className="flex flex-col items-center text-sm">
-                <img
-                  src={item.avatar}
-                  alt={item.name}
-                  className="w-10 h-10 rounded-full object-cover"
-                />
-                <span className="text-xs mt-1 truncate w-16 text-center">
-                  {item.name}
-                </span>
-              </div>
-            ))}
-          </div>
-
-          <ul className="space-y-2">
-            {["Emma Wilson", "Charlotte Evans", "Chloe Parker"].map(
-              (search, index) => (
-                <li
-                  key={index}
-                  className="flex items-center gap-2 text-gray-700 dark:text-gray-300 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 p-2 rounded-md"
-                >
-                  <span className="text-sm">{search}</span>
-                </li>
-              )
-            )}
-          </ul>
+          {filteredResults.map((result, index) => (
+            <div key={index} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">
+              {result.name} - {result.industry}
+            </div>
+          ))}
         </div>
       )}
     </div>
