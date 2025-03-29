@@ -87,3 +87,22 @@ export const handleSaveCredentials = (
     JSON.stringify(newToBeStoredCredentials)
   );
 };
+
+
+
+
+/**
+ * Converts an ISO date string to a human-readable format.
+ * Example: "1990-01-01T00:00:00.000Z" becomes "january 1 1990".
+ *
+ * @param isoDate - The ISO date string.
+ * @returns The formatted date string in lowercase.
+ */
+export function formatIsoDateToHumanReadable(isoDate: string): string {
+  const date = new Date(isoDate);
+  const options: Intl.DateTimeFormatOptions = { month: 'long', day: 'numeric', year: 'numeric' };
+  let formattedDate = date.toLocaleDateString('en-US', options);
+  // Remove comma and convert to lowercase to match the example format.
+  formattedDate = formattedDate.replace(',', '').toLowerCase();
+  return formattedDate;
+}
