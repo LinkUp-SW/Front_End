@@ -12,7 +12,6 @@
   display: grid;
   grid-template-columns: 1fr 2.5fr 1fr;
   gap: 24px;
-  margin-top: 24px;
 }
 
 /* Left sidebar styles */
