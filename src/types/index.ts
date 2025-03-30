@@ -8,7 +8,7 @@ export interface RemoveConnectionData {
 
 export interface Notification {
   id: string;
-  type: "job" | "post" | "hiring" | "course" | "analytics" | "recommendation";
+  type: "job" | "post" | "recommendation" | "message" | "connection";
   content: string;
   time: string;
   profileImg?: string;
@@ -17,6 +17,7 @@ export interface Notification {
   location?: string;
   count?: number;
   isNew?: boolean;
+  read?:boolean;
 }
 
 export interface PostType {
