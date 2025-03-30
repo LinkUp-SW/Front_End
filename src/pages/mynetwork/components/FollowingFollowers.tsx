@@ -181,9 +181,9 @@ const FollowingFollowers: React.FC = () => {
                     onConfirm={() => handleUnfollowUser(user.user_id)}
                   />
                   <DialogHeader>
-                    <DialogTitle>Unfollow {user.name}?</DialogTitle>
+                    <DialogTitle></DialogTitle>
                     <DialogDescription>
-                      Are you sure you want to unfollow {user.name}?
+                       
                     </DialogDescription>
                   </DialogHeader>
                 </DialogContent>
