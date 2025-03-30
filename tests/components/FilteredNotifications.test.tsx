@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { describe, test, expect, beforeEach } from 'vitest';
+import { describe, test, expect } from 'vitest';
 import { Notification } from '../../src/types';
 import { filterNotificationsByTab } from '../../src/pages/notifications/NotificationsPage';
 
