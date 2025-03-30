@@ -1,6 +1,7 @@
 // components/ProfileHeader.tsx
 import { Bio } from "@/types";
 import { ContactInfoModal } from "./ContactInfoModal";
+import { Link } from "react-router-dom";
 
 type ProfileHeaderProps = {
   user: Bio;
@@ -22,8 +23,8 @@ export const ProfileHeader = ({
       </p>
       <ContactInfoModal user={user} triggerLabel={`Contact Info`} />
     </div>
-    <p className="text-blue-600 hover:underline font-semibold dark:text-blue-400">
+    <Link to={'#'} className="text-blue-600 hover:underline font-semibold dark:text-blue-400">
       {connectionsCount} connections
-    </p>
+    </Link>
   </div>
 );
