@@ -54,6 +54,12 @@ import {
   DialogTrigger,
 } from "./ui/dialog";
 import PhoneNumberBanner from "./phonenumber_banner/PhoneNumberBanner";
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+  PopoverAnchor,
+} from "./ui/popover";
 
 export {
   UserList,
@@ -107,4 +113,8 @@ export {
   DialogTitle,
   DialogTrigger,
   PhoneNumberBanner,
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+  PopoverAnchor,
 };
