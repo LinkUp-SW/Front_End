@@ -20,7 +20,7 @@ export const getUserBio = async (
   token: string,
   userId: string
 ): Promise<UserProfile> => {
-  const response = await axiosInstance(`/api/v1/user/profile/bio/${userId}`, {
+  const response = await axiosInstance.get(`/api/v1/user/profile/bio/${userId}`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
