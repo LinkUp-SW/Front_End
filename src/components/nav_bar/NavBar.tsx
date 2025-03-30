@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import linkUpLogo from "/link_up_logo.png";
 import SearchInput from "./SearchInput";
 import NavItems from "./NavItems";
@@ -9,12 +10,30 @@ import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { getErrorMessage } from "@/utils/errorHandler";
 import { toast } from "sonner";
 import { userLogOut } from "@/endpoints/userAuth";
+import useFetchData from "@/hooks/useFetchData";
+import Cookies from "js-cookie";
+import { getUserProfilePic } from "@/endpoints/userProfile";
 
 const NavBar = () => {
+  const authToken = Cookies.get("linkup_auth_token");
+  const userId = Cookies.get("linkup_user_id");
+  
+  const { data, loading, error } = useFetchData(() =>
+    authToken && userId
+      ? getUserProfilePic(authToken, userId)
+      : Promise.resolve(null)
+  );
+
+  // Display error notification if an error occurs during profile picture fetch
+  useEffect(() => {
+    if (error) {
+      toast.error(getErrorMessage(error));
+    }
+  }, [error]);
+
   const handleLogout = async () => {
     try {
       await userLogOut();
-      // console.log(response)
       setTimeout(() => {
         window.location.replace("/login");
       }, 1000);
@@ -23,6 +42,12 @@ const NavBar = () => {
       toast.error(err);
     }
   };
+
+  // Use the profile picture if available; otherwise, fall back to a default image.
+  const profilePictureUrl =
+    data?.profilePicture ||
+    "https://res.cloudinary.com/dyhnxqs6f/image/upload/v1719229880/meme_k18ky2_c_crop_w_674_h_734_x_0_y_0_u0o1yz.png";
+
   return (
     <header className="w-full border-b bg-white border-b-gray-400 dark:bg-gray-900 dark:border-gray-700 flex items-center justify-center">
       <nav className="max-w-[85rem] px-5 py-2 flex lg:justify-between items-center gap-2 w-full">
@@ -39,11 +64,15 @@ const NavBar = () => {
           <Popover>
             <PopoverTrigger asChild>
               <button className="hidden lg:flex flex-col items-center cursor-pointer text-gray-600 dark:text-gray-300">
-                <img
-                  src="https://res.cloudinary.com/dyhnxqs6f/image/upload/v1719229880/meme_k18ky2_c_crop_w_674_h_734_x_0_y_0_u0o1yz.png"
-                  alt="profile-image"
-                  className="w-7 h-7 rounded-full object-cover"
-                />
+                {loading ? (
+                  <div className="h-7 w-7 animate-pulse rounded-full bg-gray-300" />
+                ) : (
+                  <img
+                    src={profilePictureUrl}
+                    alt="profile-image"
+                    className="w-7 h-7 rounded-full object-cover"
+                  />
+                )}
                 <span className="text-sm font-semibold inline-flex items-center">
                   Me <MdArrowDropDown size={20} />
                 </span>
@@ -71,12 +100,8 @@ const NavBar = () => {
           </button>
         </div>
         <div className="lg:hidden flex items-center gap-2 text-gray-500 dark:text-gray-300">
-          <i>
-            <FaPlusSquare size={30} />
-          </i>
-          <i className="scale-x-[-1]">
-            <BsChatDotsFill size={30} />
-          </i>
+          <FaPlusSquare size={30} />
+          <BsChatDotsFill size={30} className="scale-x-[-1]" />
           <ThemeToggle />
         </div>
       </nav>
