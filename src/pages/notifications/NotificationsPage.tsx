@@ -4,11 +4,60 @@ import styles from './notifications.module.css';
 import { ProfileCard, WithNavBar, LinkUpFooter, WhosHiringImage } from '../../components';
 import { RootState } from '../../store';
 import notificationPicture2 from "../../assets/notificationpicture2.jpeg"; 
-import { getNotifications, filterNotificationsByTab, setupClickOutsideListener, handleTabChange, handlePostFilterSelection, togglePostDropdown } from '@/endpoints/notifications';
-import { Notification, PostFilter } from '../../types'
+import { getNotifications, markNotificationAsRead } from '@/endpoints/notifications';
+import { Notification } from '../../types';
 
 // Define tab types for notification filtering
 export type Tab = 'all' | 'jobs' | 'posts' | 'mentions';
+export type PostFilter = 'all' | 'comments' | 'reactions';
+
+// Extract the filterNotificationsByTab function and export it separately
+export const filterNotificationsByTab = (
+  notifications: Notification[], 
+  activeTab: Tab, 
+  activePostFilter?: PostFilter
+): Notification[] => {
+  switch (activeTab) {
+    case 'jobs': {
+      return notifications.filter(notification => 
+        notification.type === 'job'
+      );
+    }
+
+    case 'posts': {
+      const postNotifications = notifications.filter(notification => 
+        notification.type === 'post'
+      );
+
+      if (activePostFilter === 'comments') {
+        return postNotifications.filter(n => 
+          n.content.toLowerCase().includes('comment') || 
+          n.content.toLowerCase().includes('replied')
+        );
+      }
+
+      if (activePostFilter === 'reactions') {
+        return postNotifications.filter(n => 
+          n.content.toLowerCase().includes('liked') || 
+          n.content.toLowerCase().includes('shared')
+        );
+      }
+
+      return postNotifications;
+    }
+
+    case 'mentions': {
+      return notifications.filter(notification => 
+        notification.content.includes('@')
+      );
+    }
+
+    default: {
+      return notifications;
+    }
+  }
+};
+
 
 const NotificationsPage: React.FC = () => {
   // State for active tab and notifications
@@ -19,9 +68,6 @@ const NotificationsPage: React.FC = () => {
   // State for post dropdown
   const [showPostDropdown, setShowPostDropdown] = useState<boolean>(false);
   const [activePostFilter, setActivePostFilter] = useState<PostFilter>('all');
-  
-  // State for read notifications
-  const [readNotifications, setReadNotifications] = useState<string[]>([]);
 
   // State for mobile responsiveness
   const [isMobile, setIsMobile] = useState<boolean>(window.innerWidth <= 768);
@@ -67,21 +113,118 @@ const NotificationsPage: React.FC = () => {
     return cleanup;
   }, []);
 
+  // Setup click outside listener for dropdowns
+  const setupClickOutsideListener = (
+    containerSelector: string,
+    arrowSelector: string,
+    setShowDropdown: (show: boolean) => void
+  ): () => void => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (!target.closest(containerSelector) && 
+          !target.closest(arrowSelector)) {
+        setShowDropdown(false);
+      }
+    };
+  
+    document.addEventListener('click', handleClickOutside);
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  };
+
+  // Handle tab click
+  const handleTabChange = (
+    tab: Tab, 
+    setActiveTab: (tab: Tab) => void,
+    setShowPostDropdown: (show: boolean) => void
+  ): void => {
+    setActiveTab(tab);
+    if (tab !== 'posts') {
+      setShowPostDropdown(false);
+    }
+  };
+
+  // Handle post filter selection
+  const handlePostFilterSelection = (
+    filter: PostFilter,
+    setActivePostFilter: (filter: PostFilter) => void,
+    setShowPostDropdown: (show: boolean) => void
+  ): void => {
+    setActivePostFilter(filter);
+    setShowPostDropdown(false);
+  };
+  
+  // Toggle post dropdown
+  const togglePostDropdown = (
+    e: React.MouseEvent,
+    showPostDropdown: boolean,
+    setShowPostDropdown: (show: boolean) => void
+  ): void => {
+    e.stopPropagation();
+    setShowPostDropdown(!showPostDropdown);
+  };
+
   // Function to handle notification click and mark as read
-  const handleNotificationClick = (notificationId: string) => {
-    // Add the notification ID to the read notifications list if not already read
-    if (!readNotifications.includes(notificationId)) {
-      setReadNotifications(prev => [...prev, notificationId]);
+  const handleNotificationClick = async (notificationId: string) => {
+    try {
+      // Call the endpoint to mark notification as read
+      await markNotificationAsRead('hfhfhfh', notificationId);
+      
+      // Optionally update the UI to reflect read status
+      setNotifications(prevNotifications => 
+        prevNotifications.map(notification => 
+          notification.id === notificationId 
+            ? { ...notification, read: true } 
+            : notification
+        )
+      );
+    } catch (error) {
+      console.error('Error marking notification as read:', error);
     }
   };
 
   // Filtered notifications based on active tab
   const filteredNotifications = filterNotificationsByTab(notifications, activeTab, activePostFilter);
 
+  // Function to render empty state message
+  const renderEmptyStateMessage = () => {
+    if (activeTab === 'posts') {
+      return (
+        <>
+          <h3 className={styles.emptyStateTitle}>No new post activities</h3>
+          <p className={styles.emptyStateDescription}>
+            Interactions with your posts will appear here
+          </p>
+        </>
+      );
+    }
+
+    if (activeTab === 'mentions') {
+      return (
+        <>
+          <h3 className={styles.emptyStateTitle}>No new mentions</h3>
+          <p className={styles.emptyStateDescription}>
+            When someone tags you in a post or comment, that notification will appear here.
+          </p>
+        </>
+      );
+    }
+
+    return (
+      <>
+        <h3 className={styles.emptyStateTitle}>No notifications</h3>
+        <p className={styles.emptyStateDescription}>
+          You're all caught up! Check back later for new updates.
+        </p>
+      </>
+    );
+  };
+
   return (
     <main className={`${styles.container} ${isDarkMode ? styles.darkMode : ''}`}>
       <div className={styles.content}>
-        {/* Left Profile Section - Using ProfileCard component */}
+        {/* Left Profile Section */}
         <div className={styles.leftSidebar}>
           <ProfileCard />
           <div className={styles.notificationSettings}>
@@ -141,11 +284,6 @@ const NotificationsPage: React.FC = () => {
                     onClick={() => handlePostFilterSelection('reactions', setActivePostFilter, setShowPostDropdown)}>
                     Reactions
                   </div>
-                  <div 
-                    className={`${styles.dropdownItem} ${activePostFilter === 'reposts' ? styles.activeDropdownItem : ''}`}
-                    onClick={() => handlePostFilterSelection('reposts', setActivePostFilter, setShowPostDropdown)}>
-                    Reposts
-                  </div>
                 </div>
               )}
             </div>
@@ -168,11 +306,11 @@ const NotificationsPage: React.FC = () => {
                   <div 
                     key={notification.id} 
                     className={`${styles.notificationItem} ${
-                      !readNotifications.includes(notification.id) ? styles.unreadNotification : styles.readNotification
+                      !notification.read ? styles.unreadNotification : styles.readNotification
                     }`}
                     onClick={() => handleNotificationClick(notification.id)}
                   >
-                    {!readNotifications.includes(notification.id) && (
+                    {!notification.read && (
                       <div className={styles.notificationIndicator}></div>
                     )}
                     <div className={styles.notificationImage}>
@@ -199,25 +337,7 @@ const NotificationsPage: React.FC = () => {
                   <div className={styles.emptyStateImage}>
                     <img src={notificationPicture2} alt="No notifications" />
                   </div>
-                  {activeTab === 'posts' && (
-                    <>
-                      <h3 className={styles.emptyStateTitle}>No new post activities</h3>
-                      <p className={styles.emptyStateDescription}>
-                        View your previous post activity on your profile
-                      </p>
-                      <a href="#" className={styles.emptyStateAction}>
-                        View previous activity
-                      </a>
-                    </>
-                  )}
-                  {activeTab === 'mentions' && (
-                    <>
-                      <h3 className={styles.emptyStateTitle}>No new mentions</h3>
-                      <p className={styles.emptyStateDescription}>
-                        When someone tags you in a post or comment, that notification will appear here.
-                      </p>
-                    </>
-                  )}
+                  {renderEmptyStateMessage()}
                 </div>
               )}
             </div>
