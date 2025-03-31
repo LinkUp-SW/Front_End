@@ -13,6 +13,7 @@ import {
 } from "./components";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
+import { getErrorMessage } from "@/utils/errorHandler";
 
 const UserInfo = () => {
   const token = Cookies.get("linkup_auth_token");
@@ -42,12 +43,12 @@ const UserInfo = () => {
     if (data) console.log(data); // Remove in production
   }, [data]);
 
-  if (!myUserId || !id) {
-    window.location.replace("user-profile/user-not-found=true");
+  if (!id||getErrorMessage(error).toLocaleLowerCase()==='user not found') {
+    window.location.replace("/user-not-found");
     return null;
   }
 
-  if (error) return <ErrorFallback />;
+  if (error) return <ErrorFallback error={error} />;
   if (loading) return <ProfileSkeleton />;
   if (!data) return null;
 
@@ -81,9 +82,9 @@ const UserInfo = () => {
   );
 };
 
-const ErrorFallback = () => (
+const ErrorFallback = ({error}:{error:unknown}) => (
   <div className="text-red-500 p-4 bg-red-100 rounded-lg">
-    Error loading profile information
+    {getErrorMessage(error)}
   </div>
 );
 
