@@ -37,7 +37,7 @@ const ManageMyNetwork = () => {
     {
       label: "Following & followers",
       icon: <FaUserPlus />,
-      route: "/followingfollowers",
+      route: "/following-followers",
     },
   ];
   return (
