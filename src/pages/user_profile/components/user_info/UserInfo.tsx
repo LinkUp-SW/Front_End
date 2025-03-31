@@ -11,19 +11,41 @@ import {
   ProfileHeader,
   ProfileActionButtons,
 } from "./components";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store";
 
 const UserInfo = () => {
   const token = Cookies.get("linkup_auth_token");
+  const myUserId = Cookies.get("linkup_user_id");
+
   const { id } = useParams();
 
-  const { data, loading, error } = useFetchData(
-    () => (token && id ? getUserBio(token, id) : Promise.resolve(null)),
-    [token, id]
+  const shouldFetch = myUserId !== id;
+  // Global state from Redux for the user bio.
+  const userBioState = useSelector((state: RootState) => state.userBio);
+
+  // If we need to fetch (i.e. viewing someone else's profile), use the custom hook.
+  // Otherwise, the hook will resolve to null.
+  const fetchData = useFetchData(
+    () =>
+      token && id && shouldFetch
+        ? getUserBio(token, id)
+        : Promise.resolve(null),
+    [token, id, shouldFetch]
   );
 
+  // Choose which data to display:
+  // If we're not fetching (i.e. the profile is the logged-in user's), use the global state.
+  // Otherwise, use the data from the custom hook.
+  const { data, loading, error } = shouldFetch ? fetchData : userBioState;
   useEffect(() => {
     if (data) console.log(data); // Remove in production
   }, [data]);
+
+  if (!myUserId || !id) {
+    window.location.replace("user-profile/user-not-found=true");
+    return null;
+  }
 
   if (error) return <ErrorFallback />;
   if (loading) return <ProfileSkeleton />;
@@ -51,11 +73,9 @@ const UserInfo = () => {
             isFollowing: data.isAlreadyFollowing,
             isPending: data.is_in_sent_connections,
             followPrimary: data.follow_primary,
-            isInConnection:data.isInConnections
+            isInConnection: data.isInConnections,
           }}
         />
-
-
       </div>
     </section>
   );
