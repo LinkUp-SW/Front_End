@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import moment from "moment";
 import { Button } from "../../../components/ui/button";
 
@@ -10,8 +10,6 @@ import { FcLike as LoveIcon } from "react-icons/fc";
 import { FaRegFaceLaughSquint as LaughIcon } from "react-icons/fa6";
 import { HiOutlineLightBulb as InsightfulIcon } from "react-icons/hi";
 import { PiHandPalmBold as SupportIcon } from "react-icons/pi";
-import { useDispatch } from "react-redux";
-import { handleOpenModalType } from "@/utils";
 import { Link } from "react-router-dom";
 import { CommentType, PostType } from "@/types";
 
@@ -21,6 +19,7 @@ import PostFooter from "./PostFooter";
 import { getEngagementButtons, getMenuActions } from "./menus";
 import { Dialog, DialogContent, DialogTrigger } from "@/components";
 import ReactionsModal from "./modals/ReactionsModal";
+import TruncatedText from "./TruncatedText";
 
 interface PostProps {
   postData: PostType;
@@ -31,39 +30,22 @@ const Post: React.FC<PostProps> = ({ postData, comments }) => {
   const { user, post, stats, action } = postData;
 
   const [liked, setLiked] = useState(false);
-  const [expanded, setExpanded] = useState(false);
 
   const [postMenuOpen, setPostMenuOpen] = useState(false);
   const [sortingMenu, setSortingMenu] = useState(false);
   const [sortingState, setSortingState] = useState("Most relevant");
 
-  const handleSortingState = () => {
-    if (sortingState == "Most relevant") {
-      setSortingState("Most recent");
-    } else {
-      setSortingState("Most relevant");
-    }
+  const handleSortingState = (selectedState: string) => {
+    setSortingState(selectedState);
   };
 
-  const dispatch = useDispatch();
+  // If not expanded, show only 40 words + ...
 
-  const handleOpenModal = (modalName: string) => {
-    dispatch(handleOpenModalType(modalName)); // Dispatch a string identifier or an object with modal details
-  };
+  const menuActions = getMenuActions();
 
-  const menuActions = getMenuActions(handleOpenModal);
-
-  const engagementButtons = getEngagementButtons(
-    liked,
-    () => setLiked(!liked),
-    handleOpenModal
-  );
+  const engagementButtons = getEngagementButtons(liked, () => setLiked(!liked));
 
   const timeAgo = moment(post.date).fromNow();
-
-  useEffect(() => {
-    console.log(postMenuOpen);
-  }, [postMenuOpen]);
 
   const statsArray = [
     { name: "celebrate", count: stats.celebrate, icon: <CelebrateIcon /> },
@@ -112,29 +94,16 @@ const Post: React.FC<PostProps> = ({ postData, comments }) => {
             </span>
           </header>
         )}
-        {PostHeader(
-          user,
-          action,
-          postMenuOpen,
-          setPostMenuOpen,
-          menuActions,
-          timeAgo,
-          post
-        )}
-        <section className="flex relative text-gray-800 dark:text-neutral-200">
-          <p className={`mt-2 text-sm   ${expanded ? "" : "line-clamp-3"}`}>
-            {post.content}
-          </p>
-          {post.content.split(" ").length > 30 && (
-            <Button
-              variant="ghost"
-              className="text-gray-500 absolute -bottom-2 transition-all -right-6 hover:bg-transparent hover:cursor-pointer"
-              onClick={() => setExpanded(!expanded)}
-            >
-              {expanded ? "less" : "more"}
-            </Button>
-          )}
-        </section>
+        <PostHeader
+          user={user}
+          action={action}
+          postMenuOpen={postMenuOpen}
+          setPostMenuOpen={setPostMenuOpen}
+          menuActions={menuActions}
+          timeAgo={timeAgo}
+          post={post}
+        />
+        <TruncatedText content={post.content} lineCount={3} />
 
         {/* Post Image(s) */}
         {post.images && post.images.length > 0 && (
@@ -194,14 +163,14 @@ const Post: React.FC<PostProps> = ({ postData, comments }) => {
         </footer>
       </CardContent>
       <CardFooter>
-        {PostFooter(
-          user,
-          sortingMenu,
-          setSortingMenu,
-          sortingState,
-          handleSortingState,
-          comments
-        )}
+        <PostFooter
+          user={user}
+          sortingMenu={sortingMenu}
+          setSortingMenu={setSortingMenu}
+          sortingState={sortingState}
+          handleSortingState={handleSortingState}
+          comments={comments}
+        />
       </CardFooter>
     </Card>
   );

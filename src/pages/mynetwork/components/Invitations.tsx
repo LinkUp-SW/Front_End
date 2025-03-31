@@ -1,66 +1,83 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-
-export interface People {
-  id: number;
-  name: string;
-  title: string;
-  mutualConnections: string;
-  image: string;
-  profileUrl: string;
-  coverImage?: string;
-}
+import {
+  fetchRecievedConnections,
+  ReceivedConnections,
+  acceptInvitation,
+  ignoreInvitation,
+} from "@/endpoints/myNetwork";
+import Cookies from "js-cookie";
+import useFetchData from "@/hooks/useFetchData";
 
 const Invitations = () => {
-  const [invitations, setInvitations] = useState<People[]>([
-    {
-      id: 1,
-      name: "Nada Omar",
-      title:
-        "Sophomore Electronics and Electrical Communications Engineering, Cairo University",
-      mutualConnections: "Haneen Mohamed and 38 other mutual connections",
-      image:
-        "https://www.svgrepo.com/show/382097/female-avatar-girl-face-woman-user-9.svg",
-      profileUrl: "/profile/Nada-Omar",
-    },
-    {
-      id: 2,
-      name: "Ghada Tarek",
-      title: "AI and Data Science Student",
-      mutualConnections: "Esraa Elbaz is a mutual connection",
-      image:
-        "https://www.svgrepo.com/show/382097/female-avatar-girl-face-woman-user-9.svg",
-      profileUrl: "/profile/Ghada-Tarek",
-    },
-    {
-      id: 3,
-      name: "Malak Ahmed",
-      title: "Attended Ain Shams University",
-      mutualConnections: "Nour Ahmed and 4 other mutual connections",
-      image:
-        "https://www.svgrepo.com/show/382097/female-avatar-girl-face-woman-user-9.svg",
-      profileUrl: "/profile/Malak-Ahmed",
-    },
-  ]);
+  const [invitations, setInvitations] = useState<ReceivedConnections[]>([]);
+  const token = Cookies.get("linkup_auth_token");
+  const { data } = useFetchData(
+    () => (token ? fetchRecievedConnections(token) : Promise.resolve(null)),
+    [token]
+  );
+
+  useEffect(() => {
+    if (data && data.receivedConnections) {
+      setInvitations(data.receivedConnections.slice(0, 3)); // Update invitations state when data is available
+    }
+  }, [data]);
+
+  useEffect(() => {
+    console.log(data);
+  }, [data]);
 
   const navigate = useNavigate();
 
-  const acceptInvitation = (id: number) => {
-    setInvitations((prev) => prev.filter((invitation) => invitation.id !== id));
-  };
+  const acceptInvitations = useCallback(
+    async (userId: string) => {
+      if (!token) {
+        console.error("No authentication token found.");
+        return;
+      }
 
-  const ignoreInvitation = (id: number) => {
-    setInvitations((prev) => prev.filter((invitation) => invitation.id !== id));
-  };
+      try {
+        console.log(token)
+        await acceptInvitation(token, userId);
+
+        setInvitations((prevInvitations) =>
+          prevInvitations.filter((c) => c.user_id !== userId)
+        );
+      } catch (error) {
+        console.error("can't", error);
+      }
+    },
+    [token]
+  );
+
+  const ignoreInvitations = useCallback(
+    async (userId: string) => {
+      if (!token) {
+        console.error("No authentication token found.");
+        return; // Optionally handle the case where token is missing
+      }
+
+      try {
+        await ignoreInvitation(token, userId);
+
+        setInvitations((prevInvitations) =>
+          prevInvitations.filter((c) => c.user_id !== userId)
+        );
+      } catch (error) {
+        console.error("Error", error);
+      }
+    },
+    [token]
+  );
 
   return (
     <div className="bg-white dark:bg-gray-900 shadow-lg rounded-lg p-4">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-          Invitations ({invitations.length})
+          Invitations ({data?.numberOfReceivedConnections ?? 0})
         </h2>
-        <button 
-          className="text-blue-600 hover:underline cursor-pointer" 
+        <button
+          className="text-blue-600 hover:underline cursor-pointer"
           onClick={() => navigate("/manage-invitations")}
         >
           Show all
@@ -69,15 +86,15 @@ const Invitations = () => {
       <ul className="space-y-4">
         {invitations.map((invite) => (
           <li
-            key={invite.id}
+            key={invite.user_id}
             className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg flex-col min-[450px]:flex-row"
           >
             <a
-              href={invite.profileUrl}
+              href={invite.name}
               className="flex items-center space-x-4 flex-1"
             >
               <img
-                src={invite.image}
+                src={invite.profilePicture}
                 alt={invite.name}
                 className="w-12 h-12 rounded-full"
               />
@@ -86,22 +103,35 @@ const Invitations = () => {
                   {invite.name}
                 </p>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                  {invite.title}
+                  {invite.headline}
                 </p>
                 <p className="text-xs text-gray-400 dark:text-gray-500">
-                  {invite.mutualConnections}
+                  {invite.numberOfMutualConnections === 1 ? (
+                    <span>
+                      {invite.nameOfOneMutualConnection} is a mutual connection
+                    </span>
+                  ) : invite.numberOfMutualConnections > 1 ? (
+                    <span>
+                      {invite.nameOfOneMutualConnection} and{" "}
+                      {invite.numberOfMutualConnections - 1}{" "}
+                      {invite.numberOfMutualConnections - 1 === 1
+                        ? "other"
+                        : "others"}{" "}
+                      are mutual connections
+                    </span>
+                  ) : null}
                 </p>
               </div>
             </a>
             <div className="flex space-x-2">
               <button
-                onClick={() => ignoreInvitation(invite.id)}
+                onClick={() => ignoreInvitations(invite.user_id)}
                 className="px-3 py-1 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white cursor-pointer"
               >
                 Ignore
               </button>
               <button
-                onClick={() => acceptInvitation(invite.id)}
+                onClick={() => acceptInvitations(invite.user_id)}
                 className="px-4 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 cursor-pointer"
               >
                 Accept

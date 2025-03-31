@@ -59,7 +59,7 @@ const Modal: React.FC = () => {
         }
         const { userInfo, onRemove } = modalData as {
           userInfo: RemoveConnectionData;
-          onRemove: (userId: number) => void;
+          onRemove: (userId: string) => void;
         };
 
         const handleConfirm = () => {
