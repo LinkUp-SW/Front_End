@@ -7,21 +7,19 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { LiaEllipsisHSolid as EllipsisIcon } from "react-icons/lia";
 import { Button } from "@/components/ui/button";
-import {
-  FaEyeSlash,
-  FaFlag,
-  FaLink,
-} from "react-icons/fa";
+import { FaEyeSlash, FaFlag, FaLink } from "react-icons/fa";
 import { PiHandsClapping as CelebrateIcon } from "react-icons/pi";
 import { FcLike as LoveIcon } from "react-icons/fc";
 import { FaRegFaceLaughSquint as LaughIcon } from "react-icons/fa6";
 import { HiOutlineLightBulb as InsightfulIcon } from "react-icons/hi";
 import { PiHandPalmBold as SupportIcon } from "react-icons/pi";
-import {
-  AiOutlineLike as LikeIcon,
-} from "react-icons/ai";
+import { AiOutlineLike as LikeIcon } from "react-icons/ai";
+import { Dialog, DialogContent } from "@/components";
+import { DialogTrigger } from "@radix-ui/react-dialog";
+import ReportCommentModal from "./modals/ReportCommentModal";
+import ReactionsModal from "./modals/ReactionsModal";
 
-interface CommentProps {
+export interface CommentProps {
   user: {
     profileImage: string;
     name: string;
@@ -48,7 +46,7 @@ interface CommentProps {
 
 const Comment: React.FC<CommentProps> = ({ user, comment, stats }) => {
   const { profileImage, name, degree } = user;
-  const { text,  edited } = comment;
+  const { text, edited } = comment;
   const [commentMenuOpen, setCommentMenuOpen] = useState(false);
 
   const statsArray = [
@@ -83,8 +81,8 @@ const Comment: React.FC<CommentProps> = ({ user, comment, stats }) => {
       icon: <FaLink className="mr-2" />,
     },
     {
-      name: "Report Post",
-      action: () => handleOpenModal("report_post"),
+      name: "Report Comment",
+      action: () => {},
       icon: <FaFlag className="mr-2" />,
     },
     {
@@ -94,17 +92,18 @@ const Comment: React.FC<CommentProps> = ({ user, comment, stats }) => {
     },
   ];
 
-  function handleOpenModal(arg0: string): void {
-    console.log(arg0)
-    throw new Error("Function not implemented.");
-  }
-
   return (
     <div className="flex flex-col px-0">
       <header className="flex items-center space-x-3 w-full">
-        <img src={profileImage} alt={name} className="w-8 h-8 rounded-full" />
+        <img
+          src={profileImage}
+          alt={name}
+          className="w-8 h-8 rounded-full relative z-10"
+        />
+        <div className="w-12 h-16 rounded-full z-0 bg-white dark:bg-gray-900 absolute" />
+
         <div className="flex flex-col gap-0 w-full relative">
-          <div className="flex justify-between">
+          <section className="flex justify-between">
             <Link to="#" className="flex gap-1 items-center">
               <h2 className="text-xs font-semibold sm:text-sm hover:cursor-pointer hover:underline hover:text-blue-600 dark:hover:text-blue-400">
                 {name}
@@ -127,32 +126,55 @@ const Comment: React.FC<CommentProps> = ({ user, comment, stats }) => {
                 )}
                 <time className="">1d</time>
               </div>
-              <Popover open={commentMenuOpen} onOpenChange={setCommentMenuOpen}>
-                <PopoverTrigger className="rounded-full relative -top-2 light:hover:bg-gray-100 transition-colors dark:hover:bg-zinc-700 hover:cursor-pointer dark:hover:text-neutral-200 h-8 gap-1.5 px-3 has-[>svg]:px-2.5">
-                  <EllipsisIcon
-                    onClick={() => setCommentMenuOpen(!commentMenuOpen)}
-                  />
-                </PopoverTrigger>
-                <PopoverContent className="relative right-30 dark:bg-gray-900 bg-white border-neutral-200 dark:border-gray-700 p-0 pt-1">
-                  <div className="flex flex-col w-full p-0">
-                    {menuActions.map((item, index) => (
-                      <Button
-                        key={index}
-                        onClick={() => {
-                          item.action();
-                          setCommentMenuOpen(false);
-                        }}
-                        className="flex justify-start items-center rounded-none h-12 bg-transparent w-full p-0 m-0 hover:bg-neutral-200 text-gray-900 dark:text-neutral-200 dark:hover:bg-gray-600 hover:cursor-pointer"
-                      >
-                        {item.icon}
-                        <span>{item.name}</span>
-                      </Button>
-                    ))}
-                  </div>
-                </PopoverContent>
-              </Popover>
+              <Dialog>
+                <Popover
+                  open={commentMenuOpen}
+                  onOpenChange={setCommentMenuOpen}
+                >
+                  <PopoverTrigger className="rounded-full relative -top-2 light:hover:bg-gray-100 transition-colors dark:hover:bg-zinc-700 hover:cursor-pointer dark:hover:text-neutral-200 h-8 gap-1.5 px-3 has-[>svg]:px-2.5">
+                    <EllipsisIcon
+                      onClick={() => setCommentMenuOpen(!commentMenuOpen)}
+                    />
+                  </PopoverTrigger>
+                  <PopoverContent className="relative right-30 dark:bg-gray-900 bg-white border-neutral-200 dark:border-gray-700 p-0 pt-1">
+                    <div className="flex flex-col w-full p-0">
+                      {menuActions.map((item, index) =>
+                        item.name == "Report Comment" ? (
+                          <DialogTrigger key={index} asChild>
+                            <Button
+                              key={index}
+                              onClick={() => {
+                                setCommentMenuOpen(false);
+                              }}
+                              className="flex justify-start items-center rounded-none h-12 bg-transparent w-full p-0 m-0 hover:bg-neutral-200 text-gray-900 dark:text-neutral-200 dark:hover:bg-gray-600 hover:cursor-pointer"
+                            >
+                              {item.icon}
+                              <span>{item.name}</span>
+                            </Button>
+                          </DialogTrigger>
+                        ) : (
+                          <Button
+                            key={index}
+                            onClick={() => {
+                              item.action();
+                              setCommentMenuOpen(false);
+                            }}
+                            className="flex justify-start items-center rounded-none h-12 bg-transparent w-full p-0 m-0 hover:bg-neutral-200 text-gray-900 dark:text-neutral-200 dark:hover:bg-gray-600 hover:cursor-pointer"
+                          >
+                            {item.icon}
+                            <span>{item.name}</span>
+                          </Button>
+                        )
+                      )}
+                    </div>
+                  </PopoverContent>
+                </Popover>
+                <DialogContent>
+                  <ReportCommentModal />
+                </DialogContent>
+              </Dialog>
             </nav>
-          </div>
+          </section>
           <div className="text-xs text-gray-500 dark:text-neutral-400 relative -top-2">
             <Link to="#" className={`text-ellipsis line-clamp-1`}>
               {user.followers ? user.followers + " followers" : user.headline}
@@ -175,20 +197,25 @@ const Comment: React.FC<CommentProps> = ({ user, comment, stats }) => {
           ·
         </p>
 
-        <button
-          onClick={() => handleOpenModal("reactions")}
-          className="flex border-r pr-3 relative items-end text-gray-500 dark:text-neutral-400 text-xs hover:underline hover:cursor-pointer hover:text-blue-600 dark:hover:text-blue-400"
-        >
-          {topStats.map((stat, index) => (
-            <span
-              key={index}
-              className="flex items-center text-black dark:text-neutral-200 text-lg"
-            >
-              {stat.icon}
-            </span>
-          ))}
-          {totalStats}
-        </button>
+        <Dialog>
+          <DialogTrigger asChild>
+            <button className="flex border-r pr-3 relative items-end text-gray-500 dark:text-neutral-400 text-xs hover:underline hover:cursor-pointer hover:text-blue-600 dark:hover:text-blue-400">
+              {topStats.map((stat, index) => (
+                <span
+                  key={index}
+                  className="flex items-center text-black dark:text-neutral-200 text-lg"
+                >
+                  {stat.icon}
+                </span>
+              ))}
+              {totalStats}
+            </button>
+          </DialogTrigger>
+          <DialogContent>
+            <ReactionsModal />
+          </DialogContent>
+        </Dialog>
+
         <Button
           variant="ghost"
           size="sm"
@@ -205,9 +232,7 @@ const Comment: React.FC<CommentProps> = ({ user, comment, stats }) => {
             ? "1 Reply"
             : `${stats.replies} Replies`}
         </p>
-        {/* </div> */}
       </footer>
-      <div></div>
     </div>
   );
 };

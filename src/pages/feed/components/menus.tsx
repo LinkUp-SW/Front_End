@@ -15,9 +15,7 @@ import {
 } from "react-icons/ai";
 import { BsFillSendFill as SendIcon } from "react-icons/bs";
 
-export const getMenuActions = (
-  handleOpenModal: (modalName: string) => void
-) => [
+export const getMenuActions = () => [
   {
     name: "Save",
     action: () => console.log("Save clicked"),
@@ -35,7 +33,7 @@ export const getMenuActions = (
   },
   {
     name: "Report Post",
-    action: () => handleOpenModal("report_post"),
+    action: () => console.log("Report Post Clicked"),
     icon: <FaFlag className="mr-2" />,
   },
   {
@@ -62,8 +60,7 @@ export const COMMENT_SORTING_MENU = [
 
 export const getEngagementButtons = (
   liked: boolean,
-  toggleLiked: () => void,
-  handleOpenModal: (modalName: string) => void
+  toggleLiked: () => void
 ) => [
   {
     name: "Like",
@@ -85,6 +82,6 @@ export const getEngagementButtons = (
   {
     name: "Send",
     icon: <SendIcon />,
-    callback: () => handleOpenModal("send_post"),
+    callback: () => {},
   },
 ];
