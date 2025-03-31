@@ -194,6 +194,6 @@ export interface UserProfileBio {
   is_in_received_connections?: boolean;
   is_in_sent_connections?: boolean;
   name_of_one_mutual_connection?: string;
-  isInConnections?:boolean;
-  isAlreadyFollowing?:boolean
+  isInConnections?: boolean;
+  isAlreadyFollowing?: boolean;
 }
