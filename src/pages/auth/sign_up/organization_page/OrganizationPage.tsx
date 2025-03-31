@@ -1,4 +1,3 @@
-import { UserAuthLayout } from "@/components";
 import { useState, useCallback, useEffect } from "react";
 import StudentForm from "./components/StudentForm";
 import JobForm from "./components/JobForm";
@@ -10,6 +9,7 @@ import { getErrorMessage } from "@/utils/errorHandler";
 import { useFormStatus } from "@/hooks/useFormStatus";
 import { UserStarterInterface } from "@/types";
 import { useInterceptBackNavigation } from "@/hooks/useInterceptBackNavigation";
+import EmailVerificationLayout from "../../components/EmailVerificationLayout";
 
 const OrganizationPage = () => {
   const [isStudent, setIsStudent] = useState(false);
@@ -173,37 +173,39 @@ const OrganizationPage = () => {
   if (!savedCredential) return null;
 
   return (
-    <main className="flex min-h-full w-full max-w-md flex-col justify-center relative pt-4">
-      <header className="sm:w-full flex flex-col gap-2">
-        <h2 className="text-center text-xl font-bold tracking-tight text-gray-900 dark:text-white">
-          Your Profile helps you discover new people and opportunities
-        </h2>
-      </header>
-      {isStudent ? (
-        <StudentForm setPartialUserStarterData={setPartialUserStarterData} />
-      ) : (
-        <JobForm setPartialUserStarterData={setPartialUserStarterData} />
-      )}
-      <div className="w-full space-y-2">
-        <button
-          id="i-am-student-button"
-          onClick={() => setIsStudent((prev) => !prev)}
-          className="w-full py-2 cursor-pointer px-4 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-800 dark:text-gray-100 font-semibold rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none transition-colors duration-200"
-        >
-          {isStudent ? "I'm not a student" : "I'm a student"}
-        </button>
-        <button
-          type="button"
-          onClick={saveCredentials}
-          disabled={isSubmitting}
-          id="continue-button"
-          className="flex disabled:opacity-75 disabled:bg-indigo-500 disabled:cursor-not-allowed cursor-pointer w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:bg-indigo-700 dark:hover:bg-indigo-600 transition-all duration-300 ease-in-out"
-        >
-          {isSubmitting ? "Please wait..." : "Continue"}
-        </button>
-      </div>
-    </main>
+    <EmailVerificationLayout>
+      <main className="flex min-h-full w-full max-w-md flex-col justify-center relative pt-4">
+        <header className="sm:w-full flex flex-col gap-2">
+          <h2 className="text-center text-xl font-bold tracking-tight text-gray-900 dark:text-white">
+            Your Profile helps you discover new people and opportunities
+          </h2>
+        </header>
+        {isStudent ? (
+          <StudentForm setPartialUserStarterData={setPartialUserStarterData} />
+        ) : (
+          <JobForm setPartialUserStarterData={setPartialUserStarterData} />
+        )}
+        <div className="w-full space-y-2">
+          <button
+            id="i-am-student-button"
+            onClick={() => setIsStudent((prev) => !prev)}
+            className="w-full py-2 cursor-pointer px-4 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-800 dark:text-gray-100 font-semibold rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none transition-colors duration-200"
+          >
+            {isStudent ? "I'm not a student" : "I'm a student"}
+          </button>
+          <button
+            type="button"
+            onClick={saveCredentials}
+            disabled={isSubmitting}
+            id="continue-button"
+            className="flex disabled:opacity-75 disabled:bg-indigo-500 disabled:cursor-not-allowed cursor-pointer w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:bg-indigo-700 dark:hover:bg-indigo-600 transition-all duration-300 ease-in-out"
+          >
+            {isSubmitting ? "Please wait..." : "Continue"}
+          </button>
+        </div>
+      </main>
+    </EmailVerificationLayout>
   );
 };
 
-export default UserAuthLayout(OrganizationPage);
+export default OrganizationPage;

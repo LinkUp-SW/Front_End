@@ -66,7 +66,7 @@ const routes: RouteObject[] = [
   },
 
   {
-    path: "/followingfollowers",
+    path: "/following-followers",
     element: React.createElement(FollowingFollowersPage),
   },
 

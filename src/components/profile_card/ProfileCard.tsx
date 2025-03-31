@@ -1,26 +1,36 @@
 import React from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Card, CardContent } from "../ui/card";
 import { FaUniversity } from "react-icons/fa";
 import { Avatar, AvatarFallback, AvatarImage, Button } from "../../components";
 import { Link } from "react-router-dom";
-import useFetchData from "@/hooks/useFetchData";
-import { getProfileCardData } from "@/endpoints/userProfile";
+import Cookies from "js-cookie";
+import { refetchUserBio } from "@/slices/user_profile/userBioSlice";
+import { RootState, AppDispatch } from "@/store"; // Ensure AppDispatch is exported from your store
+import { getErrorMessage } from "@/utils/errorHandler";
 
 const ProfileCard: React.FC = () => {
-  const { data, loading, error, refetch } = useFetchData(
-    () => getProfileCardData(),
-    []
+  // Use the correctly typed dispatch
+  const dispatch = useDispatch<AppDispatch>();
+
+  const token = Cookies.get("linkup_auth_token");
+  const userId = Cookies.get("linkup_user_id");
+
+  const { data, loading, error } = useSelector(
+    (state: RootState) => state.userBio
   );
 
   if (error) {
     return (
       <Card className="mb-2 bg-white border-0 dark:bg-gray-900 dark:text-neutral-200 w-full">
         <CardContent className="flex flex-col items-center justify-center w-full md:px-6 px-0 py-6">
-          <p className="text-red-500 text-center">
-            Error loading profile data.
-          </p>
+          <p className="text-red-500 text-center">{getErrorMessage(error)}</p>
           <Button
-            onClick={refetch}
+            onClick={() => {
+              if (token && userId) {
+                dispatch(refetchUserBio({ token, userId }));
+              }
+            }}
             variant="outline"
             className="mt-4 px-4 py-2 rounded cursor-pointer transition-colors bg-white text-gray-800 border border-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-600 dark:hover:bg-gray-700"
           >
@@ -62,35 +72,36 @@ const ProfileCard: React.FC = () => {
     <Card className="mb-2 bg-white border-0 dark:bg-gray-900 dark:text-neutral-200 w-full">
       <CardContent className="flex flex-col items-center w-full relative md:px-6 px-0 ">
         <Link
-          className="flex flex-col gap-y-1 items-start w-full   hover:cursor-pointer"
-          to={"/user-profile/1"}
+          className="flex flex-col gap-y-1 items-start hover:cursor-pointer w-full"
+          to={`/user-profile/${userId}`}
         >
-          <header
-            className="absolute md:-left-0 -top-6 h-15 
-            w-full  bg-gray-200 rounded-t-xl"
-          >
+          <header className="absolute md:-left-0 -top-6 h-15 w-full bg-gray-200 rounded-t-xl">
             <img
-              src={data?.coverImage}
+              src={data?.cover_photo}
               alt="Cover"
-              className="w-full h-full rounded-t-md "
+              className="w-full h-full min-h-20 rounded-t-md"
             />
           </header>
           <section className="md:px-0 px-6">
             <Avatar className="h-19 w-19">
-              <AvatarImage src={data?.profileImage} alt={"user-profile"} />
+              <AvatarImage src={data?.profile_photo} alt="user-profile" />
               <AvatarFallback>{"name.charAt(0)"}</AvatarFallback>
             </Avatar>
             <div className="absolute border-white border-3 top-0 px-0 rounded-full h-19 w-19"></div>
-            <h1 className="text-xl font-medium">{data?.name}</h1>
+            <h1 className="text-xl font-medium">
+              {data?.bio.first_name} {data?.bio.last_name}
+            </h1>
             <h2 className="text-xs text-ellipsis line-clamp-2">
-              {data?.headline}
+              {data?.bio.headline}
             </h2>
             <h3 className="text-xs text-gray-500 dark:text-neutral-400">
-              {data?.location}
+              {data?.bio.location.city} {data?.bio.location.country_region}
             </h3>
             <footer className="flex items-center gap-1 pt-3">
               <FaUniversity />
-              <h1 className="text-xs font-semibold">{data?.university}</h1>
+              <h1 className="text-xs font-semibold">
+                {data?.bio.education[data?.bio.education.length - 1]}
+              </h1>
             </footer>
           </section>
         </Link>

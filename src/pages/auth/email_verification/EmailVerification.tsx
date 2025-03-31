@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { UserAuthLayout } from "@/components";
 import { REGEXP_ONLY_DIGITS_AND_CHARS } from "input-otp";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components";
 import { toast } from "sonner";
 import { sendOTP, verifyOTP } from "@/endpoints/userAuth";
 import { getErrorMessage } from "@/utils/errorHandler";
+import EmailVerificationLayout from "../components/EmailVerificationLayout";
 
 const EmailVerification = () => {
   const [otp, setOtp] = useState("");
@@ -26,7 +26,6 @@ const EmailVerification = () => {
           return;
         }
       } catch (error) {
-        // Parsing failed – fallback to storedUserEmail
         console.log(error);
       }
     } else if (storedUserEmail) {
@@ -39,7 +38,7 @@ const EmailVerification = () => {
 
   // Send OTP when a valid userEmail is set
   useEffect(() => {
-    if (!userEmail) return; // Wait until email is set
+    if (!userEmail) return;
     if (didSend.current) return;
     didSend.current = true;
 
@@ -55,12 +54,10 @@ const EmailVerification = () => {
     handleSendOTP();
   }, [userEmail]);
 
-  // Update OTP state as the user types.
   const handleOTPChange = (value: string) => {
     setOtp(value);
   };
 
-  // When OTP is complete, call verifyOTP to validate the code.
   const handleOTPComplete = async (value: string) => {
     try {
       const response = toast.promise(verifyOTP(value, userEmail), {
@@ -81,7 +78,6 @@ const EmailVerification = () => {
     }
   };
 
-  // Resend logic: simulate resend API call and start a 30-second cooldown.
   const handleResendCode = useCallback(async () => {
     if (isResending || resendTimer > 0) return;
 
@@ -98,7 +94,6 @@ const EmailVerification = () => {
     }
   }, [isResending, resendTimer, userEmail]);
 
-  // Timer countdown effect.
   useEffect(() => {
     if (resendTimer === 0) return;
     const intervalId = setInterval(() => {
@@ -113,11 +108,10 @@ const EmailVerification = () => {
     return () => clearInterval(intervalId);
   }, [resendTimer]);
 
-  // If there's no email available, don't render anything.
   if (!userEmail) return null;
 
   return (
-    <main className="flex min-h-full w-full max-w-md flex-col justify-center items-center relative pt-4 px-4">
+    <div className="flex min-h-full w-full max-w-md flex-col justify-center items-center relative pt-4 px-4">
       <header className="mb-8 text-center">
         <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
           Confirm Your Email
@@ -125,12 +119,6 @@ const EmailVerification = () => {
         <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
           We sent a code to <span className="font-semibold">{userEmail}</span>
         </p>
-        {/* <button
-          id="edit-email-button"
-          className="mt-2 text-sm font-semibold text-indigo-600 hover:underline"
-        >
-          Edit Email
-        </button> */}
       </header>
       <div className="w-full flex justify-center mb-6">
         <InputOTP
@@ -169,8 +157,14 @@ const EmailVerification = () => {
           </button>
         </p>
       </div>
-    </main>
+    </div>
   );
 };
 
-export default UserAuthLayout(EmailVerification);
+const EmailVerificationPage = () => (
+  <EmailVerificationLayout>
+    <EmailVerification />
+  </EmailVerificationLayout>
+);
+
+export default EmailVerificationPage;
