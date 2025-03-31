@@ -19,4 +19,7 @@ export default defineConfig({
     include: ["./tests/**/*.test.tsx"], // Only run tests inside `tests/`
     exclude: [...configDefaults.exclude, "e2e/*"], // Exclude e2e tests
   },
+  build: {
+    target: 'esnext', // or specify a more recent version like 'chrome90', 'firefox90', etc.
+  },
 });
