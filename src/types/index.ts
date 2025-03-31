@@ -8,7 +8,7 @@ export interface RemoveConnectionData {
 
 export interface Notification {
   id: string;
-  type: "job" | "post" | "hiring" | "course" | "analytics" | "recommendation";
+  type: "job" | "post" | "recommendation" | "message" | "connection";
   content: string;
   time: string;
   profileImg?: string;
@@ -17,6 +17,7 @@ export interface Notification {
   location?: string;
   count?: number;
   isNew?: boolean;
+  read?:boolean;
 }
 
 export interface PostType {
@@ -128,7 +129,6 @@ export enum JobTypeEnum {
   internship = "Internship",
 }
 
-
 export interface UserLoginResponse {
   message: string;
   user: {
@@ -154,5 +154,47 @@ export interface UserStarterInterface {
   employeeType?: string;
   recentCompany?: string;
   birthDate?: Date;
-  is_verified:boolean
+  is_verified: boolean;
+}
+
+export interface ContactInfo {
+  phone_number: number;
+  country_code: string;
+  phone_type: string;
+  address: string;
+  birthday: string; // ISO formatted date string
+  website: string;
+}
+
+export interface Location {
+  country_region: string;
+  city: string;
+}
+
+export interface Bio {
+  contact_info: ContactInfo;
+  location: Location;
+  first_name: string;
+  last_name: string;
+  headline: string;
+  experience: string[];
+  education: string[];
+  website: string;
+}
+
+export interface UserProfile {
+  is_me: boolean;
+  bio: Bio;
+  profile_photo: string;
+  cover_photo: string;
+  number_of_connections: number;
+  contact_info: ContactInfo;
+  isSubscribed: boolean;
+  email: string;
+  follow_primary?: boolean;
+  is_in_received_connections?: boolean;
+  is_in_sent_connections?: boolean;
+  name_of_one_mutual_connection?: string;
+  isInConnections?:boolean;
+  isAlreadyFollowing?:boolean
 }

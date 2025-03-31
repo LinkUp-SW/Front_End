@@ -6,105 +6,38 @@
   padding: 0 16px;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   color: rgba(0, 0, 0, 0.9);
+  transition: background-color 0.3s, color 0.3s;
+}
+
+/* Dark mode variable colors */
+:root {
+  --text-primary: rgba(0, 0, 0, 0.9);
+  --text-secondary: rgba(0, 0, 0, 0.6);
+  --border-color: rgba(0, 0, 0, 0.08);
+  --hover-background: rgba(0, 0, 0, 0.08);
+  --background-primary: white;
+}
+
+.darkMode {
+  --text-primary: rgba(255, 255, 255, 0.87);
+  --text-secondary: rgba(255, 255, 255, 0.6);
+  --border-color: rgba(255, 255, 255, 0.12);
+  --hover-background: rgba(255, 255, 255, 0.12);
+  --background-primary: #111827;
 }
 
 .content {
   display: grid;
   grid-template-columns: 1fr 2.5fr 1fr;
   gap: 24px;
-  margin-top: 24px;
-}
-
-/* Left sidebar styles */
-.leftSidebar {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.profileCard {
-  border-radius: 10px;
-  overflow: hidden;
-  background-color: white;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
-}
-
-.profileHeader {
-  height: 60px;
-  background-color: #a0b4b7;
-}
-
-.profileContent {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 0 16px 16px;
-  position: relative;
-}
-
-.profileImage {
-  width: 72px;
-  height: 72px;
-  border-radius: 50%;
-  overflow: hidden;
-  border: 2px solid white;
-  position: relative;
-  margin-top: -36px;
-  background-color: white;
-}
-
-.profileImage img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.profileName {
-  margin: 16px 0 4px;
-  font-size: 18px;
-  font-weight: 600;
-  text-align: center;
-}
-
-.profileTitle {
-  margin: 0 0 4px;
-  font-size: 14px;
-  text-align: center;
-  color: rgba(0, 0, 0, 0.7);
-}
-
-.profileLocation {
-  margin: 0 0 4px;
-  font-size: 14px;
-  text-align: center;
-  color: rgba(0, 0, 0, 0.7);
-}
-
-.profileEducation {
-  margin: 4px 0 0;
-  font-size: 14px;
-  text-align: center;
-  color: rgba(0, 0, 0, 0.7);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.educationIcon {
-  margin-right: 4px;
 }
 
 .notificationSettings {
-  background-color: white;
+  background-color: var(--background-primary);
+  color: var(--text-primary);
   padding: 16px;
   border-radius: 10px;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
-}
-
-.notificationSettings h3 {
-  font-size: 16px;
-  font-weight: 600;
-  margin: 0 0 8px;
+  box-shadow: 0 0 0 1px var(--border-color);
 }
 
 .settingsLink {
@@ -118,28 +51,25 @@
   text-decoration: underline;
 }
 
-/* Main content wrapper for tabContainer + mainContent */
 .mainContentWrapper {
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
-/* New standalone tab container */
 .standaloneTabContainer {
   display: flex;
   padding: 4px;
-  background-color: white;
+  background-color: var(--background-primary);
   border-radius: 10px;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
-  align-items: center; /* Ensure vertical alignment */
+  box-shadow: 0 0 0 1px var(--border-color);
+  align-items: center;
 }
 
-/* Main content area styles */
 .mainContent {
-  background-color: white;
+  background-color: var(--background-primary);
   border-radius: 10px;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 0 0 1px var(--border-color);
   overflow: hidden;
 }
 
@@ -149,34 +79,32 @@
   border-radius: 18px; 
   font-size: 14px;
   font-weight: 600;
-  color: rgba(0, 0, 0, 0.6);
+  color: var(--text-secondary);
   cursor: pointer;
   margin: 4px;
   transition: background-color 0.2s;
   display: flex;
   align-items: center;
-  justify-content: center; /* Center text and arrow */
-  border: 1px solid rgba(0, 0, 0, 0.3); 
+  justify-content: center;
+  border: 1px solid var(--border-color);
   height: 40px;
   line-height: 1; 
 }
 
 .tabButton:hover {
-  background-color: rgba(0, 0, 0, 0.08);
+  background-color: var(--hover-background);
 }
 
 .activeTab {
-  background-color: #057642 !important; /* Green */
+  background-color: #057642 !important;
   color: white !important;
 }
 
-/* Posts tab dropdown styles - New/Modified */
 .postsTabContainer {
   position: relative;
-  display: inline-flex; /* Changed to inline-flex for better alignment */
+  display: inline-flex;
   margin: 4px;
-  z-index: 100;
-  align-items: center; /* Vertical alignment */
+  align-items: center;
 }
 
 .dropdownArrow {
@@ -186,20 +114,31 @@
   display: inline-block;
 }
 
-.activeTab .dropdownArrow {
-  color: white;
-}
-
 .postDropdown {
   position: absolute;
   top: 100%;
   left: 0;
   width: 180px;
-  background-color: white;
+  background-color: var(--background-primary);
   border-radius: 8px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   z-index: 10;
   margin-top: 4px;
+  overflow: hidden;
+  animation: fadeIn 0.2s ease-out;
+}
+
+/* Mobile Post Dropdown */
+.mobilePostDropdown {
+  position: fixed;
+  top: 30%;
+  left: 35%;
+  transform: translate(-50%, -50%);
+  width: 180px;
+  background-color: var(--background-primary);
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
   overflow: hidden;
 }
 
@@ -207,7 +146,12 @@
   padding: 12px 16px;
   font-size: 14px;
   font-weight: 600;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-primary);
+  position: sticky;
+  top: 0;
+  background-color: var(--background-primary);
+  z-index: 10;
 }
 
 .dropdownItem {
@@ -216,26 +160,16 @@
   cursor: pointer;
   transition: background-color 0.2s;
   position: relative;
+  color: var(--text-primary);
 }
 
 .dropdownItem:hover {
-  background-color: rgba(0, 0, 0, 0.05);
+  background-color: var(--hover-background);
 }
 
 .activeDropdownItem {
   font-weight: 600;
-  color: #057642; /* Green text for active item */
-  position: relative;
-}
-
-.activeDropdownItem::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 3px;
-  background-color: #057642; /* Green indicator bar */
+  color: #057642;
 }
 
 .notificationsList {
@@ -243,20 +177,20 @@
   padding: 8px 0;
 }
 
-/* Notification item styles */
 .notificationItem {
-  display: grid;
+  display: flex;
   grid-template-columns: 4px 48px 1fr auto auto;
   gap: 12px;
-  padding: 16px;
+  padding: 15px;
   position: relative;
   align-items: center;
   cursor: pointer;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-primary);
 }
 
 .notificationItem:hover {
-  background-color: rgba(0, 0, 0, 0.04);
+  background-color: var(--hover-background);
 }
 
 .notificationIndicator {
@@ -266,6 +200,10 @@
   border-radius: 50%;
   align-self: start;
   margin-top: 8px;
+  position: absolute;
+  left: 1%;
+  top: 50%;
+  transform: translateY(-50%);
 }
 
 .notificationImage {
@@ -285,22 +223,25 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+  flex-grow: 1;
+  margin-left:10px;
 }
 
 .notificationContent p {
   margin: 0;
   font-size: 14px;
   line-height: 1.4;
+  color: var(--text-primary);
 }
 
 .notificationTime {
-  color: rgba(0, 0, 0, 0.6);
+  color: var(--text-secondary);
   font-size: 12px;
   white-space: nowrap;
 }
 
 .notificationOptions {
-  color: rgba(0, 0, 0, 0.6);
+  color: var(--text-secondary);
   font-size: 20px;
   font-weight: bold;
 }
@@ -317,8 +258,8 @@
   display: inline-block;
   padding: 6px 16px;
   border-radius: 16px;
-  border: 1px solid rgba(0, 0, 0, 0.6);
-  color: rgba(0, 0, 0, 0.6);
+  border: 1px solid var(--text-secondary);
+  color: var(--text-secondary);
   font-size: 14px;
   font-weight: 600;
   text-decoration: none;
@@ -328,10 +269,21 @@
 }
 
 .actionButton:hover {
-  background-color: rgba(0, 0, 0, 0.08);
+  background-color: var(--hover-background);
 }
 
-/* Empty state styles */
+.unreadNotification {
+  background-color: #e7f3ff;
+}
+
+.darkMode .unreadNotification {
+  background-color: #1F2937;
+}
+
+.readNotification {
+  background-color: var(--background-primary);
+}
+
 .emptyState {
   display: flex;
   flex-direction: column;
@@ -341,50 +293,28 @@
   text-align: center;
 }
 
-.emptyStateImage img {
-  width: 100%;
-  max-width: 300px;
-  height: auto;
-}
-
 .emptyStateTitle {
   font-size: 18px;
   font-weight: 600;
   margin: 16px 0 8px;
+  color: var(--text-primary);
 }
 
 .emptyStateDescription {
   font-size: 14px;
-  color: rgba(0, 0, 0, 0.6);
+  color: var(--text-secondary);
   margin: 0 0 20px;
   max-width: 300px;
 }
 
-.emptyStateAction {
-  display: inline-block;
-  padding: 8px 20px;
-  border-radius: 24px;
-  border: 1px solid #0a66c2; 
-  color: #0a66c2;
-  font-size: 14px;
-  font-weight: 600;
-  text-decoration: none;
-}
-
-.emptyStateAction:hover {
-  background-color: #d7e5f1;
-}
-
-/* Loading state styles */
 .loading {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 200px;
-  color: rgba(0, 0, 0, 0.6);
+  color: var(--text-secondary);
 }
 
-/* Right sidebar styles */
 .rightSidebar {
   display: flex;
   flex-direction: column;
@@ -393,115 +323,15 @@
 
 .adContainer {
   border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
-  width: 100%;
-}
-
-.hiringAd img {
-  width: 100%;
-  height: auto;
-  border-radius: 4px;
+  box-shadow: 0 0 0 1px var(--border-color);
+  width: 90%;
 }
 
 .footerLinks {
   font-size: 12px;
-  color: rgba(0, 0, 0, 0.6);
+  color: var(--text-secondary);
 }
-
-.linkRow {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-  margin-bottom: 8px;
-}
-
-.linkRow a {
-  color: rgba(0, 0, 0, 0.6);
-  text-decoration: none;
-}
-
-.linkRow a:hover {
-  color: #0a66c2;
-  text-decoration: underline;
-}
-
-.copyright {
-  margin-top: 16px;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  flex-wrap: wrap;
-}
-
-.linkedInLogo {
-  font-weight: bold;
-  color: #2751e9; 
-}
-
-/* Badge styles for notification type indicators */
-.badgeContainer {
-  display: flex;
-  gap: 4px;
-  margin-top: 4px;
-  flex-wrap: wrap;
-}
-
-.badge {
-  font-size: 12px;
-  padding: 2px 8px;
-  border-radius: 12px;
-  background-color: #f3f2ef;
-  color: rgba(0, 0, 0, 0.6);
-  margin-bottom: 4px;
-}
-
-.badgeJob {
-  background-color: #e7f5e8;
-  color: #057642;
-}
-
-.badgeComment {
-  background-color: #e7f0f5;
-  color: #0a66c2;
-}
-
-.badgeReaction {
-  background-color: #fef5e7;
-  color: #b24020;
-}
-
-.badgeRepost {
-  background-color: #f0e7f5;
-  color: #8f5db7;
-}
-
-/* Filter count badge for My Posts tab */
-.filterCountBadge {
-  font-size: 11px;
-  background-color: #057642;
-  color: white;
-  border-radius: 50%;
-  min-width: 16px;
-  height: 16px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  margin-left: 4px;
-  padding: 0 4px;
-}
-
-/* Animation for dropdown */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.postDropdown {
-  animation: fadeIn 0.2s ease-out;
-}
-
-/* Enhanced Responsive adjustments */
+/* Responsive adjustments */
 @media (max-width: 1200px) {
   .content {
     grid-template-columns: 1fr 2.2fr 1fr;
@@ -517,11 +347,6 @@
   .rightSidebar {
     display: none;
   }
-  
-  .profileTitle, 
-  .profileLocation {
-    font-size: 13px;
-  }
 }
 
 @media (max-width: 768px) {
@@ -534,48 +359,21 @@
     display: none;
   }
   
-  /* Adjusted tab styles for mobile */
   .standaloneTabContainer {
     overflow-x: auto;
     justify-content: flex-start;
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
+    -ms-overflow-style: none;  
+    scrollbar-width: none;  
   }
   
   .standaloneTabContainer::-webkit-scrollbar {
-    display: none; /* Chrome, Safari, Opera */
+    display: none; 
   }
   
   .tabButton {
     white-space: nowrap;
     padding: 10px 12px;
     font-size: 13px;
-  }
-  
-  /* Adjusted dropdown positioning for mobile */
-  .postDropdown {
-    position: absolute;
-    left: 0;
-    width: 160px;
-  }
-  
-  .notificationItem {
-    grid-template-columns: 4px 40px 1fr auto;
-    gap: 10px;
-    padding: 12px;
-  }
-  
-  .notificationImage {
-    width: 40px;
-    height: 40px;
-  }
-  
-  .notificationContent p {
-    font-size: 13px;
-  }
-  
-  .emptyState {
-    padding: 40px 16px;
   }
 }
 
@@ -646,7 +444,6 @@
   }
 }
 
-/* Additional breakpoint for very small screens */
 @media (max-width: 360px) {
   .tabButton {
     padding: 6px 8px;

@@ -40,7 +40,7 @@ const ForgetPasswordPage = () => {
         </h2>
         <p className="text-center text-sm font-semibold tracking-tight text-gray-600 dark:text-gray-300">
           We’ll send a verification code to this email or phone number if it
-          matches an existing LinkedIn account.
+          matches an existing LinkUp account.
         </p>
       </header>
       <FormInput

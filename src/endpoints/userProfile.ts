@@ -1,6 +1,6 @@
-import { ProfileCardType } from "@/types";
+import axiosInstance from "@/services/axiosInstance";
+import { ProfileCardType, UserProfile } from "@/types";
 import axios from "axios";
-
 
 export const getProfileCardData = async (): Promise<ProfileCardType> => {
   try {
@@ -14,4 +14,13 @@ export const getProfileCardData = async (): Promise<ProfileCardType> => {
     console.log(error);
     throw error;
   }
+};
+
+export const getUserBio = async (token: string, userId: string):Promise<UserProfile> => {
+  const response = await axiosInstance(`/api/v1/user/profile/bio/${userId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data;
 };

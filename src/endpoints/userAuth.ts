@@ -1,5 +1,6 @@
 import { UserLoginResponse, UserStarterInterface } from "@/types";
 import axiosInstance from "@/services/axiosInstance";
+import { AxiosRequestConfig } from "axios";
 
 export const signin = async (
   identifier: string,
@@ -54,10 +55,17 @@ export const initiateForgetPassword = async (email: string) => {
 };
 
 export const resetPassword = async (password: string, token: string) => {
-  const response = await axiosInstance.patch("/api/v1/user/reset-password", {
-    password,
-    token,
-  });
+  const response = await axiosInstance.patch(
+    "/api/v1/user/reset-password",
+    {
+      password,
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
   return response.data;
 };
 
@@ -66,7 +74,15 @@ export const userLogOut = async () => {
   return response.data;
 };
 
-export const validateAuthToken = async (): Promise<{ isValid: boolean }> => {
-  const response = await axiosInstance.get("/validate-token");
+export const validateAuthToken = async (
+  token: string,
+  config?: AxiosRequestConfig
+): Promise<{ message: string; success: boolean }> => {
+  const response = await axiosInstance.get("/api/v1/user/validate-token", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    ...config,
+  });
   return response.data;
 };
