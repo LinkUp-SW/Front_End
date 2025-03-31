@@ -31,7 +31,6 @@ const NavBar = () => {
   // and only if data hasn't been loaded yet.
   useEffect(() => {
     if (token && userId && !data && !loading) {
-      console.log("Fetching user bio");
       dispatch(fetchUserBio({ token, userId }));
     }
   }, [dispatch, token, userId, data, loading]);
