@@ -25,6 +25,9 @@ import {
 } from "./pages";
 
 import React from "react";
+import SearchPage from "./pages/search/SearchPage";
+
+
 
 // Define your routes as an array of RouteObject (compatible with React Router v6)
 const routes: RouteObject[] = [
@@ -63,7 +66,7 @@ const routes: RouteObject[] = [
   },
 
   {
-    path: "/followingfollowers",
+    path: "/following-followers",
     element: React.createElement(FollowingFollowersPage),
   },
 
@@ -111,6 +114,17 @@ const routes: RouteObject[] = [
     path: "*",
     element: React.createElement(NotFoundPage),
   },
+  
+    
+    
+      {
+        path: "/search/:query",
+        element: React.createElement(SearchPage),
+      }
+    
+    
+  
+  
 ];
 
 export default routes;
