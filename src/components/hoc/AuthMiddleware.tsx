@@ -1,4 +1,4 @@
-import { validateAuthToken } from "@/endpoints/userAuth";
+import { userLogOut, validateAuthToken } from "@/endpoints/userAuth";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
@@ -13,6 +13,7 @@ const AuthMiddleware = ({ children }: AuthMiddlewareProps) => {
   const navigate = useNavigate();
   const [isVerified, setIsVerified] = useState(false);
   const token = Cookies.get("linkup_auth_token");
+  const myUserId = Cookies.get("linkup_user_id");
 
   useEffect(() => {
     let isMounted = true;
@@ -20,7 +21,8 @@ const AuthMiddleware = ({ children }: AuthMiddlewareProps) => {
 
     const checkAuth = async () => {
       try {
-        if (!token) {
+        if (!token || !myUserId) {
+          await userLogOut();
           navigate("/login", { replace: true });
           return;
         }
@@ -30,7 +32,7 @@ const AuthMiddleware = ({ children }: AuthMiddlewareProps) => {
         });
 
         if (isMounted) {
-          if (!response.success) {
+          if (!response.success || !myUserId) {
             throw new Error("Invalid token");
           }
           setIsVerified(true);
@@ -39,7 +41,7 @@ const AuthMiddleware = ({ children }: AuthMiddlewareProps) => {
         if (isMounted) {
           Cookies.remove("linkup_auth_token");
           Cookies.remove("linkup_user_id");
-          
+
           let redirectPath = "/login";
           if (error instanceof AxiosError) {
             console.error("API Error:", error.response?.data);
@@ -48,9 +50,9 @@ const AuthMiddleware = ({ children }: AuthMiddlewareProps) => {
             console.error("Auth Error:", error.message);
           }
 
-          navigate(redirectPath, { 
+          navigate(redirectPath, {
             replace: true,
-            state: { from: location.pathname } // Preserve current location
+            state: { from: location.pathname }, // Preserve current location
           });
         }
       }

@@ -5,12 +5,15 @@ import { AxiosError } from "axios";
 import Cookies from "js-cookie";
 import { validateAuthToken } from "@/endpoints/userAuth";
 
-const UserAuthLayout = <P extends object>(WrappedComponent: React.ComponentType<P>): FC<P> => {
+const UserAuthLayout = <P extends object>(
+  WrappedComponent: React.ComponentType<P>
+): FC<P> => {
   // Return a proper functional component that uses hooks
   return function WrapperComponent(props: P) {
     const navigate = useNavigate();
     const [authCheckCompleted, setAuthCheckCompleted] = useState(false);
     const token = Cookies.get("linkup_auth_token");
+    const myUserId = Cookies.get("linkup_user_id");
 
     useEffect(() => {
       let isMounted = true;
@@ -18,7 +21,7 @@ const UserAuthLayout = <P extends object>(WrappedComponent: React.ComponentType<
 
       const checkAuth = async () => {
         try {
-          if (!token) {
+          if (!token || !myUserId) {
             if (isMounted) setAuthCheckCompleted(true);
             return;
           }
@@ -28,7 +31,7 @@ const UserAuthLayout = <P extends object>(WrappedComponent: React.ComponentType<
           });
 
           if (isMounted) {
-            if (response.success) {
+            if (response.success && myUserId) {
               navigate("/feed", { replace: true });
             } else {
               Cookies.remove("linkup_auth_token");
@@ -40,13 +43,13 @@ const UserAuthLayout = <P extends object>(WrappedComponent: React.ComponentType<
           if (isMounted) {
             Cookies.remove("linkup_auth_token");
             Cookies.remove("linkup_user_id");
-            
+
             if (error instanceof AxiosError) {
               console.error("API Error:", error.response?.data);
             } else if (error instanceof Error) {
               console.error("Auth Error:", error.message);
             }
-            
+
             setAuthCheckCompleted(true);
           }
         }
