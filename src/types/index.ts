@@ -2,9 +2,19 @@ export interface test {
   name: string;
 }
 export interface RemoveConnectionData {
-  userId: number;
+  userId: string;
   userName: string;
 }
+export interface UnfollowUserType {
+  userId: string;
+  userName: string;
+}
+
+export interface WithdrawInvitationType {
+  userId: string;
+  userName: string;
+}
+
 
 export interface Notification {
   id: string;
