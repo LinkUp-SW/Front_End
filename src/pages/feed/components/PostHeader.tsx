@@ -38,7 +38,7 @@ interface PostHeaderProps {
   action?: Action;
   postMenuOpen: boolean;
   setPostMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  menuActions: any[]; // You can replace `any` with a more specific type if available
+  menuActions: { name: string; icon: React.ReactNode; action: () => void }[];
   timeAgo: string;
   post: PostData;
 }
@@ -84,7 +84,7 @@ const PostHeader: React.FC<PostHeaderProps> = ({
                 </PopoverTrigger>
                 <PopoverContent className="relative right-30 dark:bg-gray-900 bg-white border-neutral-200 dark:border-gray-700 p-0 pt-1">
                   <div className="flex flex-col w-full p-0">
-                    {menuActions.map((item: any, index: number) =>
+                    {menuActions.map((item, index) =>
                       item.name == "Report Post" ? (
                         <DialogTrigger asChild key={index}>
                           <Button

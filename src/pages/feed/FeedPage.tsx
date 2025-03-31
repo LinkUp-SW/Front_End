@@ -16,30 +16,25 @@ import {
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
-import { CommentType, PostType, ProfileCardType } from "@/types";
+import { CommentType, PostType } from "@/types";
 import { getFeedPosts, getPostComments } from "@/endpoints/feed";
-import { getProfileCardData } from "@/endpoints/userProfile";
 
 const FeedPage = () => {
   const [viewMore, setViewMore] = useState(true);
   const screenWidth = useSelector((state: RootState) => state.screen.width);
 
   const [posts, setPosts] = useState<PostType[]>([]);
-  const [profile, setProfile] = useState<ProfileCardType>();
   const [comments, setComments] = useState<CommentType[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         // Call both endpoints concurrently
-        const [fetchedPosts, fetchedProfile, fetchedComments] =
-          await Promise.all([
-            getFeedPosts(),
-            getProfileCardData(),
-            getPostComments(),
-          ]);
+        const [fetchedPosts, fetchedComments] = await Promise.all([
+          getFeedPosts(),
+          getPostComments(),
+        ]);
         setPosts(fetchedPosts);
-        setProfile(fetchedProfile);
         setComments(fetchedComments);
       } catch (error) {
         console.error("Error fetching feed data", error);
@@ -62,8 +57,8 @@ const FeedPage = () => {
       <div className="flex justify-center w-full px-0 ">
         <section className="flex w-full justify-center gap-4 px-4 sm:px-10 md:px-0 md:flex-row flex-col">
           {/* Left Sidebar */}
-          <aside className="flex flex-col self-center h-full w-full md:max-w-60">
-            {profile && <ProfileCard />}
+          <aside className="flex flex-col h-full w-full lg:max-w-60">
+            <ProfileCard />
             <Button
               variant="ghost"
               className="block md:hidden hover:cursor-pointer hover:bg-stone-200 w-full transition-colors my-2"
@@ -92,8 +87,8 @@ const FeedPage = () => {
             )}
           </aside>
           {/* Main Content */}
-          <main className="flex flex-col w-full md:max-w-[32rem] lg:max-w-[34.8rem]">
-            <CreatePost profileImageUrl={profile?.profileImage || ""} />
+          <main className="flex flex-col w-full lg:max-w-[34.8rem]">
+            <CreatePost />
             {posts.map((post, index) => (
               <Post key={index} postData={post} comments={comments} />
             ))}

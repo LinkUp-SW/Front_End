@@ -1,35 +1,36 @@
 import React from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Card, CardContent } from "../ui/card";
 import { FaUniversity } from "react-icons/fa";
 import { Avatar, AvatarFallback, AvatarImage, Button } from "../../components";
 import { Link } from "react-router-dom";
-import useFetchData from "@/hooks/useFetchData";
-import { getUserBio } from "@/endpoints/userProfile";
 import Cookies from "js-cookie";
+import { refetchUserBio } from "@/slices/user_profile/userBioSlice";
+import { RootState, AppDispatch } from "@/store"; // Ensure AppDispatch is exported from your store
+import { getErrorMessage } from "@/utils/errorHandler";
 
 const ProfileCard: React.FC = () => {
-  // const { data, loading, error, refetch } = useFetchData(
-  //   () => getProfileCardData(),
-  //   []
-  // );
-  const token = Cookies.get("linkup_auth_token");
+  // Use the correctly typed dispatch
+  const dispatch = useDispatch<AppDispatch>();
 
+  const token = Cookies.get("linkup_auth_token");
   const userId = Cookies.get("linkup_user_id");
 
-  const { data, loading, error, refetch } = useFetchData(
-    () => (token && userId ? getUserBio(token, userId) : Promise.resolve(null)),
-    [token, userId]
+  const { data, loading, error } = useSelector(
+    (state: RootState) => state.userBio
   );
 
   if (error) {
     return (
       <Card className="mb-2 bg-white border-0 dark:bg-gray-900 dark:text-neutral-200 w-full">
         <CardContent className="flex flex-col items-center justify-center w-full md:px-6 px-0 py-6">
-          <p className="text-red-500 text-center">
-            Error loading profile data.
-          </p>
+          <p className="text-red-500 text-center">{getErrorMessage(error)}</p>
           <Button
-            onClick={refetch}
+            onClick={() => {
+              if (token && userId) {
+                dispatch(refetchUserBio({ token, userId }));
+              }
+            }}
             variant="outline"
             className="mt-4 px-4 py-2 rounded cursor-pointer transition-colors bg-white text-gray-800 border border-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-600 dark:hover:bg-gray-700"
           >
@@ -69,24 +70,21 @@ const ProfileCard: React.FC = () => {
 
   return (
     <Card className="mb-2 bg-white border-0 dark:bg-gray-900 dark:text-neutral-200 w-full">
-      <CardContent className="flex flex-col  items-center w-full relative md:px-6 px-0 ">
+      <CardContent className="flex flex-col items-center w-full relative md:px-6 px-0 ">
         <Link
-          className="flex flex-col gap-y-1 items-start w-full   hover:cursor-pointer"
+          className="flex flex-col gap-y-1 items-start hover:cursor-pointer w-full"
           to={`/user-profile/${userId}`}
         >
-          <header
-            className="absolute md:-left-0 -top-6 h-15 
-            w-full  bg-gray-200 rounded-t-xl"
-          >
+          <header className="absolute md:-left-0 -top-6 h-15 w-full bg-gray-200 rounded-t-xl">
             <img
               src={data?.cover_photo}
               alt="Cover"
-              className="w-full h-full min-h-20 rounded-t-md "
+              className="w-full h-full min-h-20 rounded-t-md"
             />
           </header>
           <section className="md:px-0 px-6">
             <Avatar className="h-19 w-19">
-              <AvatarImage src={data?.profile_photo} alt={"user-profile"} />
+              <AvatarImage src={data?.profile_photo} alt="user-profile" />
               <AvatarFallback>{"name.charAt(0)"}</AvatarFallback>
             </Avatar>
             <div className="absolute border-white border-3 top-0 px-0 rounded-full h-19 w-19"></div>

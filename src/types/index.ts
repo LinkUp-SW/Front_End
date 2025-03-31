@@ -192,7 +192,7 @@ export interface Bio {
   website: string;
 }
 
-export interface UserProfile {
+export interface UserProfileBio {
   is_me: boolean;
   bio: Bio;
   profile_photo: string;
@@ -205,6 +205,6 @@ export interface UserProfile {
   is_in_received_connections?: boolean;
   is_in_sent_connections?: boolean;
   name_of_one_mutual_connection?: string;
-  isInConnections?:boolean;
-  isAlreadyFollowing?:boolean
+  isInConnections?: boolean;
+  isAlreadyFollowing?: boolean;
 }

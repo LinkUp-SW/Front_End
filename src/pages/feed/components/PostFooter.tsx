@@ -12,7 +12,7 @@ import { CommentType } from "@/types";
 import { GoFileMedia as MediaIcon } from "react-icons/go";
 import CommentWithReplies from "./CommentWithReplies";
 import { MdOutlineEmojiEmotions } from "react-icons/md";
-import EmojiPicker, { Theme } from "emoji-picker-react";
+import EmojiPicker, { Theme, EmojiClickData } from "emoji-picker-react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 
@@ -82,7 +82,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
 
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const handleEmojiRequest = (emoji: any) => {
+  const handleEmojiRequest = (emoji: EmojiClickData) => {
     setCommentInput((prevMessage) => prevMessage + emoji.emoji);
   };
 
