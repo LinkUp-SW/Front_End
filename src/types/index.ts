@@ -181,7 +181,7 @@ export interface Bio {
   website: string;
 }
 
-export interface UserProfile {
+export interface UserProfileBio {
   is_me: boolean;
   bio: Bio;
   profile_photo: string;

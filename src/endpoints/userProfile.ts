@@ -1,5 +1,5 @@
 import axiosInstance from "@/services/axiosInstance";
-import { ProfileCardType, UserProfile } from "@/types";
+import { ProfileCardType, UserProfileBio } from "@/types";
 import axios from "axios";
 
 export const getProfileCardData = async (): Promise<ProfileCardType> => {
@@ -19,7 +19,7 @@ export const getProfileCardData = async (): Promise<ProfileCardType> => {
 export const getUserBio = async (
   token: string,
   userId: string
-): Promise<UserProfile> => {
+): Promise<UserProfileBio> => {
   const response = await axiosInstance.get(`/api/v1/user/profile/bio/${userId}`, {
     headers: {
       Authorization: `Bearer ${token}`,
