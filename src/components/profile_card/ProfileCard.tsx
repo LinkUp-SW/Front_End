@@ -16,7 +16,7 @@ const ProfileCard: React.FC = () => {
   const token = Cookies.get("linkup_auth_token");
   const userId = Cookies.get("linkup_user_id");
 
-  const { data, isLoading, error } = useSelector(
+  const { data, loading, error } = useSelector(
     (state: RootState) => state.userBio
   );
 
@@ -41,7 +41,7 @@ const ProfileCard: React.FC = () => {
     );
   }
 
-  if (isLoading) {
+  if (loading) {
     return (
       <Card className="mb-2 bg-white border-0 dark:bg-gray-900 dark:text-neutral-200 w-full animate-pulse">
         <CardContent className="flex flex-col items-center w-full md:px-6 px-0">

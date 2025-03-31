@@ -22,18 +22,21 @@ const NavBar = () => {
   const token = Cookies.get("linkup_auth_token");
   const userId = Cookies.get("linkup_user_id");
 
-  const { data, isLoading, error } = useSelector(
+  // Make sure to use the correct state property names (loading instead of loading)
+  const { data, loading, error } = useSelector(
     (state: RootState) => state.userBio
   );
 
-  // Dispatch initial fetch on component mount if token and userId exist.
+  // Dispatch initial fetch on component mount if token and userId exist,
+  // and only if data hasn't been loaded yet.
   useEffect(() => {
-    if (token && userId) {
+    if (token && userId && !data && !loading) {
+      console.log("Fetching user bio");
       dispatch(fetchUserBio({ token, userId }));
     }
-  }, [dispatch, token, userId]);
+  }, [dispatch, token, userId, data, loading]);
 
-  // Display error notification if an error occurs during profile picture fetch
+  // Display error notification if an error occurs during profile picture fetch.
   useEffect(() => {
     if (error) {
       toast.error(getErrorMessage(error));
@@ -73,7 +76,7 @@ const NavBar = () => {
           <Popover>
             <PopoverTrigger asChild>
               <button className="hidden lg:flex flex-col items-center cursor-pointer text-gray-600 dark:text-gray-300">
-                {isLoading ? (
+                {loading ? (
                   <div className="h-7 w-7 animate-pulse rounded-full bg-gray-300" />
                 ) : (
                   <img
