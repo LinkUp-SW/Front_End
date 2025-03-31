@@ -1,4 +1,4 @@
-import React, { FC, ReactNode } from "react";
+import { FC, ReactNode } from "react";
 import linkUpLogo from "@/assets/link_up.png";
 
 interface EmailVerificationLayoutProps {

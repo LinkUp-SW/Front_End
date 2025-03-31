@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { People } from "./Invitations";
+// import { People } from "./Invitations";
 import { FaUserPlus } from "react-icons/fa";
 
+
 const ConnectWithPeople = () => {
-  const [people, setPeople] = useState<People[]>([
+  const [people, setPeople] = useState/*<People[]>*/([
     {
       id: 1,
       name: "Sama Mohamed",

@@ -1,19 +1,26 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { WithNavBar } from '../../components';
-import JobCategoryBar from "../../components/jobs_categories/JobsBar";
+import JobFilterBar from "../../components/jobs_categories/JobFilterBar";
 import JobListings from "./components/seeMorePageComponents/JobListings";
+import { JobFilters } from './types';
 
 const SeeMorePage: React.FC = () => {
-  const [selectedCategory, setSelectedCategory] = useState<string>("For You");
+  const [filters, setFilters] = useState<JobFilters>({
+    locations: [],
+    company: [],
+    experienceLevels: [],
+    workModes: [],
+    salaryRanges: []
+  });
 
-  const handleCategorySelect = (category: string): void => {
-    setSelectedCategory(category);
+  const handleFiltersChange = (newFilters: JobFilters) => {
+    setFilters(newFilters);
   };
 
   return (
     <div>
-      <JobCategoryBar selectedCategory={selectedCategory} onCategorySelect={handleCategorySelect} />
-      {selectedCategory === "For You" && <JobListings />}
+      <JobFilterBar onFiltersChange={handleFiltersChange} /> 
+      <JobListings filters={filters} />
     </div>
   );
 };
