@@ -10,19 +10,28 @@ import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { getErrorMessage } from "@/utils/errorHandler";
 import { toast } from "sonner";
 import { userLogOut } from "@/endpoints/userAuth";
-import useFetchData from "@/hooks/useFetchData";
 import Cookies from "js-cookie";
-import { getUserProfilePic } from "@/endpoints/userProfile";
+import { AppDispatch, RootState } from "@/store";
+import { fetchUserBio } from "@/slices/user_profile/userBioSlice";
+import { useDispatch, useSelector } from "react-redux";
 
 const NavBar = () => {
-  const authToken = Cookies.get("linkup_auth_token");
+  // Use the correctly typed dispatch
+  const dispatch = useDispatch<AppDispatch>();
+
+  const token = Cookies.get("linkup_auth_token");
   const userId = Cookies.get("linkup_user_id");
-  
-  const { data, loading, error } = useFetchData(() =>
-    authToken && userId
-      ? getUserProfilePic(authToken, userId)
-      : Promise.resolve(null)
+
+  const { data, isLoading, error } = useSelector(
+    (state: RootState) => state.userBio
   );
+
+  // Dispatch initial fetch on component mount if token and userId exist.
+  useEffect(() => {
+    if (token && userId) {
+      dispatch(fetchUserBio({ token, userId }));
+    }
+  }, [dispatch, token, userId]);
 
   // Display error notification if an error occurs during profile picture fetch
   useEffect(() => {
@@ -45,7 +54,7 @@ const NavBar = () => {
 
   // Use the profile picture if available; otherwise, fall back to a default image.
   const profilePictureUrl =
-    data?.profilePicture ||
+    data?.profile_photo ||
     "https://res.cloudinary.com/dyhnxqs6f/image/upload/v1719229880/meme_k18ky2_c_crop_w_674_h_734_x_0_y_0_u0o1yz.png";
 
   return (
@@ -64,7 +73,7 @@ const NavBar = () => {
           <Popover>
             <PopoverTrigger asChild>
               <button className="hidden lg:flex flex-col items-center cursor-pointer text-gray-600 dark:text-gray-300">
-                {loading ? (
+                {isLoading ? (
                   <div className="h-7 w-7 animate-pulse rounded-full bg-gray-300" />
                 ) : (
                   <img
