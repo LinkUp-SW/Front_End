@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { WithNavBar } from '../../components';
 import JobFilterBar from "../../components/jobs_categories/JobFilterBar";
 import JobListings from "./components/seeMorePageComponents/JobListings";

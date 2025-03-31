@@ -1,5 +1,3 @@
-// SavedJobsPage.tsx
-import React from 'react';
 import { WithNavBar } from '../../components';
 import LeftSidebar from './components/savedJobsPageComponents/LeftSideBar';
 import JobsDashboard from './components/savedJobsPageComponents/JobsDashboard';
