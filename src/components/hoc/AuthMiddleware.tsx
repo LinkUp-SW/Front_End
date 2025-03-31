@@ -14,59 +14,59 @@ const AuthMiddleware = ({ children }: AuthMiddlewareProps) => {
   const [isVerified, setIsVerified] = useState(false);
   const token = Cookies.get("linkup_auth_token");
 
-  useEffect(() => {
-    let isMounted = true;
-    const controller = new AbortController();
+  // useEffect(() => {
+  //   let isMounted = true;
+  //   const controller = new AbortController();
 
-    const checkAuth = async () => {
-      try {
-        if (!token) {
-          navigate("/login", { replace: true });
-          return;
-        }
+  //   const checkAuth = async () => {
+  //     try {
+  //       if (!token) {
+  //         navigate("/login", { replace: true });
+  //         return;
+  //       }
 
-        const response = await validateAuthToken(token, {
-          signal: controller.signal,
-        });
+  //       const response = await validateAuthToken(token, {
+  //         signal: controller.signal,
+  //       });
 
-        if (isMounted) {
-          if (!response.success) {
-            throw new Error("Invalid token");
-          }
-          setIsVerified(true);
-        }
-      } catch (error: unknown) {
-        if (isMounted) {
-          Cookies.remove("linkup_auth_token");
-          Cookies.remove("linkup_user_id");
-          
-          let redirectPath = "/login";
-          if (error instanceof AxiosError) {
-            console.error("API Error:", error.response?.data);
-            redirectPath += "?error=session_expired";
-          } else if (error instanceof Error) {
-            console.error("Auth Error:", error.message);
-          }
+  //       if (isMounted) {
+  //         if (!response.success) {
+  //           throw new Error("Invalid token");
+  //         }
+  //         setIsVerified(true);
+  //       }
+  //     } catch (error: unknown) {
+  //       if (isMounted) {
+  //         Cookies.remove("linkup_auth_token");
+  //         Cookies.remove("linkup_user_id");
 
-          navigate(redirectPath, { 
-            replace: true,
-            state: { from: location.pathname } // Preserve current location
-          });
-        }
-      }
-    };
+  //         let redirectPath = "/login";
+  //         if (error instanceof AxiosError) {
+  //           console.error("API Error:", error.response?.data);
+  //           redirectPath += "?error=session_expired";
+  //         } else if (error instanceof Error) {
+  //           console.error("Auth Error:", error.message);
+  //         }
 
-    checkAuth();
+  //         navigate(redirectPath, {
+  //           replace: true,
+  //           state: { from: location.pathname } // Preserve current location
+  //         });
+  //       }
+  //     }
+  //   };
 
-    return () => {
-      isMounted = false;
-      controller.abort();
-    };
-  }, [navigate, token]);
+  //   checkAuth();
 
-  if (!isVerified) {
-    return <>Loading...</>;
-  }
+  //   return () => {
+  //     isMounted = false;
+  //     controller.abort();
+  //   };
+  // }, [navigate, token]);
+
+  // if (!isVerified) {
+  //   return <>Loading...</>;
+  // }
 
   return <>{children}</>;
 };
