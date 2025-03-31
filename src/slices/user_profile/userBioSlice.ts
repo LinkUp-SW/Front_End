@@ -4,13 +4,13 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { AxiosError } from "axios";
 
 interface UserBioState {
-  isLoading: boolean;
+  loading: boolean;
   error: AxiosError | null;
   data: UserProfileBio | null;
 }
 
 const initialState: UserBioState = {
-  isLoading: false,
+  loading: false,
   data: null,
   error: null,
 };
@@ -67,32 +67,36 @@ const userBioSlice = createSlice({
   extraReducers: (builder) => {
     // Handlers for fetchUserBio
     builder.addCase(fetchUserBio.pending, (state) => {
-      state.isLoading = true;
+      state.loading = true;
       state.error = null;
     });
     builder.addCase(fetchUserBio.fulfilled, (state, action) => {
-      state.isLoading = false;
+      state.loading = false;
       state.data = action.payload;
     });
     builder.addCase(fetchUserBio.rejected, (state, action) => {
-      state.isLoading = false;
+      state.loading = false;
       // Use the rejected value if available, otherwise cast the error.
-      state.error = action.payload ? action.payload : (action.error as unknown as AxiosError);
+      state.error = action.payload
+        ? action.payload
+        : (action.error as unknown as AxiosError);
     });
 
     // Handlers for refetchUserBio
     builder.addCase(refetchUserBio.pending, (state) => {
-      state.isLoading = true;
+      state.loading = true;
       state.data = null;
       state.error = null;
     });
     builder.addCase(refetchUserBio.fulfilled, (state, action) => {
-      state.isLoading = false;
+      state.loading = false;
       state.data = action.payload;
     });
     builder.addCase(refetchUserBio.rejected, (state, action) => {
-      state.isLoading = false;
-      state.error = action.payload ? action.payload : (action.error as unknown as AxiosError);
+      state.loading = false;
+      state.error = action.payload
+        ? action.payload
+        : (action.error as unknown as AxiosError);
     });
   },
 });
