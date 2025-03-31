@@ -4,7 +4,6 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-  UserAuthLayout,
 } from "@/components";
 import { handleSaveCredentials } from "@/utils";
 import { useEffect, useState } from "react";
@@ -13,6 +12,7 @@ import { useNavigate } from "react-router-dom";
 import { useInterceptBackNavigation } from "@/hooks/useInterceptBackNavigation";
 import { COUNTRY_CITY_MAP } from "@/constants";
 import Cookies from "js-cookie";
+import EmailVerificationLayout from "../../components/EmailVerificationLayout";
 
 const LocationPage = () => {
   const [selectedCountry, setSelectedCountry] = useState<string>("");
@@ -58,7 +58,8 @@ const LocationPage = () => {
   if (!savedCredential) return null;
 
   return (
-    <main className="flex min-h-full w-full max-w-md flex-col justify-center relative pt-4">
+    <EmailVerificationLayout>
+<main className="flex min-h-full w-full max-w-md flex-col justify-center relative pt-4">
       <header className="sm:w-full flex flex-col gap-2 items-center">
         <h2 className="text-center text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
           Welcome, What's Your Location
@@ -125,7 +126,9 @@ const LocationPage = () => {
         Continue
       </button>{" "}
     </main>
+    </EmailVerificationLayout>
+    
   );
 };
 
-export default UserAuthLayout(LocationPage);
+export default LocationPage;
