@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { WithNavBar } from '../../components';
 import Sidebar from './components/jobsPageComponents/Sidebar';
 import TopJobPicks from './components/jobsPageComponents/TopJobsPicks';

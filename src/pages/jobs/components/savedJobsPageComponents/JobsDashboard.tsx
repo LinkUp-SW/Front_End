@@ -68,7 +68,7 @@ const JobsDashboard: React.FC = () => {
                       <p className="text-sm text-gray-800 dark:text-gray-300">{job.company}</p>
                       <p className="text-sm text-gray-500 dark:text-gray-400">{job.location}</p>
                       <p className="text-sm text-gray-500 dark:text-gray-400">
-                        Posted {job.postedTime || job.timePosted} • <span className="text-blue-600 dark:text-blue-400">Easy Apply</span>
+                        Posted {job.postedTime} • <span className="text-blue-600 dark:text-blue-400">Easy Apply</span>
                       </p>
                     </div>
                   </div>

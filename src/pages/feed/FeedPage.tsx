@@ -55,13 +55,13 @@ const FeedPage = () => {
   return (
     <>
       <div className="flex justify-center w-full px-0 ">
-        <section className="flex w-full justify-center gap-4 lg:flex-row flex-col">
+        <section className="flex w-full justify-center gap-4 px-4 sm:px-10 md:px-0 md:flex-row flex-col">
           {/* Left Sidebar */}
           <aside className="flex flex-col h-full w-full lg:max-w-60">
             <ProfileCard />
             <Button
               variant="ghost"
-              className="block lg:hidden hover:cursor-pointer hover:bg-stone-200 w-full transition-colors my-2"
+              className="block md:hidden hover:cursor-pointer hover:bg-stone-200 w-full transition-colors my-2"
               onClick={() => setViewMore(!viewMore)}
             >
               <div className="flex justify-center gap-x-2 items-center">
