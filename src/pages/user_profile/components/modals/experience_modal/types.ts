@@ -1,6 +1,6 @@
 export interface MediaItem {
   id: string;
-  file: File;
-  title: string;
-  description: string;
+  media: string,
+  title: string,
+  description: string
 }

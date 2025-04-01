@@ -1,5 +1,5 @@
 import axiosInstance from "@/services/axiosInstance";
-import { ProfileCardType, UserProfileBio } from "@/types";
+import { Experience, ProfileCardType, UserProfileBio } from "@/types";
 import axios from "axios";
 
 export const getProfileCardData = async (): Promise<ProfileCardType> => {
@@ -20,11 +20,14 @@ export const getUserBio = async (
   token: string,
   userId: string
 ): Promise<UserProfileBio> => {
-  const response = await axiosInstance.get(`/api/v1/user/profile/bio/${userId}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  const response = await axiosInstance.get(
+    `/api/v1/user/profile/bio/${userId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
   return response.data;
 };
 
@@ -42,3 +45,57 @@ export const getUserProfilePic = async (
   );
   return response.data;
 };
+
+export const getUserExperience = async (token: string, userId: string):Promise<{is_me:boolean;work_experience:Experience[]}> => {
+  const response = await axiosInstance.get(
+    `/api/v1/user/profile/experience/${userId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
+
+export const getUserEducation = async (token: string, userId: string) => {
+  const response = await axiosInstance.get(
+    `/api/v1/user/profile/education//${userId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
+
+export const getUserSkills = async (token: string, userId: string) => {
+  const response = await axiosInstance.get(
+    `/api/v1/user/profile/skills/${userId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
+
+export const addWorkExperience = async (
+  token: string,
+  workExperienceForm: Experience
+): Promise<{ message: string; experience: Experience }> => {
+  const response = await axiosInstance.post(
+    `/api/v1/user/add-work-experience`,
+    workExperienceForm,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
+
+///api/v1/search/company/:query
