@@ -1,4 +1,3 @@
-// src/components/AddSectionModal.tsx
 import React from "react";
 import {
   Dialog,
@@ -13,7 +12,9 @@ import AddProfileSectionModal from "../../../modals/add_profile_section_modal/Ad
 const AddSectionModal: React.FC = () => (
   <Dialog>
     <DialogTrigger asChild>
-      <CustomButton variant="secondary">Add profile section</CustomButton>
+      <CustomButton id="add-profile-section-button" variant="secondary">
+        Add profile section
+      </CustomButton>
     </DialogTrigger>
     <DialogContent className="!max-w-5xl gap-0 md:!w-[33rem] overflow-y-auto rounded-lg dark:bg-gray-900 p-6 max-h-[45rem]">
       <DialogHeader>

@@ -1,4 +1,3 @@
-// src/components/ResourcesPopover.tsx
 import React from "react";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components";
 import CustomButton from "./CustomButton";
@@ -49,7 +48,9 @@ const ResourcesPopover: React.FC<ResourcesPopoverProps> = (props) => {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <CustomButton variant="outline">{title}</CustomButton>
+        <CustomButton id="resources-popover-trigger" variant="outline">
+          {title}
+        </CustomButton>
       </PopoverTrigger>
       <PopoverContent className="w-44 dark:bg-gray-900 dark:border-gray-700 dark:text-white">
         {isOwner ? (
@@ -91,6 +92,7 @@ const OwnerPopoverContent: React.FC<OwnerPopoverContentProps> = ({
 }) => (
   <div className="grid gap-2">
     <button
+      id="owner-popover-blocked-users-button"
       onClick={onViewBlockedUsers}
       className="w-full dark:hover:bg-gray-700 inline-flex text-xs font-semibold cursor-pointer transition-all duration-300 ease-in-out hover:bg-gray-200 p-2 rounded items-center gap-2"
     >
@@ -98,6 +100,7 @@ const OwnerPopoverContent: React.FC<OwnerPopoverContentProps> = ({
       <span>Blocked users</span>
     </button>
     <button
+      id="owner-popover-activity"
       onClick={onViewActivity}
       className="w-full dark:hover:bg-gray-700 inline-flex text-xs font-semibold cursor-pointer transition-all duration-300 ease-in-out hover:bg-gray-200 p-2 rounded items-center gap-2"
     >
@@ -105,6 +108,7 @@ const OwnerPopoverContent: React.FC<OwnerPopoverContentProps> = ({
       <span>Activity</span>
     </button>
     <button
+      id="owner-popover-about-profile-button"
       onClick={onAboutProfile}
       className="w-full dark:hover:bg-gray-700 inline-flex text-xs font-semibold cursor-pointer transition-all duration-300 ease-in-out hover:bg-gray-200 p-2 rounded items-center gap-2"
     >
@@ -144,6 +148,7 @@ const NonOwnerPopoverContent: React.FC<NonOwnerPopoverContentProps> = ({
   <div className="grid gap-2">
     {!followPrimary ? (
       <button
+        id="non-owner-follow-button"
         onClick={isFollowing ? onUnfollow : onFollow}
         className="w-full dark:hover:bg-gray-700 inline-flex text-xs font-semibold cursor-pointer transition-all duration-300 ease-in-out hover:bg-gray-200 p-2 rounded items-center gap-2"
       >
@@ -161,6 +166,7 @@ const NonOwnerPopoverContent: React.FC<NonOwnerPopoverContentProps> = ({
       </button>
     ) : (
       <button
+        id="non-owner-connection-button"
         onClick={
           isPendingConnection
             ? onCancelRequest
@@ -189,6 +195,7 @@ const NonOwnerPopoverContent: React.FC<NonOwnerPopoverContentProps> = ({
       </button>
     )}
     <button
+      id="non-owner-report-block-button"
       onClick={onBlock}
       className="w-full dark:hover:bg-gray-700 inline-flex text-xs font-semibold cursor-pointer transition-all duration-300 ease-in-out hover:bg-gray-200 p-2 rounded items-center gap-2"
     >
@@ -196,6 +203,7 @@ const NonOwnerPopoverContent: React.FC<NonOwnerPopoverContentProps> = ({
       <span>Report/Block</span>
     </button>
     <button
+      id="non-owner-about-button"
       onClick={onAboutProfile}
       className="w-full dark:hover:bg-gray-700 inline-flex text-xs font-semibold cursor-pointer transition-all duration-300 ease-in-out hover:bg-gray-200 p-2 rounded items-center gap-2"
     >
