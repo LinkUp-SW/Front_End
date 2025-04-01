@@ -4,8 +4,13 @@ import { useState } from "react";
 interface SkillsManagerProps {
   skills: string[];
   setSkills: (skills: string[]) => void;
+  id: string;
 }
-const SkillsManager: React.FC<SkillsManagerProps> = ({ skills, setSkills }) => {
+const SkillsManager: React.FC<SkillsManagerProps> = ({
+  skills,
+  setSkills,
+  id,
+}) => {
   const [skillInput, setSkillInput] = useState("");
 
   const addSkill = () => {
@@ -33,12 +38,19 @@ const SkillsManager: React.FC<SkillsManagerProps> = ({ skills, setSkills }) => {
   };
 
   return (
-    <div className="flex flex-col gap-2 pt-5">
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-gray-500 dark:text-gray-400">
+    <div id={`${id}-container`} className="flex flex-col gap-2 pt-5">
+      <div
+        id={`${id}-header-container`}
+        className="flex items-center justify-between"
+      >
+        <h2
+          id={`${id}-header`}
+          className="text-lg font-semibold text-gray-500 dark:text-gray-400"
+        >
           Skills
         </h2>
         <button
+          id={`${id}-add-button`}
           type="button"
           onClick={addSkill}
           className="flex items-center gap-1 text-blue-600 cursor-pointer border border-blue-600 dark:border-blue-400 hover:bg-blue-600 dark:hover:bg-blue-300 hover:text-white dark:hover:text-gray-800 font-semibold transition-all duration-300 px-2 py-1 rounded-full dark:text-blue-400 text-sm"
@@ -47,8 +59,9 @@ const SkillsManager: React.FC<SkillsManagerProps> = ({ skills, setSkills }) => {
           <span>Add skill</span>
         </button>
       </div>
-      <div className="flex flex-col gap-2">
+      <div id={`${id}-input-container`} className="flex flex-col gap-2">
         <input
+          id={`${id}-input`}
           type="text"
           placeholder="Enter skill"
           value={skillInput}
@@ -56,14 +69,16 @@ const SkillsManager: React.FC<SkillsManagerProps> = ({ skills, setSkills }) => {
           onChange={(e) => setSkillInput(e.target.value)}
           className="outline-gray-600 border p-2 rounded-md text-sm transition-all duration-300 ease-in-out dark:hover:border-white hover:border-black border-gray-600 focus:outline-0"
         />
-        <div className="flex flex-wrap gap-2">
+        <div id={`${id}-skills-list`} className="flex flex-wrap gap-2">
           {skills.map((skill, index) => (
             <div
+              id={`${id}-skill-item-${index}`}
               key={index}
               className="flex items-center gap-1 bg-gray-200 dark:bg-gray-700 rounded-full px-2 py-1"
             >
               <span>{skill}</span>
               <button
+                id={`${id}-remove-button-${index}`}
                 type="button"
                 onClick={() => removeSkill(index)}
                 className="text-red-600"
