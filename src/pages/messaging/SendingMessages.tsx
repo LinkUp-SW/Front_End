@@ -21,7 +21,7 @@ const SendingMessages = () => {
   const [files, setFiles] = useState<File[]>([]);
   const [selectedFile, setSelectedFile] = useState(false);
 
-  const handleEmojiRequest = (emoji: any) => {
+  const handleEmojiRequest = (emoji: { emoji: string }) => {
     setText((prevMessage) => prevMessage + emoji.emoji);
     setSelectedEmoji(false);
   };

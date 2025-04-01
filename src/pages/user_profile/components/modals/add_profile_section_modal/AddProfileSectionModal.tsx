@@ -1,7 +1,7 @@
 // AddProfileSectionModal.tsx
 import React, { Fragment } from "react";
-import { Accordion, AccordionItem } from "../../../../../components";
-import { CORE_PROFILE_SECTIONS } from "../../../../../constants";
+import { Accordion, AccordionItem } from "@/components";
+import { CORE_PROFILE_SECTIONS } from "@/constants";
 import {
   Dialog,
   DialogContent,
@@ -15,7 +15,7 @@ import { sectionModalMap } from "../SectionModals";
 
 const AddProfileSectionModal: React.FC = () => {
   return (
-    <div className="max-w-5xl md:w-[30rem] w-full">
+    <div className="max-w-5xl md:w-[29rem] w-full">
       <Accordion>
         <AccordionItem title="Core" defaultOpen>
           <p className="text-xs">
@@ -26,12 +26,15 @@ const AddProfileSectionModal: React.FC = () => {
             {CORE_PROFILE_SECTIONS.map((section, i) => (
               <Fragment key={section.id}>
                 <Dialog>
-                  <DialogTrigger asChild>
+                  <DialogTrigger id={section.id} asChild>
                     <button className="cursor-pointer text-gray-700 font-semibold dark:text-gray-300">
                       {section.title}
                     </button>
                   </DialogTrigger>
-                  <DialogContent className="!max-w-5xl gap-0 md:!w-[38.5rem] overflow-y-auto overflow-x-hidden rounded-lg p-6 max-h-[45rem] !w-full">
+                  <DialogContent
+                    id={sectionModalMap[section.key].id}
+                    className="!max-w-5xl gap-0 md:!w-[38.5rem] dark:bg-gray-900 border-gray-900 overflow-y-auto overflow-x-hidden rounded-lg p-6 max-h-[45rem] !w-full"
+                  >
                     <DialogHeader>
                       <DialogTitle>
                         <Header title={sectionModalMap[section.key].title} />

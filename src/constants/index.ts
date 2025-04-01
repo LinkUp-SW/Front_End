@@ -7,6 +7,7 @@ import { HiOutlineDocumentText } from "react-icons/hi";
 import { BsBarChartLine } from "react-icons/bs";
 import { CgTimelapse } from "react-icons/cg";
 import { RiMoreLine } from "react-icons/ri";
+import { Job } from "../pages/jobs/types";
 
 export const LARGE_SCREEN_NAV_ITEMS = [
   {
@@ -85,37 +86,37 @@ export const FILTERS_LIST = Object.values(FILTER_OPTIONS);
 
 export const CORE_PROFILE_SECTIONS = [
   {
-    id: 1,
+    id: "add-profile-photo-button",
     title: "Add profile photo",
     key: "profile_photo",
   },
   {
-    id: 2,
+    id: "add-about-button",
     title: "Add about",
     key: "about",
   },
   {
-    id: 3,
+    id: "add-education-button",
     title: "Add education",
     key: "education",
   },
   {
-    id: 4,
+    id: "add-experience-button",
     title: "Add experience",
     key: "experience",
   },
   {
-    id: 5,
+    id: "add-services-button",
     title: "Add services",
     key: "services",
   },
   {
-    id: 6,
+    id: "add-career-break-button",
     title: "Add career break",
     key: "career_break",
   },
   {
-    id: 7,
+    id: "add-skills-button",
     title: "Add skills",
     key: "skills",
   },
@@ -144,7 +145,7 @@ export const FOOTER_LINKS = [
   { text: "Ad Choices", url: "#" },
   { text: "Advertising", url: "#" },
   { text: "Business Services", url: "#", hasArrow: true },
-  { text: "Get the LinkedIn app", url: "#" },
+  { text: "Get the LinkUp app", url: "#" },
   { text: "More", url: "#" },
 ];
 
@@ -194,36 +195,43 @@ export const JOB_CATEGORIES = [
   "Digital Security",
 ];
 
-export const SAMPLE_JOBS = [
+export const SAMPLE_JOBS: Job[] = [
   {
     id: "1",
     title: "Project Manager (Remote)",
     company: "Virtual Worker Now",
     location: "Egypt (Remote)",
+    experience_level: "Mid-Senior level",
     isRemote: true,
     isSaved: false,
     logo: "/api/placeholder/60/60",
     isPromoted: true,
     hasEasyApply: true,
     reviewTime: "4 days",
+    workMode: "Remote",
+    salary: "Confidential",
   },
   {
     id: "2",
     title: "Business Analyst",
     company: "PSA BDP",
     location: "Cairo, Cairo, Egypt (On-site)",
+    experience_level: "Entry level",
     isRemote: false,
     isSaved: true,
     logo: "/api/placeholder/60/60",
     isPromoted: true,
     hasEasyApply: true,
     alumniCount: 2,
+    workMode: "On-site",
+    salary: "$3,000 - $4,500/month",
   },
   {
     id: "3",
     title: "Digital Product Manager",
     company: "Vezeeta",
     location: "Cairo, Egypt (On-site)",
+    experience_level: "Associate",
     isRemote: false,
     isSaved: true,
     logo: "/api/placeholder/60/60",
@@ -231,42 +239,18 @@ export const SAMPLE_JOBS = [
     hasEasyApply: false,
     alumniCount: 21,
     applied: true,
-  },
-  {
-    id: "4",
-    title: "Project Manager",
-    company: "Tahaluf",
-    location: "Riyadh, Riyadh, Saudi Arabia (On-site)",
-    isRemote: false,
-    isSaved: false,
-    logo: "/api/placeholder/60/60",
-    isPromoted: false,
-    hasEasyApply: true,
-    timePosted: "2 hours ago",
-    alumniCount: 2,
-  },
-  {
-    id: "5",
-    title: "Project Manager Officer",
-    company: "DXC Technology",
-    location: "Egypt (Remote)",
-    isRemote: true,
-    isSaved: false,
-    logo: "/api/placeholder/60/60",
-    isPromoted: false,
-    hasEasyApply: false,
-    connections: 4,
-    applied: true,
-    verified: true,
+    workMode: "On-site",
+    salary: "$5,000 - $6,500/month",
   },
 ];
 
-export const MORE_JOBS = [
+export const MORE_JOBS: Job[] = [
   {
     id: "6",
     title: "Mid Level Software Project Manager",
     company: "Arcsen",
     location: "Cairo, Cairo, Egypt (On-site)",
+    experience_level: "Mid-Senior level",
     isRemote: false,
     isSaved: false,
     logo: "/api/placeholder/60/60",
@@ -274,71 +258,22 @@ export const MORE_JOBS = [
     hasEasyApply: true,
     alumniCount: 5,
     postedTime: "5 months ago",
+    workMode: "On-site",
+    salary: "$4,500 - $6,000/month",
   },
   {
     id: "7",
     title: "Product Manager",
     company: "Clay",
     location: "Egypt (Remote)",
+    experience_level: "Mid-Senior level",
     isRemote: true,
     isSaved: false,
     logo: "/api/placeholder/60/60",
     isPromoted: true,
     hasEasyApply: true,
-  },
-  {
-    id: "8",
-    title: "Senior Software Product Owner (Fintech)",
-    company: "Arib",
-    location: "Qesm 1st Nasser City, Cairo, Egypt (On-site)",
-    isRemote: false,
-    isSaved: false,
-    logo: "/api/placeholder/60/60",
-    isPromoted: true,
-    hasEasyApply: true,
-    responseTime: "1-2 weeks",
-  },
-  {
-    id: "9",
-    title: "Product Owner",
-    company: "Mondia Group",
-    location: "Cairo, Cairo, Egypt (Hybrid)",
-    isRemote: false,
-    isSaved: false,
-    logo: "/api/placeholder/60/60",
-    isPromoted: false,
-    hasEasyApply: true,
-    alumniCount: 14,
-    postedTime: "1 month ago",
-    workMode: "Hybrid",
-  },
-  {
-    id: "10",
-    title: "SAP Agile Master",
-    company: "Luxoft",
-    location: "Cairo, Egypt (Hybrid)",
-    isRemote: false,
-    isSaved: false,
-    logo: "/api/placeholder/60/60",
-    isPromoted: false,
-    hasEasyApply: false,
-    applied: true,
-    responseTime: "4 days",
-    workMode: "Hybrid",
-    verified: true,
-  },
-  {
-    id: "11",
-    title: "Product Manager",
-    company: "Azentio",
-    location: "Cairo, Egypt (Hybrid)",
-    isRemote: false,
-    isSaved: false,
-    logo: "/api/placeholder/60/60",
-    isPromoted: false,
-    hasEasyApply: false,
-    alumniCount: 6,
-    workMode: "Hybrid",
+    workMode: "Remote",
+    salary: "Confidential",
   },
 ];
 
@@ -362,10 +297,6 @@ export const POST_ACTIONS: Record<string, string> = {
   celebrate: "celebrates this",
   error: "no action",
 };
-
-
-
-
 
 // Map of Egypt and Middle Eastern countries to their corresponding major cities
 export const COUNTRY_CITY_MAP: { [key: string]: string[] } = {

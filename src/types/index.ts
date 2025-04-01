@@ -2,13 +2,23 @@ export interface test {
   name: string;
 }
 export interface RemoveConnectionData {
-  userId: number;
+  userId: string;
+  userName: string;
+}
+export interface UnfollowUserType {
+  userId: string;
   userName: string;
 }
 
+export interface WithdrawInvitationType {
+  userId: string;
+  userName: string;
+}
+
+
 export interface Notification {
   id: string;
-  type: "job" | "post" | "hiring" | "course" | "analytics" | "recommendation";
+  type: "job" | "post" | "recommendation" | "message" | "connection";
   content: string;
   time: string;
   profileImg?: string;
@@ -17,6 +27,7 @@ export interface Notification {
   location?: string;
   count?: number;
   isNew?: boolean;
+  read?:boolean;
 }
 
 export interface PostType {
@@ -181,7 +192,7 @@ export interface Bio {
   website: string;
 }
 
-export interface UserProfile {
+export interface UserProfileBio {
   is_me: boolean;
   bio: Bio;
   profile_photo: string;
@@ -194,6 +205,6 @@ export interface UserProfile {
   is_in_received_connections?: boolean;
   is_in_sent_connections?: boolean;
   name_of_one_mutual_connection?: string;
-  isInConnections?:boolean;
-  isAlreadyFollowing?:boolean
+  isInConnections?: boolean;
+  isAlreadyFollowing?: boolean;
 }
