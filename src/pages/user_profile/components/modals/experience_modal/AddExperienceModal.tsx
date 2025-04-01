@@ -10,12 +10,14 @@ import { useFormStatus } from "@/hooks/useFormStatus";
 import SkillsManager from "./components/SkillsManager";
 import MediaManager from "./components/MediaManager";
 import { MediaItem } from "./types";
-import { JobTypeEnum } from "@/types";
+import { Experience, JobTypeEnum } from "@/types";
+import { addWorkExperience } from "@/endpoints/userProfile";
+import Cookies from "js-cookie";
 
 export interface ExperienceFormData {
   title: string;
   employmentType: string;
-  company: string;
+  organization: string;
   currentlyWorking: boolean;
   startMonth: string;
   startYear: string;
@@ -24,18 +26,17 @@ export interface ExperienceFormData {
   location: string;
   locationType: string;
   description: string;
-  profileHeadline: string;
-  jobSource: string;
   skills: string[];
   media: MediaItem[];
 }
 
 const AddExperienceModal: React.FC = () => {
+  const authToken=Cookies.get('linkup_auth_token')
   const { isSubmitting, startSubmitting, stopSubmitting } = useFormStatus();
   const [formData, setFormData] = useState<ExperienceFormData>({
     title: "",
     employmentType: "",
-    company: "",
+    organization: "",
     currentlyWorking: false,
     startMonth: "",
     startYear: "",
@@ -44,8 +45,6 @@ const AddExperienceModal: React.FC = () => {
     location: "",
     locationType: "",
     description: "",
-    profileHeadline: "",
-    jobSource: "",
     skills: [],
     media: [],
   });
@@ -59,10 +58,30 @@ const AddExperienceModal: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     startSubmitting();
+    if(!authToken) return
     try {
+      const toBeSentFormData:Experience={
+        title:formData.title,
+          employee_type: formData.employmentType,
+          organization: {
+            _id:'67e6bb09dc0675f19ad10880',
+            logo:'',
+            name:'hello'
+          },
+          is_current: formData.currentlyWorking,
+          start_date: new Date(`${formData.startMonth} 1, ${formData.startYear}`),
+          end_date: formData.currentlyWorking?undefined:new Date(`${formData.endMonth} 1, ${formData.endYear}`),
+          location: formData.location,
+          description: formData.description,
+          location_type: formData.locationType,
+          skills: formData.skills, 
+          media: formData.media,
+      }
       // Example: simulate a network request
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      console.log("Submitted form data:", formData);
+      // await new Promise((resolve) => setTimeout(resolve, 2000));
+      console.log("Submitted form data:", toBeSentFormData);
+      const response=await addWorkExperience(authToken,toBeSentFormData)
+      console.log(response)
       // ... handle success, close modal, etc.
     } catch (err) {
       console.error(err);
@@ -74,7 +93,7 @@ const AddExperienceModal: React.FC = () => {
   return (
     <div
       id="add-experience-modal-container"
-      className="max-w-5xl sm:w-[35rem] w-full"
+      className="max-w-5xl sm:w-[35rem]  w-full"
     >
       <form
         id="experience-form"
@@ -105,10 +124,10 @@ const AddExperienceModal: React.FC = () => {
         <FormInput
           label="Company or Organization*"
           placeholder="Ex: Microsoft"
-          value={formData.company}
-          onChange={(e) => handleChange("company", e.target.value)}
-          id="company-name"
-          name="company"
+          value={formData.organization}
+          onChange={(e) => handleChange("organization", e.target.value)}
+          id="organization-name"
+          name="organization"
         />
         <FormCheckbox
           label="I am currently working in this role"
@@ -162,24 +181,8 @@ const AddExperienceModal: React.FC = () => {
           id="job-description"
           name="jobDescription"
         />
-        <FormInput
-          label="Profile headline"
-          placeholder=""
-          value={formData.profileHeadline}
-          onChange={(e) => handleChange("profileHeadline", e.target.value)}
-          helperText="Appears below your name at the top of the profile"
-          id="profile-headline"
-          name="profileHeadline"
-        />
-        <FormSelect
-          label="Where did you find this job?"
-          placeholder="Please select"
-          value={formData.jobSource}
-          onValueChange={(value) => handleChange("jobSource", value)}
-          options={["linkedin", "company-website", "referral", "other"]}
-          id="job-source"
-          name="jobSource"
-        />
+
+
 
         {/* Skills Manager */}
         <SkillsManager
