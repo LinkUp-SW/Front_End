@@ -31,10 +31,10 @@ const NavBar = () => {
   // Dispatch initial fetch on component mount if token and userId exist,
   // and only if data hasn't been loaded yet.
   useEffect(() => {
-    if (token && userId && !data && !loading) {
+    if (token && userId && !data && !loading && !error) {
       dispatch(fetchUserBio({ token, userId }));
     }
-  }, [dispatch, token, userId, data, loading]);
+  }, [dispatch, token, userId, data, loading, error]);
 
   // Display error notification if an error occurs during profile picture fetch.
   useEffect(() => {
