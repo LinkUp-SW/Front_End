@@ -22,10 +22,22 @@ const ProfileCard: React.FC = () => {
 
   if (error) {
     return (
-      <Card className="mb-2 bg-white border-0 dark:bg-gray-900 dark:text-neutral-200 w-full">
-        <CardContent className="flex flex-col items-center justify-center w-full md:px-6 px-0 py-6">
-          <p className="text-red-500 text-center">{getErrorMessage(error)}</p>
+      <Card
+        id="profile-card-error"
+        className="mb-2 bg-white border-0 dark:bg-gray-900 dark:text-neutral-200 w-full"
+      >
+        <CardContent
+          id="profile-card-error-content"
+          className="flex flex-col items-center justify-center w-full md:px-6 px-0 py-6"
+        >
+          <p
+            id="profile-card-error-message"
+            className="text-red-500 text-center"
+          >
+            {getErrorMessage(error)}
+          </p>
           <Button
+            id="profile-card-retry-button"
             onClick={() => {
               if (token && userId) {
                 dispatch(refetchUserBio({ token, userId }));
@@ -43,23 +55,56 @@ const ProfileCard: React.FC = () => {
 
   if (loading) {
     return (
-      <Card className="mb-2 bg-white border-0 dark:bg-gray-900 dark:text-neutral-200 w-full animate-pulse">
-        <CardContent className="flex flex-col items-center w-full md:px-6 px-0">
-          <div className="flex flex-col gap-y-1 items-start w-full relative">
-            <header className="absolute md:-left-6 -top-6 h-15 md:w-60 w-full bg-gray-200 rounded-t-xl">
+      <Card
+        id="profile-card-loading"
+        className="mb-2 bg-white border-0 dark:bg-gray-900 dark:text-neutral-200 w-full animate-pulse"
+      >
+        <CardContent
+          id="profile-card-loading-content"
+          className="flex flex-col items-center w-full md:px-6 px-0"
+        >
+          <div
+            id="profile-card-loading-wrapper"
+            className="flex flex-col gap-y-1 items-start w-full relative"
+          >
+            <header
+              id="profile-card-loading-header"
+              className="absolute md:-left-6 -top-6 h-15 md:w-60 w-full bg-gray-200 rounded-t-xl"
+            >
               <div className="w-full h-full bg-gray-300 rounded-t-md" />
             </header>
-            <section className="md:px-0 px-6 ">
-              <div className="h-19 w-19 rounded-full bg-gray-300" />
-              <div className="absolute border-white border-3 top-0 px-0 rounded-full h-19 w-19" />
-              <div className="mt-4 space-y-2">
-                <div className="h-6 w-32 bg-gray-300 rounded" />
-                <div className="h-4 w-48 bg-gray-300 rounded" />
-                <div className="h-4 w-24 bg-gray-300 rounded" />
+            <section id="profile-card-loading-section" className="md:px-0 px-6">
+              <div
+                id="profile-card-loading-avatar"
+                className="h-19 w-19 rounded-full bg-gray-300"
+              />
+              <div
+                id="profile-card-loading-avatar-border"
+                className="absolute border-white border-3 top-0 px-0 rounded-full h-19 w-19"
+              />
+              <div id="profile-card-loading-details" className="mt-4 space-y-2">
+                <div
+                  id="profile-card-loading-name"
+                  className="h-6 w-32 bg-gray-300 rounded"
+                />
+                <div
+                  id="profile-card-loading-headline"
+                  className="h-4 w-48 bg-gray-300 rounded"
+                />
+                <div
+                  id="profile-card-loading-subheadline"
+                  className="h-4 w-24 bg-gray-300 rounded"
+                />
               </div>
-              <footer className="flex items-center gap-1 pt-3">
+              <footer
+                id="profile-card-loading-footer"
+                className="flex items-center gap-1 pt-3"
+              >
                 <FaUniversity className="text-gray-300" />
-                <div className="h-4 w-20 bg-gray-300 rounded" />
+                <div
+                  id="profile-card-loading-education"
+                  className="h-4 w-20 bg-gray-300 rounded"
+                />
               </footer>
             </section>
           </div>
@@ -69,37 +114,66 @@ const ProfileCard: React.FC = () => {
   }
 
   return (
-    <Card className="mb-2 bg-white border-0 dark:bg-gray-900 dark:text-neutral-200 w-full">
-      <CardContent className="flex flex-col items-center w-full relative md:px-6 px-0 ">
+    <Card
+      id="profile-card"
+      className="mb-2 bg-white border-0 dark:bg-gray-900 dark:text-neutral-200 w-full"
+    >
+      <CardContent
+        id="profile-card-content"
+        className="flex flex-col items-center w-full relative md:px-6 px-0 "
+      >
         <Link
+          id="profile-card-link"
           className="flex flex-col gap-y-1 items-start hover:cursor-pointer w-full"
           to={`/user-profile/${userId}`}
         >
-          <header className="absolute md:-left-0 -top-6 h-15 w-full bg-gray-200 rounded-t-xl">
+          <header
+            id="profile-card-header"
+            className="absolute md:-left-0 -top-6 h-15 w-full bg-gray-200 rounded-t-xl"
+          >
             <img
+              id="profile-card-cover-photo"
               src={data?.cover_photo}
               alt="Cover"
               className="w-full h-full min-h-20 rounded-t-md"
             />
           </header>
-          <section className="md:px-0 px-6">
-            <Avatar className="h-19 w-19">
-              <AvatarImage src={data?.profile_photo} alt="user-profile" />
-              <AvatarFallback>{"name.charAt(0)"}</AvatarFallback>
+          <section id="profile-card-section" className="md:px-0 px-6">
+            <Avatar id="profile-card-avatar" className="h-19 w-19">
+              <AvatarImage
+                id="profile-card-avatar-image"
+                src={data?.profile_photo}
+                alt="user-profile"
+              />
+              <AvatarFallback id="profile-card-avatar-fallback">
+                {"name.charAt(0)"}
+              </AvatarFallback>
             </Avatar>
-            <div className="absolute border-white border-3 top-0 px-0 rounded-full h-19 w-19"></div>
-            <h1 className="text-xl font-medium">
+            <div
+              id="profile-card-avatar-border"
+              className="absolute border-white border-3 top-0 px-0 rounded-full h-19 w-19"
+            ></div>
+            <h1 id="profile-card-name" className="text-xl font-medium">
               {data?.bio.first_name} {data?.bio.last_name}
             </h1>
-            <h2 className="text-xs text-ellipsis line-clamp-2">
+            <h2
+              id="profile-card-headline"
+              className="text-xs text-ellipsis line-clamp-2"
+            >
               {data?.bio.headline}
             </h2>
-            <h3 className="text-xs text-gray-500 dark:text-neutral-400">
+            <h3
+              id="profile-card-location"
+              className="text-xs text-gray-500 dark:text-neutral-400"
+            >
               {data?.bio.location.city} {data?.bio.location.country_region}
             </h3>
-            <footer className="flex items-center gap-1 pt-3">
+            <footer
+              id="profile-card-footer"
+              className="flex items-center gap-1 pt-3"
+            >
               <FaUniversity />
-              <h1 className="text-xs font-semibold">
+              <h1 id="profile-card-education" className="text-xs font-semibold">
                 {data?.bio.education[data?.bio.education.length - 1]}
               </h1>
             </footer>
