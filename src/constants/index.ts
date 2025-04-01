@@ -7,7 +7,7 @@ import { HiOutlineDocumentText } from "react-icons/hi";
 import { BsBarChartLine } from "react-icons/bs";
 import { CgTimelapse } from "react-icons/cg";
 import { RiMoreLine } from "react-icons/ri";
-import { Job } from '../pages/jobs/types';
+import { Job } from "../pages/jobs/types";
 
 export const LARGE_SCREEN_NAV_ITEMS = [
   {
@@ -86,37 +86,37 @@ export const FILTERS_LIST = Object.values(FILTER_OPTIONS);
 
 export const CORE_PROFILE_SECTIONS = [
   {
-    id: 1,
+    id: "add-profile-photo-button",
     title: "Add profile photo",
     key: "profile_photo",
   },
   {
-    id: 2,
+    id: "add-about-button",
     title: "Add about",
     key: "about",
   },
   {
-    id: 3,
+    id: "add-education-button",
     title: "Add education",
     key: "education",
   },
   {
-    id: 4,
+    id: "add-experience-button",
     title: "Add experience",
     key: "experience",
   },
   {
-    id: 5,
+    id: "add-services-button",
     title: "Add services",
     key: "services",
   },
   {
-    id: 6,
+    id: "add-career-break-button",
     title: "Add career break",
     key: "career_break",
   },
   {
-    id: 7,
+    id: "add-skills-button",
     title: "Add skills",
     key: "skills",
   },
@@ -209,7 +209,7 @@ export const SAMPLE_JOBS: Job[] = [
     hasEasyApply: true,
     reviewTime: "4 days",
     workMode: "Remote",
-    salary: "Confidential"
+    salary: "Confidential",
   },
   {
     id: "2",
@@ -224,7 +224,7 @@ export const SAMPLE_JOBS: Job[] = [
     hasEasyApply: true,
     alumniCount: 2,
     workMode: "On-site",
-    salary: "$3,000 - $4,500/month"
+    salary: "$3,000 - $4,500/month",
   },
   {
     id: "3",
@@ -240,8 +240,8 @@ export const SAMPLE_JOBS: Job[] = [
     alumniCount: 21,
     applied: true,
     workMode: "On-site",
-    salary: "$5,000 - $6,500/month"
-  }
+    salary: "$5,000 - $6,500/month",
+  },
 ];
 
 export const MORE_JOBS: Job[] = [
@@ -259,7 +259,7 @@ export const MORE_JOBS: Job[] = [
     alumniCount: 5,
     postedTime: "5 months ago",
     workMode: "On-site",
-    salary: "$4,500 - $6,000/month"
+    salary: "$4,500 - $6,000/month",
   },
   {
     id: "7",
@@ -273,8 +273,8 @@ export const MORE_JOBS: Job[] = [
     isPromoted: true,
     hasEasyApply: true,
     workMode: "Remote",
-    salary: "Confidential"
-  }
+    salary: "Confidential",
+  },
 ];
 
 export const RECENT_SEARCHES = [
@@ -297,10 +297,6 @@ export const POST_ACTIONS: Record<string, string> = {
   celebrate: "celebrates this",
   error: "no action",
 };
-
-
-
-
 
 // Map of Egypt and Middle Eastern countries to their corresponding major cities
 export const COUNTRY_CITY_MAP: { [key: string]: string[] } = {
