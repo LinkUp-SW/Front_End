@@ -1,11 +1,10 @@
-// src/components/ProfileActionButtons.tsx
 import React, { useState, useMemo, useCallback } from "react";
 import CustomButton from "./CustomButton";
 import AddSectionModal from "./AddSectionModal";
 import ResourcesPopover from "./ResourcesPopover";
 import { IoCloseCircle } from "react-icons/io5";
 import { CiCirclePlus, CiClock2 } from "react-icons/ci";
-import { FaUserPlus, FaUserMinus,FaPaperPlane } from "react-icons/fa";
+import { FaUserPlus, FaUserMinus, FaPaperPlane } from "react-icons/fa";
 
 export type FollowStatus = {
   isFollowing?: boolean;
@@ -23,7 +22,8 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
   isOwner,
   followStatus,
 }) => {
-  const [localFollowStatus, setLocalFollowStatus] = useState<FollowStatus>(followStatus);
+  const [localFollowStatus, setLocalFollowStatus] =
+    useState<FollowStatus>(followStatus);
 
   const effectiveStatus = useMemo(
     () => (isOwner ? followStatus : localFollowStatus),
@@ -33,7 +33,7 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
   // --- Follow/Connection Handlers ---
   const handleFollow = useCallback(() => {
     console.log("Follow clicked");
-    setLocalFollowStatus(prev => ({
+    setLocalFollowStatus((prev) => ({
       ...prev,
       isFollowing: true,
       isPending: false,
@@ -43,41 +43,65 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
 
   const handleUnfollow = useCallback(() => {
     console.log("Unfollow clicked");
-    setLocalFollowStatus(prev => ({ ...prev, isFollowing: false }));
+    setLocalFollowStatus((prev) => ({ ...prev, isFollowing: false }));
   }, []);
 
   const handleConnect = useCallback(() => {
     console.log("Connect clicked");
-    setLocalFollowStatus(prev => ({ ...prev, isPending: true, isInConnection: false }));
+    setLocalFollowStatus((prev) => ({
+      ...prev,
+      isPending: true,
+      isInConnection: false,
+    }));
   }, []);
 
   const handleCancelRequest = useCallback(() => {
     console.log("Cancel request clicked");
-    setLocalFollowStatus(prev => ({ ...prev, isPending: false }));
+    setLocalFollowStatus((prev) => ({ ...prev, isPending: false }));
   }, []);
 
   const handleRemoveConnection = useCallback(() => {
     console.log("Remove Connection clicked");
-    setLocalFollowStatus(prev => ({ ...prev, isInConnection: false }));
+    setLocalFollowStatus((prev) => ({ ...prev, isInConnection: false }));
   }, []);
 
   // --- Other Handlers ---
   const handleMessage = useCallback(() => alert("Message clicked"), []);
   const handleBlock = useCallback(() => alert("Report/Block clicked"), []);
-  const handleEnhanceProfile = useCallback(() => alert("Enhance Profile clicked"), []);
+  const handleEnhanceProfile = useCallback(
+    () => alert("Enhance Profile clicked"),
+    []
+  );
   const handleOpenToWork = useCallback(() => alert("Open to Work clicked"), []);
-  const handleAboutProfile = useCallback(() => alert("About Profile clicked"), []);
-  const handleViewActivity = useCallback(() => alert("View Activity clicked"), []);
-  const handleViewBlockedUsers = useCallback(() => alert("View Blocked Users clicked"), []);
+  const handleAboutProfile = useCallback(
+    () => alert("About Profile clicked"),
+    []
+  );
+  const handleViewActivity = useCallback(
+    () => alert("View Activity clicked"),
+    []
+  );
+  const handleViewBlockedUsers = useCallback(
+    () => alert("View Blocked Users clicked"),
+    []
+  );
 
   if (isOwner) {
     return (
       <div className="flex max-w-xl flex-wrap gap-2 mb-4">
-        <CustomButton variant="primary" onClick={handleOpenToWork}>
+        <CustomButton
+          id="open-to-work-button"
+          variant="primary"
+          onClick={handleOpenToWork}
+        >
           Open to work
         </CustomButton>
         <AddSectionModal />
-        <CustomButton variant="secondary" onClick={handleEnhanceProfile}>
+        <CustomButton
+          id="enhance-profile-button"
+          variant="secondary"
+          onClick={handleEnhanceProfile}
+        >
           Enhance Profile
         </CustomButton>
         <ResourcesPopover
@@ -96,8 +120,11 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
       {effectiveStatus.followPrimary ? (
         <>
           <CustomButton
+            id="profile-action-follow-button"
             variant="primary"
-            onClick={effectiveStatus.isFollowing ? handleUnfollow : handleFollow}
+            onClick={
+              effectiveStatus.isFollowing ? handleUnfollow : handleFollow
+            }
           >
             {effectiveStatus.isFollowing ? (
               <>
@@ -111,14 +138,19 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
               </>
             )}
           </CustomButton>
-          <CustomButton variant="secondary" onClick={handleMessage}>
-            <FaPaperPlane size={20}/>
+          <CustomButton
+            id="profile-action-message-button"
+            variant="secondary"
+            onClick={handleMessage}
+          >
+            <FaPaperPlane size={20} />
             Message
           </CustomButton>
         </>
       ) : (
         <>
           <CustomButton
+            id="profile-action-connection-button"
             variant="primary"
             onClick={
               effectiveStatus.isPending
@@ -145,8 +177,12 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
               </>
             )}
           </CustomButton>
-          <CustomButton variant="secondary" onClick={handleMessage}>
-          <FaPaperPlane size={20}/>
+          <CustomButton
+            id="profile-action-message-button"
+            variant="secondary"
+            onClick={handleMessage}
+          >
+            <FaPaperPlane size={20} />
             Message
           </CustomButton>
         </>
