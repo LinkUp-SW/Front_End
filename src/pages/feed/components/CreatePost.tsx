@@ -10,12 +10,12 @@ import { Button } from "../../../components/ui/button";
 import { Dialog, DialogContent, DialogTrigger, Modal } from "@/components";
 import { Link } from "react-router-dom";
 import CreatePostModal from "./modals/CreatePostModal";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store";
 
-interface CreatePostProps {
-  profileImageUrl: string;
-}
+const CreatePost: React.FC = () => {
+  const { data, loading } = useSelector((state: RootState) => state.userBio);
 
-const CreatePost: React.FC<CreatePostProps> = ({ profileImageUrl }) => {
   // const dispatch = useDispatch();
 
   // const handleOpenModal = () => {
@@ -30,8 +30,16 @@ const CreatePost: React.FC<CreatePostProps> = ({ profileImageUrl }) => {
           <div className="flex space-x-3 justify-start items-start">
             <Link to={"#"}>
               <Avatar className="h-12 w-12 pl-0">
-                <AvatarImage src={profileImageUrl} alt="Profile" />
-                <AvatarFallback>CN</AvatarFallback>
+                {loading ? (
+                  <>
+                    <div className="h-14 w-14 animate-pulse rounded-full bg-gray-300" />
+                  </>
+                ) : (
+                  <>
+                    <AvatarImage src={data?.profile_photo||''} alt="Profile" />
+                    <AvatarFallback>CN</AvatarFallback>
+                  </>
+                )}
               </Avatar>
             </Link>
             <Dialog>

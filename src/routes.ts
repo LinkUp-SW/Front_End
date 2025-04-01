@@ -22,6 +22,7 @@ import {
   SavedJobsPage,
   ConnectionsPage,
   FollowingFollowersPage,
+  SearchPage,
 } from "./pages";
 
 import React from "react";
@@ -63,7 +64,7 @@ const routes: RouteObject[] = [
   },
 
   {
-    path: "/followingfollowers",
+    path: "/following-followers",
     element: React.createElement(FollowingFollowersPage),
   },
 
@@ -110,6 +111,10 @@ const routes: RouteObject[] = [
   {
     path: "*",
     element: React.createElement(NotFoundPage),
+  },
+  {
+    path: "/search/:query",
+    element: React.createElement(SearchPage),
   },
 ];
 

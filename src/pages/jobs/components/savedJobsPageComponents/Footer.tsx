@@ -52,9 +52,10 @@ const Footer: React.FC = () => {
           </div>
         </div>
         
-        <div className="mt-6 text-center sm:text-left">
-          <p>LinkUp Corporation © 2025</p>
-        </div>
+        <div className="mt-2 flex justify-center items-center">
+              <img className="w-5 h-5" src="/link_up_logo.png" alt="LinkUp Logo"></img>
+              <span className="ml-2">LinkUp Corporation © 2025</span>
+            </div>
       </div>
     </footer>
   );
