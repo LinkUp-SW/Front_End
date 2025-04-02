@@ -1,5 +1,5 @@
 import axiosInstance from "@/services/axiosInstance";
-import { Experience, ProfileCardType, UserProfileBio } from "@/types";
+import { Experience, Organization, ProfileCardType, UserProfileBio } from "@/types";
 import axios from "axios";
 
 export const getProfileCardData = async (): Promise<ProfileCardType> => {
@@ -46,7 +46,10 @@ export const getUserProfilePic = async (
   return response.data;
 };
 
-export const getUserExperience = async (token: string, userId: string):Promise<{is_me:boolean;work_experience:Experience[]}> => {
+export const getUserExperience = async (
+  token: string,
+  userId: string
+): Promise<{ is_me: boolean; work_experience: Experience[] }> => {
   const response = await axiosInstance.get(
     `/api/v1/user/profile/experience/${userId}`,
     {
@@ -98,4 +101,11 @@ export const addWorkExperience = async (
   return response.data;
 };
 
-///api/v1/search/company/:query
+export const getCompaniesList = async (query: string):Promise<{message:string,data:Organization[]}> => {
+  const response = await axiosInstance.get(`api/v1/search/company/${query}`);
+  return response.data;
+};
+
+// export const updateWorkExperience=async(token:string,id,form)=>{
+//   return
+// }
