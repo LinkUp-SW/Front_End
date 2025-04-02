@@ -14,8 +14,9 @@ import {
   AiFillLike as LikedIcon,
 } from "react-icons/ai";
 import { BsFillSendFill as SendIcon } from "react-icons/bs";
+import { MenuAction } from "@/types";
 
-export const getMenuActions = () => [
+export const getMenuActions: () => MenuAction[] = () => [
   {
     name: "Save",
     action: () => console.log("Save clicked"),
@@ -43,7 +44,7 @@ export const getMenuActions = () => [
   },
 ];
 
-export const COMMENT_SORTING_MENU = [
+export const COMMENT_SORTING_MENU: MenuAction[] = [
   {
     name: "Most relevant",
     subtext: "See the most relevant comments",

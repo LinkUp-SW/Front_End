@@ -16,7 +16,7 @@ import { CommentType, PostType } from "@/types";
 import { POST_ACTIONS } from "@/constants";
 import PostHeader from "./PostHeader";
 import PostFooter from "./PostFooter";
-import { getEngagementButtons, getMenuActions } from "./menus";
+import { getEngagementButtons, getMenuActions } from "./Menus";
 import { Dialog, DialogContent, DialogTrigger } from "@/components";
 import ReactionsModal from "./modals/ReactionsModal";
 import TruncatedText from "./TruncatedText";
