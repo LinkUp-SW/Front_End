@@ -396,7 +396,7 @@ const AddExperienceModal: React.FC<AddExperienceModalProps> = ({
             type="submit"
             disabled={isSubmitting}
             id="experience-submit-button"
-            className="bg-blue-600 hover:bg-blue-700 w-full disabled:opacity-60 disabled:hover:bg-blue-600 disabled:cursor-not-allowed cursor-pointer text-white py-2 px-4 rounded-md transition-all duration-300"
+            className="bg-purple-600 hover:bg-purple-700 w-full disabled:opacity-60 disabled:hover:bg-purple-600 disabled:cursor-not-allowed cursor-pointer text-white py-2 px-4 rounded-full transition-all duration-300"
           >
             {isSubmitting ? <FormSpinner/> : "Save Experience"}
           </button>
