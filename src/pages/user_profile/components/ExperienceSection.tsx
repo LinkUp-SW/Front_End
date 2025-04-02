@@ -380,7 +380,7 @@ const EmptyExperience: React.FC<EmptyExperienceProps> = ({
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
           <button
-            id="empty-experience-add-button"
+            id="experience-add-button"
             className="w-fit py-1.5 px-4 border-2 rounded-full dark:border-blue-400 font-semibold text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-600 dark:hover:bg-blue-400 hover:text-white transition-all duration-300 ease-in-out border-blue-600 cursor-pointer"
           >
             Add Experience
