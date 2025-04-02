@@ -15,6 +15,7 @@ import { MediaItem } from "./types";
 import { Experience, JobTypeEnum, Organization } from "@/types";
 import { addWorkExperience, getCompaniesList } from "@/endpoints/userProfile";
 import { getErrorMessage } from "@/utils/errorHandler";
+import FormSpinner from "@/components/form/form_spinner/FormSpinner";
 
 /**
  * We'll rely on user input + a generated ID to create a new Experience object
@@ -395,9 +396,9 @@ const AddExperienceModal: React.FC<AddExperienceModalProps> = ({
             type="submit"
             disabled={isSubmitting}
             id="experience-submit-button"
-            className="bg-blue-600 disabled:opacity-70 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-all duration-300"
+            className="bg-blue-600 hover:bg-blue-700 w-full disabled:opacity-60 disabled:hover:bg-blue-600 disabled:cursor-not-allowed cursor-pointer text-white py-2 px-4 rounded-md transition-all duration-300"
           >
-            {isSubmitting ? "Submitting..." : "Save Experience"}
+            {isSubmitting ? <FormSpinner/> : "Save Experience"}
           </button>
         </div>
       </form>

@@ -19,6 +19,7 @@ import {
 import { v4 as uuid } from "uuid";
 import { useFormStatus } from "@/hooks/useFormStatus";
 import { getErrorMessage } from "@/utils/errorHandler";
+import FormSpinner from "@/components/form/form_spinner/FormSpinner";
 /**
  * Helper to extract the numeric month (1-12) and year from a Date
  */
@@ -431,9 +432,10 @@ const EditExperienceModal: React.FC<EditExperienceModalProps> = ({
           <button
             type="submit"
             disabled={isSubmitting}
-            className="bg-blue-600 hover:bg-blue-700 disabled:opacity-70 text-white py-2 px-4 rounded-md transition-all duration-300"
+            id="experience-submit-button"
+            className="bg-blue-600 hover:bg-blue-700 w-full disabled:opacity-60 disabled:hover:bg-blue-600 disabled:cursor-not-allowed cursor-pointer text-white py-2 px-4 rounded-md transition-all duration-300"
           >
-            {isSubmitting ? "Saving...." : "Save Changes"}
+            {isSubmitting ? <FormSpinner/>: "Save Changes"}
           </button>
         </div>
       </form>
