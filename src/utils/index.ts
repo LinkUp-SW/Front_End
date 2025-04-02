@@ -105,3 +105,14 @@ export function formatIsoDateToHumanReadable(isoDate: string): string {
   formattedDate = formattedDate.replace(',', '').toLowerCase();
   return formattedDate;
 }
+
+export const formatExperienceDate = (date: Date): string => {
+  if(typeof date==='string'){
+    date=new Date(date)
+  }
+  return date.toLocaleDateString("en-US", {
+    month: "long",
+    year: "numeric",
+  }).toLowerCase();
+};
+
