@@ -5,6 +5,7 @@ import { IoIosBriefcase } from "react-icons/io";
 import { MdDeleteForever } from "react-icons/md";
 import { Experience } from "@/types";
 import {
+  Button,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -35,12 +36,14 @@ const ExperienceSection: React.FC = () => {
   const authToken = Cookies.get("linkup_auth_token");
   const { id } = useParams();
   const [experiences, setExperiences] = useState<Experience[]>([]);
-
-  // For opening the edit modal
   const [editOpen, setEditOpen] = useState(false);
   const [experienceToEdit, setExperienceToEdit] = useState<Experience | null>(
     null
   );
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [selectedExperienceId, setSelectedExperienceId] = useState<
+    string | null
+  >(null);
 
   const { data, loading, error } = useFetchData<FetchDataResult | null>(() => {
     if (authToken && id) {
@@ -55,20 +58,23 @@ const ExperienceSection: React.FC = () => {
     }
   }, [data]);
 
-  // New: Handler for deleting an experience
-  const handleDeleteExperience = async (experienceId: string) => {
-    if (authToken) {
-      if (window.confirm("Are you sure you want to delete this experience?")) {
-        try {
-          const response = await removeWorkExperience(authToken, experienceId);
-          setExperiences((prev) =>
-            prev.filter((exp) => exp._id !== experienceId)
-          );
-          toast.success(response.message);
-        } catch (error) {
-          console.error("Failed to delete experience", error);
-          toast.error(getErrorMessage(error));
-        }
+  const handleConfirmDelete = async () => {
+    if (authToken && selectedExperienceId) {
+      try {
+        const response = await removeWorkExperience(
+          authToken,
+          selectedExperienceId
+        );
+        setExperiences((prev) =>
+          prev.filter((exp) => exp._id !== selectedExperienceId)
+        );
+        toast.success(response.message);
+      } catch (error) {
+        console.error("Failed to delete experience", error);
+        toast.error(getErrorMessage(error));
+      } finally {
+        setDeleteDialogOpen(false);
+        setSelectedExperienceId(null);
       }
     }
   };
@@ -137,12 +143,13 @@ const ExperienceSection: React.FC = () => {
         <ExperienceList
           experiences={experiences}
           isMe={isMe}
-          // Pass the new delete handler to the ExperienceList
-          onDeleteExperience={handleDeleteExperience}
-          // Called when the user clicks "Edit"
           onStartEdit={(exp) => {
             setExperienceToEdit(exp);
             setEditOpen(true);
+          }}
+          onDeleteClick={(id) => {
+            setSelectedExperienceId(id);
+            setDeleteDialogOpen(true);
           }}
         />
       )}
@@ -150,13 +157,14 @@ const ExperienceSection: React.FC = () => {
       {/* Edit modal (only shown if experienceToEdit is set) */}
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
         <DialogContent
+          aria-describedby={undefined}
           id="edit-experience-dialog-content"
           className="max-h-[45rem] overflow-y-auto dark:bg-gray-900 overflow-x-hidden !max-w-5xl sm:!w-[38.5rem] !w-full"
         >
+          <DialogTitle className="hidden"></DialogTitle>
           <DialogHeader>
-            <DialogTitle>
-              <Header title="Edit Experience" />
-            </DialogTitle>
+            <Header title="Edit Experience" />
+
             <DialogDescription className="text-sm text-gray-500 dark:text-gray-300">
               *Indicates required
             </DialogDescription>
@@ -173,6 +181,41 @@ const ExperienceSection: React.FC = () => {
               onSuccess={handleEditExperience}
             />
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent
+          aria-describedby={undefined}
+          className="max-w-[425px] dark:bg-gray-900"
+        >
+          <DialogHeader>
+            <DialogTitle className="text-lg flex items-center gap-2">
+              <MdDeleteForever className="text-red-500" />
+              Delete Experience?
+            </DialogTitle>
+            <DialogDescription className="pt-2 text-gray-600 dark:text-gray-300">
+              This action cannot be undone. Are you sure you want to permanently
+              delete this experience from your profile?
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end gap-3 mt-4">
+            <Button
+              variant="outline"
+              onClick={() => setDeleteDialogOpen(false)}
+              className="border-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleConfirmDelete}
+              className="bg-red-500 hover:bg-red-600 focus-visible:ring-red-500"
+            >
+              Delete
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
     </section>
@@ -243,13 +286,13 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({ onAddExperience }) => {
           </button>
         </DialogTrigger>
         <DialogContent
+          aria-describedby={undefined}
           id="experience-add-dialog-content"
           className="max-h-[45rem] overflow-y-auto dark:bg-gray-900 overflow-x-hidden !max-w-5xl sm:!w-[38.5rem] !w-full"
         >
+          <DialogTitle className="hidden"></DialogTitle>
           <DialogHeader id="experience-add-dialog-header">
-            <DialogTitle id="experience-add-dialog-title">
-              <Header title="Add Experience" />
-            </DialogTitle>
+            <Header title="Add Experience" />
             <DialogDescription
               id="experience-add-dialog-description"
               className="text-sm text-gray-500 dark:text-gray-300"
@@ -276,16 +319,15 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({ onAddExperience }) => {
 interface ExperienceListProps {
   experiences: Experience[];
   isMe: boolean;
-  /** Called when user clicks "Edit" on an experience item */
   onStartEdit: (exp: Experience) => void;
-  /** Called when user clicks "Delete" on an experience item */
-  onDeleteExperience: (experienceId: string) => void;
+  onDeleteClick: (experienceId: string) => void;
 }
+
 const ExperienceList: React.FC<ExperienceListProps> = ({
   experiences,
   isMe,
   onStartEdit,
-  onDeleteExperience,
+  onDeleteClick,
 }) => (
   <div id="experience-list-container" className="space-y-4">
     {experiences.slice(0, 3).map((experience, idx) => (
@@ -361,7 +403,7 @@ const ExperienceList: React.FC<ExperienceListProps> = ({
               id={`experience-delete-button-${idx}`}
               aria-label="Delete Experience"
               className="bg-red-100 hover:bg-red-500 hover:text-white p-2 rounded-full transition-all duration-200 ease-in-out"
-              onClick={() => onDeleteExperience(experience._id as string)}
+              onClick={() => onDeleteClick(experience._id as string)}
             >
               <MdDeleteForever size={20} />
             </button>
@@ -426,13 +468,14 @@ const EmptyExperience: React.FC<EmptyExperienceProps> = ({
           </button>
         </DialogTrigger>
         <DialogContent
+          aria-describedby={undefined}
           id="empty-experience-dialog-content"
           className="max-h-[45rem] dark:bg-gray-900 overflow-y-auto overflow-x-hidden !max-w-5xl sm:!w-[38.5rem] !w-full"
         >
+          <DialogTitle className="hidden"></DialogTitle>
           <DialogHeader id="empty-experience-dialog-header">
-            <DialogTitle id="empty-experience-dialog-title">
-              <Header title="Add Experience" />
-            </DialogTitle>
+            <Header title="Add Experience" />
+
             <DialogDescription
               id="empty-experience-dialog-description"
               className="text-sm text-gray-500 dark:text-gray-300"
