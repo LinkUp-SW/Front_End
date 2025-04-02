@@ -1,12 +1,12 @@
 import { FormInput, UserAuthLayout } from "@/components";
 import { useFormStatus } from "@/hooks/useFormStatus";
-import { useState } from "react";
+import {  useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { NotFoundPage } from "@/pages"; // adjust the path as necessary
 import { getErrorMessage } from "@/utils/errorHandler";
 import { toast } from "sonner";
-import { resetPassword } from "@/endpoints/userAuth";
+import { resetPassword, validateAuthToken } from "@/endpoints/userAuth";
 import { validatePassword } from "@/utils";
+import useFetchData from "@/hooks/useFetchData";
 
 const ResetPasswordPage = () => {
   const [newPassword, setNewPassword] = useState("");
@@ -14,6 +14,11 @@ const ResetPasswordPage = () => {
   const { isSubmitting, startSubmitting, stopSubmitting } = useFormStatus();
   const { token } = useParams();
   const navigate = useNavigate();
+  const { loading, error } = useFetchData(
+    async () => (token ? validateAuthToken(token) : Promise.resolve(null)),
+    []
+  );
+
   const handleResetPassword = async () => {
     if (newPassword.length === 0)
       return toast.error("please enter your new password");
@@ -55,8 +60,13 @@ const ResetPasswordPage = () => {
   };
 
   // If the token is missing, render the custom 404 page
-  if (!token) {
-    return <NotFoundPage />;
+  if (!token || error) {
+    window.location.replace("/reset-password?session=expired");
+    return null;
+  }
+
+  if (loading) {
+    return <>Loading...</>;
   }
 
   return (

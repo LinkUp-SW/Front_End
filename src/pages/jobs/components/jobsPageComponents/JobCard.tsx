@@ -72,8 +72,8 @@ const JobCard: React.FC<JobCardProps> = ({ job, onDismiss }) => (
           <span className="text-sm text-gray-600 dark:text-gray-400 mr-2">Promoted</span>
         )}
         
-        {!job.isPromoted && !job.applied && (job.timePosted || job.postedTime) && (
-          <span className="text-sm text-gray-600 dark:text-gray-400 mr-2">{job.timePosted || job.postedTime}</span>
+        {!job.isPromoted && !job.applied && (job.postedTime) && (
+          <span className="text-sm text-gray-600 dark:text-gray-400 mr-2">{ job.postedTime}</span>
         )}
         
         {job.hasEasyApply && !job.applied && (

@@ -1,5 +1,5 @@
 import axiosInstance from "@/services/axiosInstance";
-import { ProfileCardType, UserProfile } from "@/types";
+import { ProfileCardType, UserProfileBio } from "@/types";
 import axios from "axios";
 
 export const getProfileCardData = async (): Promise<ProfileCardType> => {
@@ -16,11 +16,29 @@ export const getProfileCardData = async (): Promise<ProfileCardType> => {
   }
 };
 
-export const getUserBio = async (token: string, userId: string):Promise<UserProfile> => {
-  const response = await axiosInstance(`/api/v1/user/profile/bio/${userId}`, {
+export const getUserBio = async (
+  token: string,
+  userId: string
+): Promise<UserProfileBio> => {
+  const response = await axiosInstance.get(`/api/v1/user/profile/bio/${userId}`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
   });
+  return response.data;
+};
+
+export const getUserProfilePic = async (
+  token: string,
+  userId: string
+): Promise<{ profilePicture: string }> => {
+  const response = await axiosInstance.get(
+    `/api/v1/user/profile/profile-picture/${userId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
   return response.data;
 };

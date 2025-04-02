@@ -2,7 +2,16 @@ export interface test {
   name: string;
 }
 export interface RemoveConnectionData {
-  userId: number;
+  userId: string;
+  userName: string;
+}
+export interface UnfollowUserType {
+  userId: string;
+  userName: string;
+}
+
+export interface WithdrawInvitationType {
+  userId: string;
   userName: string;
 }
 
@@ -182,7 +191,7 @@ export interface Bio {
   website: string;
 }
 
-export interface UserProfile {
+export interface UserProfileBio {
   is_me: boolean;
   bio: Bio;
   profile_photo: string;
