@@ -1,4 +1,6 @@
 import React, { useRef, useState } from "react";
+import Cookies from "js-cookie";
+import { toast } from "sonner";
 import {
   DatePicker,
   FormCheckbox,
@@ -12,8 +14,6 @@ import MediaManager from "./components/MediaManager";
 import { MediaItem } from "./types";
 import { Experience, JobTypeEnum, Organization } from "@/types";
 import { addWorkExperience, getCompaniesList } from "@/endpoints/userProfile";
-import Cookies from "js-cookie";
-import { toast } from "sonner";
 import { getErrorMessage } from "@/utils/errorHandler";
 
 /**
@@ -45,13 +45,9 @@ export interface ExperienceFormData {
 }
 
 interface AddExperienceModalProps {
-  /**
-   * Called when the modal should be closed, typically after a successful submission
-   */
+  /** Called when the modal should be closed, typically after a successful submission */
   onClose?: () => void;
-  /**
-   * Called on a successful experience creation; passes the newly created experience
-   */
+  /** Called on a successful experience creation; passes the newly created experience */
   onSuccess?: (newExperience: Experience) => void;
 }
 
@@ -61,10 +57,14 @@ const AddExperienceModal: React.FC<AddExperienceModalProps> = ({
 }) => {
   const authToken = Cookies.get("linkup_auth_token");
   const { isSubmitting, startSubmitting, stopSubmitting } = useFormStatus();
+
+  // Organization search states
   const [organizations, setOrganizations] = useState<Organization[]>([]);
   const [organizationSearch, setOrganizationSearch] = useState("");
   const [isOrgsLoading, setIsOrgsLoading] = useState(false);
+  const organizationTimer = useRef<NodeJS.Timeout | null>(null);
 
+  // Core form data
   const [formData, setFormData] = useState<ExperienceFormData>({
     title: "",
     employmentType: "",
@@ -81,9 +81,9 @@ const AddExperienceModal: React.FC<AddExperienceModalProps> = ({
     media: [],
   });
 
-  // Debounce timer for organization search
-  const organizationTimer = useRef<NodeJS.Timeout | null>(null);
-
+  /**
+   * General change handler for form fields
+   */
   const handleChange = (field: keyof ExperienceFormData, value: unknown) => {
     // Special case for organization searching
     if (field === "organization") {
@@ -118,10 +118,77 @@ const AddExperienceModal: React.FC<AddExperienceModalProps> = ({
     }
   };
 
+  /**
+   * If a user selects an organization from the dropdown
+   */
   const handleSelectOrganization = (org: Organization) => {
     setFormData((prev) => ({ ...prev, organization: org }));
     setOrganizationSearch(org.name);
     setOrganizations([]);
+  };
+
+  /**
+   * Validate required fields and date constraints.
+   * Returns true if valid; false otherwise.
+   */
+  const validateForm = (): boolean => {
+    const {
+      title,
+      employmentType,
+      organization,
+      currentlyWorking,
+      startMonth,
+      startYear,
+      endMonth,
+      endYear,
+    } = formData;
+
+    // Title is required
+    if (!title.trim()) {
+      toast.error("Title is required.");
+      return false;
+    }
+
+    // Employment Type is required
+    if (!employmentType) {
+      toast.error("Employment type is required.");
+      return false;
+    }
+
+    // Organization is required. If the user hasn't picked from the list, _id might still be empty
+    if (!organization._id) {
+      toast.error("Organization is required. Please select from the dropdown.");
+      return false;
+    }
+
+    // Start month/year are required
+    if (!startMonth || !startYear) {
+      toast.error("Start date is required (month and year).");
+      return false;
+    }
+
+    // If user is NOT currently working, end month/year are required
+    if (!currentlyWorking) {
+      if (!endMonth || !endYear) {
+        toast.error("End date is required if not currently working.");
+        return false;
+      }
+    }
+
+    // Compare dates to ensure start is not after end
+    const startDate = new Date(`${startMonth} 1, ${startYear}`);
+    let endDate: Date | undefined;
+
+    if (!currentlyWorking) {
+      endDate = new Date(`${endMonth} 1, ${endYear}`);
+      // Check for invalid date range
+      if (startDate > endDate) {
+        toast.error("Start date cannot be after the end date.");
+        return false;
+      }
+    }
+
+    return true;
   };
 
   /**
@@ -139,6 +206,12 @@ const AddExperienceModal: React.FC<AddExperienceModalProps> = ({
     }
 
     try {
+      // -- Perform local validations first --
+      if (!validateForm()) {
+        stopSubmitting();
+        return;
+      }
+
       // Build up the new Experience data from the form
       const toBeSentFormData: Experience = {
         _id: generateTempId(), // Temporary ID for local state
@@ -157,11 +230,10 @@ const AddExperienceModal: React.FC<AddExperienceModalProps> = ({
         media: formData.media,
       };
 
-      // We only rely on the server returning a 200 status to confirm success
+      // We rely on the server returning a 200 status to confirm success
       const response = await addWorkExperience(authToken, toBeSentFormData);
 
       // If we reach here, the request is successful (status 200)
-      // The returned `response` likely has a `message` and an unrelated object
       toast.success(response?.message || "Experience added successfully!");
 
       // Update the parent state with the newly created experience
@@ -187,6 +259,7 @@ const AddExperienceModal: React.FC<AddExperienceModalProps> = ({
         id="experience-form"
         onSubmit={handleSubmit}
         onKeyDown={(e) => {
+          // Prevent default 'Enter' submit so user must click "Save"
           if (e.key === "Enter") {
             e.preventDefault();
           }
@@ -200,6 +273,7 @@ const AddExperienceModal: React.FC<AddExperienceModalProps> = ({
           id="experience-job-title"
           name="experienceJobTitle"
         />
+
         <FormSelect
           label="Employment Type*"
           placeholder="Select Employment Type"
@@ -209,6 +283,8 @@ const AddExperienceModal: React.FC<AddExperienceModalProps> = ({
           id="employment-type"
           name="employmentType"
         />
+
+        {/* Organization */}
         <div className="w-full relative">
           <FormInput
             label="Company or Organization*"
@@ -243,6 +319,7 @@ const AddExperienceModal: React.FC<AddExperienceModalProps> = ({
             </div>
           )}
         </div>
+
         <FormCheckbox
           label="I am currently working in this role"
           checked={formData.currentlyWorking}
@@ -252,6 +329,7 @@ const AddExperienceModal: React.FC<AddExperienceModalProps> = ({
           id="currently-working"
           name="currentlyWorking"
         />
+
         <DatePicker
           label="Start date*"
           month={formData.startMonth}
@@ -260,6 +338,7 @@ const AddExperienceModal: React.FC<AddExperienceModalProps> = ({
           onYearChange={(value) => handleChange("startYear", value)}
           id="start-date"
         />
+
         <DatePicker
           label="End date*"
           month={formData.endMonth}
@@ -269,6 +348,7 @@ const AddExperienceModal: React.FC<AddExperienceModalProps> = ({
           disabled={formData.currentlyWorking}
           id="end-date"
         />
+
         <FormInput
           label="Location"
           placeholder="Ex: London, United Kingdom"
@@ -277,6 +357,7 @@ const AddExperienceModal: React.FC<AddExperienceModalProps> = ({
           id="job-location"
           name="jobLocation"
         />
+
         <FormSelect
           label="Location type"
           placeholder="Select Location Type"
@@ -286,6 +367,7 @@ const AddExperienceModal: React.FC<AddExperienceModalProps> = ({
           id="location-type"
           name="locationType"
         />
+
         <FormTextarea
           label="Description"
           placeholder="List your major duties and successes, highlighting specific projects"
@@ -323,6 +405,9 @@ const AddExperienceModal: React.FC<AddExperienceModalProps> = ({
   );
 };
 
+/**
+ * Simple skeleton for organization search
+ */
 const OrganizationSkeleton: React.FC = () => (
   <div className="space-y-2 animate-pulse">
     {[...Array(3)].map((_, index) => (
