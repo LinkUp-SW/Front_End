@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { MediaItem } from "../types";
+import { toast } from "sonner";
 
 interface MediaManagerProps {
   media: MediaItem[];
@@ -45,6 +46,7 @@ const MediaManager: React.FC<MediaManagerProps> = ({ media, setMedia, id }) => {
 
   const handleApply = () => {
     if (!pendingFile) return;
+    if (!title.trim()) return toast.error("Please Enter a title for the Media");
     const newMedia: MediaItem = {
       id: uuidv4(),
       media: pendingFile,
@@ -185,7 +187,7 @@ const MediaManager: React.FC<MediaManagerProps> = ({ media, setMedia, id }) => {
               id={`${id}-apply-button`}
               type="button"
               onClick={handleApply}
-              className="px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 cursor-pointer font-semibold transition-all duration-300 ease-in-out"
+              className="px-4 py-2 bg-blue-600 disabled:cursor-not-allowed text-white rounded-xl disabled:opacity-60 disabled:hover:bg-blue-600 hover:bg-blue-700 cursor-pointer font-semibold transition-all duration-300 ease-in-out"
               disabled={!title.trim()}
             >
               Apply
