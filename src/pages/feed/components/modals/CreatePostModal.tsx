@@ -37,7 +37,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
   const darkMode = useSelector((state: RootState) => state.theme.theme);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleEmojiRequest = (emoji: any) => {
+  const handleEmojiRequest = (emoji: { emoji: string }) => {
     setPostText((prevMessage) => prevMessage + emoji.emoji);
   };
 

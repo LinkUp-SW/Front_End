@@ -24,7 +24,7 @@ const CreatePost: React.FC = () => {
   //   console.log("Opoen");
   //   dispatch(handleOpenModalType("create_post")); // Dispatch a string identifier or an object with modal details
   // };
-  const [isSettingsModal, setIsSettingsModal] = useState<Boolean>(false);
+  const [isSettingsModal, setIsSettingsModal] = useState<boolean>(false);
 
   return (
     <>
