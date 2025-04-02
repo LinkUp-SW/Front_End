@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { BsPencil } from "react-icons/bs";
 import { GoPlus } from "react-icons/go";
 import { IoIosBriefcase } from "react-icons/io";
+import { MdDeleteForever } from "react-icons/md";
 import { Experience } from "@/types";
 import {
   Dialog,
@@ -17,8 +18,13 @@ import Header from "./modals/components/Header";
 import useFetchData from "@/hooks/useFetchData";
 import Cookies from "js-cookie";
 import { Link, useParams } from "react-router-dom";
-import { getUserExperience } from "@/endpoints/userProfile";
+import {
+  getUserExperience,
+  removeWorkExperience,
+} from "@/endpoints/userProfile";
 import { formatExperienceDate } from "@/utils";
+import { toast } from "sonner";
+import { getErrorMessage } from "@/utils/errorHandler";
 
 interface FetchDataResult {
   work_experience: Experience[];
@@ -48,6 +54,24 @@ const ExperienceSection: React.FC = () => {
       setExperiences(data.work_experience);
     }
   }, [data]);
+
+  // New: Handler for deleting an experience
+  const handleDeleteExperience = async (experienceId: string) => {
+    if (authToken) {
+      if (window.confirm("Are you sure you want to delete this experience?")) {
+        try {
+          const response = await removeWorkExperience(authToken, experienceId);
+          setExperiences((prev) =>
+            prev.filter((exp) => exp._id !== experienceId)
+          );
+          toast.success(response.message);
+        } catch (error) {
+          console.error("Failed to delete experience", error);
+          toast.error(getErrorMessage(error));
+        }
+      }
+    }
+  };
 
   if (loading) {
     return (
@@ -113,6 +137,8 @@ const ExperienceSection: React.FC = () => {
         <ExperienceList
           experiences={experiences}
           isMe={isMe}
+          // Pass the new delete handler to the ExperienceList
+          onDeleteExperience={handleDeleteExperience}
           // Called when the user clicks "Edit"
           onStartEdit={(exp) => {
             setExperienceToEdit(exp);
@@ -252,11 +278,14 @@ interface ExperienceListProps {
   isMe: boolean;
   /** Called when user clicks "Edit" on an experience item */
   onStartEdit: (exp: Experience) => void;
+  /** Called when user clicks "Delete" on an experience item */
+  onDeleteExperience: (experienceId: string) => void;
 }
 const ExperienceList: React.FC<ExperienceListProps> = ({
   experiences,
   isMe,
   onStartEdit,
+  onDeleteExperience,
 }) => (
   <div id="experience-list-container" className="space-y-4">
     {experiences.slice(0, 3).map((experience, idx) => (
@@ -319,14 +348,24 @@ const ExperienceList: React.FC<ExperienceListProps> = ({
         )}
 
         {isMe && (
-          <button
-            id={`experience-edit-button-${idx}`}
-            aria-label="Edit Experience"
-            className="hover:bg-gray-300 absolute top-0 right-0 dark:hover:text-black p-2 rounded-full transition-all duration-200 ease-in-out"
-            onClick={() => onStartEdit(experience)}
-          >
-            <BsPencil size={20} />
-          </button>
+          <div className="absolute top-0 h-full right-0 flex flex-col justify-between">
+            <button
+              id={`experience-edit-button-${idx}`}
+              aria-label="Edit Experience"
+              className="hover:bg-gray-300 dark:hover:text-black p-2 rounded-full transition-all duration-200 ease-in-out"
+              onClick={() => onStartEdit(experience)}
+            >
+              <BsPencil size={20} />
+            </button>
+            <button
+              id={`experience-delete-button-${idx}`}
+              aria-label="Delete Experience"
+              className="bg-red-100 hover:bg-red-500 hover:text-white p-2 rounded-full transition-all duration-200 ease-in-out"
+              onClick={() => onDeleteExperience(experience._id as string)}
+            >
+              <MdDeleteForever size={20} />
+            </button>
+          </div>
         )}
       </div>
     ))}

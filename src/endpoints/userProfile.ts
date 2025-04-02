@@ -129,3 +129,18 @@ export const updateWorkExperience = async (
   );
   return response.data;
 };
+
+export const removeWorkExperience = async (
+  token: string,
+  id: string
+): Promise<{ message: string }> => {
+  const response = await axiosInstance.delete(
+    `api/v1/user/delete-work-experience/${id}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
