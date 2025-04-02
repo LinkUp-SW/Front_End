@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import { AxiosError } from "axios";
+import LinkUpLoader from "../linkup_loader/LinkUpLoader";
 // import LoadingSpinner from "@/components/LoadingSpinner"; // Add a loading component
 
 interface AuthMiddlewareProps {
@@ -67,7 +68,7 @@ const AuthMiddleware = ({ children }: AuthMiddlewareProps) => {
   }, [navigate, token]);
 
   if (!isVerified) {
-    return <>Loading...</>;
+    return <LinkUpLoader />;
   }
 
   return <>{children}</>;
