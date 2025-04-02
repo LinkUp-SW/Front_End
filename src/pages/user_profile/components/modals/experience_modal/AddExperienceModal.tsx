@@ -236,9 +236,8 @@ const AddExperienceModal: React.FC<AddExperienceModalProps> = ({
 
       // If we reach here, the request is successful (status 200)
       toast.success(response?.message || "Experience added successfully!");
-
       // Update the parent state with the newly created experience
-      onSuccess?.(toBeSentFormData);
+      onSuccess?.({ ...toBeSentFormData, _id: response.experience._id });
 
       // Close the modal
       onClose?.();
@@ -398,7 +397,7 @@ const AddExperienceModal: React.FC<AddExperienceModalProps> = ({
             id="experience-submit-button"
             className="bg-purple-600 hover:bg-purple-700 w-full disabled:opacity-60 disabled:hover:bg-purple-600 disabled:cursor-not-allowed cursor-pointer text-white py-2 px-4 rounded-full transition-all duration-300"
           >
-            {isSubmitting ? <FormSpinner/> : "Save Experience"}
+            {isSubmitting ? <FormSpinner /> : "Save Experience"}
           </button>
         </div>
       </form>
