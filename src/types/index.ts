@@ -17,7 +17,7 @@ export interface Notification {
   location?: string;
   count?: number;
   isNew?: boolean;
-  read?:boolean;
+  read?: boolean;
 }
 
 export interface PostType {
@@ -195,6 +195,13 @@ export interface UserProfile {
   is_in_received_connections?: boolean;
   is_in_sent_connections?: boolean;
   name_of_one_mutual_connection?: string;
-  isInConnections?:boolean;
-  isAlreadyFollowing?:boolean
+  isInConnections?: boolean;
+  isAlreadyFollowing?: boolean;
+}
+
+export interface MenuAction {
+  name: string;
+  action: () => void;
+  subtext?: string;
+  icon: React.ReactNode;
 }
