@@ -12,6 +12,7 @@ import {
   DialogTrigger,
 } from "@/components";
 import AddExperienceModal from "./modals/experience_modal/AddExperienceModal";
+import EditExperienceModal from "./modals/experience_modal/EditExperienceModal"; // <--- NEW
 import Header from "./modals/components/Header";
 import useFetchData from "@/hooks/useFetchData";
 import Cookies from "js-cookie";
@@ -29,15 +30,18 @@ const ExperienceSection: React.FC = () => {
   const { id } = useParams();
   const [experiences, setExperiences] = useState<Experience[]>([]);
 
-  const { data, loading, error } = useFetchData<FetchDataResult | null>(
-    () => {
-      if (authToken && id) {
-        return getUserExperience(authToken, id);
-      }
-      return Promise.resolve(null);
-    },
-    [authToken, id] // re-fetch if these change
+  // For opening the edit modal
+  const [editOpen, setEditOpen] = useState(false);
+  const [experienceToEdit, setExperienceToEdit] = useState<Experience | null>(
+    null
   );
+
+  const { data, loading, error } = useFetchData<FetchDataResult | null>(() => {
+    if (authToken && id) {
+      return getUserExperience(authToken, id);
+    }
+    return Promise.resolve(null);
+  }, [authToken, id]);
 
   useEffect(() => {
     if (data?.work_experience) {
@@ -72,9 +76,18 @@ const ExperienceSection: React.FC = () => {
   const isMe = data?.is_me ?? false;
   const isEmpty = experiences.length === 0;
 
-  // Handler for adding a new experience (called by AddExperienceModal via props)
+  // Handler for adding a new experience
   const handleAddExperience = (newExperience: Experience) => {
     setExperiences((prev) => [...prev, newExperience]);
+  };
+
+  // Handler for updating an existing experience
+  const handleEditExperience = (updatedExp: Experience) => {
+    setExperiences((prev) =>
+      prev.map((exp) => (exp._id === updatedExp._id ? updatedExp : exp))
+    );
+    setEditOpen(false);
+    setExperienceToEdit(null);
   };
 
   return (
@@ -97,8 +110,45 @@ const ExperienceSection: React.FC = () => {
           <EmptyExperienceReadOnly />
         )
       ) : (
-        <ExperienceList experiences={experiences} isMe={isMe} />
+        <ExperienceList
+          experiences={experiences}
+          isMe={isMe}
+          // Called when the user clicks "Edit"
+          onStartEdit={(exp) => {
+            setExperienceToEdit(exp);
+            setEditOpen(true);
+          }}
+        />
       )}
+
+      {/* Edit modal (only shown if experienceToEdit is set) */}
+      <Dialog open={editOpen} onOpenChange={setEditOpen}>
+        <DialogContent
+          id="edit-experience-dialog-content"
+          className="max-h-[45rem] overflow-y-auto dark:bg-gray-900 overflow-x-hidden !max-w-5xl sm:!w-[38.5rem] !w-full"
+        >
+          <DialogHeader>
+            <DialogTitle>
+              <Header title="Edit Experience" />
+            </DialogTitle>
+            <DialogDescription className="text-sm text-gray-500 dark:text-gray-300">
+              *Indicates required
+            </DialogDescription>
+          </DialogHeader>
+
+          {/* Render only if we have an experience to edit */}
+          {experienceToEdit && (
+            <EditExperienceModal
+              experience={experienceToEdit}
+              onClose={() => {
+                setEditOpen(false);
+                setExperienceToEdit(null);
+              }}
+              onSuccess={handleEditExperience}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </section>
   );
 };
@@ -130,30 +180,32 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({
       >
         Experiences
       </h2>
-      {isEmpty&&isMe && (
+      {isEmpty && isMe && (
         <p id="experience-section-description" className="text-sm">
           Showcase your accomplishments and get up to 2X as many profile views
           and connections
         </p>
       )}
     </div>
-    {/* Show the "+ Add Experience" button only if user is the owner and the list is not empty */}
+    {/* Only show "+ Add Experience" button if user is the owner and the list is not empty */}
     {!isEmpty && isMe && <ActionButtons onAddExperience={onAddExperience} />}
   </header>
 );
 
 /* ------------------------------------------------------------------
-   ActionButtons (only for isMe === true)
+   ActionButtons
 ------------------------------------------------------------------ */
 interface ActionButtonsProps {
   onAddExperience: (exp: Experience) => void;
 }
-
 const ActionButtons: React.FC<ActionButtonsProps> = ({ onAddExperience }) => {
   const [open, setOpen] = useState(false);
 
   return (
-    <div id="experience-section-action-buttons" className="flex items-center gap-2">
+    <div
+      id="experience-section-action-buttons"
+      className="flex items-center gap-2"
+    >
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
           <button
@@ -193,15 +245,19 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({ onAddExperience }) => {
 };
 
 /* ------------------------------------------------------------------
-   ExperienceList (displays existing experiences)
-   We hide the "edit" button if isMe === false
+   ExperienceList
 ------------------------------------------------------------------ */
 interface ExperienceListProps {
   experiences: Experience[];
   isMe: boolean;
+  /** Called when user clicks "Edit" on an experience item */
+  onStartEdit: (exp: Experience) => void;
 }
-
-const ExperienceList: React.FC<ExperienceListProps> = ({ experiences, isMe }) => (
+const ExperienceList: React.FC<ExperienceListProps> = ({
+  experiences,
+  isMe,
+  onStartEdit,
+}) => (
   <div id="experience-list-container" className="space-y-4">
     {experiences.slice(0, 3).map((experience, idx) => (
       <div
@@ -242,11 +298,11 @@ const ExperienceList: React.FC<ExperienceListProps> = ({ experiences, isMe }) =>
         )}
 
         {experience.media.length > 0 && (
-          <div>
+          <div className="mt-2">
             {experience.media.map((med) => (
               <div
                 key={med.media}
-                className="text-xs font-semibold flex items-start gap-2 mt-2"
+                className="text-xs font-semibold flex items-start gap-2"
               >
                 <img
                   src={med.media}
@@ -262,12 +318,12 @@ const ExperienceList: React.FC<ExperienceListProps> = ({ experiences, isMe }) =>
           </div>
         )}
 
-        {/* Show edit button only if isMe === true */}
         {isMe && (
           <button
             id={`experience-edit-button-${idx}`}
             aria-label="Edit Experience"
             className="hover:bg-gray-300 absolute top-0 right-0 dark:hover:text-black p-2 rounded-full transition-all duration-200 ease-in-out"
+            onClick={() => onStartEdit(experience)}
           >
             <BsPencil size={20} />
           </button>
@@ -287,23 +343,29 @@ const ExperienceList: React.FC<ExperienceListProps> = ({ experiences, isMe }) =>
 );
 
 /* ------------------------------------------------------------------
-   EmptyExperience (for isMe === true)
-   The user can add a new experience from here
+   EmptyExperience (for isMe === true when no experiences)
 ------------------------------------------------------------------ */
 interface EmptyExperienceProps {
   onAddExperience: (exp: Experience) => void;
 }
-
-const EmptyExperience: React.FC<EmptyExperienceProps> = ({ onAddExperience }) => {
+const EmptyExperience: React.FC<EmptyExperienceProps> = ({
+  onAddExperience,
+}) => {
   const [open, setOpen] = useState(false);
 
   return (
     <div id="empty-experience-container" className="grid gap-2">
-      <div id="empty-experience-info" className="opacity-65 flex gap-2 items-center">
+      <div
+        id="empty-experience-info"
+        className="opacity-65 flex gap-2 items-center"
+      >
         <div id="empty-experience-icon" className="p-3 rounded-xl border-2">
           <IoIosBriefcase size={25} />
         </div>
-        <div id="empty-experience-details" className="flex flex-col justify-center">
+        <div
+          id="empty-experience-details"
+          className="flex flex-col justify-center"
+        >
           <h2 id="empty-experience-job-title" className="font-semibold">
             Job Title
           </h2>
@@ -354,23 +416,20 @@ const EmptyExperience: React.FC<EmptyExperienceProps> = ({ onAddExperience }) =>
 
 /* ------------------------------------------------------------------
    EmptyExperienceReadOnly (for isMe === false && isEmpty)
-   The user cannot add or edit; just a read-only placeholder
 ------------------------------------------------------------------ */
-const EmptyExperienceReadOnly: React.FC = () => {
-  return (
-    <div id="empty-experience-readonly-container" className="grid gap-2">
-      <div className="opacity-65 flex gap-2 items-center">
-        <div className="p-3 rounded-xl border-2">
-          <IoIosBriefcase size={25} />
-        </div>
-        <div className="flex flex-col justify-center">
-          <h2 className="font-semibold">No Experience</h2>
-          <p className="text-sm">This user has not added any experience yet.</p>
-        </div>
+const EmptyExperienceReadOnly: React.FC = () => (
+  <div id="empty-experience-readonly-container" className="grid gap-2">
+    <div className="opacity-65 flex gap-2 items-center">
+      <div className="p-3 rounded-xl border-2">
+        <IoIosBriefcase size={25} />
+      </div>
+      <div className="flex flex-col justify-center">
+        <h2 className="font-semibold">No Experience</h2>
+        <p className="text-sm">This user has not added any experience yet.</p>
       </div>
     </div>
-  );
-};
+  </div>
+);
 
 /* ------------------------------------------------------------------
    Skeleton Loader
