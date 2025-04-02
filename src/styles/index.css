@@ -258,3 +258,6 @@ body {
 .animate-caret-blink {
     animation: caret-blink 1.25s ease-out infinite;
 }
+button{
+    @apply cursor-pointer
+}
