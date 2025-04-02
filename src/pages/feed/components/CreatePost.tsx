@@ -10,6 +10,8 @@ import { Button } from "../../../components/ui/button";
 import { Dialog, DialogContent, DialogTrigger, Modal } from "@/components";
 import { Link } from "react-router-dom";
 import CreatePostModal from "./modals/CreatePostModal";
+import { useState } from "react";
+import PostSettingsModal from "./modals/PostSettingsModal";
 
 interface CreatePostProps {
   profileImageUrl: string;
@@ -22,6 +24,7 @@ const CreatePost: React.FC<CreatePostProps> = ({ profileImageUrl }) => {
   //   console.log("Opoen");
   //   dispatch(handleOpenModalType("create_post")); // Dispatch a string identifier or an object with modal details
   // };
+  const [isSettingsModal, setIsSettingsModal] = useState<Boolean>(false);
 
   return (
     <>
@@ -43,8 +46,15 @@ const CreatePost: React.FC<CreatePostProps> = ({ profileImageUrl }) => {
                   <p className="w-full">Start a post</p>
                 </Button>
               </DialogTrigger>
-              <DialogContent>
-                <CreatePostModal />
+              <DialogContent className="dark:bg-gray-900 dark:border-gray-700 w-[70rem]">
+                {isSettingsModal ? (
+                  <PostSettingsModal setIsSettingsModal={setIsSettingsModal} />
+                ) : (
+                  <CreatePostModal
+                    profileImageUrl={profileImageUrl}
+                    setIsSettings={setIsSettingsModal}
+                  />
+                )}
               </DialogContent>
             </Dialog>
           </div>
