@@ -57,7 +57,7 @@ const TruncatedText: React.FC<TruncatedTextProps> = ({
   }, [content, expanded, lineCount]);
 
   return (
-    <div>
+    <div className="pl-4">
       {/* Hidden element for measurement (off-screen) */}
       <p
         ref={textRef}

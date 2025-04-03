@@ -54,7 +54,7 @@ const PostHeader: React.FC<PostHeaderProps> = ({
   post,
 }) => {
   return (
-    <header className="flex items-center space-x-3 w-full">
+    <header className="flex items-center space-x-3 w-full pl-4">
       <img
         src={user.profileImage}
         alt={user.name}
