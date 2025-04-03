@@ -8,12 +8,16 @@ import {
 } from "@/endpoints/myNetwork";
 import Cookies from "js-cookie";
 import useFetchData from "@/hooks/useFetchData";
-
+import { useParams } from "react-router-dom";
 const Invitations = () => {
   const [invitations, setInvitations] = useState<ReceivedConnections[]>([]);
   const token = Cookies.get("linkup_auth_token");
+  const { id } = useParams();
   const { data } = useFetchData(
-    () => (token ? fetchRecievedConnections(token) : Promise.resolve(null)),
+    () =>
+      token
+        ? fetchRecievedConnections(token, id as string, 3)
+        : Promise.resolve(null),
     [token]
   );
 

@@ -160,7 +160,9 @@ export const fetchConnectionsNumber = async (
 };
 
 export const fetchRecievedConnections = async (
-  token: string
+  token: string,
+  cursor: string | null,
+  limit: number
 ): Promise<ReceivedConnectionsResponse> => {
   const response = await axiosInstance.get(
     "/api/v1/user/my-network/invitation-manager/received",
@@ -168,13 +170,16 @@ export const fetchRecievedConnections = async (
       headers: {
         Authorization: `Bearer ${token}`,
       },
+      params: { cursor, limit }
     }
   );
   return response.data;
 };
 
 export const fetchSentConnections = async (
-  token: string
+  token: string,
+  cursor: string | null,
+  limit: number
 ): Promise<SentConnectionsResponse> => {
   const response = await axiosInstance.get(
     "/api/v1/user/my-network/invitation-manager/sent",
@@ -182,6 +187,7 @@ export const fetchSentConnections = async (
       headers: {
         Authorization: `Bearer ${token}`,
       },
+      params: { cursor, limit }
     }
   );
   return response.data;
