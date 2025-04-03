@@ -333,7 +333,7 @@ const ExperienceList: React.FC<ExperienceListProps> = ({
     {experiences.slice(0, 3).map((experience, idx) => (
       <div
         id={`experience-item-${experience._id}`}
-        key={experience._id}
+        key={idx}
         className="border-l-2 border-blue-600 pl-4 relative"
       >
         <h3 id={`experience-title-${experience._id}`} className="font-bold">
@@ -370,9 +370,9 @@ const ExperienceList: React.FC<ExperienceListProps> = ({
 
         {experience.media.length > 0 && (
           <div className="mt-2">
-            {experience.media.map((med) => (
+            {experience.media.map((med, idx) => (
               <div
-                key={med.media}
+                key={`${med.media}-${idx}`}
                 className="text-xs font-semibold flex items-start gap-2"
               >
                 <img
