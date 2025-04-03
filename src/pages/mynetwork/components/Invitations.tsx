@@ -37,7 +37,7 @@ const Invitations = () => {
       }
 
       try {
-        console.log(token)
+        console.log(token);
         await acceptInvitation(token, userId);
 
         setInvitations((prevInvitations) =>
@@ -77,6 +77,7 @@ const Invitations = () => {
           Invitations ({data?.numberOfReceivedConnections ?? 0})
         </h2>
         <button
+          id="showall-invitations-button"
           className="text-blue-600 hover:underline cursor-pointer"
           onClick={() => navigate("/manage-invitations")}
         >
@@ -125,12 +126,14 @@ const Invitations = () => {
             </a>
             <div className="flex space-x-2">
               <button
+                id="ignore-invitation-button"
                 onClick={() => ignoreInvitations(invite.user_id)}
                 className="px-3 py-1 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white cursor-pointer"
               >
                 Ignore
               </button>
               <button
+                id="accept-invitation-button"
                 onClick={() => acceptInvitations(invite.user_id)}
                 className="px-4 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 cursor-pointer"
               >
