@@ -41,6 +41,8 @@ export interface PostType {
     content: string;
     date: number;
     images?: string[];
+    video?: string;
+    pdf?: string;
     public: boolean;
     edited?: boolean;
   };
@@ -213,4 +215,24 @@ export interface MenuAction {
   action: () => void;
   subtext?: string;
   icon: React.ReactNode;
+}
+
+export enum MediaType {
+  image = "image",
+  images = "images",
+  video = "video",
+  pdf = "pdf",
+  post = "post",
+  link = "link",
+  none = "none",
+}
+
+export interface PostDBObject {
+  token: string; // auth token
+  content: string; // Text content of the post
+  mediaType: MediaType; // Type of media (e.g., "image", "video", etc.)
+  media: string[]; // Array of media URLs or Base64 strings
+  commentsDisabled: string; // Indicates if comments are disabled (e.g., "true" or "false")
+  publicPost: boolean; // Whether the post is public or not
+  taggedUsers: string[]; // Array of user IDs tagged in the post
 }
