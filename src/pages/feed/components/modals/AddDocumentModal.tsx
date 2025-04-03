@@ -1,12 +1,11 @@
-import React from "react";
-import TransparentButton from "../buttons/TransparentButton";
 import BlueButton from "../buttons/BlueButton";
+import TransparentButton from "../buttons/TransparentButton";
 
-interface UploadMediaModalProps {
+interface AddDocumentModalProps {
   setActiveModal: (value: string) => void; // Similar to PostSettingsModalProps
 }
 
-const UploadMediaModal: React.FC<UploadMediaModalProps> = ({
+const AddDocumentModal: React.FC<AddDocumentModalProps> = ({
   setActiveModal,
 }) => {
   return (
@@ -21,4 +20,4 @@ const UploadMediaModal: React.FC<UploadMediaModalProps> = ({
   );
 };
 
-export default UploadMediaModal;
+export default AddDocumentModal;
