@@ -8,6 +8,7 @@ export interface Following {
 }
 export interface FollowingResponse {
   following: Following[];
+  nextCursor: string;
 }
 
 export interface Followers {
@@ -20,6 +21,7 @@ export interface Followers {
 
 export interface FollowersResponse {
   followers: Followers[];
+  nextCursor: string;
 }
 
 export interface Connection {
@@ -32,6 +34,7 @@ export interface Connection {
 
 export interface ConnectionResponse {
   connections: Connection[];
+  nextCursor: string;
 }
 
 export interface ConnectionsNumber {
@@ -52,6 +55,7 @@ export interface ReceivedConnections {
 export interface ReceivedConnectionsResponse {
   receivedConnections: ReceivedConnections[];
   numberOfReceivedConnections: number;
+  nextCursor: string;
 }
 
 export interface SentConnections {
@@ -64,17 +68,22 @@ export interface SentConnections {
 
 export interface SentConnectionsResponse {
   sentConnections: SentConnections[];
+  nextCursor: string;
 }
 
 export const fetchConnections = async (
-  token: string
+  token: string,
+  userId: string,
+  cursor: string | null,
+  limit: number
 ): Promise<ConnectionResponse> => {
   const response = await axiosInstance.get(
-    "/api/v1/user/my-network/invite-connect/connections",
+    `/api/v1/user/my-network/invite-connect/connections/${userId}`,
     {
       headers: {
         Authorization: `Bearer ${token}`,
       },
+      params: { cursor, limit },
     }
   );
   console.log("Connections response:", response.data);
@@ -96,11 +105,13 @@ export const removeConnections = async (
   );
 
   console.log("Remove connection response:", response.data);
-  return response.data; // Return the response if you want to handle the result further
+  return response.data;
 };
 
 export const fetchFollowers = async (
   token: string
+  // cursor: string | null,
+  // limit: number
 ): Promise<FollowersResponse> => {
   const response = await axiosInstance.get(
     "/api/v1/user/my-network/network-manager/followers",
@@ -108,6 +119,7 @@ export const fetchFollowers = async (
       headers: {
         Authorization: `Bearer ${token}`,
       },
+      // params: { cursor, limit },
     }
   );
   console.log("Followers response:", response.data);
@@ -116,6 +128,8 @@ export const fetchFollowers = async (
 
 export const fetchFollowing = async (
   token: string
+  // cursor: string | null,
+  // limit: number
 ): Promise<FollowingResponse> => {
   const response = await axiosInstance.get(
     "/api/v1/user/my-network/network-manager/following",
@@ -123,6 +137,7 @@ export const fetchFollowing = async (
       headers: {
         Authorization: `Bearer ${token}`,
       },
+      // params: { cursor, limit },
     }
   );
   console.log("Following response:", response.data);
@@ -172,7 +187,7 @@ export const fetchSentConnections = async (
   return response.data;
 };
 
-export const UnfollowUser = async (
+export const unfollowUser = async (
   token: string,
   userId: string
 ): Promise<{ message: string }> => {
@@ -187,7 +202,7 @@ export const UnfollowUser = async (
   return response.data;
 };
 
-export const FollowUser = async (
+export const followUser = async (
   token: string,
   userId: string
 ): Promise<{ message: string }> => {
