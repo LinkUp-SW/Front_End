@@ -2,10 +2,9 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { WithNavBar } from '../../components';
 import Sidebar from './components/jobsPageComponents/Sidebar';
 import TopJobPicks from './components/jobsPageComponents/TopJobsPicks';
-import JobCollections from './components/jobsPageComponents/JobCollection';
 import RecentSearches from './components/jobsPageComponents/RecentSearches';
 import MoreJobs from './components/jobsPageComponents/MoreJobs';
-import { SAMPLE_JOBS, RECENT_SEARCHES } from '../../constants/index';
+import { RECENT_SEARCHES } from '../../constants/index';
 import { Job } from './types';
 import { fetchJobs, JobData, fetchTopJobs } from '../../endpoints/jobs';
 import Cookies from 'js-cookie';
@@ -97,13 +96,12 @@ const JobsPage: React.FC = () => {
       
       setTopJobsLoading(true);
       try {
-        const response = await fetchTopJobs(token, 3); // Get top 3 jobs
+        const response = await fetchTopJobs(token, 3); 
         const newJobs = convertApiDataToJobs(response.data);
         setTopJobs(newJobs);
       } catch (error) {
         console.error('Error fetching top jobs:', error);
-        // Fallback to sample jobs if API fails
-        setTopJobs(SAMPLE_JOBS.slice(0, 3));
+  
       } finally {
         setTopJobsLoading(false);
       }
@@ -186,11 +184,6 @@ const JobsPage: React.FC = () => {
             loading={topJobsLoading}
           />
 
-          {/* Job collections section */}
-          <JobCollections 
-            jobs={SAMPLE_JOBS.slice(3, 5)} 
-            onDismissJob={(id) => {}} 
-          />
           
           {/* Recent job searches section */}
           <RecentSearches 
