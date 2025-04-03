@@ -46,7 +46,7 @@ const MoreJobs: React.FC<MoreJobsProps> = ({
       
       {(!hasMore && jobs.length > 0) && (
         <div className="p-4 text-center">
-          <p className="text-gray-600 dark:text-gray-400">No more jobs to load</p>
+          <p className="text-gray-600 dark:text-gray-400">No more jobs available</p>
         </div>
       )}
       
