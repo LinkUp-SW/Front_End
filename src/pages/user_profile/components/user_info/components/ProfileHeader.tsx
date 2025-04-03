@@ -23,7 +23,7 @@ export const ProfileHeader = ({
       </p>
       <ContactInfoModal user={user} triggerLabel={`Contact Info`} />
     </div>
-    <Link to={'#'} className="text-blue-600 hover:underline font-semibold dark:text-blue-400">
+    <Link to={'/connections'} className="text-blue-600 hover:underline font-semibold dark:text-blue-400">
       {connectionsCount} connections
     </Link>
   </div>
