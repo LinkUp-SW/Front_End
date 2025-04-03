@@ -25,7 +25,7 @@ const JobCard: React.FC<JobCardProps> = ({ job, onDismiss }) => (
         </button>
       </div>
       
-      <div className="text-sm text-gray-800 dark:text-gray-200">{job.company} · {job.location}</div>
+      <div className="text-sm text-gray-800 dark:text-gray-200">{job.company} · {job.location} ({job.workMode})</div>
       
       {job.alumniCount && (
         <div className="mt-1 text-xs text-gray-600 dark:text-gray-400 flex items-center gap-1">
