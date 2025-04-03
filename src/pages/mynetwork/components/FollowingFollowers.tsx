@@ -4,8 +4,8 @@ import {
   Following,
   Followers,
   fetchFollowers,
-  UnfollowUser,
-  FollowUser,
+  unfollowUser,
+  followUser,
 } from "@/endpoints/myNetwork";
 import Cookies from "js-cookie";
 import withSidebarAd from "@/components/hoc/withSidebarAd";
@@ -19,7 +19,9 @@ import UnfollowUserModal from "./modals/UnfollowUserModal";
 import { DialogDescription, DialogTitle } from "@radix-ui/react-dialog";
 
 const FollowingFollowers: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<"following" | "followers">("following");
+  const [activeTab, setActiveTab] = useState<"following" | "followers">(
+    "following"
+  );
   const [following, setFollowing] = useState<Following[]>([]);
   const [followers, setFollowers] = useState<Followers[]>([]);
   const [loading, setLoading] = useState(false);
@@ -50,7 +52,9 @@ const FollowingFollowers: React.FC = () => {
         setFollowers(
           followersRes.followers.map((user) => ({
             ...user,
-            isFollowing: followingRes.following.some((f) => f.user_id === user.user_id),
+            isFollowing: followingRes.following.some(
+              (f) => f.user_id === user.user_id
+            ),
           }))
         );
       } else {
@@ -69,36 +73,42 @@ const FollowingFollowers: React.FC = () => {
   }, [loadFollowingFollowers]);
 
   // Handle Unfollow
-  const handleUnfollowUser = useCallback(async (userId: string) => {
-    if (!token) {
-      console.error("No authentication token found.");
-      return;
-    }
+  const handleUnfollowUser = useCallback(
+    async (userId: string) => {
+      if (!token) {
+        console.error("No authentication token found.");
+        return;
+      }
 
-    try {
-      await UnfollowUser(token, userId);
-      // Re-fetch data after unfollowing
-      loadFollowingFollowers();
-    } catch (error) {
-      console.error("Error unfollowing user:", error);
-    }
-  }, [token, loadFollowingFollowers]);
+      try {
+        await unfollowUser(token, userId);
+        // Re-fetch data after unfollowing
+        loadFollowingFollowers();
+      } catch (error) {
+        console.error("Error unfollowing user:", error);
+      }
+    },
+    [token, loadFollowingFollowers]
+  );
 
   // Handle Follow
-  const handleFollowUser = useCallback(async (userId: string) => {
-    if (!token) {
-      console.error("No authentication token found.");
-      return;
-    }
+  const handleFollowUser = useCallback(
+    async (userId: string) => {
+      if (!token) {
+        console.error("No authentication token found.");
+        return;
+      }
 
-    try {
-      await FollowUser(token, userId);
-      // Re-fetch data after following
-      loadFollowingFollowers();
-    } catch (error) {
-      console.error("Error following user:", error);
-    }
-  }, [token, loadFollowingFollowers]);
+      try {
+        await followUser(token, userId);
+        // Re-fetch data after following
+        loadFollowingFollowers();
+      } catch (error) {
+        console.error("Error following user:", error);
+      }
+    },
+    [token, loadFollowingFollowers]
+  );
 
   if (loading) {
     return <div>Loading...</div>;
@@ -108,6 +118,7 @@ const FollowingFollowers: React.FC = () => {
     <div className="flex-1 bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 transition-all flex flex-col max-h-fit">
       <div className="flex border-b">
         <button
+          id="following-button"
           className={`px-4 py-2 text-lg font-semibold transition-colors ${
             activeTab === "following"
               ? "border-b-2 border-blue-500 text-blue-500"
@@ -118,6 +129,7 @@ const FollowingFollowers: React.FC = () => {
           Following
         </button>
         <button
+          id="followers-button"
           className={`px-4 py-2 text-lg font-semibold transition-colors ${
             activeTab === "followers"
               ? "border-b-2 border-blue-500 text-blue-500"
@@ -151,45 +163,50 @@ const FollowingFollowers: React.FC = () => {
             {activeTab === "following" ? (
               <Dialog>
                 <DialogTrigger asChild>
-                  <button className="px-4 py-2 bg-red-500 text-white rounded-lg flex items-center hover:bg-red-600 transition-colors">
+                  <button
+                    id="unfollow-dialog-following-button"
+                    className="px-4 py-2 bg-red-500 text-white rounded-lg flex items-center hover:bg-red-600 transition-colors"
+                  >
                     Unfollow
                   </button>
                 </DialogTrigger>
-                <DialogContent>
-                  <UnfollowUserModal
-                    userData={{ userName: user.name, userId: user.user_id }}
-                    onConfirm={() => handleUnfollowUser(user.user_id)}
-                  />
-                <DialogHeader>
-                        <DialogTitle></DialogTitle>
-                        <DialogDescription></DialogDescription>
-                      </DialogHeader>
-                    </DialogContent>
-                  </Dialog>
-            ) : (user as Followers).following ?  (
-              <Dialog>
-                <DialogTrigger asChild>
-                  <span>
-                    <button className="px-4 py-2 bg-red-500 text-white rounded-lg flex items-center hover:bg-red-600 transition-colors">
-                      Unfollow
-                    </button>
-                  </span>
-                </DialogTrigger>
-                <DialogContent>
+                <DialogContent className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg shadow-lg p-6">
                   <UnfollowUserModal
                     userData={{ userName: user.name, userId: user.user_id }}
                     onConfirm={() => handleUnfollowUser(user.user_id)}
                   />
                   <DialogHeader>
                     <DialogTitle></DialogTitle>
-                    <DialogDescription>
-                       
-                    </DialogDescription>
+                    <DialogDescription></DialogDescription>
+                  </DialogHeader>
+                </DialogContent>
+              </Dialog>
+            ) : (user as Followers).following ? (
+              <Dialog>
+                <DialogTrigger asChild>
+                  <span>
+                    <button
+                      id="unfollow-dialog-followers-button"
+                      className="px-4 py-2 bg-red-500 text-white rounded-lg flex items-center hover:bg-red-600 transition-colors"
+                    >
+                      Unfollow
+                    </button>
+                  </span>
+                </DialogTrigger>
+                <DialogContent className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg shadow-lg p-6">
+                  <UnfollowUserModal
+                    userData={{ userName: user.name, userId: user.user_id }}
+                    onConfirm={() => handleUnfollowUser(user.user_id)}
+                  />
+                  <DialogHeader>
+                    <DialogTitle></DialogTitle>
+                    <DialogDescription></DialogDescription>
                   </DialogHeader>
                 </DialogContent>
               </Dialog>
             ) : (
               <button
+                id="follow-button"
                 className="px-4 py-2 bg-blue-500 text-white rounded-lg flex items-center hover:bg-blue-600 transition-colors"
                 onClick={() => handleFollowUser(user.user_id)}
               >
