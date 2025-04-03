@@ -188,6 +188,7 @@ export interface Bio {
   experience: string[];
   education: string[];
   website: string;
+  
 }
 
 export interface UserProfileBio {
@@ -204,5 +205,6 @@ export interface UserProfileBio {
   is_in_sent_connections?: boolean;
   name_of_one_mutual_connection?: string;
   isInConnections?: boolean;
+  isConnectByEmail:boolean
   isAlreadyFollowing?: boolean;
 }
