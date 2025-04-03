@@ -176,7 +176,7 @@ const FollowingFollowers: React.FC = () => {
     <div className="flex-1 bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 transition-all flex flex-col max-h-fit">
       <div className="flex border-b">
         <button
-          id="following-button"
+          id="following-tab-button"
           className={`px-4 py-2 text-lg font-semibold transition-colors ${
             activeTab === "following"
               ? "border-b-2 border-blue-500 text-blue-500"
@@ -190,7 +190,7 @@ const FollowingFollowers: React.FC = () => {
           Following
         </button>
         <button
-          id="followers-button"
+          id="followers-tab-button"
           className={`px-4 py-2 text-lg font-semibold transition-colors ${
             activeTab === "followers"
               ? "border-b-2 border-blue-500 text-blue-500"
@@ -227,7 +227,10 @@ const FollowingFollowers: React.FC = () => {
             {activeTab === "following" ? (
               <Dialog>
                 <DialogTrigger asChild>
-                  <button className="px-4 py-2 bg-red-500 text-white rounded-lg flex items-center hover:bg-red-600 transition-colors">
+                  <button
+                    id="unfollow-button-1"
+                    className="px-4 py-2 bg-red-500 text-white rounded-lg flex items-center hover:bg-red-600 transition-colors"
+                  >
                     Unfollow
                   </button>
                 </DialogTrigger>
@@ -245,7 +248,10 @@ const FollowingFollowers: React.FC = () => {
             ) : (user as Followers).following ? (
               <Dialog>
                 <DialogTrigger asChild>
-                  <button className="px-4 py-2 bg-red-500 text-white rounded-lg flex items-center hover:bg-red-600 transition-colors">
+                  <button
+                    id="unfollow-button-2"
+                    className="px-4 py-2 bg-red-500 text-white rounded-lg flex items-center hover:bg-red-600 transition-colors"
+                  >
                     Unfollow
                   </button>
                 </DialogTrigger>
@@ -262,6 +268,7 @@ const FollowingFollowers: React.FC = () => {
               </Dialog>
             ) : (
               <button
+                id="follow-button-3"
                 className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
                 onClick={() => handleFollowUser(user.user_id)}
               >
