@@ -234,7 +234,10 @@ const FollowingFollowers: React.FC = () => {
                     Unfollow
                   </button>
                 </DialogTrigger>
-                <DialogContent>
+                <DialogContent
+                  id="unfollow-dialog1-content"
+                  className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg shadow-lg p-6"
+                >
                   <UnfollowUserModal
                     userData={{ userName: user.name, userId: user.user_id }}
                     onConfirm={() => handleUnfollowUser(user.user_id)}
@@ -255,7 +258,10 @@ const FollowingFollowers: React.FC = () => {
                     Unfollow
                   </button>
                 </DialogTrigger>
-                <DialogContent>
+                <DialogContent
+                  id="unfollow-dialog2-content"
+                  className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg shadow-lg p-6"
+                >
                   <UnfollowUserModal
                     userData={{ userName: user.name, userId: user.user_id }}
                     onConfirm={() => handleUnfollowUser(user.user_id)}
