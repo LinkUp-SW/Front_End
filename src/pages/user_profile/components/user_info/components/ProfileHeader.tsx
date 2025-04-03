@@ -4,12 +4,14 @@ import { ContactInfoModal } from "./ContactInfoModal";
 import { Link } from "react-router-dom";
 
 type ProfileHeaderProps = {
+  userid: string;
   user: Bio;
   connectionsCount: number;
 };
 
 export const ProfileHeader = ({
   user,
+  userid,
   connectionsCount,
 }: ProfileHeaderProps) => (
   <div className="mb-4 grid gap-1">
@@ -23,7 +25,10 @@ export const ProfileHeader = ({
       </p>
       <ContactInfoModal user={user} triggerLabel={`Contact Info`} />
     </div>
-    <Link to={'/connections'} className="text-blue-600 hover:underline font-semibold dark:text-blue-400">
+    <Link
+      to={`/connections/${userid}`}
+      className="text-blue-600 hover:underline font-semibold dark:text-blue-400"
+    >
       {connectionsCount} connections
     </Link>
   </div>

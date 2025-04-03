@@ -65,6 +65,7 @@ const UserInfo = () => {
 
       <div className="pt-20 px-6 pb-6">
         <ProfileHeader
+          userid={id}
           user={data.bio}
           connectionsCount={data.number_of_connections}
         />

@@ -7,9 +7,9 @@ import { CiCirclePlus, CiClock2 } from "react-icons/ci";
 import { FaUserPlus, FaUserMinus, FaPaperPlane } from "react-icons/fa";
 import {
   connectWithUser,
-  FollowUser,
+  followUser,
   removeUserFromConnection,
-  UnfollowUser,
+  unfollowUser,
   withdrawInvitation,
 } from "@/endpoints/myNetwork";
 import { useNavigate, useParams } from "react-router-dom";
@@ -65,7 +65,7 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
   const handleFollow = useCallback(async () => {
     console.log("Follow clicked");
     try {
-      const response = await FollowUser(authToken as string, id as string);
+      const response = await followUser(authToken as string, id as string);
       console.log(response);
       toast.success(response.message);
       setLocalFollowStatus((prev) => ({
@@ -84,7 +84,7 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
   const handleUnfollow = useCallback(async () => {
     console.log("Unfollow clicked");
     try {
-      const response = await UnfollowUser(authToken as string, id as string);
+      const response = await unfollowUser(authToken as string, id as string);
       console.log(response);
       toast.success(response.message);
       setLocalFollowStatus((prev) => ({ ...prev, isFollowing: false }));
