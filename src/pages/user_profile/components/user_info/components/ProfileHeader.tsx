@@ -27,7 +27,7 @@ export const ProfileHeader = ({
     </div>
     <Link
       to={`/connections/${userid}`}
-      className="text-blue-600 hover:underline font-semibold dark:text-blue-400"
+      className="text-blue-600 hover:underline w-fit font-semibold dark:text-blue-400"
     >
       {connectionsCount} connections
     </Link>
