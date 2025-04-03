@@ -34,3 +34,16 @@ export const fetchJobs = async (token: string, limit: number = 10, cursor?: stri
     console.log("Jobs response:", response.data);
     return response.data;
   };
+
+export const fetchTopJobs = async (token: string, limit: number = 3): Promise<JobResponse> => {
+    const url = `/api/v1/jobs/get-top-jobs?limit=${limit}`;
+    
+    const response = await axiosInstance.get(url, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    
+    console.log("Top Jobs response:", response.data);
+    return response.data;
+  };  

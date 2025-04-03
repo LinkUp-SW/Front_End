@@ -7,15 +7,16 @@ import RecentSearches from './components/jobsPageComponents/RecentSearches';
 import MoreJobs from './components/jobsPageComponents/MoreJobs';
 import { SAMPLE_JOBS, RECENT_SEARCHES } from '../../constants/index';
 import { Job } from './types';
-import { fetchJobs, JobData } from '../../endpoints/jobs';
+import { fetchJobs, JobData, fetchTopJobs } from '../../endpoints/jobs';
 import Cookies from 'js-cookie';
 
 const JobsPage: React.FC = () => {
   // State for job listings
-  const [jobs, setJobs] = useState<Job[]>(SAMPLE_JOBS);
+  const [topJobs, setTopJobs] = useState<Job[]>([]);
   const [moreJobs, setMoreJobs] = useState<Job[]>([]);
   const [recentSearches, setRecentSearches] = useState(RECENT_SEARCHES);
   const [loading, setLoading] = useState(false);
+  const [topJobsLoading, setTopJobsLoading] = useState(false);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(true);
   
@@ -27,8 +28,8 @@ const JobsPage: React.FC = () => {
   const JOBS_PER_PAGE = 5;
 
   // Handle job dismissal
-  const dismissJob = (jobId: string) => {
-    setJobs(jobs.filter(job => job.id !== jobId));
+  const dismissTopJob = (jobId: string) => {
+    setTopJobs(topJobs.filter(job => job.id !== jobId));
   };
 
   // Handle more job dismissal
@@ -85,7 +86,33 @@ const JobsPage: React.FC = () => {
     }
   }, [nextCursor, hasMore, loading]);
 
-  // Initial job fetch
+  // Fetch top jobs
+  useEffect(() => {
+    const fetchInitialTopJobs = async () => {
+      const token = Cookies.get('linkup_auth_token');
+      if (!token) {
+        console.error('No authentication token found. Please log in.');
+        return;
+      }
+      
+      setTopJobsLoading(true);
+      try {
+        const response = await fetchTopJobs(token, 3); // Get top 3 jobs
+        const newJobs = convertApiDataToJobs(response.data);
+        setTopJobs(newJobs);
+      } catch (error) {
+        console.error('Error fetching top jobs:', error);
+        // Fallback to sample jobs if API fails
+        setTopJobs(SAMPLE_JOBS.slice(0, 3));
+      } finally {
+        setTopJobsLoading(false);
+      }
+    };
+    
+    fetchInitialTopJobs();
+  }, []);
+
+  // Initial regular jobs fetch
   useEffect(() => {
     const fetchInitialJobs = async () => {
       const token = Cookies.get('linkup_auth_token');
@@ -154,14 +181,15 @@ const JobsPage: React.FC = () => {
         <div className="w-full md:w-3/4">
           {/* Top job picks section */}
           <TopJobPicks 
-            jobs={jobs.slice(0, 3)} 
-            onDismissJob={dismissJob} 
+            jobs={topJobs} 
+            onDismissJob={dismissTopJob}
+            loading={topJobsLoading}
           />
-          
+
           {/* Job collections section */}
           <JobCollections 
-            jobs={jobs.slice(3, 5)} 
-            onDismissJob={dismissJob} 
+            jobs={SAMPLE_JOBS.slice(3, 5)} 
+            onDismissJob={(id) => {}} 
           />
           
           {/* Recent job searches section */}
