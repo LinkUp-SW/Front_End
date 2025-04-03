@@ -1,25 +1,21 @@
-
 import axiosInstance from "@/services/axiosInstance";
 
 export interface Following {
-  user_id: string,
-  name: string,
-  headline: string,
-  profilePicture:string,
-  
+  user_id: string;
+  name: string;
+  headline: string;
+  profilePicture: string;
 }
 export interface FollowingResponse {
   following: Following[];
 }
 
-export interface Followers
-{
-  user_id: string,
-  name: string,
-  headline: string,
-  profilePicture:string,
-  following:boolean
-
+export interface Followers {
+  user_id: string;
+  name: string;
+  headline: string;
+  profilePicture: string;
+  following: boolean;
 }
 
 export interface FollowersResponse {
@@ -27,61 +23,52 @@ export interface FollowersResponse {
 }
 
 export interface Connection {
-  
-  user_id: string,
-  name: string,
-  headline: string,
-  profilePicture: string,
-  date: Date
+  user_id: string;
+  name: string;
+  headline: string;
+  profilePicture: string;
+  date: Date;
 }
 
 export interface ConnectionResponse {
   connections: Connection[];
 }
 
-export interface ConnectionsNumber
-{
-  user_id: string,
-  number_of_connections: number
+export interface ConnectionsNumber {
+  user_id: string;
+  number_of_connections: number;
 }
 
-export interface ReceivedConnections 
-  {
-      user_id: string,
-      name: string,
-      headline: string,
-      profilePicture: string,
-      numberOfMutualConnections: number,
-      nameOfOneMutualConnection: string,
-      date: Date
-  }
+export interface ReceivedConnections {
+  user_id: string;
+  name: string;
+  headline: string;
+  profilePicture: string;
+  numberOfMutualConnections: number;
+  nameOfOneMutualConnection: string;
+  date: Date;
+}
 
-  export interface ReceivedConnectionsResponse 
-  {
-    receivedConnections:ReceivedConnections [], 
-    numberOfReceivedConnections: number
+export interface ReceivedConnectionsResponse {
+  receivedConnections: ReceivedConnections[];
+  numberOfReceivedConnections: number;
+}
 
-  }
+export interface SentConnections {
+  user_id: string;
+  name: string;
+  headline: string;
+  profilePicture: string;
+  date: Date;
+}
 
-  export interface SentConnections
-  
-    {
-      user_id: string,
-      name: string,
-      headline: string,
-      profilePicture: string,
-      date: Date
-  }
+export interface SentConnectionsResponse {
+  sentConnections: SentConnections[];
+}
 
-  export interface SentConnectionsResponse
-  {
-    sentConnections:SentConnections []
-  }
-
-  
-
-
-export const fetchConnections = async (token: string): Promise<ConnectionResponse> => {
+export const fetchConnections = async (
+  token: string
+): Promise<ConnectionResponse> => {
   const response = await axiosInstance.get(
     "/api/v1/user/my-network/invite-connect/connections",
     {
@@ -91,135 +78,136 @@ export const fetchConnections = async (token: string): Promise<ConnectionRespons
     }
   );
   console.log("Connections response:", response.data);
-  return response.data; 
-  
+  return response.data;
 };
 
-export const removeConnections = async (token: string, userId: string): Promise<void> => {
-  
-    // Call the API with the dynamic userId in the URL
-    const response = await axiosInstance.delete(
-      `/api/v1/user/my-network/connections/remove/${userId}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        
-      }
-    );
-    
-    console.log("Remove connection response:", response.data);
-    return response.data;  // Return the response if you want to handle the result further
-
-  
-};
-
-
-
-export const fetchFollowers= async (token:string): Promise<FollowersResponse> => {
-
-  const response= await axiosInstance.get("/api/v1/user/my-network/network-manager/followers",
+export const removeConnections = async (
+  token: string,
+  userId: string
+): Promise<void> => {
+  // Call the API with the dynamic userId in the URL
+  const response = await axiosInstance.delete(
+    `/api/v1/user/my-network/connections/remove/${userId}`,
     {
-      headers:
-      {
-         Authorization: `Bearer ${token}`
-      }
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     }
-  )
+  );
+
+  console.log("Remove connection response:", response.data);
+  return response.data; // Return the response if you want to handle the result further
+};
+
+export const fetchFollowers = async (
+  token: string
+): Promise<FollowersResponse> => {
+  const response = await axiosInstance.get(
+    "/api/v1/user/my-network/network-manager/followers",
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
   console.log("Followers response:", response.data);
-  return response.data
-}
+  return response.data;
+};
 
-export const fetchFollowing= async (token:string): Promise<FollowingResponse> => {
-
-  const response= await axiosInstance.get("/api/v1/user/my-network/network-manager/following",
+export const fetchFollowing = async (
+  token: string
+): Promise<FollowingResponse> => {
+  const response = await axiosInstance.get(
+    "/api/v1/user/my-network/network-manager/following",
     {
-      headers:
-      {
-         Authorization: `Bearer ${token}`
-      }
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     }
-  )
+  );
   console.log("Following response:", response.data);
-  return response.data
-}
+  return response.data;
+};
 
-export const fetchConnectionsNumber= async (token:string): Promise<ConnectionsNumber> => {
-
-  const response= await axiosInstance.get("/api/v1/user/my-network/connections/count",
+export const fetchConnectionsNumber = async (
+  token: string
+): Promise<ConnectionsNumber> => {
+  const response = await axiosInstance.get(
+    "/api/v1/user/my-network/connections/count",
     {
-      headers:
-      {
-         Authorization: `Bearer ${token}`
-      }
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     }
-  )
+  );
   console.log("Connections number response:", response.data);
-  return response.data
-}
+  return response.data;
+};
 
-export const fetchRecievedConnections= async (token:string): Promise<ReceivedConnectionsResponse> =>{
-  const response= await axiosInstance.get("/api/v1/user/my-network/invitation-manager/received",
-  {
-    headers:
+export const fetchRecievedConnections = async (
+  token: string
+): Promise<ReceivedConnectionsResponse> => {
+  const response = await axiosInstance.get(
+    "/api/v1/user/my-network/invitation-manager/received",
     {
-       Authorization: `Bearer ${token}`
-      
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     }
-  }
-)
-  return response.data
+  );
+  return response.data;
+};
 
-}
-
-export const fetchSentConnections= async (token:string): Promise<SentConnectionsResponse> =>{
-  const response= await axiosInstance.get("/api/v1/user/my-network/invitation-manager/sent",
-  {
-    headers:
+export const fetchSentConnections = async (
+  token: string
+): Promise<SentConnectionsResponse> => {
+  const response = await axiosInstance.get(
+    "/api/v1/user/my-network/invitation-manager/sent",
     {
-       Authorization: `Bearer ${token}`
-      
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     }
-  }
-)
-  return response.data
+  );
+  return response.data;
+};
 
-}
-
-export const UnfollowUser= async (token:string, userId:string): Promise<void> => {
-  const response= await axiosInstance.delete(`/api/v1/user/unfollow/${userId}`,
-  {
-    headers:
+export const UnfollowUser = async (
+  token: string,
+  userId: string
+): Promise<{ message: string }> => {
+  const response = await axiosInstance.delete(
+    `/api/v1/user/unfollow/${userId}`,
     {
-       Authorization: `Bearer ${token}`
-      
-    },
-    
-  }
-)
-  return response.data
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
 
-}
-
-export const FollowUser= async(token:string, userId:string): Promise<void> => {
-  const response= await axiosInstance.post(`/api/v1/user/follow/${userId}`,
-  
+export const FollowUser = async (
+  token: string,
+  userId: string
+): Promise<{ message: string }> => {
+  const response = await axiosInstance.post(
+    `/api/v1/user/follow/${userId}`,
     {},
     {
-    headers:
-    {
-       Authorization: `Bearer ${token}`
-      
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     }
-  }
-    
-  
-)
-  return response.data
+  );
 
-}
+  return response.data;
+};
 
-export const acceptInvitation = async (token: string, userId: string): Promise<void> => {
+export const acceptInvitation = async (
+  token: string,
+  userId: string
+): Promise<void> => {
   const response = await axiosInstance.post(
     `/api/v1/user/accept/${userId}`,
     {}, // Empty body if no additional data is required
@@ -231,36 +219,69 @@ export const acceptInvitation = async (token: string, userId: string): Promise<v
   );
   return response.data;
 };
-export const ignoreInvitation= async(token:string, userId:string): Promise<void> => {
-  const response= await axiosInstance.delete(`/api/v1/user/my-network/invitation-manager/ignore/${userId}`,
-  {
-    headers:
+export const ignoreInvitation = async (
+  token: string,
+  userId: string
+): Promise<void> => {
+  const response = await axiosInstance.delete(
+    `/api/v1/user/my-network/invitation-manager/ignore/${userId}`,
     {
-       Authorization: `Bearer ${token}`
-      
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      data: {
+        userId: userId,
+      },
+    }
+  );
+  return response.data;
+};
+
+export const withdrawInvitation = async (
+  token: string,
+  userId: string
+): Promise<{ message: string }> => {
+  const response = await axiosInstance.delete(
+    `/api/v1/user/my-network/invitation-manager/withdraw/${userId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
+
+export const connectWithUser = async (
+  token: string,
+  userId: string,
+  email: string
+) => {
+  const response = await axiosInstance.post(
+    `/api/v1/user/connect/${userId}`,
+    {
+      email: email,
     },
-    data:
     {
-      userId: userId
-
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     }
-  }
-)
-  return response.data
+  );
+  return response.data;
+};
 
-}
-
-export const withdrawInvitation= async(token:string, userId:string): Promise<void> => {
-  const response= await axiosInstance.delete(`/api/v1/user/my-network/invitation-manager/withdraw/${userId}`,
-  {
-    headers:
+export const removeUserFromConnection = async (
+  token: string,
+  userId: string
+) => {
+  const response = await axiosInstance.delete(
+    `/api/v1/user/my-network/connections/remove/${userId}`,
     {
-       Authorization: `Bearer ${token}`
-      
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     }
-  }
-)
-  return response.data
-
-}
-
+  );
+  return response.data;
+};

@@ -33,6 +33,11 @@ export const getUserBio = async (
       },
     }
   );
+  if (response.status === 200) {
+    console.log("User bio fetched successfully.");
+  } else {
+    console.error("Unexpected HTTP status:", response.status);
+  }
   return response.data;
 };
 
@@ -136,6 +141,19 @@ export const removeWorkExperience = async (
 ): Promise<{ message: string }> => {
   const response = await axiosInstance.delete(
     `api/v1/user/delete-work-experience/${id}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
+
+export const blockUser = async (token: string, userId: string) => {
+  const response = await axiosInstance.post(
+    `/api/v1/user/block/${userId}`,
+    {},
     {
       headers: {
         Authorization: `Bearer ${token}`,
