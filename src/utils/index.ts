@@ -26,9 +26,9 @@ export const validateEmail = (email: string): boolean => {
   // @                     --> The @ symbol.
   // (?:(?!-)[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,})
   //                        --> Domain part: labels can’t start with a hyphen, and the TLD must be at least 2 letters.
-  const emailRegex = 
-  /^(?=.{1,254}$)(?=[^@]{1,64}@)[a-zA-Z0-9][a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]*(?:\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:(?=[a-z0-9]{1,63}\.)[a-z0-9](?:[a-z0-9]{0,61}[a-z0-9])?\.)+(?=[a-z0-9]{2,63}$)[a-z0-9]{2,63}$/i;
-  
+  const emailRegex =
+    /^(?=.{1,254}$)(?=[^@]{1,64}@)[a-zA-Z0-9][a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]*(?:\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:(?=[a-z0-9]{1,63}\.)[a-z0-9](?:[a-z0-9]{0,61}[a-z0-9])?\.)+(?=[a-z0-9]{2,63}$)[a-z0-9]{2,63}$/i;
+
   return emailRegex.test(email);
 };
 
@@ -87,9 +87,6 @@ export const handleSaveCredentials = (
   );
 };
 
-
-
-
 /**
  * Converts an ISO date string to a human-readable format.
  * Example: "1990-01-01T00:00:00.000Z" becomes "january 1 1990".
@@ -99,20 +96,25 @@ export const handleSaveCredentials = (
  */
 export function formatIsoDateToHumanReadable(isoDate: string): string {
   const date = new Date(isoDate);
-  const options: Intl.DateTimeFormatOptions = { month: 'long', day: 'numeric', year: 'numeric' };
-  let formattedDate = date.toLocaleDateString('en-US', options);
+  const options: Intl.DateTimeFormatOptions = {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  };
+  let formattedDate = date.toLocaleDateString("en-US", options);
   // Remove comma and convert to lowercase to match the example format.
-  formattedDate = formattedDate.replace(',', '').toLowerCase();
+  formattedDate = formattedDate.replace(",", "").toLowerCase();
   return formattedDate;
 }
 
 export const formatExperienceDate = (date: Date): string => {
-  if(typeof date==='string'){
-    date=new Date(date)
+  if (typeof date === "string") {
+    date = new Date(date);
   }
-  return date.toLocaleDateString("en-US", {
-    month: "long",
-    year: "numeric",
-  }).toLowerCase();
+  return date
+    .toLocaleDateString("en-US", {
+      month: "long",
+      year: "numeric",
+    })
+    .toLowerCase();
 };
-
