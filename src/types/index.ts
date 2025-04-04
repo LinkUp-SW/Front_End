@@ -15,7 +15,6 @@ export interface WithdrawInvitationType {
   userName: string;
 }
 
-
 export interface Notification {
   id: string;
   type: "job" | "post" | "recommendation" | "message" | "connection";
@@ -27,7 +26,7 @@ export interface Notification {
   location?: string;
   count?: number;
   isNew?: boolean;
-  read?:boolean;
+  read?: boolean;
 }
 
 export interface PostType {
@@ -98,11 +97,10 @@ export interface CommentType {
 
 export type PostFilter = "all" | "comments" | "reactions" | "reposts";
 
-
-export interface Organization{
-  _id:string;
-  logo:string;
-  name:string;
+export interface Organization {
+  _id: string;
+  logo: string;
+  name: string;
 }
 
 export interface Experience {
@@ -116,16 +114,14 @@ export interface Experience {
   location: string;
   description: string;
   location_type: string;
-  skills: string[]; 
+  skills: string[];
   media: Media[];
 }
 
-
-
 export interface Media {
-  media: string,
-  title: string,
-  description: string
+  media: string;
+  title: string;
+  description: string;
 }
 export enum JobTypeEnum {
   full_time = "Full-time",
@@ -188,7 +184,6 @@ export interface Bio {
   experience: string[];
   education: string[];
   website: string;
-  
 }
 
 export interface UserProfileBio {
@@ -205,6 +200,21 @@ export interface UserProfileBio {
   is_in_sent_connections?: boolean;
   name_of_one_mutual_connection?: string;
   isInConnections?: boolean;
-  isConnectByEmail:boolean
+  isConnectByEmail: boolean;
   isAlreadyFollowing?: boolean;
+}
+
+// Add to types.ts
+export interface Education {
+  _id?: string;
+  school: Organization; // Reusing Organization type assuming it has name/logo
+  degree: string;
+  field_of_study: string;
+  start_date: Date;
+  end_date: Date;
+  grade: string;
+  activities_and_socials: string;
+  skills: string[];
+  description: string;
+  media: Media[];
 }
