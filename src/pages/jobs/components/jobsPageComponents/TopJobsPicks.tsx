@@ -46,7 +46,7 @@ const TopJobPicks: React.FC<TopJobPicksProps> = ({ jobs, onDismissJob, loading =
       
       <div className="p-4 flex justify-center">
         <button 
-          onClick={() => navigate("/collections")} 
+          onClick={() => navigate("/jobs/see-more")} 
           className="flex items-center text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
         >
           Show all <FaArrowRight className="ml-1" size={16} />
