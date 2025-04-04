@@ -10,7 +10,7 @@ import { RxHamburgerMenu } from "react-icons/rx";
 import styles from "./styles.module.css"; // Import your CSS module
 import { convertStringsArrayToLowerCase } from "../../../../../utils";
 import { IoMdAdd } from "react-icons/io";
-import { editUserAbout } from "@/endpoints/userProfile";
+import { addUserAbout } from "@/endpoints/userProfile";
 import Cookies from "js-cookie";
 import { useFormStatus } from "@/hooks/useFormStatus";
 import FormSpinner from "@/components/form/form_spinner/FormSpinner";
@@ -18,21 +18,17 @@ import { toast } from "sonner";
 import { getErrorMessage } from "@/utils/errorHandler";
 import { About } from "@/types";
 
-const AboutModal = ({
-  description,
-  fetchedSkills,
+const AddAboutModal = ({
   setAboutData,
   setIsOpenModal,
 }: {
-  description: string;
-  fetchedSkills: string[];
   setAboutData: (aboutData: About) => void;
   setIsOpenModal: (isOpenModal: boolean) => void;
 }) => {
   const [wordCount, setWordCount] = useState<number>(0);
-  const [aboutText, setAboutText] = useState<string>(description || "");
+  const [aboutText, setAboutText] = useState<string>("");
   const [isAddSkillTriggred, setIsAddSkillTriggred] = useState(false);
-  const [skills, setSkills] = useState<string[]>(fetchedSkills || []);
+  const [skills, setSkills] = useState<string[]>([]);
   const [newSkill, setNewSkill] = useState<string>("");
   const [draggingIndex, setDraggingIndex] = useState<number | null>(null);
 
@@ -213,7 +209,7 @@ const AboutModal = ({
       return toast.error("You are not allowed to perform this action");
     startSubmitting();
     try {
-      const response = await editUserAbout(authToken, {
+      const response = await addUserAbout(authToken, {
         about: aboutText,
         skills: skills,
       });
@@ -349,4 +345,4 @@ const AboutModal = ({
   );
 };
 
-export default AboutModal;
+export default AddAboutModal;
