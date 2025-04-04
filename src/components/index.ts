@@ -60,6 +60,7 @@ import {
   PopoverContent,
   PopoverAnchor,
 } from "./ui/popover";
+import TruncatedText from "./truncate_text/TruncatedText";
 
 export {
   UserList,
@@ -117,4 +118,5 @@ export {
   PopoverTrigger,
   PopoverContent,
   PopoverAnchor,
+  TruncatedText
 };
