@@ -9,9 +9,9 @@ import {
   FormTextarea,
 } from "@/components";
 import { useFormStatus } from "@/hooks/useFormStatus";
-import SkillsManager from "./components/SkillsManager";
-import MediaManager from "./components/MediaManager";
-import { MediaItem } from "./types";
+import SkillsManager from "../components/SkillsManager";
+import MediaManager from "../components/MediaManager";
+import { MediaItem } from "../components/types";
 import { Experience, JobTypeEnum, Organization } from "@/types";
 import { addWorkExperience, getCompaniesList } from "@/endpoints/userProfile";
 import { getErrorMessage } from "@/utils/errorHandler";

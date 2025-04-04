@@ -8,9 +8,9 @@ import {
   FormSelect,
   FormTextarea,
 } from "@/components";
-import SkillsManager from "./components/SkillsManager";
-import MediaManager from "./components/MediaManager";
-import { MediaItem } from "./types";
+import SkillsManager from "../components/SkillsManager";
+import MediaManager from "../components/MediaManager";
+import { MediaItem } from "../components/types";
 import { Experience, JobTypeEnum, Organization } from "@/types";
 import {
   updateWorkExperience,
@@ -435,7 +435,7 @@ const EditExperienceModal: React.FC<EditExperienceModalProps> = ({
             id="experience-submit-button"
             className="bg-purple-600 hover:bg-purple-700 w-full disabled:opacity-60 disabled:hover:bg-purple-600 disabled:cursor-not-allowed cursor-pointer text-white py-2 px-4 rounded-full transition-all duration-300"
           >
-            {isSubmitting ? <FormSpinner/>: "Save Changes"}
+            {isSubmitting ? <FormSpinner /> : "Save Changes"}
           </button>
         </div>
       </form>

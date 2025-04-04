@@ -402,7 +402,7 @@ const ExperienceList: React.FC<ExperienceListProps> = ({
             <button
               id={`experience-delete-button-${idx}`}
               aria-label="Delete Experience"
-              className="bg-red-100 hover:bg-red-500 hover:text-white p-2 rounded-full transition-all duration-200 ease-in-out"
+              className="bg-red-100 dark:bg-red-200 dark:text-gray-700 hover:bg-red-500 hover:text-white p-2 rounded-full transition-all duration-200 ease-in-out"
               onClick={() => onDeleteClick(experience._id as string)}
             >
               <MdDeleteForever size={20} />
