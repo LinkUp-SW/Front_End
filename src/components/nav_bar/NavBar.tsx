@@ -37,11 +37,11 @@ const NavBar = () => {
   }, [dispatch, token, userId, data, loading, error]);
 
   // Display error notification if an error occurs during profile picture fetch.
-  useEffect(() => {
-    if (error) {
-      toast.error(getErrorMessage(error));
-    }
-  }, [error]);
+  // useEffect(() => {
+  //   if (error) {
+  //     toast.error(getErrorMessage(error));
+  //   }
+  // }, [error]);
 
   const handleLogout = async () => {
     try {

@@ -217,7 +217,7 @@ const JobFilterBar: React.FC<JobFilterBarProps> = ({ onFiltersChange }) => {
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
   return (
-    <header className="w-full border-y bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 flex items-center justify-center px-4 py-3 fixed top-14 left-0 z-10">
+    <header className="w-full border-y bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 flex items-center justify-center px-4 py-3 fixed top-14 left-0 z-13">
       <nav className="w-full max-w-7xl px-4 sm:px-6 lg:px-18">
         <div className="flex items-center justify-between">
           {/* Mobile Menu Toggle */}
