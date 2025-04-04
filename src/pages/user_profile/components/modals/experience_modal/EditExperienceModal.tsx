@@ -227,6 +227,12 @@ const EditExperienceModal: React.FC<EditExperienceModalProps> = ({
     return true;
   };
 
+  useEffect(() => {
+    if (organizationSearch.trim() === "") {
+      setIsOrgsLoading(false);
+    }
+  }, [isOrgsLoading, organizationSearch]);
+
   /**
    * Submits the updated form data to the server
    */

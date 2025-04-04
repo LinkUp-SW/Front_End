@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Cookies from "js-cookie";
 import { toast } from "sonner";
 import {
@@ -249,6 +249,12 @@ const AddExperienceModal: React.FC<AddExperienceModalProps> = ({
       stopSubmitting();
     }
   };
+
+  useEffect(() => {
+    if (organizationSearch.trim() === "") {
+      setIsOrgsLoading(false);
+    }
+  }, [isOrgsLoading, organizationSearch]);
 
   return (
     <div
