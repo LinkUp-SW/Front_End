@@ -1,5 +1,6 @@
 import axiosInstance from "@/services/axiosInstance";
 import {
+  About,
   Education,
   Experience,
   Organization,
@@ -216,7 +217,10 @@ export const removeEducation = async (token: string, id: string) => {
   return response.data;
 };
 
-export const getUserAbout = async (token: string, userId: string) => {
+export const getUserAbout = async (
+  token: string,
+  userId: string
+): Promise<{ is_me: boolean; about: About }> => {
   const response = await axiosInstance.get(
     `/api/v1/user/profile/about/${userId}`,
     {
@@ -227,3 +231,35 @@ export const getUserAbout = async (token: string, userId: string) => {
   );
   return response.data;
 };
+
+export const editUserAbout = async (
+  token: string,
+  aboutForm: About
+): Promise<{ message: string }> => {
+  const response = await axiosInstance.put(
+    `/api/v1/user/profile/about`,
+    aboutForm,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
+
+
+export const addUserAbout=async (
+  token: string,
+  aboutForm: About
+): Promise<{ message: string }> => {
+  const response = await axiosInstance.post(
+    `/api/v1/user/profile/about`,
+    aboutForm,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;}
