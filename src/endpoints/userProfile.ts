@@ -1,5 +1,6 @@
 import axiosInstance from "@/services/axiosInstance";
 import {
+  Education,
   Experience,
   Organization,
   ProfileCardType,
@@ -73,7 +74,7 @@ export const getUserExperience = async (
 
 export const getUserEducation = async (token: string, userId: string) => {
   const response = await axiosInstance.get(
-    `/api/v1/user/profile/education//${userId}`,
+    `/api/v1/user/profile/education/${userId}`,
     {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -114,7 +115,7 @@ export const addWorkExperience = async (
 export const getCompaniesList = async (
   query: string
 ): Promise<{ message: string; data: Organization[] }> => {
-  const response = await axiosInstance.get(`api/v1/search/company/${query}`);
+  const response = await axiosInstance.get(`/api/v1/search/company/${query}`);
   return response.data;
 };
 
@@ -154,6 +155,58 @@ export const blockUser = async (token: string, userId: string) => {
   const response = await axiosInstance.post(
     `/api/v1/user/block/${userId}`,
     {},
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
+
+export const getSchoolsList = async (
+  query: string
+): Promise<{ message: string; data: Organization[] }> => {
+  const response = await axiosInstance.get(`/api/v1/search/education/${query}`);
+  return response.data;
+};
+
+export const addEducation = async (
+  token: string,
+  educationForm: Education
+): Promise<{ message: string; education: Education }> => {
+  const response = await axiosInstance.post(
+    `/api/v1/user/add-education`,
+    educationForm,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
+
+export const updateEducation = async (
+  token: string,
+  id: string,
+  form: Education
+): Promise<{ message: string }> => {
+  const response = await axiosInstance.put(
+    `/api/v1/user/update-education/${id}`,
+    form,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
+
+export const removeEducation = async (token: string, id: string) => {
+  const response = await axiosInstance.delete(
+    `/api/v1/user/delete-education/${id}`,
     {
       headers: {
         Authorization: `Bearer ${token}`,
