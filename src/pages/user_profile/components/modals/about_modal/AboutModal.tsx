@@ -191,7 +191,7 @@ const AboutModal = () => {
           value={aboutText}
           onChange={handleAboutText}
           rows={10}
-          className="border-gray-50 border outline-1 outline-gray-400 dark:outline-gray-300 focus:outline-1 rounded-md text-sm p-2"
+          className="border-gray-50 border outline-1 outline-gray-400 dark:outline-gray-600 focus:outline-1 rounded-md text-sm p-2"
         />
         <span className="absolute bottom-0 right-0 text-sm text-gray-700 dark:text-gray-400">
           {wordCount} / 2600
@@ -231,10 +231,12 @@ const AboutModal = () => {
                 <span className="inline-flex gap-2 items-center">
                   <span
                     onClick={() => handleRemoveSkill(skill)}
+                    onTouchStart={(e) => e.stopPropagation()} // Prevents the touch event from reaching the parent
                     className="cursor-pointer hover:bg-gray-300 hover:text-black rounded-full p-[0.15rem] transition-all duration-300 ease-in-out"
                   >
                     <IoMdClose />
                   </span>
+
                   <span className="text-base font-semibold">{skill}</span>
                 </span>
                 <span className="cursor-grab">
