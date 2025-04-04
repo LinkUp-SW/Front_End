@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
-import { MediaItem } from "../types";
+import { MediaItem } from "./types";
 import { toast } from "sonner";
 
 interface MediaManagerProps {
