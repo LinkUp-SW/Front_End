@@ -215,3 +215,15 @@ export const removeEducation = async (token: string, id: string) => {
   );
   return response.data;
 };
+
+export const getUserAbout = async (token: string, userId: string) => {
+  const response = await axiosInstance.get(
+    `/api/v1/user/profile/about/${userId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
