@@ -218,3 +218,8 @@ export interface Education {
   description: string;
   media: Media[];
 }
+
+export interface About {
+  about: string;
+  skills: string[];
+}
