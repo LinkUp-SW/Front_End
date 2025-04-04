@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Cookies from "js-cookie";
 import { toast } from "sonner";
 import { DatePicker, FormInput, FormTextarea } from "@/components";
@@ -126,6 +126,12 @@ const AddEducationModal: React.FC<AddEducationModalProps> = ({
 
     return true;
   };
+
+  useEffect(() => {
+    if (schoolSearch.trim() === "") {
+      setIsSchoolsLoading(false);
+    }
+  }, [isSchoolsLoading, schoolSearch]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -188,6 +188,12 @@ const EditEducationModal: React.FC<EditEducationModalProps> = ({
     }
   };
 
+  useEffect(() => {
+    if (schoolSearch.trim() === "") {
+      setIsSchoolsLoading(false);
+    }
+  }, [isSchoolsLoading, schoolSearch]);
+
   return (
     <div className="max-w-5xl sm:w-[35rem] w-full">
       <form
