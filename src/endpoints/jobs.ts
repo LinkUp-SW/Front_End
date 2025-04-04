@@ -17,7 +17,14 @@ export interface JobData {
   job_title: string;
   location: string;
   workplace_type: "On-site" | "Remote" | "Hybrid";
-  applications_count: number;
+  experience_level: 'Internship' | 'Entry level' | 'Associate' | 'Mid-Senior level' | 'Director' | 'Executive';
+  salary: string;
+  posted_time:string;
+  timeAgo:string;
+  description:string;
+  benefits:string[];
+  qualifications:string[];
+  responsibilities:string[];
 }
 
 export const fetchJobs = async (token: string, limit: number = 10, cursor?: string): Promise<JobResponse> => {
@@ -47,3 +54,16 @@ export const fetchTopJobs = async (token: string, limit: number = 3): Promise<Jo
     console.log("Top Jobs response:", response.data);
     return response.data;
   };  
+
+export const fetchSingleJob = async (token: string, jobId: string): Promise<{ data: JobData }> => {
+    const url = `/api/v1/jobs/get-job/${jobId}`;
+    
+    const response = await axiosInstance.get(url, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    
+    console.log("Single Job response:", response.data);
+    return response.data;
+  };

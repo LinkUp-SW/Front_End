@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { WithNavBar } from '../../components';
+import { useNavigate } from 'react-router-dom';
 import Sidebar from './components/jobsPageComponents/Sidebar';
 import TopJobPicks from './components/jobsPageComponents/TopJobsPicks';
 import RecentSearches from './components/jobsPageComponents/RecentSearches';
@@ -10,6 +11,8 @@ import { fetchJobs, JobData, fetchTopJobs } from '../../endpoints/jobs';
 import Cookies from 'js-cookie';
 
 const JobsPage: React.FC = () => {
+  const navigate = useNavigate();
+
   // State for job listings
   const [topJobs, setTopJobs] = useState<Job[]>([]);
   const [moreJobs, setMoreJobs] = useState<Job[]>([]);
@@ -41,6 +44,9 @@ const JobsPage: React.FC = () => {
     setRecentSearches([]);
   };
 
+  const handleJobSelect = (jobId: string) => {
+    navigate(`/jobs/see-more?selected=${jobId}`);
+  };
 
   const convertApiDataToJobs = (jobData: JobData[]): Job[] => {
     return jobData.map(job => ({
@@ -48,15 +54,15 @@ const JobsPage: React.FC = () => {
       title: job.job_title,
       company: job.organization_id.name,
       location: job.location,
-      experience_level: 'Entry level',
+      experience_level: job.experience_level,
       isRemote: job.workplace_type === 'Remote',
       isSaved: false,
       logo: job.organization_id.logo,
       isPromoted: false,
       hasEasyApply: true,
       workMode: job.workplace_type,
-      postedTime: '1d ago', // Default value as API doesn't provide this
-      salary: 'Not disclosed' // Default value as API doesn't provide this
+      postedTime: job.timeAgo,
+      salary: job.salary,
     }));
   };
 
@@ -175,16 +181,15 @@ const JobsPage: React.FC = () => {
         {/* Left sidebar */}
         <Sidebar />
         
-        {/* Main content */}
         <div className="w-full md:w-3/4">
           {/* Top job picks section */}
           <TopJobPicks 
             jobs={topJobs} 
             onDismissJob={dismissTopJob}
+            onSelectJob={handleJobSelect} 
             loading={topJobsLoading}
           />
 
-          
           {/* Recent job searches section */}
           <RecentSearches 
             searches={recentSearches}
@@ -195,6 +200,7 @@ const JobsPage: React.FC = () => {
           <MoreJobs 
             jobs={moreJobs} 
             onDismissJob={dismissMoreJob}
+            onSelectJob={handleJobSelect} 
             loading={loading}
             hasMore={hasMore}
             onLoadMore={loadMoreJobs}

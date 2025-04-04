@@ -6,6 +6,7 @@ import { FaSpinner } from 'react-icons/fa';
 interface MoreJobsProps {
   jobs: Job[];
   onDismissJob: (id: string) => void;
+  onSelectJob: (id: string) => void;
   loading?: boolean;
   hasMore?: boolean;
   onLoadMore?: () => void;
@@ -13,7 +14,8 @@ interface MoreJobsProps {
 
 const MoreJobs: React.FC<MoreJobsProps> = ({ 
   jobs, 
-  onDismissJob, 
+  onDismissJob,
+  onSelectJob, 
   loading = false,
   hasMore = false,
   onLoadMore
@@ -28,7 +30,12 @@ const MoreJobs: React.FC<MoreJobsProps> = ({
       <div className="divide-y divide-gray-200 dark:divide-gray-700">
         {jobs.length > 0 ? (
           jobs.map(job => (
-            <JobCard key={job.id} job={job} onDismiss={onDismissJob} />
+            <JobCard 
+              key={job.id} 
+              job={job} 
+              onDismiss={onDismissJob} 
+              onSelect={onSelectJob} 
+            />
           ))
         ) : (
           <div className="p-8 text-center">

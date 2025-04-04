@@ -7,11 +7,21 @@ import { Job } from '../../types';
 interface TopJobPicksProps {
   jobs: Job[];
   onDismissJob: (id: string) => void;
+  onSelectJob: (id: string) => void;
   loading?: boolean;
 }
 
-const TopJobPicks: React.FC<TopJobPicksProps> = ({ jobs, onDismissJob, loading = false }) => {
+const TopJobPicks: React.FC<TopJobPicksProps> = ({ 
+  jobs, 
+  onDismissJob, 
+  onSelectJob, 
+  loading = false 
+}) => {
   const navigate = useNavigate();
+  
+  const handleSeeMoreClick = () => {
+    navigate("/jobs/see-more");
+  };
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow mb-6 transition-colors">
@@ -35,7 +45,12 @@ const TopJobPicks: React.FC<TopJobPicksProps> = ({ jobs, onDismissJob, loading =
           ))
         ) : jobs.length > 0 ? (
           jobs.map(job => (
-            <JobCard key={job.id} job={job} onDismiss={onDismissJob} />
+            <JobCard 
+              key={job.id} 
+              job={job} 
+              onDismiss={onDismissJob} 
+              onSelect={onSelectJob} 
+            />
           ))
         ) : (
           <div className="p-4 text-center text-gray-600 dark:text-gray-400">
@@ -46,7 +61,7 @@ const TopJobPicks: React.FC<TopJobPicksProps> = ({ jobs, onDismissJob, loading =
       
       <div className="p-4 flex justify-center">
         <button 
-          onClick={() => navigate("/jobs/see-more")} 
+          onClick={handleSeeMoreClick} 
           className="flex items-center text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
         >
           Show all <FaArrowRight className="ml-1" size={16} />
