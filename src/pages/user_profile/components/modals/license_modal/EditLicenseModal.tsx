@@ -74,6 +74,10 @@ const EditLicenseModal: React.FC<AddLicenseModalProps> = ({
     media: license.media.map((l) => ({ ...l, id: generateTempId() })) || [],
   });
 
+  useEffect(() => {
+    setSchoolSearch(formData.issuing_organization.name || "");
+  }, [formData.issuing_organization]);
+
   const handleChange = (field: keyof LicenseFormData, value: unknown) => {
     if (field === "issuing_organization") {
       const searchValue = value as string;
@@ -98,9 +102,9 @@ const EditLicenseModal: React.FC<AddLicenseModalProps> = ({
     }
   };
 
-  const handleSelectSchool = (school: Organization) => {
-    setFormData((prev) => ({ ...prev, school }));
-    setSchoolSearch(school.name);
+  const handleSelectSchool = (issuing_organization: Organization) => {
+    setFormData((prev) => ({ ...prev, issuing_organization }));
+    setSchoolSearch(issuing_organization.name);
     setSchools([]);
   };
 
