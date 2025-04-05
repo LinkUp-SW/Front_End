@@ -332,3 +332,12 @@ export const removeLicense = async (
   );
   return response.data;
 };
+
+export const deleteUserProfileImage = async (token: string):Promise<{message:string}> => {
+  const response = await axiosInstance.delete(`/api/v1/user/profile/profile-picture`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data;
+};
