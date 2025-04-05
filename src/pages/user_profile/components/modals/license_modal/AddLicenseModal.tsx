@@ -85,9 +85,9 @@ const AddLicenseModal: React.FC<AddLicenseModalProps> = ({
     }
   };
 
-  const handleSelectSchool = (school: Organization) => {
-    setFormData((prev) => ({ ...prev, school }));
-    setSchoolSearch(school.name);
+  const handleSelectSchool = (issuing_organization: Organization) => {
+    setFormData((prev) => ({ ...prev, issuing_organization }));
+    setSchoolSearch(issuing_organization.name);
     setSchools([]);
   };
 
@@ -153,9 +153,10 @@ const AddLicenseModal: React.FC<AddLicenseModalProps> = ({
 
       const response = await addLicense(authToken, newLicense);
       toast.success(response.message);
-      onSuccess?.({ ...newLicense, _id: response.education._id });
+      onSuccess?.({ ...newLicense, _id: response.license._id });
       onClose?.();
     } catch (error) {
+      console.log(error)
       toast.error(getErrorMessage(error));
     } finally {
       stopSubmitting();
