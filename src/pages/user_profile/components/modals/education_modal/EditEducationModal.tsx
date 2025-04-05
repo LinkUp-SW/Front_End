@@ -266,7 +266,7 @@ const EditEducationModal: React.FC<EditEducationModalProps> = ({
           id="edit-education-end-date"
         />
         <FormInput
-          label="Grade"
+          label="Grade*"
           placeholder="Ex: A+"
           value={formData.grade}
           onChange={(e) => handleChange("grade", e.target.value)}

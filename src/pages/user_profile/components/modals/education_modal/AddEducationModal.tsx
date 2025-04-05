@@ -248,10 +248,10 @@ const AddEducationModal: React.FC<AddEducationModalProps> = ({
         />
 
         <FormInput
-          label="Grade"
+          label="Grade*"
           value={formData.grade}
           onChange={(e) => handleChange("grade", e.target.value)}
-          placeholder="Enter your grade"
+          placeholder="Ex: A+"
           id="grade"
           name="grade"
         />
