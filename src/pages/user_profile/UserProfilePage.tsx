@@ -3,6 +3,7 @@ import {
   AboutSection,
   EducationSection,
   ExperienceSection,
+  LicenseSection,
   ResourcesSection,
   UserInfo,
   ViewedSection,
@@ -18,6 +19,7 @@ const UserProfilePage = () => {
           <AboutSection />
           <ExperienceSection />
           <EducationSection />
+          <LicenseSection/>
         </div>
 
         {/* Right Sidebar */}
