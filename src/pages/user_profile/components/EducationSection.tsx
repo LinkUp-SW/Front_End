@@ -364,7 +364,7 @@ const EducationList: React.FC<EducationListProps> = ({
           </div>
         )}
         {isMe && (
-          <div className="absolute top-0 h-full right-0 flex flex-col justify-between">
+          <div className="absolute top-[-1rem] h-full right-0 flex gap-2 flex-col justify-between">
             <button
               id={`education-edit-button-${idx}`}
               aria-label="Edit Education"
