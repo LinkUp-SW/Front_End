@@ -3,7 +3,7 @@ import { WithNavBar } from '../../components';
 import { useLocation, useNavigate } from 'react-router-dom';
 import JobFilterBar from "../../components/jobs_categories/JobFilterBar";
 import JobListings from "./components/seeMorePageComponents/JobListings";
-import { JobFilters, Job } from './types';
+import { JobFilters, Job, CompanyInfo } from './types';
 import { fetchSingleJob } from '../../endpoints/jobs';
 import Cookies from 'js-cookie';
 
@@ -59,25 +59,63 @@ const SeeMorePage: React.FC = () => {
   }, [selectedJobId]);
 
   const convertApiDataToJob = (jobData: any): Job => {
+    const companyInfo: CompanyInfo = {
+      name: jobData.organization?.name || "",
+      logo: jobData.organization?.logo || "",
+      followers: jobData.organization?.followers || "10,000+",
+      industryType: jobData.organization?.industry || "Information Technology",
+      employeeCount: jobData.organization?.size || "51-200 employees",
+      linkupPresence: jobData.organization?.linkup_presence || "100+ on LinkUp",
+      description: jobData.organization?.description || "A growing company focused on innovation and excellence in their field."
+    };
+
+    // Map API data to Job type according to your type definition
     return {
       id: jobData._id,
-      title: jobData.job_title,
-      company: jobData.organization_id.name,
-      location: jobData.location,
-      experience_level: jobData.experience_level,
+      title: jobData.job_title || "Unknown Title",
+      company: jobData.organization?.name || "Unknown Company",
+      location: jobData.location || "Unknown Location",
+      experience_level: mapExperienceLevel(jobData.experience_level),
       isRemote: jobData.workplace_type === 'Remote',
       isSaved: false,
-      logo: jobData.organization_id.logo,
-      isPromoted: false,
-      hasEasyApply: true,
-      workMode: jobData.workplace_type,
-      postedTime: jobData.timeAgo,
-      salary: jobData.salary,
-      description: jobData.description,
-      responsibilities: jobData.responsibilities,
-      qualifications: jobData.qualifications,
-      benefits: jobData.benefits,
+      logo: jobData.organization?.logo || "",
+      isPromoted: Boolean(jobData.isPromoted),
+      hasEasyApply: Boolean(jobData.hasEasyApply || true),
+      workMode: mapWorkMode(jobData.workplace_type),
+      postedTime: jobData.timeAgo || "",
+      salary: jobData.salary || "",
+      description: jobData.description || "",
+      responsibilities: jobData.responsibilities || [],
+      qualifications: jobData.qualifications || [],
+      benefits: jobData.benefits || [],
+      companyInfo: companyInfo
     };
+  };
+
+  // Helper function to ensure experience_level matches your union type
+  const mapExperienceLevel = (level: string): Job['experience_level'] => {
+    const validLevels: Job['experience_level'][] = [
+      'Internship', 'Entry level', 'Associate', 'Mid-Senior level', 'Director', 'Executive'
+    ];
+    
+    if (level && validLevels.includes(level as Job['experience_level'])) {
+      return level as Job['experience_level'];
+    }
+    
+    // Default to Entry level if not valid
+    return 'Entry level';
+  };
+
+  // Helper function to ensure workMode matches your union type
+  const mapWorkMode = (mode: string): Job['workMode'] => {
+    const validModes: Job['workMode'][] = ['On-site', 'Remote', 'Hybrid'];
+    
+    if (mode && validModes.includes(mode as Job['workMode'])) {
+      return mode as Job['workMode'];
+    }
+    
+    // Default to On-site if not valid
+    return 'On-site';
   };
 
   const handleFiltersChange = (newFilters: JobFilters) => {

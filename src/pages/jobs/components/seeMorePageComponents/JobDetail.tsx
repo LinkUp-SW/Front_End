@@ -4,11 +4,12 @@ import JobContent from "./JobContent";
 import { Job } from "../../types";
 
 interface JobDetailProps {
-  job: Job;
+  job?: Job;
   isLoading?: boolean;
 }
 
 const JobDetail: React.FC<JobDetailProps> = ({ job, isLoading = false }) => {
+  // Show loading state
   if (isLoading) {
     return (
       <div className="p-6 space-y-6">
@@ -32,6 +33,15 @@ const JobDetail: React.FC<JobDetailProps> = ({ job, isLoading = false }) => {
     );
   }
 
+  // Handle case where job is undefined
+  if (!job) {
+    return (
+      <div className="p-6 flex items-center justify-center h-full">
+        <p className="text-gray-500 dark:text-gray-400">No job selected</p>
+      </div>
+    );
+  }
+
   return (
     <div className="p-4 md:p-6 h-full overflow-y-auto">
       <JobHeader job={job} />
@@ -49,8 +59,9 @@ const JobDetail: React.FC<JobDetailProps> = ({ job, isLoading = false }) => {
                 alt={`${job.company} logo`} 
                 className="w-10 h-10 object-contain bg-white dark:bg-gray-700 rounded-md p-1"
                 onError={(e) => {
-                  (e.target as HTMLElement).style.display = 'none';
-                  const parent = (e.target as HTMLElement).parentElement;
+                  const target = e.target as HTMLImageElement;
+                  target.style.display = 'none';
+                  const parent = target.parentElement;
                   if (parent) {
                     parent.appendChild(document.createTextNode(job.company.substring(0, 1)));
                     parent.classList.add('bg-blue-100', 'dark:bg-blue-900', 'text-blue-500', 'dark:text-blue-300', 'flex', 'items-center', 'justify-center');

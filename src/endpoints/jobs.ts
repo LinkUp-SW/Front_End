@@ -10,7 +10,8 @@ export interface JobResponse {
 
 export interface JobData {
   _id: string;
-  organization_id: {
+  organization: {
+    _id: string;
     name: string;
     logo: string;
   };
