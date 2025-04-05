@@ -223,3 +223,15 @@ export interface About {
   about: string;
   skills: string[];
 }
+
+export interface License {
+  _id?: string;
+  name: string;
+  issuing_organization: Organization;
+  issue_date: Date;
+  expiration_date: Date;
+  credintial_id: string;
+  credintial_url: string;
+  skills: string[];
+  media: Media[];
+}

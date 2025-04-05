@@ -3,6 +3,7 @@ import {
   About,
   Education,
   Experience,
+  License,
   Organization,
   ProfileCardType,
   UserProfileBio,
@@ -248,8 +249,7 @@ export const editUserAbout = async (
   return response.data;
 };
 
-
-export const addUserAbout=async (
+export const addUserAbout = async (
   token: string,
   aboutForm: About
 ): Promise<{ message: string }> => {
@@ -262,4 +262,23 @@ export const addUserAbout=async (
       },
     }
   );
-  return response.data;}
+  return response.data;
+};
+
+export const getOrganizationsAndSchoolsList = async (query: string) => {
+  const response = await axiosInstance.get(`/api/v1/search/${query}`);
+  return response.data;
+};
+
+export const addLicense = async (token: string, lisenceForm: License) => {
+  const response = await axiosInstance.post(
+    `/api/v1/user/add-license`,
+    lisenceForm,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
