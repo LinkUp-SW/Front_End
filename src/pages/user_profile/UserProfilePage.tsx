@@ -8,6 +8,7 @@ import {
   UserInfo,
   ViewedSection,
 } from "./components";
+import SkillsSection from "./components/SkillsSection";
 
 const UserProfilePage = () => {
   return (
@@ -20,6 +21,7 @@ const UserProfilePage = () => {
           <ExperienceSection />
           <EducationSection />
           <LicenseSection />
+          <SkillsSection />
         </div>
 
         {/* Right Sidebar */}
