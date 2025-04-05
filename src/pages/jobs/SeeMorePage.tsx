@@ -40,14 +40,6 @@ const SeeMorePage: React.FC = () => {
         const response = await fetchSingleJob(token, selectedJobId);
         const jobData = convertApiDataToJob(response.data);
         setSelectedJob(jobData);
-        
-        // If job has company, automatically add it to filters
-        if (jobData.company) {
-          setFilters(prev => ({
-            ...prev,
-            company: [jobData.company]
-          }));
-        }
       } catch (error) {
         console.error('Error fetching job details:', error);
       } finally {
@@ -75,13 +67,13 @@ const SeeMorePage: React.FC = () => {
       title: jobData.job_title || "Unknown Title",
       company: jobData.organization?.name || "Unknown Company",
       location: jobData.location || "Unknown Location",
-      experience_level: mapExperienceLevel(jobData.experience_level),
+      experience_level: jobData.experience_level || "Entry level",
       isRemote: jobData.workplace_type === 'Remote',
       isSaved: false,
       logo: jobData.organization?.logo || "",
       isPromoted: Boolean(jobData.isPromoted),
       hasEasyApply: Boolean(jobData.hasEasyApply || true),
-      workMode: mapWorkMode(jobData.workplace_type),
+      workMode: jobData.workplace_type || "On-site",
       postedTime: jobData.timeAgo || "",
       salary: jobData.salary || "",
       description: jobData.description || "",
@@ -90,32 +82,6 @@ const SeeMorePage: React.FC = () => {
       benefits: jobData.benefits || [],
       companyInfo: companyInfo
     };
-  };
-
-  // Helper function to ensure experience_level matches your union type
-  const mapExperienceLevel = (level: string): Job['experience_level'] => {
-    const validLevels: Job['experience_level'][] = [
-      'Internship', 'Entry level', 'Associate', 'Mid-Senior level', 'Director', 'Executive'
-    ];
-    
-    if (level && validLevels.includes(level as Job['experience_level'])) {
-      return level as Job['experience_level'];
-    }
-    
-    // Default to Entry level if not valid
-    return 'Entry level';
-  };
-
-  // Helper function to ensure workMode matches your union type
-  const mapWorkMode = (mode: string): Job['workMode'] => {
-    const validModes: Job['workMode'][] = ['On-site', 'Remote', 'Hybrid'];
-    
-    if (mode && validModes.includes(mode as Job['workMode'])) {
-      return mode as Job['workMode'];
-    }
-    
-    // Default to On-site if not valid
-    return 'On-site';
   };
 
   const handleFiltersChange = (newFilters: JobFilters) => {

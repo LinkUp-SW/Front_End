@@ -232,13 +232,25 @@ const JobListings: React.FC<JobListingsProps> = ({
   const handleSelectJob = (job: Job) => {
     // If parent component provided onJobSelect, call it
     if (onJobSelect) {
-      onJobSelect(job);
+      // Check if the job has complete data before passing it up
+      if (job.description && 
+          Array.isArray(job.responsibilities) && 
+          Array.isArray(job.qualifications) && 
+          Array.isArray(job.benefits)) {
+        onJobSelect(job);
+      } else {
+        // If job doesn't have complete data, fetch it first
+        setJobDetailLoading(true);
+        fetchSelectedJob(job.id);
+      }
       return;
     }
     
     // Otherwise handle selection internally
-    // If we already have full details for this job, just select it
-    if (job.description && job.responsibilities && job.qualifications) {
+    if (job.description && 
+        Array.isArray(job.responsibilities) && 
+        Array.isArray(job.qualifications) && 
+        Array.isArray(job.benefits)) {
       setSelectedJob(job);
     } else {
       // Otherwise fetch the full details
