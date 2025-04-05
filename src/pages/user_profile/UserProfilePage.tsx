@@ -19,7 +19,7 @@ const UserProfilePage = () => {
           <AboutSection />
           <ExperienceSection />
           <EducationSection />
-          <LicenseSection/>
+          <LicenseSection />
         </div>
 
         {/* Right Sidebar */}
