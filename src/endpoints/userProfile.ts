@@ -270,7 +270,10 @@ export const getOrganizationsAndSchoolsList = async (query: string) => {
   return response.data;
 };
 
-export const addLicense = async (token: string, lisenceForm: License) => {
+export const addLicense = async (
+  token: string,
+  lisenceForm: License
+): Promise<{ message: string; license: License }> => {
   const response = await axiosInstance.post(
     `/api/v1/user/add-license`,
     lisenceForm,
@@ -291,6 +294,36 @@ export const editLicense = async (
   const response = await axiosInstance.put(
     `/api/v1/user/update-license/${id}`,
     lisenceForm,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
+
+export const getUserLicenses = async (
+  token: string,
+  userId: string
+): Promise<{ is_me: boolean; licenses: License[] }> => {
+  const response = await axiosInstance.get(
+    `/api/v1/user/profile/licenses/${userId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
+
+export const removeLicense = async (
+  token: string,
+  id: string
+): Promise<{ message: string }> => {
+  const response = await axiosInstance.delete(
+    `/api/v1/user/delete-license/${id}`,
     {
       headers: {
         Authorization: `Bearer ${token}`,
