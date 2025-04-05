@@ -20,19 +20,8 @@ import { v4 as uuid } from "uuid";
 import { useFormStatus } from "@/hooks/useFormStatus";
 import { getErrorMessage } from "@/utils/errorHandler";
 import FormSpinner from "@/components/form/form_spinner/FormSpinner";
-/**
- * Helper to extract the numeric month (1-12) and year from a Date
- */
-function extractMonthAndYear(date?: Date): { month: string; year: string } {
-  if (!date) {
-    return { month: "", year: "" };
-  }
-  const d = new Date(date);
-  return {
-    month: String(d.getMonth() + 1), // months are 0-based in JS, so +1
-    year: String(d.getFullYear()),
-  };
-}
+import { extractMonthAndYear } from "@/utils";
+
 
 interface EditExperienceModalProps {
   /** The existing experience to edit. */

@@ -118,3 +118,12 @@ export const formatExperienceDate = (date: Date): string => {
     })
     .toLowerCase();
 };
+
+
+
+
+export function extractMonthAndYear(date?: Date): { month: string; year: string } {
+  if (!date) return { month: "", year: "" };
+  const d = new Date(date);
+  return { month: String(d.getMonth() + 1), year: String(d.getFullYear()) };
+}

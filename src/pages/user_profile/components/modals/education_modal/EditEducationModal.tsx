@@ -12,11 +12,8 @@ import SkillsManager from "../components/SkillsManager";
 import MediaManager from "../components/MediaManager";
 import { MediaItem } from "../components/types";
 import { v4 as uuid } from "uuid";
-function extractMonthAndYear(date?: Date): { month: string; year: string } {
-  if (!date) return { month: "", year: "" };
-  const d = new Date(date);
-  return { month: String(d.getMonth() + 1), year: String(d.getFullYear()) };
-}
+import { extractMonthAndYear } from "@/utils";
+
 
 interface EditEducationModalProps {
   education: Education;
