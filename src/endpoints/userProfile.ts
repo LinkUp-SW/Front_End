@@ -282,3 +282,20 @@ export const addLicense = async (token: string, lisenceForm: License) => {
   );
   return response.data;
 };
+
+export const editLicense = async (
+  token: string,
+  id: string,
+  lisenceForm: License
+) => {
+  const response = await axiosInstance.put(
+    `/api/v1/user/update-license/${id}`,
+    lisenceForm,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
