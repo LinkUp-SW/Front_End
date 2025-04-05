@@ -32,43 +32,83 @@ const JobListings: React.FC<JobListingsProps> = ({
   const [selectedJob, setSelectedJob] = useState<Job | null>(propSelectedJob || null);
   const [jobDetailLoading, setJobDetailLoading] = useState(false);
   const [fetchedOnce, setFetchedOnce] = useState(false);
+  const JOBS_PER_PAGE = 10; // Define how many jobs to show per page
   
-  // Filtered jobs based on selected filters
+  // Check if any filters are active
+  const isFilterActive = useMemo(() => {
+    return Object.values(filters).some(filterArr => filterArr.length > 0);
+  }, [filters]);
+  
+  // Apply filters to jobs only if filters are active
   const filteredJobs = useMemo(() => {
-    return jobs.filter(job => {
-      // Location filter 
-      const matchesLocations = filters.locations.length === 0 || 
-        filters.locations.some(loc => 
-          job.location.toLowerCase().includes(loc.toLowerCase())
-        );
-      
-      // Company filter 
-      const matchesCompany = filters.company.length === 0 || 
-        filters.company.some(type => 
-          job.company.toLowerCase().includes(type.toLowerCase())
-        );
-      
-      // Experience level filter
-      const matchesExperienceLevels = filters.experienceLevels.length === 0 || 
-        filters.experienceLevels.includes(job.experience_level);
-      
-      // Work mode filter
-      const matchesWorkModes = filters.workModes.length === 0 || 
-        filters.workModes.includes(job.workMode);
-      
-      // Salary range filter
-      const matchesSalaryRanges = filters.salaryRanges.length === 0 || 
-        (job.salary && filters.salaryRanges.includes(job.salary));
-      
-      return matchesLocations && 
-             matchesCompany && 
-             matchesExperienceLevels && 
-             matchesWorkModes && 
-             matchesSalaryRanges;
-    });
-  }, [jobs, filters]);
+    // If no filters are active, return all jobs
+    if (!isFilterActive) {
+      return jobs;
+    }
+    
+    // Start with all jobs
+    let result = [...jobs];
+    
+    // Filter by location
+    if (filters.locations && filters.locations.length > 0) {
+      result = result.filter(job => 
+        filters.locations.some(location => 
+          job.location.toLowerCase().includes(location.toLowerCase())
+        )
+      );
+    }
+    
+    // Filter by company
+    if (filters.company && filters.company.length > 0) {
+      result = result.filter(job => 
+        filters.company.some(company => 
+          job.company.toLowerCase().includes(company.toLowerCase())
+        )
+      );
+    }
+    
+    // Filter by experience level
+    if (filters.experienceLevels && filters.experienceLevels.length > 0) {
+      result = result.filter(job => 
+        filters.experienceLevels.includes(job.experience_level)
+      );
+    }
+    
+    // Filter by work mode
+    if (filters.workModes && filters.workModes.length > 0) {
+      result = result.filter(job => 
+        filters.workModes.includes(job.workMode)
+      );
+    }
+    
+    // Filter by salary range - implement if salary has a consistent format
+    if (filters.salaryRanges && filters.salaryRanges.length > 0) {
+      result = result.filter(job => {
+        if (!job.salary) return false;
+        
+        const salaryStr = String(job.salary); // Ensure it's a string
+        const salaryValue = parseInt(salaryStr.replace(/[^0-9]/g, ''));
+        
+        return filters.salaryRanges.some(range => {
+          if (range === '1000-5000') return salaryValue >= 1000 && salaryValue <= 5000;
+          if (range === '5000-10000') return salaryValue >= 5000 && salaryValue <= 10000;
+          if (range === '10000+') return salaryValue >= 10000;
+          return false;
+        });
+      });
+    }
+    
+    return result;
+  }, [jobs, filters, isFilterActive]);
 
-  const totalPages = Math.ceil(filteredJobs.length / 10); // 10 jobs per page
+  // Calculate total pages based on filtered jobs
+  const totalPages = Math.ceil(filteredJobs.length / JOBS_PER_PAGE);
+  
+  // Get current page's jobs
+  const currentJobs = useMemo(() => {
+    const startIndex = (currentPage - 1) * JOBS_PER_PAGE;
+    return filteredJobs.slice(startIndex, startIndex + JOBS_PER_PAGE);
+  }, [filteredJobs, currentPage, JOBS_PER_PAGE]);
   
   const convertApiDataToJob = (jobData: any): Job => {
     return {
@@ -112,10 +152,12 @@ const JobListings: React.FC<JobListingsProps> = ({
       
       setLoading(true);
       try {
-        const response = await fetchJobs(token, 20); 
+        // Set limit to a high number to get all jobs at once
+        const response = await fetchJobs(token, 100); 
         const jobsData = response.data.map(job => convertApiDataToJob(job));
         setJobs(jobsData);
-        setFetchedOnce(true); 
+        setFetchedOnce(true);
+        console.log(`Fetched ${jobsData.length} jobs`);
       } catch (error) {
         console.error('Error fetching jobs:', error);
       } finally {
@@ -204,56 +246,108 @@ const JobListings: React.FC<JobListingsProps> = ({
     }
   };
 
-  // Effect to select first job when filtered jobs change and no job is selected
+  // Effect to select first job when currentJobs change and no job is selected
   useEffect(() => {
-    if (!selectedJob && filteredJobs.length > 0 && !propSelectedJobId) {
-      // If no job is selected and we have filtered jobs, select the first one
-      const firstJob = filteredJobs[0];
+    if (!selectedJob && currentJobs.length > 0 && !propSelectedJobId) {
+      // If no job is selected and we have jobs, select the first one
+      const firstJob = currentJobs[0];
       handleSelectJob(firstJob);
     }
-  }, [filteredJobs, selectedJob, propSelectedJobId]);
+  }, [currentJobs, selectedJob, propSelectedJobId]);
+
+  // Handle page change
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    // Scroll to top of job list when page changes
+    const jobListElement = document.querySelector('.job-list-container');
+    if (jobListElement) {
+      jobListElement.scrollTop = 0;
+    }
+  };
+
+  // Reset to first page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filters]);
 
   return (
     <div className="min-h-screen pt-11 overflow-hidden">
       <div className="max-w-6xl mx-auto bg-white dark:bg-gray-800 flex flex-col md:flex-row">
-        <div className="w-full md:w-1/3 overflow-y-auto border-r border-gray-200 dark:border-gray-700" style={{ maxHeight: "100vh" }}>
+        <div className="w-full md:w-1/3 overflow-y-auto border-r border-gray-200 dark:border-gray-700 job-list-container" style={{ maxHeight: "100vh" }}>
           {loading ? (
             <div className="p-8 text-center">
               <div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
               <p className="text-gray-600 dark:text-gray-400">Loading jobs...</p>
             </div>
           ) : (
-            <JobList 
-              jobs={filteredJobs} 
-              selectedJobId={selectedJob?.id || ''} 
-              onSelectJob={handleSelectJob} 
-            />
-          )}
-          
-          {!loading && (
             <>
-              <Pagination 
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={setCurrentPage}
+              <div className="px-4 py-3 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
+                <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Showing {currentJobs.length} of {filteredJobs.length} jobs
+                  {isFilterActive && jobs.length !== filteredJobs.length && ` (filtered from ${jobs.length} total)`}
+                </p>
+                {isFilterActive && (
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {filters.locations.map(loc => (
+                      <span key={loc} className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded dark:bg-blue-800 dark:text-blue-100">
+                        Location: {loc}
+                      </span>
+                    ))}
+                    {filters.company.map(comp => (
+                      <span key={comp} className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded dark:bg-green-800 dark:text-green-100">
+                        Company: {comp}
+                      </span>
+                    ))}
+                    {filters.experienceLevels.map(exp => (
+                      <span key={exp} className="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded dark:bg-purple-800 dark:text-purple-100">
+                        Experience: {exp}
+                      </span>
+                    ))}
+                    {filters.workModes.map(mode => (
+                      <span key={mode} className="bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded dark:bg-orange-800 dark:text-orange-100">
+                        Work mode: {mode}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+              
+              <JobList 
+                jobs={currentJobs} 
+                selectedJobId={selectedJob?.id || ''} 
+                onSelectJob={handleSelectJob} 
               />
               
-              <div className="mt-6 text-xs text-gray-600 dark:text-gray-400 p-4">
-                <div className="flex flex-wrap gap-x-4 gap-y-2">
-                  {FOOTER_LINKS.map((link, index) => (
-                    <span key={index} className="cursor-pointer hover:underline flex items-center dark:text-gray-400 dark:hover:text-gray-300">
-                      {link.text} {link.hasArrow && <FaSortDown size={12} />}
-                    </span>
-                  ))}
+              {filteredJobs.length > JOBS_PER_PAGE && (
+                <Pagination 
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
+                />
+              )}
+              
+              {filteredJobs.length === 0 && !loading && (
+                <div className="p-8 text-center text-gray-500 dark:text-gray-400">
+                  {isFilterActive ? "No jobs match your filter criteria" : "No jobs available"}
                 </div>
-                
-                <div className="mt-2 flex justify-center items-center">
-                  <img className="w-5 h-5" src="/link_up_logo.png" alt="LinkUp Logo"></img>
-                  <span className="ml-2">LinkUp Corporation © 2025</span>
-                </div>
-              </div>
+              )}
             </>
           )}
+          
+          <div className="mt-6 text-xs text-gray-600 dark:text-gray-400 p-4">
+            <div className="flex flex-wrap gap-x-4 gap-y-2">
+              {FOOTER_LINKS.map((link, index) => (
+                <span key={index} className="cursor-pointer hover:underline flex items-center dark:text-gray-400 dark:hover:text-gray-300">
+                  {link.text} {link.hasArrow && <FaSortDown size={12} />}
+                </span>
+              ))}
+            </div>
+            
+            <div className="mt-2 flex justify-center items-center">
+              <img className="w-5 h-5" src="/link_up_logo.png" alt="LinkUp Logo"></img>
+              <span className="ml-2">LinkUp Corporation © 2025</span>
+            </div>
+          </div>
         </div>
 
         {/* Job Details Component */}
@@ -269,7 +363,7 @@ const JobListings: React.FC<JobListingsProps> = ({
             </div>
           ) : (
             <div className="flex items-center justify-center h-full text-gray-500 dark:text-gray-400">
-              No jobs match the current filters
+              No job selected
             </div>
           )}
         </div>
