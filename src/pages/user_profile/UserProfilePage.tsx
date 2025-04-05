@@ -1,12 +1,12 @@
 import { Modal, WithNavBar } from "../../components";
 import {
   AboutSection,
+  EducationSection,
   ExperienceSection,
   ResourcesSection,
   UserInfo,
   ViewedSection,
 } from "./components";
-import EducationSection from "./components/EducationSection";
 
 const UserProfilePage = () => {
   return (
