@@ -44,7 +44,7 @@ pipeline {
                  echo 'building...' 
                 sh '''
                     cd mywork
-                    npm run build
+                    
                     cd ..
                     rm -rf mywork
                  '''
