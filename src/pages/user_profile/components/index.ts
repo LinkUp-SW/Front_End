@@ -5,6 +5,7 @@ import ResourcesSection from "./ResourcesSection";
 import UserInfo from "./user_info/UserInfo";
 import ViewedSection from "./ViewedSection";
 import EducationSection from "./EducationSection";
+import LicenseSection from "./LicenseSection";
 
 export {
   AboutSection,
@@ -14,4 +15,5 @@ export {
   UserInfo,
   ViewedSection,
   EducationSection,
+  LicenseSection,
 };
