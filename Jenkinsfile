@@ -46,7 +46,7 @@ pipeline {
                     cd mywork
                     
                     cd ..
-                    rm -rf mywork
+                    #rm -rf mywork
                  '''
             }
         }
