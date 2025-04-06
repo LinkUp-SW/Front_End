@@ -335,7 +335,7 @@ export const removeLicense = async (
 
 export const deleteUserProfileImage = async (
   token: string
-): Promise<{ message: string }> => {
+): Promise<{ message: string,profilePicture:string }> => {
   const response = await axiosInstance.delete(
     `/api/v1/user/profile/profile-picture`,
     {
@@ -350,7 +350,7 @@ export const deleteUserProfileImage = async (
 export const updateUserProfileImage = async (
   token: string,
   profilePicture: File
-) => {
+): Promise<{ message: string; profilePicture: string }> => {
   const formData = new FormData();
   formData.append("profilePicture", profilePicture);
 
