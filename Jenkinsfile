@@ -16,7 +16,7 @@ pipeline {
                 echo 'installing dependencies...' 
                 sh '''
                     cd mywork
-                    touch npmpackages
+                    npm install
                 '''
                  
             }
@@ -26,7 +26,7 @@ pipeline {
                  echo 'Linting...'   
                  sh '''
                     cd mywork
-                    
+                    npm run lint
                  '''
             }
         }
@@ -35,7 +35,7 @@ pipeline {
                  echo 'test...'  
                  sh '''
                     cd mywork
-                    
+                    npx vitest
                  '''
             }
         }
@@ -44,7 +44,7 @@ pipeline {
                  echo 'building...'  
                 sh '''
                     cd mywork
-                    
+                    npm run build
                     cd ..
                     #rm -rf mywork
                  '''
