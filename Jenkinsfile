@@ -41,7 +41,7 @@ pipeline {
         }
         stage('Build') { 
             steps {
-                 echo 'building...' 
+                 echo 'building...'  
                 sh '''
                     cd mywork
                     
