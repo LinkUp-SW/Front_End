@@ -333,11 +333,56 @@ export const removeLicense = async (
   return response.data;
 };
 
-export const deleteUserProfileImage = async (token: string):Promise<{message:string}> => {
-  const response = await axiosInstance.delete(`/api/v1/user/profile/profile-picture`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+export const deleteUserProfileImage = async (
+  token: string
+): Promise<{ message: string }> => {
+  const response = await axiosInstance.delete(
+    `/api/v1/user/profile/profile-picture`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
+
+export const updateUserProfileImage = async (
+  token: string,
+  profilePicture: File
+) => {
+  const formData = new FormData();
+  formData.append("profilePicture", profilePicture);
+
+  const response = await axiosInstance.put(
+    "/api/v1/user/profile/profile-picture",
+    formData,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  return response.data;
+};
+
+export const uploadUserProfileImage = async (
+  token: string,
+  profilePicture: File
+) => {
+  const formData = new FormData();
+  formData.append("profilePicture", profilePicture);
+
+  const response = await axiosInstance.post(
+    "/api/v1/user/profile/profile-picture",
+    formData,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
   return response.data;
 };
