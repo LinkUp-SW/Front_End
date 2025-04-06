@@ -33,9 +33,22 @@ const ManageInvitations: React.FC = () => {
   );
   const [sentNextCursor, setSentNextCursor] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  const [allReceivedFetched, setAllReceivedFetched] = useState(false);
+  const [allSentFetched, setAllSentFetched] = useState(false);
+
   const token = Cookies.get("linkup_auth_token");
 
   const observerRef = useRef<IntersectionObserver | null>(null);
+  const debounceTimeout = useRef<NodeJS.Timeout | null>(null);
+  const lastCursorRef = useRef<{
+    received: string | null;
+    sent: string | null;
+  }>({
+    received: null,
+    sent: null,
+  });
+
   const lastElementRef = useCallback(
     (node: HTMLDivElement | null) => {
       if (loading) return;
@@ -43,41 +56,81 @@ const ManageInvitations: React.FC = () => {
 
       observerRef.current = new IntersectionObserver(
         (entries) => {
-          if (entries[0].isIntersecting) {
-            if (activeTab === "received" && receivedNextCursor) {
-              loadMoreReceived();
-            } else if (activeTab === "sent" && sentNextCursor) {
-              loadMoreSent();
+          const isVisible = entries[0].isIntersecting;
+          if (!isVisible) return;
+
+          if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
+
+          debounceTimeout.current = setTimeout(() => {
+            if (
+              activeTab === "received" &&
+              receivedNextCursor &&
+              !allReceivedFetched
+            ) {
+              if (receivedNextCursor !== lastCursorRef.current.received) {
+                lastCursorRef.current.received = receivedNextCursor;
+                loadMoreReceived();
+              }
+            } else if (
+              activeTab === "sent" &&
+              sentNextCursor &&
+              !allSentFetched
+            ) {
+              if (sentNextCursor !== lastCursorRef.current.sent) {
+                lastCursorRef.current.sent = sentNextCursor;
+                loadMoreSent();
+              }
             }
-          }
+          }, 300);
         },
         { threshold: 1.0 }
       );
 
       if (node) observerRef.current.observe(node);
     },
-    [loading, activeTab, receivedNextCursor, sentNextCursor]
+    [
+      loading,
+      activeTab,
+      receivedNextCursor,
+      sentNextCursor,
+      allReceivedFetched,
+      allSentFetched,
+    ]
   );
 
   const fetchInitialData = async () => {
     if (!token) return;
 
-    setLoading(true);
-    try {
-      if (activeTab === "received") {
+    if (activeTab === "received") {
+      if (receivedInvitations.length > 0) return;
+
+      try {
         const data = await fetchRecievedConnections(token, null, LIMIT);
         setReceivedInvitations(data.receivedConnections);
         setReceivedNextCursor(data.nextCursor);
-      } else {
+        if (!data.nextCursor) setAllReceivedFetched(true);
+      } catch (error) {
+        console.error("Error fetching received invitations:", error);
+      }
+    } else {
+      if (sentInvitations.length > 0) return;
+
+      try {
         const data = await fetchSentConnections(token, null, LIMIT);
         setSentInvitations(data.sentConnections);
         setSentNextCursor(data.nextCursor);
+        if (!data.nextCursor) setAllSentFetched(true);
+      } catch (error) {
+        console.error("Error fetching sent invitations:", error);
       }
-    } catch (error) {
-      console.error("Error fetching invitations:", error);
+      setLoading(false);
     }
-    setLoading(false);
   };
+
+  useEffect(() => {
+    console.log("Received Invitations:", receivedInvitations);
+    console.log("Sent Invitations:", sentInvitations);
+  }, [receivedInvitations, sentInvitations]);
 
   useEffect(() => {
     fetchInitialData();
@@ -94,6 +147,7 @@ const ManageInvitations: React.FC = () => {
       );
       setReceivedInvitations((prev) => [...prev, ...data.receivedConnections]);
       setReceivedNextCursor(data.nextCursor);
+      if (!data.nextCursor) setAllReceivedFetched(true);
     } catch (error) {
       console.error("Error loading more received invitations:", error);
     }
@@ -107,6 +161,7 @@ const ManageInvitations: React.FC = () => {
       const data = await fetchSentConnections(token, sentNextCursor, LIMIT);
       setSentInvitations((prev) => [...prev, ...data.sentConnections]);
       setSentNextCursor(data.nextCursor);
+      if (!data.nextCursor) setAllSentFetched(true);
     } catch (error) {
       console.error("Error loading more sent invitations:", error);
     }
@@ -242,7 +297,6 @@ const ManageInvitations: React.FC = () => {
                       Withdraw
                     </button>
                   </DialogTrigger>
-
                   <DialogContent className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg shadow-lg p-6">
                     <DialogHeader>
                       <DialogTitle></DialogTitle>
