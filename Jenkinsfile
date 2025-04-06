@@ -23,7 +23,7 @@ pipeline {
         }
         stage('Lint Code') { 
             steps {
-                 echo 'Linting...'  
+                 echo 'Linting...'   
                  sh '''
                     cd mywork
                     
