@@ -119,11 +119,56 @@ export const formatExperienceDate = (date: Date): string => {
     .toLowerCase();
 };
 
-
-
-
-export function extractMonthAndYear(date?: Date): { month: string; year: string } {
+export function extractMonthAndYear(date?: Date): {
+  month: string;
+  year: string;
+} {
   if (!date) return { month: "", year: "" };
   const d = new Date(date);
   return { month: String(d.getMonth() + 1), year: String(d.getFullYear()) };
 }
+
+export const fileToBase64 = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onloadend = () => {
+      if (reader.result) {
+        resolve(reader.result as string);
+      } else {
+        reject("Failed to convert file to base64");
+      }
+    };
+
+    reader.onerror = () => {
+      reject("Error reading file");
+    };
+
+    reader.readAsDataURL(file); // Reads the file and converts it to base64
+  });
+};
+
+export default fileToBase64;
+
+export const parseURI = (file: Blob): Promise<string> => {
+  const reader = new FileReader();
+  return new Promise((resolve, reject) => {
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(file);
+  });
+};
+
+export const getDataBlob = async (url: string): Promise<string> => {
+  try {
+    const response = await fetch(url);
+    if (!response.ok)
+      throw new Error(`Failed to fetch ${url}: ${response.statusText}`);
+    const blob = await response.blob();
+    const uri = await parseURI(blob);
+    return uri;
+  } catch (error) {
+    console.error("Error:", error);
+    throw error;
+  }
+};
