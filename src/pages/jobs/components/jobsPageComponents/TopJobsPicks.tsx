@@ -61,6 +61,7 @@ const TopJobPicks: React.FC<TopJobPicksProps> = ({
       
       <div className="p-4 flex justify-center">
         <button 
+          id="show-all-jobs-btn"
           onClick={handleSeeMoreClick} 
           className="flex items-center text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
         >

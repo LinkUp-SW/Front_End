@@ -60,6 +60,7 @@ const MoreJobs: React.FC<MoreJobsProps> = ({
       {(hasMore && jobs.length > 0 && !loading) && (
         <div className="p-4 text-center">
           <button 
+            id="load-more-jobs-btn"
             onClick={onLoadMore}
             className="px-4 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 shadow-md cursor-pointer"
           >

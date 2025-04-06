@@ -19,8 +19,10 @@ const Sidebar: React.FC = () => {
         {SIDEBAR_MENU_ITEMS.map((item, index) => (
           <div 
             key={index} 
+            id={`sidebar-item-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
             className="flex items-center gap-2 p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded cursor-pointer transition-colors"
             onClick={() => handleMenuItemClick(item.label)}
+            role="button"
           >
             <span className="text-gray-600 dark:text-gray-300">
               {React.createElement(item.icon, { size: 20 })}
@@ -31,7 +33,11 @@ const Sidebar: React.FC = () => {
         
         <div className="border-t dark:border-gray-700 my-4"></div>
         
-        <div className="flex items-center gap-2 p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded cursor-pointer transition-colors">
+        <div 
+          id="post-job-btn" 
+          className="flex items-center gap-2 p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded cursor-pointer transition-colors"
+          role="button"
+        >
           <FaEdit size={20} />
           <span className="font-medium">Post a free job</span>
         </div>
@@ -41,7 +47,12 @@ const Sidebar: React.FC = () => {
       <div className="mt-6 text-xs text-gray-600 dark:text-gray-400 transition-colors">
         <div className="flex flex-wrap gap-x-4 gap-y-2">
           {FOOTER_LINKS.map((link, index) => (
-            <span key={index} className="cursor-pointer hover:underline hover:text-gray-800 dark:hover:text-gray-200 flex items-center transition-colors">
+            <span 
+            key={index} 
+            id={`footer-link-${index}`}
+            className="cursor-pointer hover:underline hover:text-gray-800 dark:hover:text-gray-200 flex items-center transition-colors"
+            role="button"
+            >
               {link.text} {link.hasArrow && <FaSortDown size={12} />}
             </span>
           ))}

@@ -212,6 +212,7 @@ const JobsPage: React.FC = () => {
               ref={loadingRef} 
               className="h-10 w-full"
               aria-hidden="true"
+              id="jobs-infinite-scroll-trigger"
             />
           )}
         </div>

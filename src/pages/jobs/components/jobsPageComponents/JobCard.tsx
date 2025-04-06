@@ -28,6 +28,7 @@ const JobCard: React.FC<JobCardProps> = ({ job, onDismiss, onSelect }) => {
       <div className="flex-1">
         <div className="flex justify-between">
           <a 
+            id={`job-title-${job.id}`}
             onClick={(e) => {
               e.stopPropagation(); // Prevent the parent div click from triggering
               handleJobClick();
@@ -37,6 +38,7 @@ const JobCard: React.FC<JobCardProps> = ({ job, onDismiss, onSelect }) => {
             {job.title} {job.verified && <span className="inline-block ml-1">✓</span>}
           </a>
           <button 
+            id={`dismiss-job-${job.id}`}
             onClick={(e) => {
               e.stopPropagation(); // Prevent the parent div click from triggering
               onDismiss(job.id);
