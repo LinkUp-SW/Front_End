@@ -2,130 +2,226 @@ import {
   Avatar,
   AvatarFallback,
   AvatarImage,
-  Button,
-  Dialog,
-  DialogContent,
-  DialogTrigger,
   Popover,
   PopoverContent,
   PopoverTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
 } from "@/components";
 import { RootState } from "@/store";
 import EmojiPicker, { Theme } from "emoji-picker-react";
-import { memo, useRef, useState } from "react";
+import { memo, useRef } from "react";
+import TextareaAutoResize from "react-textarea-autosize";
 import { FaChevronDown, FaRegClock } from "react-icons/fa";
 import { MdOutlineEmojiEmotions } from "react-icons/md";
 import { useSelector } from "react-redux";
 import { GoFileMedia as MediaIcon } from "react-icons/go";
-import UploadMediaModal from "./UploadMediaModal";
 import BlueButton from "../buttons/BlueButton";
 import IconButton from "../buttons/IconButton";
+import { IoDocument as DocumentIcon } from "react-icons/io5";
+import PostImages from "../PostImages";
+import { MdModeEdit as EditIcon } from "react-icons/md";
+import { IoClose as CloseIcon } from "react-icons/io5";
 
 interface CreatePostModalProps {
   profileImageUrl: string;
-  setIsSettings: (value: boolean) => void;
+  setActiveModal: (value: string) => void;
+  postText: string;
+  setPostText: (value: string | ((prevMessage: string) => string)) => void;
+  selectedMedia: File[];
+  setSelectedMedia: (images: File[]) => void;
+  submitPost: () => void;
+  privacySetting: string;
 }
 
 const CreatePostModal: React.FC<CreatePostModalProps> = ({
   profileImageUrl,
-  setIsSettings,
+  setActiveModal,
+  postText,
+  setPostText,
+  selectedMedia,
+  setSelectedMedia,
+  submitPost,
+  privacySetting,
 }) => {
-  const [postText, setPostText] = useState<string>("");
-  const [selectedImages, setSelectedImages] = useState<File[]>();
   const MemoizedEmojiPicker = memo(EmojiPicker);
 
   const darkMode = useSelector((state: RootState) => state.theme.theme);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleEmojiRequest = (emoji: { emoji: string }) => {
-    setPostText((prevMessage) => prevMessage + emoji.emoji);
-  };
-
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setSelectedImages([file]);
-    }
+    setPostText((prevMessage: string) => prevMessage + emoji.emoji);
   };
 
   return (
-    <div className="flex flex-col items-start gap-4 w-full ">
-      <div
-        onClick={() => setIsSettings(true)}
-        className="flex p-2 gap-4 hover:cursor-pointer hover:bg-gray-300 dark:hover:bg-gray-700 rounded-2xl"
-      >
-        <Avatar className="h-12 w-12 pl-0">
-          <AvatarImage src={profileImageUrl} alt="Profile" />
-          <AvatarFallback>CN</AvatarFallback>
-        </Avatar>
-        <div className="flex flex-col text-black dark:text-neutral-200">
-          <div className="flex items-center gap-3">
-            <p className="text-xl font-medium">Amr Doma</p>
-            <FaChevronDown />
+    <div className="flex flex-col relative items-start gap-4 w-full px-4 ">
+      <div className="dark:bg-gray-800 w-full sticky top-0">
+        <div
+          onClick={() => setActiveModal("settings")}
+          className="flex w-1/2 z-50  py-2  gap-4 hover:cursor-pointer hover:bg-gray-300 dark:hover:bg-gray-700 rounded-2xl"
+        >
+          <Avatar className="h-12 w-12 pl-0">
+            <AvatarImage src={profileImageUrl} alt="Profile" />
+            <AvatarFallback>CN</AvatarFallback>
+          </Avatar>
+          <div className="flex flex-col  text-black dark:text-neutral-200 ">
+            <div className="flex items-center gap-3">
+              <p className="text-xl font-medium">Amr Doma</p>
+              <FaChevronDown />
+            </div>
+            <p className="text-md">Post to {privacySetting}</p>
           </div>
-          <p className="text-md">Post to Anyone</p>
         </div>
       </div>
-      <textarea
-        placeholder="What do you want to talk about?"
-        value={postText}
-        onChange={(e) => setPostText(e.target.value)}
-        autoFocus
-        draggable={false}
-        className="min-h-[20rem] w-full resize-none outline-0 text-xl border-0 ring-0 focus:ring-0 focus:border-0  focus-visible:border-0 focus-visible:ring-0 dark:bg-gray-900"
-      ></textarea>
-      <div className="flex justify-start items-center">
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              variant="ghost"
-              className=" hover:cursor-pointer rounded-full dark:hover:bg-gray-800 dark:hover:text-neutral-200"
-            >
-              <MdOutlineEmojiEmotions />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent
-            forceMount
-            className="dark:bg-gray-900 w-fit p-0 dark:border-gray-600"
-          >
-            <MemoizedEmojiPicker
-              className="dark:bg-gray-900 w-full p-0"
-              theme={darkMode === "dark" ? Theme.DARK : Theme.LIGHT}
-              width={"full"}
-              onEmojiClick={handleEmojiRequest}
-            />
-          </PopoverContent>
-        </Popover>
+      <div className="flex flex-col w-full overflow-y-visible">
+        {/* Text Area */}
+        <TextareaAutoResize
+          rows={4}
+          placeholder="What do you want to talk about?"
+          value={postText}
+          onChange={(e) => {
+            setPostText(e.target.value);
 
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button
-              variant="ghost"
-              onClick={() => fileInputRef.current?.click()}
-              className=" hover:cursor-pointer rounded-full dark:hover:bg-gray-800 dark:hover:text-neutral-200"
-            >
-              <MediaIcon />
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="dark:bg-gray-900 dark:border-0">
-            <UploadMediaModal />
-          </DialogContent>
-        </Dialog>
-
-        <input
-          type="file"
-          accept="image/*"
-          ref={fileInputRef}
-          onChange={handleFileUpload}
-          className="hidden"
+            // Auto-resize the textarea
+            const textarea = e.target;
+            textarea.style.height = "auto";
+            textarea.style.height = `${textarea.scrollHeight}px`;
+          }}
+          autoFocus
+          draggable={false}
+          className="w-full resize-none min-h-[10rem] overflow-hidden outline-0 text-xl border-0 ring-0 focus:ring-0 focus:border-0 focus-visible:border-0 focus-visible:ring-0 dark:bg-gray-900"
         />
-      </div>
 
-      <div className="flex w-full justify-end border-t dark:border-gray-600 pt-4 gap-2">
-        <IconButton className="dark:hover:bg-gray-700 rounded-full hover:cursor-pointer">
-          <FaRegClock />
-        </IconButton>
-        <BlueButton disabled={postText.length == 0}>Post</BlueButton>
+        {selectedMedia.length > 0 && (
+          <div>
+            {/* Media Preview */}
+
+            <div className="flex justify-end gap-2">
+              <IconButton
+                onClick={() => {
+                  setActiveModal("add-media");
+                }}
+              >
+                <EditIcon />
+              </IconButton>
+              <IconButton
+                onClick={() => {
+                  setSelectedMedia([]);
+                  console.log(selectedMedia);
+                }}
+              >
+                <CloseIcon className="border rounded-full h-10 w-10 bg-gray-200 text-black" />
+              </IconButton>
+            </div>
+
+            {selectedMedia[0].type.startsWith("image/") ? (
+              <PostImages
+                className="flex-shrink-0"
+                images={selectedMedia.map((file) => URL.createObjectURL(file))}
+                isLandscape={false}
+              ></PostImages>
+            ) : (
+              <div className="flex justify-center items-center">
+                <video
+                  src={URL.createObjectURL(selectedMedia[0])}
+                  className="w-1/2 self-center border"
+                  controls
+                />
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+      <div className="sticky -bottom-4 py-5 w-full  z-50 dark:bg-gray-900">
+        <div className="flex justify-start items-center">
+          <TooltipProvider>
+            <Tooltip>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <TooltipTrigger asChild>
+                    <IconButton>
+                      <MdOutlineEmojiEmotions />
+                    </IconButton>
+                  </TooltipTrigger>
+                </PopoverTrigger>
+                <PopoverContent
+                  forceMount
+                  className="dark:bg-gray-900 w-fit p-0 dark:border-gray-600"
+                >
+                  <MemoizedEmojiPicker
+                    className="dark:bg-gray-900 w-full p-0"
+                    theme={darkMode === "dark" ? Theme.DARK : Theme.LIGHT}
+                    width={"full"}
+                    onEmojiClick={handleEmojiRequest}
+                  />
+                </PopoverContent>
+              </Popover>
+              <TooltipContent>
+                <p>Open Emoji keyboard</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
+          {!selectedMedia.length && (
+            <div>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger
+                    onClick={() => {
+                      fileInputRef.current?.click();
+                      setActiveModal("add-media");
+                    }}
+                    asChild
+                  >
+                    <IconButton>
+                      <MediaIcon />
+                    </IconButton>
+                  </TooltipTrigger>
+
+                  <TooltipContent>
+                    <p>Add media</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger
+                    onClick={() => setActiveModal("add-document")}
+                    asChild
+                  >
+                    <IconButton>
+                      <DocumentIcon></DocumentIcon>
+                    </IconButton>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Add a document</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>{" "}
+            </div>
+          )}
+        </div>
+
+        <div className="flex w-full justify-end border-t dark:border-gray-600 pt-4 gap-2">
+          {/* <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <IconButton>
+                <FaRegClock />
+              </IconButton>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Schedule for later</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider> */}
+
+          <BlueButton onClick={submitPost} disabled={postText.length == 0}>
+            Post
+          </BlueButton>
+        </div>
       </div>
     </div>
   );
