@@ -228,7 +228,6 @@ export enum MediaType {
 }
 
 export interface PostDBObject {
-  token: string; // auth token
   content: string; // Text content of the post
   mediaType: MediaType; // Type of media (e.g., "image", "video", etc.)
   media: string[]; // Array of media URLs or Base64 strings
