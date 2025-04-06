@@ -283,23 +283,23 @@ const JobListings: React.FC<JobListingsProps> = ({
   }, [filters]);
 
   return (
-    <div className="min-h-screen pt-11 overflow-hidden">
+    <div id="jobs-listings-container" className="min-h-screen pt-11 overflow-hidden">
       <div className="max-w-6xl mx-auto bg-white dark:bg-gray-800 flex flex-col md:flex-row">
-        <div className="w-full md:w-1/3 overflow-y-auto border-r border-gray-200 dark:border-gray-700 job-list-container" style={{ maxHeight: "100vh" }}>
+        <div id="job-list-sidebar" className="w-full md:w-1/3 overflow-y-auto border-r border-gray-200 dark:border-gray-700 job-list-container" style={{ maxHeight: "100vh" }}>
           {loading ? (
-            <div className="p-8 text-center">
+            <div id="job-list-loading" className="p-8 text-center">
               <div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
               <p className="text-gray-600 dark:text-gray-400">Loading jobs...</p>
             </div>
           ) : (
             <>
-              <div className="px-4 py-3 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
+              <div id="job-results-header" className="px-4 py-3 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
                 <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
                   Showing {currentJobs.length} of {filteredJobs.length} jobs
                   {isFilterActive && jobs.length !== filteredJobs.length && ` (filtered from ${jobs.length} total)`}
                 </p>
                 {isFilterActive && (
-                  <div className="mt-2 flex flex-wrap gap-2">
+                  <div id="active-filters" className="mt-2 flex flex-wrap gap-2">
                     {filters.locations.map(loc => (
                       <span key={loc} className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded dark:bg-blue-800 dark:text-blue-100">
                         Location: {loc}
@@ -339,23 +339,23 @@ const JobListings: React.FC<JobListingsProps> = ({
               )}
               
               {filteredJobs.length === 0 && !loading && (
-                <div className="p-8 text-center text-gray-500 dark:text-gray-400">
+                <div id="no-jobs-message" className="p-8 text-center text-gray-500 dark:text-gray-400">
                   {isFilterActive ? "No jobs match your filter criteria" : "No jobs available"}
                 </div>
               )}
             </>
           )}
           
-          <div className="mt-6 text-xs text-gray-600 dark:text-gray-400 p-4">
+          <div id="footer-links" className="mt-6 text-xs text-gray-600 dark:text-gray-400 p-4">
             <div className="flex flex-wrap gap-x-4 gap-y-2">
               {FOOTER_LINKS.map((link, index) => (
-                <span key={index} className="cursor-pointer hover:underline flex items-center dark:text-gray-400 dark:hover:text-gray-300">
+                <span id={`footer-link-${index}`} key={index} className="cursor-pointer hover:underline flex items-center dark:text-gray-400 dark:hover:text-gray-300">
                   {link.text} {link.hasArrow && <FaSortDown size={12} />}
                 </span>
               ))}
             </div>
             
-            <div className="mt-2 flex justify-center items-center">
+            <div id="copyright-footer" className="mt-2 flex justify-center items-center">
               <img className="w-5 h-5" src="/link_up_logo.png" alt="LinkUp Logo"></img>
               <span className="ml-2">LinkUp Corporation © 2025</span>
             </div>
@@ -363,18 +363,18 @@ const JobListings: React.FC<JobListingsProps> = ({
         </div>
 
         {/* Job Details Component */}
-        <div className="w-full md:w-2/3 overflow-y-auto bg-white dark:bg-gray-900" style={{ maxHeight: "100vh" }}>
+        <div id="job-detail-container" className="w-full md:w-2/3 overflow-y-auto bg-white dark:bg-gray-900" style={{ maxHeight: "100vh" }}>
           {selectedJob ? (
             <JobDetail 
               job={selectedJob} 
               isLoading={jobDetailLoading} 
             />
           ) : loading || jobDetailLoading ? (
-            <div className="flex items-center justify-center h-full">
+            <div id="job-detail-loading" className="flex items-center justify-center h-full">
               <div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full"></div>
             </div>
           ) : (
-            <div className="flex items-center justify-center h-full text-gray-500 dark:text-gray-400">
+            <div id="no-job-selected" className="flex items-center justify-center h-full text-gray-500 dark:text-gray-400">
               No job selected
             </div>
           )}

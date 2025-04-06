@@ -54,11 +54,11 @@ const SeeMorePage: React.FC = () => {
     const companyInfo: CompanyInfo = {
       name: jobData.organization?.name || "",
       logo: jobData.organization?.logo || "",
-      followers: jobData.organization?.followers || "10,000+",
-      industryType: jobData.organization?.industry || "Information Technology",
-      employeeCount: jobData.organization?.size || "51-200 employees",
-      linkupPresence: jobData.organization?.linkup_presence || "100+ on LinkUp",
-      description: jobData.organization?.description || "A growing company focused on innovation and excellence in their field."
+      followers: jobData.organization?.followers || "",
+      industryType: jobData.organization?.industry || "",
+      employeeCount: jobData.organization?.size || "",
+      linkupPresence: jobData.organization?.linkup_presence || "",
+      description: jobData.organization?.description || ""
     };
 
     // Map API data to Job type according to your type definition
@@ -67,7 +67,7 @@ const SeeMorePage: React.FC = () => {
       title: jobData.job_title || "Unknown Title",
       company: jobData.organization?.name || "Unknown Company",
       location: jobData.location || "Unknown Location",
-      experience_level: jobData.experience_level || "Entry level",
+      experience_level: jobData.experience_level ,
       isRemote: jobData.workplace_type === 'Remote',
       isSaved: false,
       logo: jobData.organization?.logo || "",
@@ -100,7 +100,7 @@ const SeeMorePage: React.FC = () => {
   };
 
   return (
-    <div>
+    <div id="see-more-page-container">
       <JobFilterBar onFiltersChange={handleFiltersChange} /> 
       <JobListings 
         filters={filters} 

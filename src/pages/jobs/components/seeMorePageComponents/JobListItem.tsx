@@ -14,8 +14,9 @@ const JobListItem: React.FC<JobListItemProps> = ({ job, isSelected, onClick }) =
         ${isSelected ? 'border-l-4 border-l-blue-500 dark:border-l-blue-400 bg-gray-50 dark:bg-gray-700' : ''}`}
       onClick={onClick}
       data-testid={`job-item-${job.id}`}
+      id={`job-list-item-${job.id}`}
     >
-      <div className="flex">
+      <div className="flex items-start">
         <div className="mr-3">
           {job.logo && job.logo.startsWith('http') ? (
             <img 
@@ -44,7 +45,7 @@ const JobListItem: React.FC<JobListItemProps> = ({ job, isSelected, onClick }) =
           </div>
           <p className="text-sm text-gray-800 dark:text-gray-200">{job.company}</p>
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            {job.location} {job.isRemote && "• Remote"} {job.workMode && !job.isRemote && `• ${job.workMode}`}
+            {job.location} {job.workMode  && `• ${job.workMode}`}
           </p>
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{job.postedTime}</p>
           

@@ -82,6 +82,7 @@ const JobHeader: React.FC<JobHeaderProps> = ({ job }) => {
         </div>
         <div className="flex space-x-2">
           <button 
+            id="btn-job-alerts"
             className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
             title="Get job alerts"
           >
@@ -91,6 +92,7 @@ const JobHeader: React.FC<JobHeaderProps> = ({ job }) => {
             </svg>
           </button>
           <button 
+            id="btn-job-options"
             className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
             title="More options"
           >
@@ -127,12 +129,16 @@ const JobHeader: React.FC<JobHeaderProps> = ({ job }) => {
       
       <div className="flex flex-wrap gap-2 mb-6">
         {job.hasEasyApply && (
-          <button className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 md:px-6 rounded-full flex items-center text-sm font-medium transition-colors">
+          <button 
+            id="btn-easy-apply"
+            className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 md:px-6 rounded-full flex items-center text-sm font-medium transition-colors"
+          >
             <span className="bg-white text-blue-600 rounded px-1 mr-2 text-xs">in</span>
             <span>Easy Apply</span>
           </button>
         )}
         <button
+          id="btn-save-job"
           disabled={saveInProgress}
           className={`
             py-2 px-4 md:px-6 rounded-full text-sm font-medium transition-colors flex items-center

@@ -34,6 +34,7 @@ const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPage
       <nav className="flex items-center space-x-1">
         {/* Previous button */}
         <button 
+          id="pagination-prev-button"
           className={`px-2 py-1 rounded ${currentPage === 1 ? 'text-gray-400 dark:text-gray-600 cursor-not-allowed' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'}`}
           onClick={() => currentPage > 1 && onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
@@ -49,6 +50,7 @@ const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPage
               <React.Fragment key={`ellipsis-${index}`}>
                 <span className="px-2 py-1 text-gray-500 dark:text-gray-400">...</span>
                 <button
+                  id={`pagination-page-${number}`}
                   onClick={() => onPageChange(number)}
                   className={`px-3 py-1 rounded ${currentPage === number ? 'bg-black dark:bg-gray-600 text-white' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'}`}
                 >
@@ -60,6 +62,7 @@ const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPage
           
           return (
             <button
+              id={`pagination-page-${number}`}
               key={number}
               onClick={() => onPageChange(number)}
               className={`px-3 py-1 rounded ${currentPage === number ? 'bg-black dark:bg-gray-600 text-white' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'}`}
@@ -71,6 +74,7 @@ const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPage
         
         {/* Next button */}
         <button 
+          id="pagination-next-button"
           className={`px-2 py-1 rounded ${currentPage === totalPages ? 'text-gray-400 dark:text-gray-600 cursor-not-allowed' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'}`}
           onClick={() => currentPage < totalPages && onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages}

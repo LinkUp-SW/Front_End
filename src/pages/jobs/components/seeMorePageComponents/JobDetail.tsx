@@ -84,7 +84,10 @@ const JobDetail: React.FC<JobDetailProps> = ({ job, isLoading = false }) => {
             </div>
           </div>
           
-          <button className="border rounded-full px-4 py-1 flex items-center gap-2 text-blue-600 dark:text-blue-400 border-blue-600 dark:border-blue-400 text-sm">
+          <button 
+            id="btn-follow-company"
+            className="border rounded-full px-4 py-1 flex items-center gap-2 text-blue-600 dark:text-blue-400 border-blue-600 dark:border-blue-400 text-sm"
+          >
             + Follow
           </button>
         </div>
@@ -99,8 +102,11 @@ const JobDetail: React.FC<JobDetailProps> = ({ job, isLoading = false }) => {
           {job.companyInfo?.description || 
            "A growing company focused on innovation and excellence in their field."}
         </p>
-        <button className="block w-full text-center border border-blue-600 dark:border-blue-500 text-blue-600 dark:text-blue-400 rounded-full py-2 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors">
-            Show more
+        <button 
+          id="btn-show-more-company"
+          className="block w-full text-center border border-blue-600 dark:border-blue-500 text-blue-600 dark:text-blue-400 rounded-full py-2 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
+        >
+          Show more
         </button>
       </div>
     </div>

@@ -24,11 +24,17 @@ const JobContent: React.FC<JobContentProps> = ({ job }) => {
         </p>
         
         <div className="flex space-x-3 mt-3 overflow-x-auto">
-          <button className="border border-gray-300 dark:border-gray-600 rounded-full px-4 py-2 text-sm flex items-center whitespace-nowrap dark:text-gray-300">
+          <button 
+            id="btn-tailor-resume" 
+            className="border border-gray-300 dark:border-gray-600 rounded-full px-4 py-2 text-sm flex items-center whitespace-nowrap dark:text-gray-300"
+          >
             <span className="text-gray-500 dark:text-gray-400 mr-2">★</span>
             <span>Tailor my resume to this job</span>
           </button>
-          <button className="border border-gray-300 dark:border-gray-600 rounded-full px-4 py-2 text-sm flex items-center whitespace-nowrap dark:text-gray-300">
+          <button 
+            id="btn-job-fit" 
+            className="border border-gray-300 dark:border-gray-600 rounded-full px-4 py-2 text-sm flex items-center whitespace-nowrap dark:text-gray-300"
+          >
             <span className="text-gray-500 dark:text-gray-400 mr-2">★</span>
             <span>Am I a good fit for this job?</span>
           </button>
@@ -44,9 +50,12 @@ const JobContent: React.FC<JobContentProps> = ({ job }) => {
             </div>
             <span className="text-sm dark:text-gray-300">School alumni from Cairo University</span>
           </div>
-          <div className="border border-gray-300 dark:border-gray-600 rounded-full px-4 py-1 text-sm dark:text-gray-300">
+          <button 
+            id="btn-show-connections" 
+            className="border border-gray-300 dark:border-gray-600 rounded-full px-4 py-1 text-sm dark:text-gray-300"
+          >
             Show all
-          </div>
+          </button>
         </div>
       </div>
       
@@ -59,6 +68,7 @@ const JobContent: React.FC<JobContentProps> = ({ job }) => {
             )}
             {descriptionText.length > 200 && (
               <button 
+                id="btn-toggle-description"
                 onClick={() => setShowFullDescription(!showFullDescription)}
                 className="text-blue-600 dark:text-blue-400 ml-1 hover:underline"
               >
@@ -71,18 +81,21 @@ const JobContent: React.FC<JobContentProps> = ({ job }) => {
         <div className="mt-6 border-b border-gray-200 dark:border-gray-700">
           <div className="flex space-x-4 mb-2">
             <button 
+              id="tab-responsibilities"
               className={`pb-2 font-medium text-sm ${activeSection === 'responsibilities' ? 'border-b-2 border-blue-600 dark:border-blue-400 text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-400'}`}
               onClick={() => setActiveSection('responsibilities')}
             >
               Responsibilities
             </button>
             <button 
+              id="tab-qualifications"
               className={`pb-2 font-medium text-sm ${activeSection === 'qualifications' ? 'border-b-2 border-blue-600 dark:border-blue-400 text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-400'}`}
               onClick={() => setActiveSection('qualifications')}
             >
               Qualifications
             </button>
             <button 
+              id="tab-benefits"
               className={`pb-2 font-medium text-sm ${activeSection === 'benefits' ? 'border-b-2 border-blue-600 dark:border-blue-400 text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-400'}`}
               onClick={() => setActiveSection('benefits')}
             >
@@ -122,7 +135,10 @@ const JobContent: React.FC<JobContentProps> = ({ job }) => {
         )}
         
         <div className="mt-8 mb-6">
-          <button className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg">
+          <button 
+            id="btn-apply-now"
+            className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg"
+          >
             Apply Now
           </button>
         </div>
