@@ -61,6 +61,8 @@ import {
   PopoverAnchor,
 } from "./ui/popover";
 import TruncatedText from "./truncate_text/TruncatedText";
+import { Slider } from "./ui/slider";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "./ui/tabs";
 
 export {
   UserList,
@@ -118,5 +120,10 @@ export {
   PopoverTrigger,
   PopoverContent,
   PopoverAnchor,
-  TruncatedText
+  TruncatedText,
+  Slider,
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
 };

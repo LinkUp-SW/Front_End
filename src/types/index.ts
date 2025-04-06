@@ -202,6 +202,10 @@ export interface UserProfileBio {
   isInConnections?: boolean;
   isConnectByEmail: boolean;
   isAlreadyFollowing?: boolean;
+  is_default_profile_photo: boolean;
+  education: Organization | null;
+  work_experience: Organization | null;
+  is_defult_cover_photo: boolean;
 }
 
 // Add to types.ts
