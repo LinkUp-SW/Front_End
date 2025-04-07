@@ -5,7 +5,7 @@ import Pagination from "./Pagination";
 import { Job, JobFilters } from "../../types";
 import { FOOTER_LINKS } from '../../../../constants/index';
 import { FaSortDown } from "react-icons/fa6";
-import { fetchSingleJob, fetchJobs } from '../../../../endpoints/jobs';
+import { fetchSingleJob, fetchJobs, JobData } from '../../../../endpoints/jobs';
 import Cookies from 'js-cookie';
 
 interface JobListingsProps {
@@ -110,7 +110,7 @@ const JobListings: React.FC<JobListingsProps> = ({
     return filteredJobs.slice(startIndex, startIndex + JOBS_PER_PAGE);
   }, [filteredJobs, currentPage, JOBS_PER_PAGE]);
   
-  const convertApiDataToJob = (jobData: any): Job => {
+  const convertApiDataToJob = (jobData: JobData): Job => {
     return {
       id: jobData._id,
       title: jobData.job_title,

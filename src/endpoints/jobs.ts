@@ -14,6 +14,11 @@ export interface JobData {
     _id: string;
     name: string;
     logo: string;
+    description: string;
+    linkup_presence: string;
+    size: string;
+    industry: string;
+    followers: string;
   };
   job_title: string;
   location: string;
@@ -26,6 +31,8 @@ export interface JobData {
   benefits:string[];
   qualifications:string[];
   responsibilities:string[];
+  isPromoted:boolean;
+  hasEasyApply:boolean;
 }
 
 export const fetchJobs = async (token: string, limit: number = 10, cursor?: string): Promise<JobResponse> => {

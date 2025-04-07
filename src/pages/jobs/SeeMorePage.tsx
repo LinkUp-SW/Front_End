@@ -4,7 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import JobFilterBar from "../../components/jobs_filter_bar/JobFilterBar";
 import JobListings from "./components/seeMorePageComponents/JobListings";
 import { JobFilters, Job, CompanyInfo } from './types';
-import { fetchSingleJob } from '../../endpoints/jobs';
+import { fetchSingleJob, JobData } from '../../endpoints/jobs';
 import Cookies from 'js-cookie';
 
 const SeeMorePage: React.FC = () => {
@@ -50,7 +50,7 @@ const SeeMorePage: React.FC = () => {
     fetchSelectedJobData();
   }, [selectedJobId]);
 
-  const convertApiDataToJob = (jobData: any): Job => {
+  const convertApiDataToJob = (jobData: JobData): Job => {
     const companyInfo: CompanyInfo = {
       name: jobData.organization?.name || "",
       logo: jobData.organization?.logo || "",
@@ -67,7 +67,7 @@ const SeeMorePage: React.FC = () => {
       title: jobData.job_title || "Unknown Title",
       company: jobData.organization?.name || "Unknown Company",
       location: jobData.location || "Unknown Location",
-      experience_level: jobData.experience_level ,
+      experience_level: jobData.experience_level,
       isRemote: jobData.workplace_type === 'Remote',
       isSaved: false,
       logo: jobData.organization?.logo || "",
