@@ -55,7 +55,7 @@ const routes: RouteObject[] = [
     element: React.createElement(NotificationsPage),
   },
   {
-    path: "/collections",
+    path: "/jobs/see-more",
     element: React.createElement(SeeMorePage),
   },
   {
@@ -68,7 +68,9 @@ const routes: RouteObject[] = [
     element: React.createElement(FollowingFollowersPage),
   },
 
-  { path: "/connections/:id", element: React.createElement(ConnectionsPage) },
+  { path: "/connections/:id", 
+    element: React.createElement(ConnectionsPage) 
+  },
 
   {
     path: "/manage-invitations",

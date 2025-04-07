@@ -37,16 +37,25 @@ const Buttons = () => {
           onChange={() => handleMainButton()}
           className="selectMainButton"
         >
-          <option value="Focused">Focused</option>
-          <option value="Other">Other</option>
-          <option value="Archived">Archived</option>
-          <option value="Spam">Spam</option>
+          <option id="focused" value="Focused">
+            Focused
+          </option>
+          <option id="other" value="Other">
+            Other
+          </option>
+          <option id="archived" value="Archived">
+            Archived
+          </option>
+          <option id="spam" value="Spam">
+            Spam
+          </option>
         </select>
 
         <div className="border-1 border-gray-300 h-7"></div>
 
         {buttonNameList.map((buttonName) => (
           <button
+            id="button-name"
             className={`${
               activeFilter === buttonName && AllowOtherButtons === "true"
                 ? "text-center  hover:cursor-pointer font-semibold bg-[#01754f] rounded-2xl text-white  pr-2 pl-2 pt-1 pb-1 mr-3"
