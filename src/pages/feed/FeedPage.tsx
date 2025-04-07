@@ -89,7 +89,7 @@ const FeedPage = () => {
             )}
           </aside>
           {/* Main Content */}
-          <main className="flex flex-col w-full md:max-w-[27.8rem]">
+          <main className="flex flex-col w-full max-w-auto md:max-w-[27.8rem] lg:max-w-[35rem]">
             <CreatePost />
             {posts.map((post, index) => (
               <Post key={index} postData={post} comments={comments} />
