@@ -15,12 +15,14 @@ interface ImageEditorProps {
   sourceImage: string;
   onSave: (dataUrl: string) => void;
   onClose: () => void;
+  onCancel: () => void;
 }
 
 export default function ImageEditor({
   sourceImage,
   onSave,
   onClose,
+  onCancel,
 }: ImageEditorProps) {
   const [image, setImage] = useState<HTMLImageElement | null>(null);
   const [cropMode, setCropMode] = useState(false);
@@ -37,11 +39,11 @@ export default function ImageEditor({
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  // Helper to ensure a value stays within [min, max]
+  // Helper to clamp values within [min, max]
   const clamp = (val: number, min: number, max: number) =>
     Math.min(Math.max(val, min), max);
 
-  // Initialize image from source prop
+  // Load image from backend and treat it as the base image
   useEffect(() => {
     const img = new Image();
     img.onload = () => {
@@ -66,24 +68,49 @@ export default function ImageEditor({
     if (!canvas || !ctx) return;
 
     if (cropMode && previewDataUrl && !isDragging) {
-      // If in crop mode and a preview exists (and not dragging), display the preview.
+      // In crop mode, if there's a preview (and not dragging), draw the preview.
       const previewImg = new Image();
       previewImg.onload = () => {
-        canvas.width = previewImg.width;
-        canvas.height = previewImg.height;
+        // Keep canvas dimensions equal to the base image.
+        canvas.width = image.width;
+        canvas.height = image.height;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(previewImg, 0, 0);
+        // Draw the preview stretched to fill the canvas.
+        ctx.drawImage(previewImg, 0, 0, canvas.width, canvas.height);
       };
       previewImg.src = previewDataUrl;
     } else {
-      // Draw the original image with adjustments (if not cropping) or with crop overlay while dragging.
+      // Draw the base image with new filters applied fresh.
       canvas.width = image.width;
       canvas.height = image.height;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(image, 0, 0);
-      if (!cropMode) {
-        applyAdjustments(ctx, canvas.width, canvas.height);
+
+      // Use canvas filters for brightness, contrast, and saturation.
+      ctx.filter = `brightness(${adjustments.brightness}%) contrast(${adjustments.contrast}%) saturate(${adjustments.saturation}%)`;
+      ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+      ctx.filter = "none";
+
+      // Then, apply vignette manually (drawn only once).
+      if (adjustments.vignette > 0) {
+        ctx.save();
+        const vignette = adjustments.vignette / 100;
+        const gradient = ctx.createRadialGradient(
+          canvas.width / 2,
+          canvas.height / 2,
+          0,
+          canvas.width / 2,
+          canvas.height / 2,
+          Math.sqrt((canvas.width / 2) ** 2 + (canvas.height / 2) ** 2)
+        );
+        gradient.addColorStop(0, "rgba(0,0,0,0)");
+        gradient.addColorStop(0.5, "rgba(0,0,0,0)");
+        gradient.addColorStop(1, `rgba(0,0,0,${vignette})`);
+        ctx.fillStyle = gradient;
+        ctx.globalCompositeOperation = "multiply";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.restore();
       }
+
       if (cropMode && isDragging) {
         drawCropOverlay(ctx);
       }
@@ -97,74 +124,6 @@ export default function ImageEditor({
     adjustments,
     previewDataUrl,
   ]);
-
-  const applyAdjustments = (
-    ctx: CanvasRenderingContext2D,
-    width: number,
-    height: number
-  ) => {
-    const imageData = ctx.getImageData(0, 0, width, height);
-    const data = imageData.data;
-
-    const brightness = adjustments.brightness / 100;
-    const contrast = adjustments.contrast / 100;
-    const saturation = adjustments.saturation / 100;
-
-    for (let i = 0; i < data.length; i += 4) {
-      // Apply brightness
-      data[i] = Math.min(255, Math.max(0, data[i] * brightness));
-      data[i + 1] = Math.min(255, Math.max(0, data[i + 1] * brightness));
-      data[i + 2] = Math.min(255, Math.max(0, data[i + 2] * brightness));
-
-      // Apply contrast
-      const factor =
-        (259 * (contrast * 255 + 255)) / (255 * (259 - contrast * 255));
-      data[i] = Math.min(255, Math.max(0, factor * (data[i] - 128) + 128));
-      data[i + 1] = Math.min(
-        255,
-        Math.max(0, factor * (data[i + 1] - 128) + 128)
-      );
-      data[i + 2] = Math.min(
-        255,
-        Math.max(0, factor * (data[i + 2] - 128) + 128)
-      );
-
-      // Apply saturation
-      const gray =
-        0.2989 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
-      data[i] = Math.min(255, Math.max(0, gray + saturation * (data[i] - gray)));
-      data[i + 1] = Math.min(
-        255,
-        Math.max(0, gray + saturation * (data[i + 1] - gray))
-      );
-      data[i + 2] = Math.min(
-        255,
-        Math.max(0, gray + saturation * (data[i + 2] - gray))
-      );
-    }
-    ctx.putImageData(imageData, 0, 0);
-
-    // Apply vignette effect
-    if (adjustments.vignette > 0) {
-      const vignette = adjustments.vignette / 100;
-      ctx.save();
-      const gradient = ctx.createRadialGradient(
-        width / 2,
-        height / 2,
-        0,
-        width / 2,
-        height / 2,
-        Math.sqrt(Math.pow(width / 2, 2) + Math.pow(height / 2, 2))
-      );
-      gradient.addColorStop(0, "rgba(0,0,0,0)");
-      gradient.addColorStop(0.5, "rgba(0,0,0,0)");
-      gradient.addColorStop(1, `rgba(0,0,0,${vignette})`);
-      ctx.fillStyle = gradient;
-      ctx.globalCompositeOperation = "multiply";
-      ctx.fillRect(0, 0, width, height);
-      ctx.restore();
-    }
-  };
 
   const drawCropOverlay = (ctx: CanvasRenderingContext2D) => {
     const x = Math.min(cropStart.x, cropEnd.x);
@@ -180,44 +139,40 @@ export default function ImageEditor({
     ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
     const canvasWidth = ctx.canvas.width;
     const canvasHeight = ctx.canvas.height;
-
-    // Draw overlay outside crop area
     ctx.fillRect(0, 0, canvasWidth, y);
     ctx.fillRect(0, y, x, height);
     ctx.fillRect(x + width, y, canvasWidth - (x + width), height);
     ctx.fillRect(0, y + height, canvasWidth, canvasHeight - (y + height));
   };
 
-  // This function computes the crop preview and sets it in state.
+  // Compute crop preview using the current base image.
   const updateCropPreview = () => {
     if (!image) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
-    // Clamp the crop coordinates to ensure they remain within bounds.
+    // Clamp coordinates
     const x = clamp(Math.min(cropStart.x, cropEnd.x), 0, canvas.width);
     const y = clamp(Math.min(cropStart.y, cropEnd.y), 0, canvas.height);
     const endX = clamp(Math.max(cropStart.x, cropEnd.x), 0, canvas.width);
     const endY = clamp(Math.max(cropStart.y, cropEnd.y), 0, canvas.height);
     const width = endX - x;
     const height = endY - y;
-
     if (width < 10 || height < 10) {
       setPreviewDataUrl(null);
       return;
     }
-
     const tempCanvas = document.createElement("canvas");
     tempCanvas.width = width;
     tempCanvas.height = height;
     const tempCtx = tempCanvas.getContext("2d");
     if (!tempCtx) return;
-    // Draw the current canvas area into the temp canvas.
-    tempCtx.drawImage(canvas, x, y, width, height, 0, 0, width, height);
+    // Draw from the base image so that filters don’t stack.
+    tempCtx.drawImage(image, x, y, width, height, 0, 0, width, height);
     const croppedDataUrl = tempCanvas.toDataURL("image/png");
     setPreviewDataUrl(croppedDataUrl);
   };
 
-  // Mouse handlers for cropping
+  // Mouse handlers (with clamping)
   const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
     if (!cropMode) return;
     const canvas = canvasRef.current;
@@ -251,7 +206,7 @@ export default function ImageEditor({
     }
   };
 
-  // Touch handlers for cropping (mobile support)
+  // Touch handlers (with clamping)
   const handleTouchStart = (e: React.TouchEvent<HTMLCanvasElement>) => {
     if (!cropMode) return;
     const canvas = canvasRef.current;
@@ -287,7 +242,7 @@ export default function ImageEditor({
     }
   };
 
-  // Crop preset functions
+  // Crop presets
   const setPresetSquare = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -322,11 +277,12 @@ export default function ImageEditor({
     setTimeout(updateCropPreview, 0);
   };
 
-  // When the user clicks "Apply Crop", commit the preview.
+  // Commit the crop preview when the user clicks "Apply Crop".
   const handleApplyCrop = () => {
     if (!previewDataUrl) return;
     const newImg = new Image();
     newImg.onload = () => {
+      // Update the base image with the newly cropped image.
       setImage(newImg);
       setPreviewDataUrl(null);
       setCropMode(false);
@@ -339,7 +295,6 @@ export default function ImageEditor({
     if (!canvas) return;
     onSave(canvas.toDataURL("image/png"));
     onClose();
-    
   };
 
   return (
@@ -349,9 +304,6 @@ export default function ImageEditor({
           <CardTitle className="text-2xl text-gray-800 dark:text-white">
             Edit Profile Picture
           </CardTitle>
-          <Button variant="outline" onClick={onClose}>
-            Close Editor
-          </Button>
         </CardHeader>
 
         <CardContent className="bg-white dark:bg-gray-800">
@@ -360,7 +312,7 @@ export default function ImageEditor({
               <div className="border border-gray-200 rounded-md overflow-hidden bg-gray-50 dark:bg-gray-700">
                 <canvas
                   ref={canvasRef}
-                  className="max-w-full max-h-[400px] mx-auto"
+                  className="max-w-full max-h-[400px] h-full mx-auto"
                   onMouseDown={handleMouseDown}
                   onMouseMove={handleMouseMove}
                   onMouseUp={handleMouseUp}
@@ -537,10 +489,17 @@ export default function ImageEditor({
         </CardContent>
 
         <CardFooter className="flex justify-between bg-white dark:bg-gray-800">
-          <Button variant="outline" onClick={onClose}>
+          <Button
+            variant="outline"
+            onClick={onCancel}
+            className="destructiveBtn"
+          >
             Cancel
           </Button>
-          <Button onClick={handleSave} className="flex items-center gap-2">
+          <Button
+            onClick={handleSave}
+            className="flex items-center gap-2  affimativeBtn"
+          >
             <Download className="h-4 w-4" />
             Save Changes
           </Button>
