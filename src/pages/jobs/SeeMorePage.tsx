@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { WithNavBar } from '../../components';
 import { useLocation, useNavigate } from 'react-router-dom';
-import JobFilterBar from "../../components/jobs_categories/JobFilterBar";
+import JobFilterBar from "../../components/jobs_filter_bar/JobFilterBar";
 import JobListings from "./components/seeMorePageComponents/JobListings";
 import { JobFilters, Job, CompanyInfo } from './types';
 import { fetchSingleJob } from '../../endpoints/jobs';

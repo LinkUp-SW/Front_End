@@ -3,7 +3,7 @@ import { MdArrowDropDown, MdMenu, MdClose } from 'react-icons/md';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { JobFilters } from '../../../src/pages/jobs/types';
+import { JobFilters } from '../../pages/jobs/types';
 
 interface JobFilterBarProps {
   onFiltersChange: (filters: JobFilters) => void;
