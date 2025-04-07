@@ -17,14 +17,13 @@ const RadioButton: React.FC<RadioButtonProps> = ({
 }) => {
   return (
     <div
-      className={`flex items-center gap-4 py-4 justify-between cursor-pointer ${
-        isSelected ? "" : "hover:bg-gray-100 dark:hover:bg-gray-800"
-      }`}
+      className={`flex items-center gap-4 py-4 justify-between cursor-pointer
+        hover:bg-gray-100 dark:hover:bg-gray-800`}
       onClick={onClick}
     >
       <div className="flex gap-4 px-4">
         {/* Icon */}
-        <div className="flex items-center justify-center w-13 h-13 bg-black text-white rounded-full">
+        <div className="flex items-center justify-center w-13 h-13 bg-stone-100 dark:bg-black text-neutral-700 dark:text-white rounded-full">
           {icon}
         </div>
 
@@ -45,13 +44,13 @@ const RadioButton: React.FC<RadioButtonProps> = ({
       <div
         className={`w-5 h-5 border-6 mr-5 rounded-full flex items-center justify-center ${
           isSelected
-            ? "border-green-600"
+            ? "dark:border-green-600 light:border-green-700"
             : "border-gray-400 dark:border-gray-600"
         }`}
       >
         {isSelected && (
           <>
-            <div className="w-2.5 h-2.5 bg-black rounded-full"></div>
+            <div className="w-2.5 h-2.5 light:bg-white dark:bg-black rounded-full"></div>
           </>
         )}
       </div>
