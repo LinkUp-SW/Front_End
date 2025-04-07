@@ -37,6 +37,7 @@ const ProfilePictureModal = ({
     if (userBio?.is_default_profile_photo) {
       setEditedImage(null);
     } else {
+      console.log(src);
       getDataBlob(src)
         .then((data) => {
           setEditedImage(data);
@@ -161,6 +162,8 @@ const ProfilePictureModal = ({
     );
   }, [editedImage]);
 
+  useEffect(() => {}, []);
+
   return (
     <div className="grid w-full gap-4 place-items-center">
       {showEditor ? (
@@ -175,13 +178,18 @@ const ProfilePictureModal = ({
             onClose={() => {
               setShowEditor(false);
             }}
+            onCancel={() => {
+              setShowEditor(false);
+              setEditedImage(null);
+              setUploadedImage(profilePic);
+            }}
           />
         </div>
       ) : (
         <>
           <div className="relative group">
             <img
-              src={profilePic}
+              src={editedImage || profilePic}
               alt="Profile"
               className="w-40 h-40 md:w-56 md:h-56 rounded-full ring-4 ring-gray-200 dark:ring-gray-600 transition-all duration-300"
             />
@@ -189,9 +197,7 @@ const ProfilePictureModal = ({
           <div className="flex flex-grow flex-wrap w-full items-center gap-4 p-4 bg-white dark:bg-gray-800 rounded-xl shadow-lg transition-colors duration-300">
             <button
               disabled={
-                (userBio?.is_default_profile_photo &&
-                  editedImage === null &&
-                  uploadedImage === null) ||
+                (userBio?.is_default_profile_photo && editedImage === null) ||
                 isSubmitting
               }
               onClick={onEdit}
