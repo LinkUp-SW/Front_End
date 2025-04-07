@@ -16,6 +16,8 @@
   --border-color: rgba(0, 0, 0, 0.08);
   --hover-background: rgba(0, 0, 0, 0.08);
   --background-primary: white;
+  --unread-background: #e7f3ff;
+  --badge-color: #0a66c2;
 }
 
 .darkMode {
@@ -24,6 +26,8 @@
   --border-color: rgba(255, 255, 255, 0.12);
   --hover-background: rgba(255, 255, 255, 0.12);
   --background-primary: #111827;
+  --unread-background: #1F2937;
+  --badge-color: #1d4ed8;
 }
 
 .content {
@@ -38,6 +42,7 @@
   padding: 16px;
   border-radius: 10px;
   box-shadow: 0 0 0 1px var(--border-color);
+  position: relative;
 }
 
 .settingsLink {
@@ -49,6 +54,13 @@
 
 .settingsLink:hover {
   text-decoration: underline;
+}
+
+.unreadCounter {
+  margin-top: 10px;
+  font-size: 14px;
+  color: var(--badge-color);
+  font-weight: 500;
 }
 
 .mainContentWrapper {
@@ -88,7 +100,8 @@
   justify-content: center;
   border: 1px solid var(--border-color);
   height: 40px;
-  line-height: 1; 
+  line-height: 1;
+  position: relative;
 }
 
 .tabButton:hover {
@@ -98,6 +111,22 @@
 .activeTab {
   background-color: #057642 !important;
   color: white !important;
+}
+
+.tabNotificationBadge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background-color: var(--badge-color);
+  color: white;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
 }
 
 .postsTabContainer {
@@ -187,6 +216,7 @@
   cursor: pointer;
   border-bottom: 1px solid var(--border-color);
   color: var(--text-primary);
+  transition: background-color 0.2s, box-shadow 0.2s;
 }
 
 .notificationItem:hover {
@@ -194,8 +224,8 @@
 }
 
 .notificationIndicator {
-  width: 4px;
-  height: 4px;
+  width: 8px;
+  height: 8px;
   background-color: #0a66c2;
   border-radius: 50%;
   align-self: start;
@@ -204,6 +234,11 @@
   left: 1%;
   top: 50%;
   transform: translateY(-50%);
+  transition: opacity 0.2s ease;
+}
+
+.darkMode .notificationIndicator {
+  background-color: #1d4ed8;
 }
 
 .notificationImage {
@@ -272,16 +307,29 @@
   background-color: var(--hover-background);
 }
 
-.unreadNotification {
-  background-color: #e7f3ff;
+.readNotification .notificationIndicator {
+  display: none;
 }
 
-.darkMode .unreadNotification {
-  background-color: #1F2937;
+.unreadNotification {
+  background-color: var(--unread-background);
+  position: relative;
+  padding-left: 24px; /* Add space for the blue dot */
 }
 
 .readNotification {
   background-color: var(--background-primary);
+  padding-left: 15px; /* Keep consistent padding even when indicator is gone */
+}
+
+/* Animation for transition from unread to read */
+.unreadNotification, .readNotification {
+  transition: background-color 0.3s ease, padding-left 0.3s ease;
+}
+
+/* Add this new class for clicked notifications */
+.clickedNotification {
+  background-color: var(--background-primary) !important;
 }
 
 .emptyState {
@@ -331,6 +379,19 @@
   font-size: 12px;
   color: var(--text-secondary);
 }
+
+/* Animation for dropdowns */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* Responsive adjustments */
 @media (max-width: 1200px) {
   .content {
@@ -400,7 +461,8 @@
   .notificationItem {
     grid-template-columns: 4px 36px 1fr;
     gap: 8px;
-    padding: 10px 8px;
+    position: relative;
+    padding-left: 24px; /* Space for blue dot */
   }
   
   .notificationImage {
@@ -438,9 +500,12 @@
     margin-bottom: 16px;
   }
   
-  .emptyStateAction {
-    padding: 6px 16px;
-    font-size: 13px;
+  .tabNotificationBadge {
+    width: 16px;
+    height: 16px;
+    font-size: 10px;
+    top: -4px;
+    right: -4px;
   }
 }
 
