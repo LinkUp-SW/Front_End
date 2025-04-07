@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   fetchRecievedConnections,
   ReceivedConnections,
@@ -94,8 +94,8 @@ const Invitations = () => {
             key={invite.user_id}
             className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg flex-col min-[450px]:flex-row"
           >
-            <a
-              href={invite.name}
+            <Link
+              to={`/user-profile/${invite.user_id}`}
               className="flex items-center space-x-4 flex-1"
             >
               <img
@@ -127,7 +127,7 @@ const Invitations = () => {
                   ) : null}
                 </p>
               </div>
-            </a>
+            </Link>
             <div className="flex space-x-2">
               <button
                 id="ignore-invitation-button"

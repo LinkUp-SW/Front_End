@@ -19,10 +19,12 @@ import {
   DialogDescription,
 } from "@/components";
 import WithdrawInvitationModal from "./modals/WithdrawInvitationModal";
+import { useNavigate } from "react-router-dom";
 
-const LIMIT = 3;
+const LIMIT = 10;
 
 const ManageInvitations: React.FC = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<"received" | "sent">("received");
   const [receivedInvitations, setReceivedInvitations] = useState<
     ReceivedConnections[]
@@ -125,6 +127,10 @@ const ManageInvitations: React.FC = () => {
       }
       setLoading(false);
     }
+  };
+
+  const navigateToUser = (user_id: string) => {
+    return navigate(`/user-profile/${user_id}`);
   };
 
   useEffect(() => {
@@ -236,6 +242,7 @@ const ManageInvitations: React.FC = () => {
         {activeTab === "received"
           ? receivedInvitations.map((invite, index) => (
               <div
+                onClick={() => navigateToUser(invite.user_id)}
                 key={invite.user_id}
                 ref={
                   index === receivedInvitations.length - 1
@@ -247,10 +254,17 @@ const ManageInvitations: React.FC = () => {
                 <img
                   src={invite.profilePicture}
                   alt={invite.name}
+                  onClick={() => navigateToUser(invite.user_id)}
                   className="w-14 h-14 rounded-full"
                 />
                 <div className="flex-1 text-center sm:text-left">
-                  <p className="text-lg font-medium">{invite.name}</p>
+                  <p
+                    className="text-lg font-medium"
+                    onClick={() => navigateToUser(invite.user_id)}
+                    id="user-name-link"
+                  >
+                    {invite.name}
+                  </p>
                   <p className="text-sm text-gray-600">{invite.headline}</p>
                 </div>
                 <div className="flex space-x-2">
@@ -280,12 +294,20 @@ const ManageInvitations: React.FC = () => {
                 className="flex items-center p-3 bg-gray-100 dark:bg-gray-700 rounded-lg shadow-sm"
               >
                 <img
+                  onClick={() => navigateToUser(invite.user_id)}
                   src={invite.profilePicture}
                   alt={invite.name}
-                  className="w-14 h-14 rounded-full"
+                  className="w-14 h-14 cursor-pointer rounded-full"
                 />
                 <div className="flex-1 text-center sm:text-left">
-                  <p className="text-lg font-medium">{invite.name}</p>
+                  <p
+                    className="text-lg font-medium cursor-pointer"
+                    onClick={() => navigateToUser(invite.user_id)}
+                    id="user-name-link"
+
+                  >
+                    {invite.name}
+                  </p>
                   <p className="text-sm text-gray-600">{invite.headline}</p>
                 </div>
                 <Dialog>

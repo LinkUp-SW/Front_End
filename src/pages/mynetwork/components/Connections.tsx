@@ -17,9 +17,11 @@ import {
 } from "@/endpoints/myNetwork";
 import RemoveConnectionModal from "./modals/remove_connection_modal/RemoveConnectionModal";
 import Cookies from "js-cookie";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 const Connections: React.FC = () => {
+  const navigate = useNavigate();
+
   const [search, setSearch] = useState("");
   const [connections, setConnections] = useState<Connection[]>([]);
   const [loading, setLoading] = useState(false);
@@ -31,7 +33,6 @@ const Connections: React.FC = () => {
   const observer = useRef<IntersectionObserver | null>(null);
   const hasFetchedInitial = useRef(false); // Prevents double fetching on mount
   const [openDialogUserId, setOpenDialogUserId] = useState<string | null>(null);
-
 
   const handleRemoveConnection = useCallback(
     async (userId: string) => {
@@ -62,7 +63,7 @@ const Connections: React.FC = () => {
     setLoading(true);
     try {
       console.log(id);
-      const data = await fetchConnections(token, id as string, cursor, 2);
+      const data = await fetchConnections(token, id as string, cursor, 7);
 
       // Avoid fetching twice by checking duplicates
       setConnections((prev) => {
@@ -103,6 +104,10 @@ const Connections: React.FC = () => {
     [loading, hasMore, loadConnections]
   );
 
+  const navigateToUser = (user_id: string) => {
+    return navigate(`/user-profile/${user_id}`);
+  };
+
   return (
     <div className="min-h-screen p-10 flex flex-col lg:flex-row">
       <div className="flex-1 bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 max-h-fit">
@@ -141,10 +146,15 @@ const Connections: React.FC = () => {
                   <img
                     src={conn.profilePicture}
                     alt={conn.name}
+                    onClick={() => navigateToUser(conn.user_id)}
+                    id="user-name-link"
                     className="w-12 h-12 rounded-full object-cover"
                   />
                   <div>
-                    <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+                    <h3
+                      className="text-lg font-medium text-gray-900 dark:text-white"
+                      onClick={() => navigateToUser(conn.user_id)}
+                    >
                       {conn.name}
                     </h3>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -160,10 +170,11 @@ const Connections: React.FC = () => {
                     Message
                   </button>
                   <Dialog
-                   open={openDialogUserId === conn.user_id}
-                   onOpenChange={(open) => {
-                     if (!open) setOpenDialogUserId(null);
-                   }}>
+                    open={openDialogUserId === conn.user_id}
+                    onOpenChange={(open) => {
+                      if (!open) setOpenDialogUserId(null);
+                    }}
+                  >
                     <DialogTrigger asChild>
                       <button
                         id="remove-connection-button"
@@ -181,7 +192,7 @@ const Connections: React.FC = () => {
                       <RemoveConnectionModal
                         userData={{ userName: conn.name, userId: conn.user_id }}
                         onConfirm={() => handleRemoveConnection(conn.user_id)}
-                        onCancel={() => setOpenDialogUserId(null)} 
+                        onCancel={() => setOpenDialogUserId(null)}
                       />
                       <DialogHeader>
                         <DialogTitle></DialogTitle>
