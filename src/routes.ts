@@ -23,6 +23,8 @@ import {
   ConnectionsPage,
   FollowingFollowersPage,
   SearchPage,
+  SignInAndSecurityPage,
+  ChangePasswordPage
 } from "./pages";
 
 import React from "react";
@@ -115,6 +117,14 @@ const routes: RouteObject[] = [
   {
     path: "/search/:query",
     element: React.createElement(SearchPage),
+  },
+  {
+    path: "/settings/security",
+    element: React.createElement(SignInAndSecurityPage),
+  },
+  {
+    path: "/settings/security/changepassword",
+    element: React.createElement(ChangePasswordPage),
   },
 ];
 
