@@ -120,6 +120,35 @@ export const addUserSkills = async (
   return response.data;
 };
 
+export const updateUserSkill = async (
+  token: string,
+  id: string,
+  formData: SkillForm
+) => {
+  const response = await axiosInstance.put(
+    `/api/v1/user/update-skill/${id}`,
+    formData,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
+
+export const deleteUserSkills = async (token: string, id: string) => {
+  const response = await axiosInstance.delete(
+    `/api/v1/user/delete-skill/${id}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
+
 export const addWorkExperience = async (
   token: string,
   workExperienceForm: Experience

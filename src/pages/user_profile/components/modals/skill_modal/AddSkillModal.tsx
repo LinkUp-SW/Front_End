@@ -1,7 +1,7 @@
 import { FormInput } from "@/components";
 import { addUserSkills, getUserSections } from "@/endpoints/userProfile";
 import useFetchData from "@/hooks/useFetchData";
-import { Organization, Skill, SkillForm, SkillUserSections } from "@/types";
+import { Skill, SkillForm, SkillUserSections } from "@/types";
 import Cookies from "js-cookie";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -58,22 +58,21 @@ const AddSkillModal: React.FC<AddSkillModalProps> = ({
         ...formData,
       });
       console.log(response.skill);
+      console.log(formData);
       // Update the parent state with the newly created experience
       onSuccess?.({
         ...formData,
         _id: response.skill._id,
         endorsments: response.skill.endorsments,
-        educations: formData.educations.map(
-          (id) => ({ _id: id } as Organization)
-        ),
-        experiences: formData.experiences.map(
-          (id) => ({ _id: id } as Organization)
-        ),
-        licenses: formData.licenses.map((id) => ({ _id: id } as Organization)),
+        educations: response.skill.educations,
+        experiences: response.skill.experiences,
+        licenses: response.skill.licenses,
       });
 
+      toast.success('Skill Added Successfully!')
       // Close the modal
       onClose?.();
+      
     } catch (error) {
       toast.error(getErrorMessage(error));
     } finally {

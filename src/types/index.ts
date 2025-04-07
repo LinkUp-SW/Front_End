@@ -254,16 +254,16 @@ export interface Skill {
   educations: Organization[];
   experiences: Organization[];
   licenses: Organization[];
+  total_endorsements?:number
 }
 
 export interface Endorsement {
   user_id: string;
-  profile_photo: string;
+  profilePicture: string;
   name: string;
 }
 
-
-export interface SkillUserSections{
+export interface SkillUserSections {
   educations: Organization[];
   experiences: Organization[];
   licenses: Organization[];

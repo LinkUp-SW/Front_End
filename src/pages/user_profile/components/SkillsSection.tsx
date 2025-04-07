@@ -8,18 +8,25 @@ import {
   DialogTitle,
   DialogDescription,
   Button,
+  DialogClose,
+  DialogFooter,
 } from "@/components";
+import { FaPeopleGroup } from "react-icons/fa6";
 import { FaRegLightbulb } from "react-icons/fa";
 import { Skill } from "@/types";
 import useFetchData from "@/hooks/useFetchData";
 import Cookies from "js-cookie";
-import { useParams } from "react-router-dom";
-import { getUserSkills } from "@/endpoints/userProfile";
+import { Link, useParams } from "react-router-dom";
+import { deleteUserSkills, getUserSkills } from "@/endpoints/userProfile";
 import AddSkillModal from "./modals/skill_modal/AddSkillModal";
 import { GoPlus } from "react-icons/go";
 import Header from "./modals/components/Header";
 import { MdDeleteForever } from "react-icons/md";
 import { BsPencil } from "react-icons/bs";
+import EditSkillModal from "./modals/skill_modal/EditSkillModal";
+import { useFormStatus } from "@/hooks/useFormStatus";
+import { toast } from "sonner";
+import { getErrorMessage } from "@/utils/errorHandler";
 
 interface FetchDataResult {
   skills: Skill[];
@@ -29,8 +36,9 @@ interface FetchDataResult {
 const SkillsSection = () => {
   const authToken = Cookies.get("linkup_auth_token");
   const { id } = useParams();
-  const { data, loading, error } = useFetchData<FetchDataResult | null>(() =>
-    authToken && id ? getUserSkills(authToken, id) : Promise.resolve(null)
+  const { data, loading, error } = useFetchData<FetchDataResult | null>(
+    () => authToken && id ? getUserSkills(authToken, id) : Promise.resolve(null),
+    [id] // add id as a dependency so that when it changes, the effect runs again
   );
   const [skills, setSkills] = useState<Skill[]>([]);
   const [selectedSkill, setSelectedSkill] = useState<string | null>(null);
@@ -39,6 +47,7 @@ const SkillsSection = () => {
   const [editOpen, setEditOpen] = useState(false);
   const isMe = data?.is_me ?? false;
   const isEmpty = skills.length === 0;
+  const { isSubmitting, startSubmitting, stopSubmitting } = useFormStatus();
 
   const handleAddSkill = (newSkill: Skill) => {
     setSkills((prev) => [...prev, newSkill]);
@@ -48,11 +57,23 @@ const SkillsSection = () => {
     if (data?.skills) {
       setSkills(data.skills);
     }
-    console.log(data);
   }, [data]);
 
   const handleConfirmDelete = async () => {
-    console.log(selectedSkill);
+    startSubmitting();
+    try {
+      const response = await deleteUserSkills(
+        authToken as string,
+        selectedSkill as string
+      );
+      setSkills(skills.filter((skill) => skill._id !== selectedSkill));
+      setDeleteDialogOpen(false);
+      toast.success(response.message);
+    } catch (error) {
+      toast.error(getErrorMessage(error));
+    } finally {
+      stopSubmitting();
+    }
   };
 
   if (error) {
@@ -85,7 +106,7 @@ const SkillsSection = () => {
 
   return (
     <section
-      id="skill-section"
+      id="skills-section"
       className={`bg-white dark:bg-gray-900 p-6 rounded-lg shadow ${
         isEmpty ? "outline-dotted dark:outline-blue-300 outline-blue-500" : ""
       }`}
@@ -94,55 +115,155 @@ const SkillsSection = () => {
         <h2 className="text-xl font-bold">Skills</h2>
         {!isEmpty && isMe && <ActionButtons onAddSkill={handleAddSkill} />}
       </header>
-      <div className="relative space-y-4 mt-10">
+      {/* Use divide-y to place horizontal lines between skills */}
+      <div className="mt-2 divide-y divide-gray-200 dark:divide-gray-700">
         {skills.map((skill, idx) => (
-          <div key={skill._id} className="space-y-2">
-            <h3 className="font-semibold">{skill.name}</h3>
-            {skill.experiences?.length > 0 && (
-              <div className="space-y-1 pl-4">
-                {skill.experiences.map((exp) => (
-                  <div
-                    key={exp._id}
-                    className="flex items-center gap-1 text-sm"
-                  >
-                    <span>-</span>
-                    <span>{exp.name}</span>
-                  </div>
-                ))}
+          <div key={skill._id} className="py-4 relative">
+            <h3 className="font-semibold text-lg">{skill.name}</h3>
+
+            {/* Experiences */}
+            {skill.experiences && skill.experiences.length > 0 && (
+              <div className="pl-4 mt-2">
+                <h4 className="text-sm font-semibold text-gray-600 dark:text-gray-400">
+                  Experiences
+                </h4>
+                <div className="flex flex-wrap gap-4 mt-2 pl-4">
+                  {skill.experiences.map((exp) => (
+                    <div key={exp._id} className="flex items-center gap-2">
+                      <img
+                        src={exp.logo}
+                        alt={exp.name}
+                        className="w-8 h-8 rounded object-cover"
+                      />
+                      <span className="text-sm text-gray-700 dark:text-gray-200">
+                        {exp.name}
+                      </span>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
-            {skill.educations?.length > 0 && (
-              <div className="space-y-1 pl-4">
-                {skill.educations.map((exp) => (
-                  <div
-                    key={exp._id}
-                    className="flex items-center gap-1 text-sm"
-                  >
-                    <span>-</span>
-                    <span>{exp.name}</span>
-                  </div>
-                ))}
+
+            {/* Educations */}
+            {skill.educations && skill.educations.length > 0 && (
+              <div className="mt-4 pl-4">
+                <h4 className="text-sm font-semibold text-gray-600 dark:text-gray-400">
+                  Educations
+                </h4>
+                <div className="flex flex-wrap gap-4 mt-2 pl-4">
+                  {skill.educations.map((edu) => (
+                    <div key={edu._id} className="flex items-center gap-2">
+                      <img
+                        src={edu.logo}
+                        alt={edu.name}
+                        className="w-8 h-8 rounded object-cover"
+                      />
+                      <span className="text-sm text-gray-700 dark:text-gray-200">
+                        {edu.name}
+                      </span>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
-            {skill.licenses?.length > 0 && (
-              <div className="space-y-1 pl-4">
-                {skill.licenses.map((exp) => (
-                  <div
-                    key={exp._id}
-                    className="flex items-center gap-1 text-sm"
-                  >
-                    <span>-</span>
-                    <span>{exp.name}</span>
-                  </div>
-                ))}
+
+            {/* Licenses */}
+            {skill.licenses && skill.licenses.length > 0 && (
+              <div className="mt-4 pl-4">
+                <h4 className="text-sm font-semibold text-gray-600 dark:text-gray-400">
+                  Licenses
+                </h4>
+                <div className="flex flex-wrap gap-4 mt-2 pl-4">
+                  {skill.licenses.map((license) => (
+                    <div key={license._id} className="flex items-center gap-2">
+                      <img
+                        src={license.logo}
+                        alt={license.name}
+                        className="w-8 h-8 rounded object-cover"
+                      />
+                      <span className="text-sm text-gray-700 dark:text-gray-200">
+                        {license.name}
+                      </span>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
+
+            {/* Endorsements */}
+            {skill.endorsments.length > 0 && (
+              <Dialog>
+                <DialogTrigger asChild>
+                  <button className="flex items-center gap-1 font-semibold text-sm text-blue-600 hover:underline focus:outline-none pl-4 mt-4">
+                    <span>
+                      <FaPeopleGroup size={20} />
+                    </span>
+                    {skill.endorsments.slice(0, 2).map((endorser, idx, arr) => (
+                      <span key={endorser.user_id}>
+                        {endorser.name}
+                        {idx < arr.length - 1 ? ", " : " "}
+                      </span>
+                    ))}
+                    {skill.total_endorsements &&
+                      skill.total_endorsements > 2 && (
+                        <span>and {skill.total_endorsements - 2} others</span>
+                      )}
+                  </button>
+                </DialogTrigger>
+                <DialogContent className="max-w-lg mx-auto p-6 bg-white dark:bg-gray-800 shadow-lg">
+                  <DialogHeader className="divide-y">
+                    <DialogTitle className="text-2xl font-bold text-gray-800 dark:text-gray-100">
+                      Endorsements
+                    </DialogTitle>
+                    <DialogDescription className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                      These are the people who endorsed this skill.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="mt-6 space-y-4 divide-y">
+                    {skill.endorsments.length > 0 ? (
+                      skill.endorsments.map((endorsement) => (
+                        <Link
+                        to={`/user-profile/${endorsement.user_id}`}
+                          key={endorsement.user_id}
+                          className="flex w-full  items-center gap-4 p-2 hover:bg-gray-50 dark:hover:bg-gray-700  transition-colors"
+                        >
+                          <img
+                            src={endorsement.profilePicture}
+                            alt={endorsement.name}
+                            className="w-10 h-10 rounded-full object-cover"
+                          />
+                          <span className="font-medium text-gray-700 dark:text-gray-200">
+                            {endorsement.name}
+                          </span>
+                        </Link>
+                      ))
+                    ) : (
+                      <p className="text-gray-600 dark:text-gray-300">
+                        No endorsements yet.
+                      </p>
+                    )}
+                  </div>
+                  <DialogFooter className="w-full flex justify-end">
+                    <DialogClose asChild>
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        className="w-fit destructiveBtn"
+                      >
+                        Close
+                      </Button>
+                    </DialogClose>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            )}
+
             {isMe && (
-              <div className="absolute top-[-1rem] h-full right-0 flex gap-2 flex-row justify-between">
+              <div className="absolute top-2 right-0 flex gap-2">
                 <button
                   id={`skill-edit-button-${idx}`}
                   aria-label="Edit Skill"
-                  className="hover:bg-gray-300 dark:hover:text-black p-2 rounded-full transition-all duration-200 ease-in-out"
+                  className="hover:bg-gray-300 w-fit h-9 dark:hover:text-black p-2 rounded-full transition-all duration-200 ease-in-out"
                   onClick={() => {
                     setSkillToEdit(skill);
                     setEditOpen(true);
@@ -167,7 +288,7 @@ const SkillsSection = () => {
         ))}
       </div>
 
-      {/* Edit modal */}
+      {/* Edit Modal */}
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
         <DialogContent
           aria-describedby={undefined}
@@ -178,6 +299,16 @@ const SkillsSection = () => {
           <DialogHeader>
             <Header title={`Edit ${skillToEdit?.name}`} />
           </DialogHeader>
+          {skillToEdit && (
+            <EditSkillModal
+              skill={skillToEdit}
+              onClose={() => {
+                setEditOpen(false);
+                setSkillToEdit(null);
+              }}
+              onSuccess={() => {}}
+            />
+          )}
         </DialogContent>
       </Dialog>
 
@@ -200,6 +331,7 @@ const SkillsSection = () => {
           <div className="flex justify-end gap-3 mt-4">
             <Button
               variant="outline"
+              disabled={isSubmitting}
               onClick={() => setDeleteDialogOpen(false)}
               className="border-gray-300 hover:bg-gray-100 dark:text-black dark:hover:bg-gray-700 dark:hover:text-white dark:border-gray-700 transition-all duration-300 ease-in-out"
             >
@@ -207,6 +339,7 @@ const SkillsSection = () => {
             </Button>
             <Button
               variant="destructive"
+              disabled={isSubmitting}
               onClick={handleConfirmDelete}
               className="destructiveBtn"
             >
@@ -268,7 +401,6 @@ const EmptySkills: React.FC<{ onAddSkill: (skill: Skill) => void }> = ({
   onAddSkill,
 }) => {
   const [open, setOpen] = useState(false);
-
   return (
     <div className="grid gap-2 dark:text-gray-100">
       <div className="opacity-65 flex gap-2 items-center">
@@ -283,7 +415,6 @@ const EmptySkills: React.FC<{ onAddSkill: (skill: Skill) => void }> = ({
           <p className="text-sm">Experience or Education related</p>
         </div>
       </div>
-
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
           <button className="w-fit py-1.5 px-4 border-2 rounded-full dark:border-blue-400 font-semibold text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-600 dark:hover:bg-blue-400 hover:text-white transition-all duration-300 ease-in-out border-blue-600 cursor-pointer">
@@ -297,7 +428,6 @@ const EmptySkills: React.FC<{ onAddSkill: (skill: Skill) => void }> = ({
               *Indicates required
             </DialogDescription>
           </DialogHeader>
-          {/* Add Skill Form would go here */}
           <AddSkillModal
             onClose={() => setOpen(false)}
             onSuccess={(newSkill) => {
