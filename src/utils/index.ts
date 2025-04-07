@@ -107,6 +107,17 @@ export function formatIsoDateToHumanReadable(isoDate: string): string {
   return formattedDate;
 }
 
+export const formatExperienceDate = (date: Date): string => {
+  if(typeof date==='string'){
+    date=new Date(date)
+  }
+  return date.toLocaleDateString("en-US", {
+    month: "long",
+    year: "numeric",
+  }).toLowerCase();
+};
+
+
 export const parseURI = (file: Blob): Promise<string> => {
   const reader = new FileReader();
   return new Promise((resolve, reject) => {

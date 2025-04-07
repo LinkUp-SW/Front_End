@@ -68,8 +68,9 @@ const routes: RouteObject[] = [
     element: React.createElement(FollowingFollowersPage),
   },
 
-  { path: "/connections", 
-    element: React.createElement(ConnectionsPage) },
+  { path: "/connections/:id", 
+    element: React.createElement(ConnectionsPage) 
+  },
 
   {
     path: "/manage-invitations",

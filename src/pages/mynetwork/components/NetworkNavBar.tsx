@@ -15,6 +15,7 @@ const NetworkNavBar = ({
   return (
     <div className="flex justify-between items-center border-b border-gray-300 dark:border-gray-700 mb-4">
       <button
+        id="grow-button"
         onClick={() => handleTabClick("grow")}
         className={`w-1/2 py-2 text-center font-semibold transition cursor-pointer 
           ${
@@ -28,6 +29,7 @@ const NetworkNavBar = ({
       </button>
 
       <button
+        id="catch-up-button"
         onClick={() => handleTabClick("catch-up")}
         className={`w-1/2 py-2 text-center font-semibold transition cursor-pointer
           ${

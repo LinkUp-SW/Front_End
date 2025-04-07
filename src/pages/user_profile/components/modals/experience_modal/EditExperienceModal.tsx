@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Cookies from "js-cookie";
 import { toast } from "sonner";
 import {
@@ -8,28 +8,42 @@ import {
   FormSelect,
   FormTextarea,
 } from "@/components";
-import { useFormStatus } from "@/hooks/useFormStatus";
 import SkillsManager from "./components/SkillsManager";
 import MediaManager from "./components/MediaManager";
 import { MediaItem } from "./types";
 import { Experience, JobTypeEnum, Organization } from "@/types";
-import { addWorkExperience, getCompaniesList } from "@/endpoints/userProfile";
+import {
+  updateWorkExperience,
+  getCompaniesList,
+} from "@/endpoints/userProfile";
+import { v4 as uuid } from "uuid";
+import { useFormStatus } from "@/hooks/useFormStatus";
 import { getErrorMessage } from "@/utils/errorHandler";
 import FormSpinner from "@/components/form/form_spinner/FormSpinner";
-
 /**
- * We'll rely on user input + a generated ID to create a new Experience object
- * for the local list, because the server doesn't provide it back.
+ * Helper to extract the numeric month (1-12) and year from a Date
  */
-const generateTempId = () => {
-  if (typeof crypto !== "undefined" && crypto.randomUUID) {
-    return crypto.randomUUID();
+function extractMonthAndYear(date?: Date): { month: string; year: string } {
+  if (!date) {
+    return { month: "", year: "" };
   }
-  // fallback if crypto.randomUUID is unavailable
-  return Math.random().toString(36).substring(2, 15);
-};
+  const d = new Date(date);
+  return {
+    month: String(d.getMonth() + 1), // months are 0-based in JS, so +1
+    year: String(d.getFullYear()),
+  };
+}
 
-export interface ExperienceFormData {
+interface EditExperienceModalProps {
+  /** The existing experience to edit. */
+  experience: Experience;
+  /** Called when the modal should be closed, typically after a successful edit */
+  onClose?: () => void;
+  /** Called with the updated experience after a successful edit */
+  onSuccess?: (updatedExp: Experience) => void;
+}
+
+interface ExperienceFormData {
   title: string;
   employmentType: string;
   organization: Organization;
@@ -45,48 +59,69 @@ export interface ExperienceFormData {
   media: MediaItem[];
 }
 
-interface AddExperienceModalProps {
-  /** Called when the modal should be closed, typically after a successful submission */
-  onClose?: () => void;
-  /** Called on a successful experience creation; passes the newly created experience */
-  onSuccess?: (newExperience: Experience) => void;
-}
-
-const AddExperienceModal: React.FC<AddExperienceModalProps> = ({
+/**
+ * A modal that lets the user edit an existing experience.
+ * Pre-populates fields from props.experience.
+ */
+const EditExperienceModal: React.FC<EditExperienceModalProps> = ({
+  experience,
   onClose,
   onSuccess,
 }) => {
+  // Grab existing values for month/year
+  const { month: startMonth, year: startYear } = extractMonthAndYear(
+    experience.start_date
+  );
+  const { month: endMonth, year: endYear } = extractMonthAndYear(
+    experience.end_date
+  );
+
+  // Auth token check
   const authToken = Cookies.get("linkup_auth_token");
-  const { isSubmitting, startSubmitting, stopSubmitting } = useFormStatus();
 
   // Organization search states
   const [organizations, setOrganizations] = useState<Organization[]>([]);
   const [organizationSearch, setOrganizationSearch] = useState("");
   const [isOrgsLoading, setIsOrgsLoading] = useState(false);
+  const { isSubmitting, startSubmitting, stopSubmitting } = useFormStatus();
+
+  // Debounce timer
   const organizationTimer = useRef<NodeJS.Timeout | null>(null);
 
-  // Core form data
+  // Local form state (pre-fill with the existing experience)
   const [formData, setFormData] = useState<ExperienceFormData>({
-    title: "",
-    employmentType: "",
-    organization: { _id: "", name: "", logo: "" },
-    currentlyWorking: false,
-    startMonth: "",
-    startYear: "",
-    endMonth: "",
-    endYear: "",
-    location: "",
-    locationType: "",
-    description: "",
-    skills: [],
-    media: [],
+    title: experience.title,
+    employmentType: experience.employee_type,
+    organization: {
+      _id: experience.organization?._id || "",
+      name: experience.organization?.name || "",
+      logo: experience.organization?.logo || "",
+    },
+    currentlyWorking: experience.is_current,
+    startMonth,
+    startYear,
+    // If they're currently working, we might not have an end date
+    endMonth: experience.is_current ? "" : endMonth,
+    endYear: experience.is_current ? "" : endYear,
+    location: experience.location || "",
+    locationType: experience.location_type || "",
+    description: experience.description || "",
+    skills: experience.skills || [],
+    media: experience.media.map((m) => ({ ...m, id: uuid() })) || [],
   });
 
   /**
-   * General change handler for form fields
+   * On mount, set the "organizationSearch" input to the existing org name
+   */
+  useEffect(() => {
+    setOrganizationSearch(formData.organization.name || "");
+  }, [formData.organization]);
+
+  /**
+   * Generic change handler for most fields
    */
   const handleChange = (field: keyof ExperienceFormData, value: unknown) => {
-    // Special case for organization searching
+    // If user is typing in the "organization" field, we do a debounce search
     if (field === "organization") {
       const searchValue = value as string;
       setOrganizationSearch(searchValue);
@@ -106,8 +141,8 @@ const AddExperienceModal: React.FC<AddExperienceModalProps> = ({
           .then((data) => {
             setOrganizations(data.data);
           })
-          .catch((error) => {
-            console.error("Error fetching companies:", error);
+          .catch((err) => {
+            console.error("Failed to fetch companies:", err);
             toast.error("Failed to fetch companies.");
           })
           .finally(() => {
@@ -120,7 +155,7 @@ const AddExperienceModal: React.FC<AddExperienceModalProps> = ({
   };
 
   /**
-   * If a user selects an organization from the dropdown
+   * If user clicks a listed organization
    */
   const handleSelectOrganization = (org: Organization) => {
     setFormData((prev) => ({ ...prev, organization: org }));
@@ -193,15 +228,13 @@ const AddExperienceModal: React.FC<AddExperienceModalProps> = ({
   };
 
   /**
-   * Submits the form data to create a new Experience.
+   * Submits the updated form data to the server
    */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     startSubmitting();
-
-    // Ensure user is logged in
     if (!authToken) {
-      toast.error("You need to be logged in to add experience.");
+      toast.error("You need to be logged in to edit experience.");
       stopSubmitting();
       return;
     }
@@ -213,9 +246,8 @@ const AddExperienceModal: React.FC<AddExperienceModalProps> = ({
         return;
       }
 
-      // Build up the new Experience data from the form
-      const toBeSentFormData: Experience = {
-        _id: generateTempId(), // Temporary ID for local state
+      const updatedExperience: Experience = {
+        _id: experience._id, // keep the same ID
         title: formData.title,
         employee_type: formData.employmentType,
         organization: formData.organization,
@@ -231,13 +263,21 @@ const AddExperienceModal: React.FC<AddExperienceModalProps> = ({
         media: formData.media,
       };
 
-      // We rely on the server returning a 200 status to confirm success
-      const response = await addWorkExperience(authToken, toBeSentFormData);
+      console.log(updatedExperience);
 
-      // If we reach here, the request is successful (status 200)
-      toast.success(response?.message || "Experience added successfully!");
-      // Update the parent state with the newly created experience
-      onSuccess?.({ ...toBeSentFormData, _id: response.experience._id });
+      // Make a request to your "updateWorkExperience" endpoint
+      // This is an example; adjust to match your actual API method
+      const res = await updateWorkExperience(
+        authToken,
+        experience._id as string,
+        updatedExperience
+      );
+
+      // Typically the server returns an object with {message: string} or similar
+      toast.success(res.message || "Experience updated successfully!");
+
+      // Let the parent component update the local experiences list
+      onSuccess?.(updatedExperience);
 
       // Close the modal
       onClose?.();
@@ -251,18 +291,12 @@ const AddExperienceModal: React.FC<AddExperienceModalProps> = ({
   };
 
   return (
-    <div
-      id="add-experience-modal-container"
-      className="max-w-5xl sm:w-[35rem] w-full"
-    >
+    <div className="max-w-5xl sm:w-[35rem] w-full">
       <form
-        id="experience-form"
         onSubmit={handleSubmit}
         onKeyDown={(e) => {
-          // Prevent default 'Enter' submit so user must click "Save"
-          if (e.key === "Enter") {
-            e.preventDefault();
-          }
+          // Prevent Enter from accidentally submitting if the user is in a text field
+          if (e.key === "Enter") e.preventDefault();
         }}
       >
         <FormInput
@@ -270,29 +304,29 @@ const AddExperienceModal: React.FC<AddExperienceModalProps> = ({
           placeholder="Ex: Retail Sales Manager"
           value={formData.title}
           onChange={(e) => handleChange("title", e.target.value)}
-          id="experience-job-title"
-          name="experienceJobTitle"
+          id="edit-experience-title"
+          name="editExperienceTitle"
         />
 
         <FormSelect
           label="Employment Type*"
           placeholder="Select Employment Type"
           value={formData.employmentType}
-          onValueChange={(value) => handleChange("employmentType", value)}
+          onValueChange={(val) => handleChange("employmentType", val)}
           options={Object.values(JobTypeEnum)}
-          id="employment-type"
-          name="employmentType"
+          id="edit-employment-type"
+          name="editEmploymentType"
         />
 
-        {/* Organization */}
+        {/* Organization field w/ dropdown */}
         <div className="w-full relative">
           <FormInput
             label="Company or Organization*"
             placeholder="Ex: Microsoft"
             value={organizationSearch}
             onChange={(e) => handleChange("organization", e.target.value)}
-            id="organization-name"
-            name="organization"
+            id="edit-organization-name"
+            name="editOrganization"
           />
           {(isOrgsLoading || organizations.length !== 0) && (
             <div className="w-full max-h-fit p-2 bg-white dark:border-gray-400 border dark:bg-gray-800 rounded-lg z-50 absolute top-22">
@@ -326,27 +360,29 @@ const AddExperienceModal: React.FC<AddExperienceModalProps> = ({
           onCheckedChange={(checked) =>
             handleChange("currentlyWorking", checked)
           }
-          id="currently-working"
-          name="currentlyWorking"
+          id="edit-currently-working"
+          name="editCurrentlyWorking"
         />
 
+        {/* Start Date */}
         <DatePicker
           label="Start date*"
           month={formData.startMonth}
           year={formData.startYear}
-          onMonthChange={(value) => handleChange("startMonth", value)}
-          onYearChange={(value) => handleChange("startYear", value)}
-          id="start-date"
+          onMonthChange={(val) => handleChange("startMonth", val)}
+          onYearChange={(val) => handleChange("startYear", val)}
+          id="edit-start-date"
         />
 
+        {/* End Date (disable if currently working) */}
         <DatePicker
           label="End date*"
           month={formData.endMonth}
           year={formData.endYear}
-          onMonthChange={(value) => handleChange("endMonth", value)}
-          onYearChange={(value) => handleChange("endYear", value)}
+          onMonthChange={(val) => handleChange("endMonth", val)}
+          onYearChange={(val) => handleChange("endYear", val)}
           disabled={formData.currentlyWorking}
-          id="end-date"
+          id="edit-end-date"
         />
 
         <FormInput
@@ -354,50 +390,52 @@ const AddExperienceModal: React.FC<AddExperienceModalProps> = ({
           placeholder="Ex: London, United Kingdom"
           value={formData.location}
           onChange={(e) => handleChange("location", e.target.value)}
-          id="job-location"
-          name="jobLocation"
+          id="edit-location"
+          name="editLocation"
         />
 
         <FormSelect
           label="Location type"
           placeholder="Select Location Type"
           value={formData.locationType}
-          onValueChange={(value) => handleChange("locationType", value)}
+          onValueChange={(val) => handleChange("locationType", val)}
           options={["remote", "hybrid", "onsite", "flexible"]}
-          id="location-type"
-          name="locationType"
+          id="edit-location-type"
+          name="editLocationType"
         />
 
         <FormTextarea
           label="Description"
-          placeholder="List your major duties and successes, highlighting specific projects"
+          placeholder="List your major duties, highlighting specific projects"
           value={formData.description}
           onChange={(e) => handleChange("description", e.target.value)}
           maxLength={2000}
-          id="job-description"
-          name="jobDescription"
+          id="edit-description"
+          name="editDescription"
         />
 
+        {/* Skills Manager */}
         <SkillsManager
           skills={formData.skills}
           setSkills={(newSkills) => handleChange("skills", newSkills)}
-          id="skills-manager"
+          id="edit-skills-manager"
         />
 
+        {/* Media Manager */}
         <MediaManager
           media={formData.media}
           setMedia={(newMedia) => handleChange("media", newMedia)}
-          id="media-manager"
+          id="edit-media-manager"
         />
 
-        <div id="experience-submit-container" className="pt-5">
+        <div className="pt-5">
           <button
             type="submit"
             disabled={isSubmitting}
             id="experience-submit-button"
             className="bg-purple-600 hover:bg-purple-700 w-full disabled:opacity-60 disabled:hover:bg-purple-600 disabled:cursor-not-allowed cursor-pointer text-white py-2 px-4 rounded-full transition-all duration-300"
           >
-            {isSubmitting ? <FormSpinner /> : "Save Experience"}
+            {isSubmitting ? <FormSpinner/>: "Save Changes"}
           </button>
         </div>
       </form>
@@ -405,13 +443,10 @@ const AddExperienceModal: React.FC<AddExperienceModalProps> = ({
   );
 };
 
-/**
- * Simple skeleton for organization search
- */
 const OrganizationSkeleton: React.FC = () => (
   <div className="space-y-2 animate-pulse">
     {[...Array(3)].map((_, index) => (
-      <div className="flex items-center gap-2" key={index}>
+      <div key={index} className="flex items-center gap-2">
         <div className="h-10 w-10 bg-gray-300 dark:bg-gray-700 rounded-lg" />
         <div className="h-4 w-32 bg-gray-300 dark:bg-gray-700 rounded" />
       </div>
@@ -419,4 +454,4 @@ const OrganizationSkeleton: React.FC = () => (
   </div>
 );
 
-export default AddExperienceModal;
+export default EditExperienceModal;

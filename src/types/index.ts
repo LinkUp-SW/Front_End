@@ -99,37 +99,35 @@ export interface CommentType {
 
 export type PostFilter = "all" | "comments" | "reactions" | "reposts";
 
+
+export interface Organization{
+  _id:string;
+  logo:string;
+  name:string;
+}
+
 export interface Experience {
-  _id: string;
+  _id?: string;
   title: string;
   employee_type: string;
-  company: string;
+  organization: Organization;
   is_current: boolean;
   start_date: Date;
   end_date?: Date;
   location: string;
   description: string;
   location_type: string;
-  where_did_you_find_us: string;
-  skills: string[];
-  media: Media;
+  skills: string[]; 
+  media: Media[];
 }
 
-export interface Skill {
-  name: string;
-  endorsments: string[];
-  used_where: [
-    education: string[],
-    certificate: string[],
-    experience: string[]
-  ];
-}
+
 
 export interface Media {
-  image: string[];
-  video: string[];
+  media: string,
+  title: string,
+  description: string
 }
-
 export enum JobTypeEnum {
   full_time = "Full-time",
   part_time = "Part-time",
@@ -191,6 +189,7 @@ export interface Bio {
   experience: string[];
   education: string[];
   website: string;
+  
 }
 
 export interface UserProfileBio {
@@ -207,6 +206,7 @@ export interface UserProfileBio {
   is_in_sent_connections?: boolean;
   name_of_one_mutual_connection?: string;
   isInConnections?: boolean;
+  isConnectByEmail:boolean
   isAlreadyFollowing?: boolean;
 }
 

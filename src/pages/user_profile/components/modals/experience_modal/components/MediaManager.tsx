@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { MediaItem } from "../types";
+import { toast } from "sonner";
 
 interface MediaManagerProps {
   media: MediaItem[];
@@ -10,14 +11,19 @@ interface MediaManagerProps {
 
 const MediaManager: React.FC<MediaManagerProps> = ({ media, setMedia, id }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [pendingFile, setPendingFile] = useState<File | null>(null);
+  const [pendingFile, setPendingFile] = useState<string | null>(null);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      setPendingFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        // The result is a Base64 string with the media type prefix (e.g., data:image/png;base64,...)
+        setPendingFile(reader.result as string);
+      };
+      reader.readAsDataURL(file);
       setTitle("");
       setDescription("");
       e.target.value = "";
@@ -40,9 +46,10 @@ const MediaManager: React.FC<MediaManagerProps> = ({ media, setMedia, id }) => {
 
   const handleApply = () => {
     if (!pendingFile) return;
+    if (!title.trim()) return toast.error("Please Enter a title for the Media");
     const newMedia: MediaItem = {
       id: uuidv4(),
-      file: pendingFile,
+      media: pendingFile,
       title: title.trim(),
       description: description.trim(),
     };
@@ -90,7 +97,7 @@ const MediaManager: React.FC<MediaManagerProps> = ({ media, setMedia, id }) => {
           >
             <img
               id={`${id}-media-image-${item.id}`}
-              src={URL.createObjectURL(item.file)}
+              src={item.media}
               alt={item.title}
               className="w-20 h-20 object-cover rounded"
             />
@@ -128,7 +135,7 @@ const MediaManager: React.FC<MediaManagerProps> = ({ media, setMedia, id }) => {
           <div id={`${id}-thumbnail-preview`} className="mb-2">
             <img
               id={`${id}-thumbnail-image`}
-              src={URL.createObjectURL(pendingFile)}
+              src={pendingFile}
               alt="Thumbnail"
               className="w-32 h-32 object-cover rounded"
             />
@@ -180,7 +187,7 @@ const MediaManager: React.FC<MediaManagerProps> = ({ media, setMedia, id }) => {
               id={`${id}-apply-button`}
               type="button"
               onClick={handleApply}
-              className="px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 cursor-pointer font-semibold transition-all duration-300 ease-in-out"
+              className="px-4 py-2 bg-blue-600 disabled:cursor-not-allowed text-white rounded-xl disabled:opacity-60 disabled:hover:bg-blue-600 hover:bg-blue-700 cursor-pointer font-semibold transition-all duration-300 ease-in-out"
               disabled={!title.trim()}
             >
               Apply
