@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { JSX, useEffect, useState } from "react";
 import moment from "moment";
 import { Button } from "../../../components/ui/button";
 
@@ -15,7 +15,7 @@ import { CommentType, PostType } from "@/types";
 import { POST_ACTIONS } from "@/constants";
 import PostHeader from "./PostHeader";
 import PostFooter from "./PostFooter";
-import { getEngagementButtons, getMenuActions } from "./Menus";
+import { getEngagementButtons, getMenuActions } from "../components/Menus";
 import { Dialog, DialogContent, DialogTrigger } from "@/components";
 import ReactionsModal from "./modals/ReactionsModal";
 import TruncatedText from "./TruncatedText";
@@ -162,22 +162,27 @@ const Post: React.FC<PostProps> = ({ postData, comments }) => {
         </footer>
         {/* Engagement Buttons */}
         <footer className="mt-3 flex justify-around text-gray-600 dark:text-neutral-400 text-sm w-full">
-          {engagementButtons.map((button, index) => (
-            <Button
-              key={index}
-              variant="ghost"
-              size="lg"
-              onClick={button.callback}
-              className={`flex dark:hover:bg-zinc-800 dark:hover:text-neutral-200 ${
-                button.name == "Like" &&
-                liked &&
-                "text-blue-400 hover:text-blue-400 dark:hover:text-blue-400"
-              } items-center gap-2 hover:cursor-pointer  transition-all`}
-            >
-              {button.icon}
-              {button.name}
-            </Button>
-          ))}
+          {engagementButtons.map(
+            (
+              button: { name: string; icon: JSX.Element; callback: () => void },
+              index: number
+            ) => (
+              <Button
+                key={index}
+                variant="ghost"
+                size="lg"
+                onClick={button.callback}
+                className={`flex dark:hover:bg-zinc-800 dark:hover:text-neutral-200 ${
+                  button.name == "Like" &&
+                  liked &&
+                  "text-blue-400 hover:text-blue-400 dark:hover:text-blue-400"
+                } items-center gap-2 hover:cursor-pointer  transition-all`}
+              >
+                {button.icon}
+                {button.name}
+              </Button>
+            )
+          )}
         </footer>
       </CardContent>
       <CardFooter>
