@@ -7,6 +7,12 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { RiDeleteBin6Fill as GarbageIcon } from "react-icons/ri";
 import IconButton from "../buttons/IconButton";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components";
 
 interface UploadMediaModalProps {
   setActiveModal: (value: string) => void;
@@ -62,8 +68,30 @@ const UploadMediaModal: React.FC<UploadMediaModalProps> = ({
     const files = e.target.files;
     if (files) {
       const fileArray = Array.from(files);
-      const images = fileArray.filter((file) => file.type.startsWith("image/"));
-      const videos = fileArray.filter((file) => file.type.startsWith("video/"));
+
+      const maxFileSize = 50 * 1048576; // 10 MB
+      const maxFiles = 10;
+
+      if (fileArray.length > maxFiles) {
+        toast.error(`You can only upload up to ${maxFiles} files.`);
+        return;
+      }
+      const validFiles = fileArray.filter((file) => {
+        if (file.size > maxFileSize) {
+          toast.error(`File "${file.name}" exceeds the maximum size of 50 MB.`);
+          return false;
+        }
+        return file.type.startsWith("image/") || file.type.startsWith("video/");
+      });
+      if (validFiles.length) {
+        setSelectedIndex(0);
+      }
+      const images = validFiles.filter((file) =>
+        file.type.startsWith("image/")
+      );
+      const videos = validFiles.filter((file) =>
+        file.type.startsWith("video/")
+      );
 
       if (
         videos.length > 1 ||
@@ -78,19 +106,21 @@ const UploadMediaModal: React.FC<UploadMediaModalProps> = ({
         toast.error("You cannot upload images and a video together.");
         return;
       }
+
       setSelectedIndex(currentSelectedMedia.length);
-      setCurrentSelectedMedia([...currentSelectedMedia, ...fileArray]);
+      setCurrentSelectedMedia([...currentSelectedMedia, ...validFiles]);
     }
   };
 
   return (
-    <div className="flex flex-col  dark:bg-gray-800 !h-[30rem]">
+    <div className="flex flex-col  dark:bg-gray-800 h-auto !lg:h-[30rem]">
       {/* Selected Media Preview */}
 
       <div className="flex gap-4 w-full h-full justify-center">
         {/* Left: Selected Media */}
-        <div className="flex  h-[30rem] w-[45rem] items-center justify-center dark:border-gray-700 rounded-lg">
-          {currentSelectedMedia.length > 0 ? (
+        <div className="flex  lg:h-[30rem] lg:w-[45rem] items-center justify-center dark:border-gray-700 rounded-lg">
+          {currentSelectedMedia.length > 0 &&
+          currentSelectedMedia[selectedIndex] ? (
             currentSelectedMedia[selectedIndex].type.startsWith("image/") ? (
               <img
                 src={URL.createObjectURL(currentSelectedMedia[selectedIndex])}
@@ -107,13 +137,11 @@ const UploadMediaModal: React.FC<UploadMediaModalProps> = ({
           ) : (
             <div className="flex flex-col items-center justify-center gap-2">
               <div>
-                {
-                  <img
-                    src={`../../../../public/feed_upload_media_${darkMode}.svg`}
-                    alt="Upload Media"
-                    className=""
-                  />
-                }
+                <img
+                  src={`../../../../public/feed_upload_media_${darkMode}.svg`}
+                  alt="Upload Media"
+                  className=""
+                />
               </div>
               <p className="dark:text-neutral-200 pt-2 text-center text-xl font-medium w-full h-full">
                 Select files to begin
@@ -122,7 +150,6 @@ const UploadMediaModal: React.FC<UploadMediaModalProps> = ({
                 Share images or a single video in your post.
               </p>
               <div className="pb-5 pt-3">
-                {" "}
                 <BlueButton onClick={() => triggerFileInput()} size={"sm"}>
                   Upload from computer
                 </BlueButton>
@@ -175,28 +202,57 @@ const UploadMediaModal: React.FC<UploadMediaModalProps> = ({
                 </div>
               ))}
             </div>
-            <div className="flex gap-2 mt-2 items-center justify-center">
-              <IconButton
-                onClick={handleDuplicate}
-                className="p-2 bg-gray-800 text-white rounded-full hover:bg-gray-700"
-                title="Duplicate"
-              >
-                <FaCopy />
-              </IconButton>
-              <IconButton
-                onClick={handleDelete}
-                className=" text-white !p-0 w-10 h-10  rounded-full"
-                title="Delete"
-              >
-                <GarbageIcon></GarbageIcon>
-              </IconButton>
-              <IconButton
-                onClick={triggerFileInput}
-                className="p-2 h-10 w-10 border-1 text-white rounded-full"
-                title="Add"
-              >
-                <FaPlus />
-              </IconButton>
+            <div className="flex gap-2 mt-2 pt-10 items-center justify-center">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger onClick={handleDuplicate} asChild>
+                    <IconButton
+                      className="p-2 dark:bg-gray-800 dark:text-white rounded-full dark:hover:bg-gray-700"
+                      title="Duplicate"
+                    >
+                      <FaCopy />
+                    </IconButton>
+                  </TooltipTrigger>
+
+                  <TooltipContent>
+                    <p>Duplicate</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger onClick={handleDelete} asChild>
+                    <IconButton
+                      className=" dark:text-white !p-0 w-10 h-10  rounded-full"
+                      title="Delete"
+                    >
+                      <GarbageIcon></GarbageIcon>
+                    </IconButton>
+                  </TooltipTrigger>
+
+                  <TooltipContent>
+                    <p>Delete</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger onClick={triggerFileInput} asChild>
+                    <IconButton
+                      className="p-2 h-10 w-10 border-1 hover:border-2 light:border-neutral-700 dark:text-white rounded-full"
+                      title="Add"
+                    >
+                      <FaPlus />
+                    </IconButton>
+                  </TooltipTrigger>
+
+                  <TooltipContent>
+                    <p>Add</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>
           </div>
         )}
@@ -212,7 +268,7 @@ const UploadMediaModal: React.FC<UploadMediaModalProps> = ({
       />
 
       {/* Footer Buttons */}
-      <div className="flex w-full justify-end gap-2 px-5 mt-8 absolute top-[31.8rem] right-[0.01rem]">
+      <div className="flex w-full justify-end gap-2 px-5 mt-8 absolute top-[28.8rem] lg:top-[31.8rem] lg:right-[0.01rem]">
         <TransparentButton onClick={() => setActiveModal("create-post")}>
           Back
         </TransparentButton>
