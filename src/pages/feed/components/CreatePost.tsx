@@ -28,6 +28,23 @@ import { toast } from "sonner";
 import { createPost } from "@/endpoints/feed";
 import { DialogDescription } from "@radix-ui/react-dialog";
 
+const useDismissModal = () => {
+  const dismiss = () => {
+    // Select the close button using its classes
+    const closeButton = document.querySelector(
+      ".z-50.ring-offset-background.focus\\:ring-ring.hover\\:cursor-pointer"
+    ) as HTMLButtonElement;
+
+    if (closeButton) {
+      closeButton.click(); // Simulate a click on the close button
+    }
+  };
+
+  return {
+    dismiss,
+  };
+};
+
 const CreatePost: React.FC = () => {
   const { data, loading } = useSelector((state: RootState) => state.userBio);
   const [privacySetting, setPrivacySetting] = useState<string>("Anyone");
@@ -35,26 +52,10 @@ const CreatePost: React.FC = () => {
   const [commentSetting, setCommentSetting] = useState<string>("Anyone");
   const [selectedMedia, setSelectedMedia] = useState<File[]>([]);
   const [activeModal, setActiveModal] = useState<string>("create-post");
+  const { dismiss } = useDismissModal();
 
   const navigate = useNavigate();
   const userID = Cookies.get("linkup_auth_token");
-
-  const useDismissModal = () => {
-    const dismiss = () => {
-      // Select the close button using its classes
-      const closeButton = document.querySelector(
-        ".z-50.ring-offset-background.focus\\:ring-ring.hover\\:cursor-pointer"
-      ) as HTMLButtonElement;
-
-      if (closeButton) {
-        closeButton.click(); // Simulate a click on the close button
-      }
-    };
-
-    return {
-      dismiss,
-    };
-  };
 
   const clearFields = () => {
     setPrivacySetting("Anyone");
@@ -158,13 +159,12 @@ const CreatePost: React.FC = () => {
 
     //console.log("Post Object:", postObject);
     try {
-      const { dismiss } = useDismissModal();
       dismiss();
       clearFields();
       const toastId = toast.loading("Submitting your post...");
       await createPost(postObject, userID);
       toast.success("Post created successfully!", { id: toastId });
-    } catch (error) {
+    } catch {
       toast.error("Error creating post. Please try again.");
     }
   };
