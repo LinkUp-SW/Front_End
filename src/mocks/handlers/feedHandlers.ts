@@ -33,6 +33,13 @@ Always happy to know your thoughts on this 👇`,
       date: 0,
       public: true,
       edited: true,
+      images: [
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRHuwz1iiHfv1dnWFljnoUvBJiNaB4Uz2CG1g&s",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRHuwz1iiHfv1dnWFljnoUvBJiNaB4Uz2CG1g&s",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRHuwz1iiHfv1dnWFljnoUvBJiNaB4Uz2CG1g&s",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRHuwz1iiHfv1dnWFljnoUvBJiNaB4Uz2CG1g&s",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRHuwz1iiHfv1dnWFljnoUvBJiNaB4Uz2CG1g&s",
+      ],
     },
     stats: {
       likes: 15,
@@ -93,6 +100,8 @@ Grab the job you want. Get specific. Get found.
 
 What's your current headline? Let's optimize it!`,
       date: 0,
+      video:
+        "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
       public: true,
       edited: true,
     },
@@ -157,6 +166,7 @@ What’s your current headline? Let’s optimize it!`,
       date: 0,
       public: true,
       edited: true,
+      pdf: "https://cdn.simplepdf.com/simple-pdf/assets/sample.pdf",
     },
     stats: {
       likes: 15,
