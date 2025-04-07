@@ -60,6 +60,12 @@ import {
   PopoverContent,
   PopoverAnchor,
 } from "./ui/popover";
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+  TooltipProvider,
+} from "@/components/ui/tooltip";
 
 export {
   UserList,
@@ -117,4 +123,8 @@ export {
   PopoverTrigger,
   PopoverContent,
   PopoverAnchor,
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
 };

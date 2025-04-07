@@ -1,4 +1,5 @@
-import { CommentType, PostType } from "@/types";
+import axiosInstance from "@/services/axiosInstance";
+import { CommentType, PostDBObject, PostType } from "@/types";
 import axios from "axios";
 
 export const getFeedPosts = async (): Promise<PostType[]> => {
@@ -26,4 +27,16 @@ export const getPostComments = async (): Promise<CommentType[]> => {
     console.log(error);
     throw error;
   }
+};
+export const createPost = async (postPayload: PostDBObject, token: string) => {
+  const response = await axiosInstance.post(
+    "api/v1/post/create-post",
+    postPayload,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
 };
