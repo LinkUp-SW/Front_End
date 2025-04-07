@@ -93,6 +93,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
           autoFocus
           draggable={false}
           className="w-full resize-none min-h-[10rem] overflow-hidden outline-0 text-xl border-0 ring-0 focus:ring-0 focus:border-0 focus-visible:border-0 focus-visible:ring-0 dark:bg-gray-900"
+          id="text-input"
         />
 
         {selectedMedia.length > 0 && (
