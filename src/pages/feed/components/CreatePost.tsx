@@ -7,12 +7,17 @@ import {
 import { Button } from "../../../components/ui/button";
 // import { useDispatch } from "react-redux";
 // import { handleOpenModalType } from "@/utils";
-import { Dialog, DialogContent, DialogTrigger, Modal } from "@/components";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components";
 import { Link, useNavigate } from "react-router-dom";
 import CreatePostModal from "./modals/CreatePostModal";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import PostSettingsModal from "./modals/PostSettingsModal";
 import UploadMediaModal from "./modals/UploadMediaModal";
 import AddDocumentModal from "./modals/AddDocumentModal";
@@ -21,6 +26,7 @@ import { MediaType, PostDBObject } from "@/types";
 import Cookies from "js-cookie";
 import { toast } from "sonner";
 import { createPost } from "@/endpoints/feed";
+import { DialogDescription } from "@radix-ui/react-dialog";
 
 const CreatePost: React.FC = () => {
   const { data, loading } = useSelector((state: RootState) => state.userBio);
@@ -182,6 +188,8 @@ const CreatePost: React.FC = () => {
                   "max-h-[30rem] overflow-y-auto"
                 }`}
               >
+                <DialogTitle className="hidden"></DialogTitle>
+                <DialogDescription className="hidden"></DialogDescription>
                 {activeModal == "settings" ? (
                   <PostSettingsModal
                     setActiveModal={setActiveModal}

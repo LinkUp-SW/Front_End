@@ -14,7 +14,7 @@ import { RootState } from "@/store";
 import EmojiPicker, { Theme } from "emoji-picker-react";
 import { memo, useRef } from "react";
 import TextareaAutoResize from "react-textarea-autosize";
-import { FaChevronDown, FaRegClock } from "react-icons/fa";
+import { FaChevronDown } from "react-icons/fa";
 import { MdOutlineEmojiEmotions } from "react-icons/md";
 import { useSelector } from "react-redux";
 import { GoFileMedia as MediaIcon } from "react-icons/go";

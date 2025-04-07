@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import TransparentButton from "../buttons/TransparentButton";
 import BlueButton from "../buttons/BlueButton";
 import { toast } from "sonner";
-import { FaCopy, FaTrash, FaPlus } from "react-icons/fa";
+import { FaCopy, FaPlus } from "react-icons/fa";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { RiDeleteBin6Fill as GarbageIcon } from "react-icons/ri";

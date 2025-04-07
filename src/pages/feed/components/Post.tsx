@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import moment from "moment";
 import { Button } from "../../../components/ui/button";
 
@@ -12,7 +12,6 @@ import { HiOutlineLightBulb as InsightfulIcon } from "react-icons/hi";
 import { PiHandPalmBold as SupportIcon } from "react-icons/pi";
 import { Link } from "react-router-dom";
 import { CommentType, PostType } from "@/types";
-import { EmbedPDF } from "@simplepdf/react-embed-pdf";
 import { POST_ACTIONS } from "@/constants";
 import PostHeader from "./PostHeader";
 import PostFooter from "./PostFooter";
@@ -37,11 +36,6 @@ const Post: React.FC<PostProps> = ({ postData, comments }) => {
   const [sortingMenu, setSortingMenu] = useState(false);
   const [sortingState, setSortingState] = useState("Most relevant");
 
-  const [firstImageDimensions, setFirstImageDimensions] = useState<{
-    width: number;
-    height: number;
-  }>({ width: 0, height: 0 });
-
   const handleSortingState = (selectedState: string) => {
     setSortingState(selectedState);
   };
@@ -52,7 +46,6 @@ const Post: React.FC<PostProps> = ({ postData, comments }) => {
       img.src = post.images[0];
       img.onload = () => {
         setIsLandscape(img.width > img.height); // Check if the image is landscape
-        setFirstImageDimensions({ width: img.width, height: img.height }); // Store dimensions
       };
     }
   }, [post.images]);
