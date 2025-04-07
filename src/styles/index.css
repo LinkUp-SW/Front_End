@@ -227,16 +227,19 @@ body {
         --scrollbar-thumb-hover: var(--secondary-accent-color);
     }
 }
-@layer components{
-    
-    .selectMainButton{
+
+@layer components {
+
+    .selectMainButton {
         @apply text-center appearance-none hover:bg-green-900 hover:cursor-pointer font-semibold bg-[#01754f] rounded-2xl text-white pr-2 pl-2 pt-1 pb-1 m-5 mt-3 mb-3
     }
-    .selectMainButton option{
+
+    .selectMainButton option {
         @apply bg-white text-black
     }
-    .buttonStyle{
-        @apply  text-center hover:bg-gray-100 hover:border-1 hover:border-gray-800  hover:cursor-pointer text-black rounded-2xl border-1 border-gray-400 border-1 pr-2 pl-2 pt-1 pb-1 mr-3 
+
+    .buttonStyle {
+        @apply text-center hover:bg-gray-100 hover:border-1 hover:border-gray-800 hover:cursor-pointer text-black rounded-2xl border-1 border-gray-400 border-1 pr-2 pl-2 pt-1 pb-1 mr-3
     }
 
 }
@@ -258,14 +261,15 @@ body {
 .animate-caret-blink {
     animation: caret-blink 1.25s ease-out infinite;
 }
-button{
-    @apply cursor-pointer
+
+button {
+    @apply cursor-pointer disabled:cursor-not-allowed
 }
 
-.destructiveBtn{
-    @apply bg-pink-500 hover:bg-pink-700 focus-visible:ring-pink-500 border-none hover:text-white text-white transition-all duration-300 ease-in-out
+.destructiveBtn {
+    @apply bg-pink-500 hover:bg-pink-700 focus-visible:ring-pink-500 border-none hover:text-white text-white transition-all duration-300 ease-in-out disabled:cursor-not-allowed
 }
 
-.affimativeBtn{
+.affimativeBtn {
     @apply bg-cyan-600 hover:bg-cyan-700 transition-all duration-300 ease-in-out
 }
