@@ -61,7 +61,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
         <div
           onClick={() => setActiveModal("settings")}
           id="post-settings-button"
-          className="flex w-fit z-0 p-2  gap-4 hover:cursor-pointer hover:bg-gray-300 dark:hover:bg-gray-700 rounded-2xl"
+          className="flex w-fit z-0 p-2  gap-4  hover:cursor-pointer hover:bg-neutral-100 dark:hover:bg-gray-700 rounded-2xl"
         >
           <Avatar className="h-12 w-12 pl-0">
             <AvatarImage src={profileImageUrl} alt="Profile" />
