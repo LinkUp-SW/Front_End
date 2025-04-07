@@ -222,7 +222,10 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
           </Tooltip>
         </TooltipProvider> */}
 
-          <BlueButton onClick={submitPost} disabled={postText.length == 0}>
+          <BlueButton
+            onClick={submitPost}
+            disabled={postText.length == 0 && selectedMedia.length == 0}
+          >
             Post
           </BlueButton>
         </div>
