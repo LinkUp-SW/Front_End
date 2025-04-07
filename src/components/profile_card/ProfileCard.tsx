@@ -8,6 +8,7 @@ import Cookies from "js-cookie";
 import { refetchUserBio } from "@/slices/user_profile/userBioSlice";
 import { RootState, AppDispatch } from "@/store"; // Ensure AppDispatch is exported from your store
 import { getErrorMessage } from "@/utils/errorHandler";
+import { BiSolidBriefcase } from "react-icons/bi";
 
 const ProfileCard: React.FC = () => {
   // Use the correctly typed dispatch
@@ -168,14 +169,29 @@ const ProfileCard: React.FC = () => {
             >
               {data?.bio.location.city} {data?.bio.location.country_region}
             </h3>
-            <footer
-              id="profile-card-footer"
-              className="flex items-center gap-1 pt-3"
-            >
-              <FaUniversity />
-              <h1 id="profile-card-education" className="text-xs font-semibold">
-                {data?.bio.education[data?.bio.education.length - 1]}
-              </h1>
+            <footer id="profile-card-footer" className="grid gap-1 pt-3">
+              {data?.education && (
+                <div className="flex items-center gap-2">
+                  <FaUniversity />
+                  <h1
+                    id="profile-card-education"
+                    className="text-xs font-semibold"
+                  >
+                    {data?.education?.name}
+                  </h1>
+                </div>
+              )}
+              {data?.work_experience && (
+                <div className="flex items-center gap-2">
+                  <BiSolidBriefcase />
+                  <h1
+                    id="profile-card-education"
+                    className="text-xs font-semibold"
+                  >
+                    {data?.work_experience?.name}
+                  </h1>
+                </div>
+              )}
             </footer>
           </section>
         </Link>
