@@ -1,4 +1,3 @@
-// JobsDashboard.tsx
 import React, { useEffect, useState } from 'react';
 import { Job } from '../../types';
 
@@ -44,10 +43,10 @@ const JobsDashboard: React.FC = () => {
         <h1 className="text-xl font-medium mb-4 text-gray-900 dark:text-white">My Jobs</h1>
         
         <div className="flex flex-wrap gap-2 mb-6">
-          <button className="bg-green-700 text-white px-4 py-1 rounded-full">Saved</button>
-          <button className="bg-white dark:bg-gray-700 border dark:border-gray-600 px-4 py-1 rounded-full text-gray-800 dark:text-gray-200">In Progress</button>
-          <button className="bg-white dark:bg-gray-700 border dark:border-gray-600 px-4 py-1 rounded-full text-gray-800 dark:text-gray-200">Applied</button>
-          <button className="bg-white dark:bg-gray-700 border dark:border-gray-600 px-4 py-1 rounded-full text-gray-800 dark:text-gray-200">Archived</button>
+          <button id="saved-jobs-tab" className="bg-green-700 text-white px-4 py-1 rounded-full">Saved</button>
+          <button id="in-progress-tab" className="bg-white dark:bg-gray-700 border dark:border-gray-600 px-4 py-1 rounded-full text-gray-800 dark:text-gray-200">In Progress</button>
+          <button id="applied-tab" className="bg-white dark:bg-gray-700 border dark:border-gray-600 px-4 py-1 rounded-full text-gray-800 dark:text-gray-200">Applied</button>
+          <button id="archived-tab" className="bg-white dark:bg-gray-700 border dark:border-gray-600 px-4 py-1 rounded-full text-gray-800 dark:text-gray-200">Archived</button>
         </div>
         
         {savedJobs.length > 0 ? (
@@ -74,6 +73,7 @@ const JobsDashboard: React.FC = () => {
                   </div>
                   <div className="flex items-start">
                     <button 
+                      id={`job-options-${job.id}`}
                       className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
                       onClick={() => removeFromSaved(job.id)}
                     >
