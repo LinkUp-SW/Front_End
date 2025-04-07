@@ -68,8 +68,8 @@ const UploadMediaModal: React.FC<UploadMediaModalProps> = ({
     const files = e.target.files;
     if (files) {
       const fileArray = Array.from(files);
-
-      const maxFileSize = 50 * 1048576; // 10 MB
+      const maxFileSizeInMB = 10;
+      const maxFileSize = maxFileSizeInMB * 1048576; // 10 MB
       const maxFiles = 10;
 
       if (fileArray.length > maxFiles) {
@@ -78,7 +78,9 @@ const UploadMediaModal: React.FC<UploadMediaModalProps> = ({
       }
       const validFiles = fileArray.filter((file) => {
         if (file.size > maxFileSize) {
-          toast.error(`File "${file.name}" exceeds the maximum size of 50 MB.`);
+          toast.error(
+            `File "${file.name}" exceeds the maximum size of ${maxFileSizeInMB} MB.`
+          );
           return false;
         }
         return file.type.startsWith("image/") || file.type.startsWith("video/");
