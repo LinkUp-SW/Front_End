@@ -35,8 +35,33 @@ const CreatePost: React.FC = () => {
   const [commentSetting, setCommentSetting] = useState<string>("Anyone");
   const [selectedMedia, setSelectedMedia] = useState<File[]>([]);
   const [activeModal, setActiveModal] = useState<string>("create-post");
+
   const navigate = useNavigate();
   const userID = Cookies.get("linkup_auth_token");
+
+  const useDismissModal = () => {
+    const dismiss = () => {
+      // Select the close button using its classes
+      const closeButton = document.querySelector(
+        ".z-50.ring-offset-background.focus\\:ring-ring.hover\\:cursor-pointer"
+      ) as HTMLButtonElement;
+
+      if (closeButton) {
+        closeButton.click(); // Simulate a click on the close button
+      }
+    };
+
+    return {
+      dismiss,
+    };
+  };
+
+  const clearFields = () => {
+    setPrivacySetting("Anyone");
+    setCommentSetting("Anyone");
+    setPostText("");
+    setSelectedMedia([]);
+  };
 
   const submitPost = async () => {
     let media_type: string | undefined;
@@ -107,12 +132,11 @@ const CreatePost: React.FC = () => {
       // Wait for all FileReader operations to complete
       await Promise.all(fileReaders);
     } else {
-      toast.error("Failed to process one or more files. Please try again.");
-      return;
+      media_type = "none";
     }
 
-    if (postText.trim().length === 0) {
-      toast.error("The post must have content.");
+    if (postText.trim().length === 0 && selectedMedia.length === 0) {
+      toast.error("The post must have either content or media.");
       return;
     }
     if (!userID) {
@@ -132,12 +156,16 @@ const CreatePost: React.FC = () => {
       taggedUsers: [],
     };
 
-    console.log("Post Object:", postObject);
+    //console.log("Post Object:", postObject);
     try {
-      const response = await createPost(postObject, userID);
-      console.log("Post created successfully:", response);
+      const { dismiss } = useDismissModal();
+      dismiss();
+      clearFields();
+      const toastId = toast.loading("Submitting your post...");
+      await createPost(postObject, userID);
+      toast.success("Post created successfully!", { id: toastId });
     } catch (error) {
-      console.error("Error creating post:", error);
+      toast.error("Error creating post. Please try again.");
     }
   };
 
