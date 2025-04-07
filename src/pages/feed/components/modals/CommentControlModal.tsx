@@ -58,7 +58,7 @@ const CommentControlModal: React.FC<CommentControlModalProps> = ({
         />
       </div>
 
-      <div className="flex w-full justify-end gap-2 px-5">
+      <div className="flex w-full justify-end gap-2 px-5 border-t pt-5 relative top-5">
         <TransparentButton onClick={() => setActiveModal("settings")}>
           Back
         </TransparentButton>

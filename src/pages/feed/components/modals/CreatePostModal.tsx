@@ -57,10 +57,10 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
 
   return (
     <div className="flex flex-col relative items-start gap-4 w-full px-4 ">
-      <div className="dark:bg-gray-800 w-full sticky top-0">
+      <div className="bg-white dark:bg-gray-900 w-full z-0 h-[5rem] pt-2 sticky -top-4">
         <div
           onClick={() => setActiveModal("settings")}
-          className="flex w-1/2 z-50  py-2  gap-4 hover:cursor-pointer hover:bg-gray-300 dark:hover:bg-gray-700 rounded-2xl"
+          className="flex w-fit z-0 p-2  gap-4 hover:cursor-pointer hover:bg-gray-300 dark:hover:bg-gray-700 rounded-2xl"
         >
           <Avatar className="h-12 w-12 pl-0">
             <AvatarImage src={profileImageUrl} alt="Profile" />
@@ -68,10 +68,10 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
           </Avatar>
           <div className="flex flex-col  text-black dark:text-neutral-200 ">
             <div className="flex items-center gap-3">
-              <p className="text-xl font-medium">Amr Doma</p>
+              <p className="text-xl font-medium text-nowrap">Amr Doma</p>
               <FaChevronDown />
             </div>
-            <p className="text-md">Post to {privacySetting}</p>
+            <p className="text-md text-nowrap">Post to {privacySetting}</p>
           </div>
         </div>
       </div>
@@ -103,22 +103,26 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
                 onClick={() => {
                   setActiveModal("add-media");
                 }}
+                size={"icon"}
+                className="text-white bg-gray-700 hover:bg-gray-800 dark:bg-transparent dark:text-gray-900"
               >
                 <EditIcon />
               </IconButton>
               <IconButton
+                size={"icon"}
                 onClick={() => {
                   setSelectedMedia([]);
                   console.log(selectedMedia);
                 }}
+                className="border rounded-full h-10 w-10 dark:bg-gray-200  text-white bg-gray-700 hover:bg-gray-800 dark:text-gray-900"
               >
-                <CloseIcon className="border rounded-full h-10 w-10 bg-gray-200 text-black" />
+                <CloseIcon />
               </IconButton>
             </div>
 
             {selectedMedia[0].type.startsWith("image/") ? (
               <PostImages
-                className="flex-shrink-0"
+                className="flex-shrink-0 -z-50"
                 images={selectedMedia.map((file) => URL.createObjectURL(file))}
                 isLandscape={false}
               ></PostImages>
@@ -134,7 +138,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
           </div>
         )}
       </div>
-      <div className="sticky -bottom-4 py-5 w-full  z-50 dark:bg-gray-900">
+      <div className="sticky -bottom-4 py-5 w-full  z-40 bg-white dark:bg-gray-900">
         <div className="flex justify-start items-center">
           <TooltipProvider>
             <Tooltip>
