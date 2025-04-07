@@ -200,13 +200,13 @@ const JobFilterBar: React.FC<JobFilterBarProps> = ({ onFiltersChange }) => {
             >
               <input 
                 type="checkbox" 
-                id={`salary-${range.replace(/\+/g, 'plus').replace(/\-/g, 'to')}`}
+                id={`salary-${range.replace(/\+/g, 'plus').replace(/-/g, 'to')}`}
                 checked={filters.salaryRanges.includes(range)}
                 onChange={(e) => updateFilter('salaryRanges', range, e.target.checked)}
                 className="w-4 h-4 mr-3 accent-green-800 border-gray-300 rounded dark:bg-gray-600 dark:border-gray-500"
               />
               <label 
-                htmlFor={`salary-${range.replace(/\+/g, 'plus').replace(/\-/g, 'to')}`} 
+                htmlFor={`salary-${range.replace(/\+/g, 'plus').replace(/-/g, 'to')}`} 
                 className="text-sm flex-grow cursor-pointer dark:text-gray-200"
               >
                 {range}
