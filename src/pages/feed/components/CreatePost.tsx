@@ -107,11 +107,12 @@ const CreatePost: React.FC = () => {
       // Wait for all FileReader operations to complete
       await Promise.all(fileReaders);
     } else {
-      media_type = "none";
+      toast.error("Failed to process one or more files. Please try again.");
+      return;
     }
 
-    if (postText.length === 0) {
-      toast.error("The post must have text.");
+    if (postText.trim().length === 0) {
+      toast.error("The post must have content.");
       return;
     }
     if (!userID) {
@@ -166,7 +167,8 @@ const CreatePost: React.FC = () => {
               onOpenChange={(isOpen) => {
                 if (!isOpen) {
                   setTimeout(() => {
-                    setActiveModal("create-post"); // Reset activeModal to "create-post" when the modal is closed
+                    setSelectedMedia([]); // Reset activeModal to "create-post" when the modal is closed
+                    setActiveModal("create-post");
                   }, 200);
                 }
               }}
@@ -182,7 +184,7 @@ const CreatePost: React.FC = () => {
               <DialogContent
                 className={`dark:bg-gray-900 min-w-[20rem] sm:min-w-[35rem] w-auto dark:border-gray-700  ${
                   activeModal === "add-media" &&
-                  "!w-[70rem] !max-w-[70rem] !max-h-[50rem]"
+                  "w-auto !lg:w-[70rem] !max-w-[70rem] !lg:max-h-[50rem]"
                 }   py-3 px-0 ${
                   activeModal === "create-post" &&
                   "max-h-[30rem] overflow-y-auto"
