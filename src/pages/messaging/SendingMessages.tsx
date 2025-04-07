@@ -2,13 +2,14 @@ import { useDispatch } from "react-redux";
 import { sendMessage } from "../../slices/messaging/messagingSlice";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
-import { FaRegImage } from "react-icons/fa6";
-import { MdOutlineEmojiEmotions } from "react-icons/md";
-import { MdAttachFile } from "react-icons/md";
-import { IoIosClose } from "react-icons/io";
-import { FaFileAlt } from "react-icons/fa";
 import { useState } from "react";
 import EmojiPicker from "emoji-picker-react";
+import { BsImage } from "react-icons/bs";
+import { BsPaperclip } from "react-icons/bs";
+import { BsEmojiSmile } from "react-icons/bs";
+import { BsThreeDots } from "react-icons/bs";
+import { IoIosClose } from "react-icons/io";
+import { FaFileAlt } from "react-icons/fa";
 
 const SendingMessages = () => {
   const selectedConvID = useSelector(
@@ -41,18 +42,30 @@ const SendingMessages = () => {
     if (!text.trim()) return;
     const newMessage = {
       id: new Date().toISOString(),
-      Img: "https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg",
-      name: "You", // You can adjust this based on logged-in user
       message: text,
-      date: Date.now(),
+      media: [],
+      media_type: [],
+      timestamp: new Date(),
+      reacted: false,
+      is_seen: true,
+      user1_img:
+        "https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg",
+      user2_img:
+        "https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg",
+      user1_name: "7amada",
+      user2_name: "ayhaga2",
     };
 
     dispatch(
       sendMessage({
-        senderID: "10",
+        convID: selectedConvID,
+        senderID: "user_101",
+        user2ID: "user_202",
+        user2Name: "ALI",
+        lastTextMessage: newMessage.message,
+        date: new Date(),
         profileImg:
           "https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg",
-        convID: selectedConvID,
         message: newMessage,
       })
     );
@@ -61,88 +74,120 @@ const SendingMessages = () => {
   };
   return (
     <>
+      {/* File attachments UI */}
       {files.length > 0 && (
-        <div>
+        <div className="px-4 space-y-2 mb-2">
           {files.map((file, index) => (
             <div
               key={index}
-              className="flex justify-between items-center bg-white p-2 rounded shadow-sm mb-1"
+              className="flex justify-between items-center bg-gray-50 p-2 rounded-md border border-gray-200"
             >
-              <div>
-                <div className="relative inline-block h-10 w-10 mr-2 bg-[#56687a]">
+              <div className="flex items-center">
+                <div className="relative inline-block h-10 w-10 mr-2 bg-gray-200 rounded">
                   <FaFileAlt
                     size={20}
-                    className=" text-white absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2   "
+                    className="text-gray-600 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
                   />
                 </div>
                 <div className="inline-block">
-                  <p>
-                    {file.name} •{(file.size / 1024).toFixed(1)} KB
+                  <p className="text-sm font-medium text-gray-700">
+                    {file.name} • {(file.size / 1024).toFixed(1)} KB
                   </p>
-                  <p className="text-xs">Attached</p>
+                  <p className="text-xs text-gray-500">Attached</p>
                 </div>
               </div>
 
-              <IoIosClose
-                size={30}
-                className="inline-block hover:cursor-pointer hover:bg-gray-200 hover:rounded-full"
+              <button
                 onClick={() => removeFile(index)}
-              />
+                className="text-gray-400 hover:text-gray-600 hover:bg-gray-200 rounded-full p-1"
+              >
+                <IoIosClose id="close-file" size={24} />
+              </button>
             </div>
           ))}
         </div>
       )}
 
-      <div className="h-1/2 border-1 border-[#e8e8e8]">
-        <div className="h-1/2 border border-[#e8e8e8] flex justify-center items-center">
-          <input
-            type="text"
+      <div className="border-t border-gray-200 flex flex-col">
+        {/* Message input area */}
+        <div className="px-4 pt-4 pb-2">
+          <textarea
+            id="text-message"
             value={text}
             onChange={(e) => setText(e.target.value)}
-            placeholder="Write a message.."
-            className="bg-[#f5f3f0] w-[92%] h-[85%] border border-gray-300 rounded-md p-3 overflow-y-auto"
+            placeholder="Write a message..."
+            className="w-full min-h-24 bg-gray-50 text-gray-700 p-4 rounded-md resize-none outline-none border-none"
           />
         </div>
 
-        <div className="h-1/2 border-1 border-[#e8e8e8] flex relative justify-between">
-          <div className=" flex p-5">
-            <FaRegImage />
-            <label htmlFor="uploadFolder">
-              <MdAttachFile onClick={() => setSelectedFile(!selectedFile)} />
-            </label>
-            {selectedFile ? (
+        {/* Bottom action bar with icons and send button */}
+        <div className="flex items-start justify-between px-4 pt-3 pb-15 border-t border-gray-200">
+          <div className="flex space-x-4">
+            <button
+              id="send-message-image"
+              className="text-gray-500 hover:text-gray-700"
+            >
+              <BsImage size={20} />
+            </button>
+
+            <label htmlFor="upload-folder" className="cursor-pointer">
+              <BsPaperclip
+                size={20}
+                className="text-gray-500 hover:text-gray-700"
+                onClick={() => setSelectedFile(!selectedFile)}
+              />
               <input
+                id="upload-folder"
                 type="file"
                 multiple
-                id="uploadFolder"
                 onChange={handleFileRequest}
                 className="hidden"
-              ></input>
-            ) : (
-              ""
-            )}
+              />
+            </label>
 
-            <MdOutlineEmojiEmotions
+            <button
+              id="gif-btn"
+              className="text-gray-500 hover:text-gray-700 font-medium"
+            >
+              GIF
+            </button>
+
+            <button
+              id="emoji-btn"
               onClick={() => setSelectedEmoji(!selectedEmoji)}
-            />
-            {selectedEmoji ? (
-              <div className="absolute bottom-30 left-10 h-50 overflow-auto">
+              className="text-gray-500 hover:text-gray-700 relative"
+            >
+              <BsEmojiSmile size={20} />
+            </button>
+
+            {selectedEmoji && (
+              <div className="absolute bottom-14 left-4 z-10 shadow-lg rounded-lg">
                 <EmojiPicker onEmojiClick={handleEmojiRequest} />
               </div>
-            ) : (
-              ""
             )}
           </div>
 
-          <button
-            onClick={handleSendMessage}
-            disabled={!text.trim()}
-            className={`m-5 h-5 w-15 align-middle rounded-md text-white ${
-              text.trim() ? "bg-blue-500" : "bg-gray-300"
-            }`}
-          >
-            send
-          </button>
+          <div className="flex items-start space-x-2">
+            <button
+              id="send-message"
+              onClick={handleSendMessage}
+              disabled={!text.trim()}
+              className={`px-4 py-1 rounded-full text-sm ${
+                text.trim()
+                  ? "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                  : "bg-gray-100 text-gray-400 cursor-not-allowed"
+              }`}
+            >
+              Send
+            </button>
+
+            <button
+              id="sending-msg-dots"
+              className="text-gray-500 hover:text-gray-700 p-1"
+            >
+              <BsThreeDots size={20} />
+            </button>
+          </div>
         </div>
       </div>
     </>

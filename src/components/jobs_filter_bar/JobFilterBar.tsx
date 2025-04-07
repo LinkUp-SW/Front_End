@@ -3,7 +3,7 @@ import { MdArrowDropDown, MdMenu, MdClose } from 'react-icons/md';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { JobFilters } from '../../../src/pages/jobs/types';
+import { JobFilters } from '../../pages/jobs/types';
 
 interface JobFilterBarProps {
   onFiltersChange: (filters: JobFilters) => void;
@@ -66,6 +66,7 @@ const JobFilterBar: React.FC<JobFilterBarProps> = ({ onFiltersChange }) => {
       component: (
         <div className="w-64 p-2 bg-white dark:bg-gray-800">
           <Input
+            id="location-search-input"
             placeholder="Search Location..."
             value={searchLocation}
             onChange={(e) => {
@@ -82,6 +83,7 @@ const JobFilterBar: React.FC<JobFilterBarProps> = ({ onFiltersChange }) => {
             .filter((loc) => loc.toLowerCase().includes(searchLocation.toLowerCase()))
             .map((loc) => (
               <Button 
+                id={`location-option-${loc.toLowerCase().replace(/\s+/g, '-')}`}
                 key={loc} 
                 variant="ghost" 
                 onClick={() => {
@@ -101,6 +103,7 @@ const JobFilterBar: React.FC<JobFilterBarProps> = ({ onFiltersChange }) => {
       component: (
         <div className="w-64 p-2 bg-white dark:bg-gray-800">
           <Input
+            id="company-search-input"
             placeholder="Search Company..."
             value={searchCompany}
             onChange={(e) => {
@@ -117,6 +120,7 @@ const JobFilterBar: React.FC<JobFilterBarProps> = ({ onFiltersChange }) => {
             .filter((comp) => comp.toLowerCase().includes(searchCompany.toLowerCase()))
             .map((comp) => (
               <Button 
+                id={`company-option-${comp.toLowerCase().replace(/\s+/g, '-')}`}
                 key={comp} 
                 variant="ghost" 
                 onClick={() => {
@@ -142,13 +146,13 @@ const JobFilterBar: React.FC<JobFilterBarProps> = ({ onFiltersChange }) => {
             >
               <input 
                 type="checkbox" 
-                id={level}
+                id={`experience-${level.toLowerCase().replace(/\s+/g, '-')}`}
                 checked={filters.experienceLevels.includes(level)}
                 onChange={(e) => updateFilter('experienceLevels', level, e.target.checked)}
                 className="w-4 h-4 mr-3 accent-green-800 border-gray-300 rounded dark:bg-gray-600 dark:border-gray-500"
               />
               <label 
-                htmlFor={level} 
+                htmlFor={`experience-${level.toLowerCase().replace(/\s+/g, '-')}`} 
                 className="text-sm flex-grow cursor-pointer dark:text-gray-200"
               >
                 {level}
@@ -169,13 +173,13 @@ const JobFilterBar: React.FC<JobFilterBarProps> = ({ onFiltersChange }) => {
             >
               <input 
                 type="checkbox" 
-                id={option}
+                id={`workmode-${option.toLowerCase().replace(/\s+/g, '-')}`}
                 checked={filters.workModes.includes(option)}
                 onChange={(e) => updateFilter('workModes', option, e.target.checked)}
                 className="w-4 h-4 mr-3 accent-green-800 border-gray-300 rounded dark:bg-gray-600 dark:border-gray-500"
               />
               <label 
-                htmlFor={option} 
+                htmlFor={`workmode-${option.toLowerCase().replace(/\s+/g, '-')}`} 
                 className="text-sm flex-grow cursor-pointer dark:text-gray-200"
               >
                 {option}
@@ -196,13 +200,13 @@ const JobFilterBar: React.FC<JobFilterBarProps> = ({ onFiltersChange }) => {
             >
               <input 
                 type="checkbox" 
-                id={range}
+                id={`salary-${range.replace(/\+/g, 'plus').replace(/-/g, 'to')}`}
                 checked={filters.salaryRanges.includes(range)}
                 onChange={(e) => updateFilter('salaryRanges', range, e.target.checked)}
                 className="w-4 h-4 mr-3 accent-green-800 border-gray-300 rounded dark:bg-gray-600 dark:border-gray-500"
               />
               <label 
-                htmlFor={range} 
+                htmlFor={`salary-${range.replace(/\+/g, 'plus').replace(/-/g, 'to')}`} 
                 className="text-sm flex-grow cursor-pointer dark:text-gray-200"
               >
                 {range}
@@ -217,12 +221,13 @@ const JobFilterBar: React.FC<JobFilterBarProps> = ({ onFiltersChange }) => {
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
   return (
-    <header className="w-full border-y bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 flex items-center justify-center px-4 py-3 fixed top-14 left-0 z-10">
+    <header className="w-full border-y bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 flex items-center justify-center px-4 py-3 fixed top-14 left-0 z-13">
       <nav className="w-full max-w-7xl px-4 sm:px-6 lg:px-18">
         <div className="flex items-center justify-between">
           {/* Mobile Menu Toggle */}
           <div className="lg:hidden">
             <button 
+              id="mobile-menu-toggle"
               onClick={toggleMenu} 
               className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
               aria-label={isMenuOpen ? "Close menu" : "Open menu"}
@@ -244,6 +249,7 @@ const JobFilterBar: React.FC<JobFilterBarProps> = ({ onFiltersChange }) => {
           `}>
             {/* Close Button for Mobile */}
             <button 
+              id="close-mobile-menu"
               onClick={() => setIsMenuOpen(false)} 
               className="lg:hidden absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
               aria-label="Close menu"
@@ -265,6 +271,7 @@ const JobFilterBar: React.FC<JobFilterBarProps> = ({ onFiltersChange }) => {
                   >
                     <PopoverTrigger asChild>
                       <Button 
+                        id={`filter-${filter.label.toLowerCase().replace(/\s+/g, '-')}`}
                         variant="outline" 
                         className="w-full lg:w-auto flex items-center justify-between px-4 py-2.5 border border-gray-300 dark:bg-gray-800 dark:border-gray-700 rounded-full text-base hover:bg-gray-100 dark:hover:bg-gray-700 whitespace-nowrap dark:text-gray-200"
                       >

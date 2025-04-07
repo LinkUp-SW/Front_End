@@ -13,7 +13,7 @@ const Header = () => {
           <label htmlFor="searchMessages" className="font-semibold">
             Messaging
           </label>
-          <div className="relative w-60">
+          <div id="search" className="relative w-60">
             <IoSearchSharp className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#3b3d3e]" />
             <input
               type="text"
@@ -27,10 +27,16 @@ const Header = () => {
         </div>
 
         <div className="flex items-center space-x-4">
-          <button className="hover:rounded-full hover:bg-gray-200 hover:cursor-pointer">
+          <button
+            id="header-dots"
+            className="hover:rounded-full hover:bg-gray-200 hover:cursor-pointer"
+          >
             <HiOutlineDotsHorizontal size={30} />
           </button>
-          <button className="hover:rounded-full hover:bg-gray-200 hover:cursor-pointer">
+          <button
+            id="pencil-icon"
+            className="hover:rounded-full hover:bg-gray-200 hover:cursor-pointer"
+          >
             <HiOutlinePencilAlt size={30} />{" "}
           </button>
         </div>

@@ -4,9 +4,8 @@ export interface CompanyInfo {
   followers: string;
   industryType: string;
   employeeCount: string;
-  linkedInPresence: string;
+  linkupPresence: string;
   description: string;
-  hasMoreDescription?: boolean;
 }
 
 export interface Job {
@@ -30,9 +29,9 @@ export interface Job {
   workMode: 'On-site' | 'Remote' | 'Hybrid';
   companyInfo?: CompanyInfo;  
   description?: string;
-  qualifications?: string;
-  responsibilities?: string;
-  benefits?: string;
+  qualifications?: string[];
+  responsibilities?: string[];
+  benefits?: string[];
   salary: string;
 }
 
