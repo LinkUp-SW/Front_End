@@ -15,7 +15,6 @@ export interface WithdrawInvitationType {
   userName: string;
 }
 
-
 export interface Notification {
   id: string;
   type: "job" | "post" | "recommendation" | "message" | "connection";
@@ -26,9 +25,9 @@ export interface Notification {
   actionLink?: string;
   location?: string;
   count?: number;
-  isNew?: boolean;
-  read?:boolean;
+  isNew: boolean;  // Make isNew non-optional to avoid undefined checks
 }
+
 
 export interface PostType {
   user: {
