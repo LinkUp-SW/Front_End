@@ -156,7 +156,15 @@ const CreatePost: React.FC = () => {
                 )}
               </Avatar>
             </Link>
-            <Dialog>
+            <Dialog
+              onOpenChange={(isOpen) => {
+                if (!isOpen) {
+                  setTimeout(() => {
+                    setActiveModal("create-post"); // Reset activeModal to "create-post" when the modal is closed
+                  }, 200);
+                }
+              }}
+            >
               <DialogTrigger asChild className="w-full">
                 <Button
                   variant="ghost"
@@ -166,7 +174,7 @@ const CreatePost: React.FC = () => {
                 </Button>
               </DialogTrigger>
               <DialogContent
-                className={`dark:bg-gray-900 dark:border-gray-700  ${
+                className={`dark:bg-gray-900 min-w-[20rem] sm:min-w-[35rem] w-auto dark:border-gray-700  ${
                   activeModal === "add-media" &&
                   "!w-[70rem] !max-w-[70rem] !max-h-[50rem]"
                 }   py-3 px-0 ${
