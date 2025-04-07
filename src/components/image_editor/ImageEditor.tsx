@@ -298,10 +298,22 @@ export default function ImageEditor({
   };
 
   return (
-    <div id="image-editor-container" className="container mx-auto py-8 px-4 animate-fade-in">
-      <Card id="image-editor-card" className="w-full max-w-4xl mx-auto bg-white dark:bg-gray-800 shadow-lg">
-        <CardHeader id="image-editor-header" className="flex flex-row justify-between items-center border-b border-gray-200 dark:border-gray-700">
-          <CardTitle id="image-editor-title" className="text-2xl text-gray-800 dark:text-white">
+    <div
+      id="image-editor-container"
+      className="container mx-auto py-8 px-4 animate-fade-in"
+    >
+      <Card
+        id="image-editor-card"
+        className="w-full max-w-4xl mx-auto bg-white dark:bg-gray-800 shadow-lg"
+      >
+        <CardHeader
+          id="image-editor-header"
+          className="flex flex-row justify-between items-center border-b border-gray-200 dark:border-gray-700"
+        >
+          <CardTitle
+            id="image-editor-title"
+            className="text-2xl text-gray-800 dark:text-white"
+          >
             Edit Profile Picture
           </CardTitle>
         </CardHeader>
@@ -328,24 +340,36 @@ export default function ImageEditor({
             <div id="image-editor-tabs">
               <Tabs defaultValue="adjustments">
                 <TabsList className="w-full mb-4 bg-gray-50 dark:bg-gray-700">
-                  <TabsTrigger id="adjustments-tab" value="adjustments" className="flex-1 text-gray-800 dark:text-gray-200">
+                  <TabsTrigger
+                    id="adjustments-tab"
+                    value="adjustments"
+                    className="flex-1 text-gray-800 dark:text-gray-200"
+                  >
                     <SlidersHorizontal className="h-4 w-4 mr-2" />
                     Adjustments
                   </TabsTrigger>
-                  <TabsTrigger id="crop-tab" value="crop" className="flex-1 text-gray-800 dark:text-gray-200">
+                  <TabsTrigger
+                    id="crop-tab"
+                    value="crop"
+                    className="flex-1 text-gray-800 dark:text-gray-200"
+                  >
                     <Crop className="h-4 w-4 mr-2" />
                     Crop
                   </TabsTrigger>
                 </TabsList>
 
-                <TabsContent id="adjustments-content" value="adjustments" className="space-y-6">
+                <TabsContent
+                  id="adjustments-content"
+                  value="adjustments"
+                  className="space-y-6"
+                >
                   <div className="space-y-4">
                     <div className="space-y-2">
                       <div className="flex justify-between">
                         <label className="text-gray-800 dark:text-gray-200">
                           Brightness
                         </label>
-                        <span className="text-sm text-gray-500">
+                        <span className="text-sm text-gray-500 dark:text-gray-300">
                           {adjustments.brightness}%
                         </span>
                       </div>
@@ -353,6 +377,7 @@ export default function ImageEditor({
                         id="brightness-slider"
                         min={0}
                         max={200}
+                        className="dark:filter dark:invert"
                         value={[adjustments.brightness]}
                         onValueChange={(value) =>
                           setAdjustments((prev) => ({
@@ -368,13 +393,14 @@ export default function ImageEditor({
                         <label className="text-gray-800 dark:text-gray-200">
                           Contrast
                         </label>
-                        <span className="text-sm text-gray-500">
+                        <span className="text-sm text-gray-500 dark:text-gray-300">
                           {adjustments.contrast}%
                         </span>
                       </div>
                       <Slider
                         id="contrast-slider"
                         min={0}
+                        className="dark:filter dark:invert"
                         max={200}
                         value={[adjustments.contrast]}
                         onValueChange={(value) =>
@@ -391,7 +417,7 @@ export default function ImageEditor({
                         <label className="text-gray-800 dark:text-gray-200">
                           Saturation
                         </label>
-                        <span className="text-sm text-gray-500">
+                        <span className="text-sm text-gray-500 dark:text-gray-300">
                           {adjustments.saturation}%
                         </span>
                       </div>
@@ -399,6 +425,7 @@ export default function ImageEditor({
                         id="saturation-slider"
                         min={0}
                         max={200}
+                        className="dark:filter dark:invert"
                         value={[adjustments.saturation]}
                         onValueChange={(value) =>
                           setAdjustments((prev) => ({
@@ -414,7 +441,7 @@ export default function ImageEditor({
                         <label className="text-gray-800 dark:text-gray-200">
                           Vignette
                         </label>
-                        <span className="text-sm text-gray-500">
+                        <span className="text-sm text-gray-500 dark:text-gray-300">
                           {adjustments.vignette}%
                         </span>
                       </div>
@@ -422,6 +449,7 @@ export default function ImageEditor({
                         id="vignette-slider"
                         min={0}
                         max={100}
+                        className="dark:filter dark:invert"
                         value={[adjustments.vignette]}
                         onValueChange={(value) =>
                           setAdjustments((prev) => ({
@@ -434,13 +462,25 @@ export default function ImageEditor({
                   </div>
                 </TabsContent>
 
-                <TabsContent id="crop-content" value="crop" className="space-y-4">
+                <TabsContent
+                  id="crop-content"
+                  value="crop"
+                  className="space-y-4"
+                >
                   {cropMode && (
                     <div className="flex gap-2 mb-2">
-                      <Button id="preset-square" variant="outline" onClick={setPresetSquare}>
+                      <Button
+                        id="preset-square"
+                        variant="outline"
+                        onClick={setPresetSquare}
+                      >
                         Square
                       </Button>
-                      <Button id="preset-16-9" variant="outline" onClick={setPreset16_9}>
+                      <Button
+                        id="preset-16-9"
+                        variant="outline"
+                        onClick={setPreset16_9}
+                      >
                         16:9
                       </Button>
                     </div>
@@ -461,10 +501,15 @@ export default function ImageEditor({
                     ) : (
                       <div className="space-y-2">
                         <p className="text-sm text-gray-500">
-                          Drag or use presets to select crop area. Preview shown below.
+                          Drag or use presets to select crop area. Preview shown
+                          below.
                         </p>
                         <div className="flex gap-2">
-                          <Button id="apply-crop-button" onClick={handleApplyCrop} className="flex-1">
+                          <Button
+                            id="apply-crop-button"
+                            onClick={handleApplyCrop}
+                            className="flex-1"
+                          >
                             Apply Crop
                           </Button>
                           <Button
