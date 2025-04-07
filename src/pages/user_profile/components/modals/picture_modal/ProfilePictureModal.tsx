@@ -15,6 +15,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store"; // Adjust the import path to your store type
 import { editUserBio } from "@/slices/user_profile/userBioSlice";
 import { useFormStatus } from "@/hooks/useFormStatus";
+
 const ProfilePictureModal = ({
   src,
   setPic,
@@ -154,20 +155,11 @@ const ProfilePictureModal = ({
     }
   };
 
-  useEffect(() => {
-    console.log(
-      userBio?.is_default_profile_photo && editedImage === null,
-      editedImage === null,
-      userBio?.is_default_profile_photo
-    );
-  }, [editedImage]);
-
-  useEffect(() => {}, []);
 
   return (
-    <div className="grid w-full gap-4 place-items-center">
+    <div id="profile-picture-modal" className="grid w-full gap-4 place-items-center">
       {showEditor ? (
-        <div className="animate-fade-in-up w-full">
+        <div id="image-editor-container" className="animate-fade-in-up w-full">
           <ImageEditor
             sourceImage={uploadedImage as string}
             onSave={(dataUrl) => {
@@ -187,15 +179,17 @@ const ProfilePictureModal = ({
         </div>
       ) : (
         <>
-          <div className="relative group">
+          <div id="profile-image-container" className="relative group">
             <img
+              id="profile-image"
               src={editedImage || profilePic}
               alt="Profile"
               className="w-40 h-40 md:w-56 md:h-56 rounded-full ring-4 ring-gray-200 dark:ring-gray-600 transition-all duration-300"
             />
           </div>
-          <div className="flex flex-grow flex-wrap w-full items-center gap-4 p-4 bg-white dark:bg-gray-800 rounded-xl shadow-lg transition-colors duration-300">
+          <div id="profile-actions" className="flex flex-grow flex-wrap w-full items-center gap-4 p-4 bg-white dark:bg-gray-800 rounded-xl shadow-lg transition-colors duration-300">
             <button
+              id="edit-button"
               disabled={
                 (userBio?.is_default_profile_photo && editedImage === null) ||
                 isSubmitting
@@ -208,6 +202,7 @@ const ProfilePictureModal = ({
             </button>
 
             <button
+              id="upload-button"
               onClick={onUpload}
               className="flex flex-grow items-center gap-2 text-gray-600 dark:text-gray-300 hover:text-green-500 dark:hover:text-green-400 transition-colors duration-200"
             >
@@ -216,6 +211,7 @@ const ProfilePictureModal = ({
             </button>
 
             <button
+              id="delete-button"
               disabled={userBio?.is_default_profile_photo || isSubmitting}
               onClick={onDelete}
               className="flex flex-grow disabled:opacity-65 cursor-not-allowed items-center gap-2 text-gray-600 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-400 transition-colors duration-200"
@@ -225,6 +221,7 @@ const ProfilePictureModal = ({
             </button>
 
             <button
+              id="save-button"
               onClick={onSave}
               disabled={
                 isSubmitting ||

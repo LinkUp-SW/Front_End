@@ -298,10 +298,10 @@ export default function ImageEditor({
   };
 
   return (
-    <div className="container mx-auto py-8 px-4 animate-fade-in">
-      <Card className="w-full max-w-4xl mx-auto bg-white dark:bg-gray-800 shadow-lg">
-        <CardHeader className="flex flex-row justify-between items-center border-b border-gray-200 dark:border-gray-700">
-          <CardTitle className="text-2xl text-gray-800 dark:text-white">
+    <div id="image-editor-container" className="container mx-auto py-8 px-4 animate-fade-in">
+      <Card id="image-editor-card" className="w-full max-w-4xl mx-auto bg-white dark:bg-gray-800 shadow-lg">
+        <CardHeader id="image-editor-header" className="flex flex-row justify-between items-center border-b border-gray-200 dark:border-gray-700">
+          <CardTitle id="image-editor-title" className="text-2xl text-gray-800 dark:text-white">
             Edit Profile Picture
           </CardTitle>
         </CardHeader>
@@ -311,6 +311,7 @@ export default function ImageEditor({
             <div className="space-y-4">
               <div className="border border-gray-200 rounded-md overflow-hidden bg-gray-50 dark:bg-gray-700">
                 <canvas
+                  id="image-editor-canvas"
                   ref={canvasRef}
                   className="max-w-full max-h-[400px] h-full mx-auto"
                   onMouseDown={handleMouseDown}
@@ -324,26 +325,20 @@ export default function ImageEditor({
               </div>
             </div>
 
-            <div>
+            <div id="image-editor-tabs">
               <Tabs defaultValue="adjustments">
                 <TabsList className="w-full mb-4 bg-gray-50 dark:bg-gray-700">
-                  <TabsTrigger
-                    value="adjustments"
-                    className="flex-1 text-gray-800 dark:text-gray-200"
-                  >
+                  <TabsTrigger id="adjustments-tab" value="adjustments" className="flex-1 text-gray-800 dark:text-gray-200">
                     <SlidersHorizontal className="h-4 w-4 mr-2" />
                     Adjustments
                   </TabsTrigger>
-                  <TabsTrigger
-                    value="crop"
-                    className="flex-1 text-gray-800 dark:text-gray-200"
-                  >
+                  <TabsTrigger id="crop-tab" value="crop" className="flex-1 text-gray-800 dark:text-gray-200">
                     <Crop className="h-4 w-4 mr-2" />
                     Crop
                   </TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="adjustments" className="space-y-6">
+                <TabsContent id="adjustments-content" value="adjustments" className="space-y-6">
                   <div className="space-y-4">
                     <div className="space-y-2">
                       <div className="flex justify-between">
@@ -355,6 +350,7 @@ export default function ImageEditor({
                         </span>
                       </div>
                       <Slider
+                        id="brightness-slider"
                         min={0}
                         max={200}
                         value={[adjustments.brightness]}
@@ -377,6 +373,7 @@ export default function ImageEditor({
                         </span>
                       </div>
                       <Slider
+                        id="contrast-slider"
                         min={0}
                         max={200}
                         value={[adjustments.contrast]}
@@ -399,6 +396,7 @@ export default function ImageEditor({
                         </span>
                       </div>
                       <Slider
+                        id="saturation-slider"
                         min={0}
                         max={200}
                         value={[adjustments.saturation]}
@@ -421,6 +419,7 @@ export default function ImageEditor({
                         </span>
                       </div>
                       <Slider
+                        id="vignette-slider"
                         min={0}
                         max={100}
                         value={[adjustments.vignette]}
@@ -435,13 +434,13 @@ export default function ImageEditor({
                   </div>
                 </TabsContent>
 
-                <TabsContent value="crop" className="space-y-4">
+                <TabsContent id="crop-content" value="crop" className="space-y-4">
                   {cropMode && (
                     <div className="flex gap-2 mb-2">
-                      <Button variant="outline" onClick={setPresetSquare}>
+                      <Button id="preset-square" variant="outline" onClick={setPresetSquare}>
                         Square
                       </Button>
-                      <Button variant="outline" onClick={setPreset16_9}>
+                      <Button id="preset-16-9" variant="outline" onClick={setPreset16_9}>
                         16:9
                       </Button>
                     </div>
@@ -449,6 +448,7 @@ export default function ImageEditor({
                   <div className="space-y-4">
                     {!cropMode ? (
                       <Button
+                        id="start-cropping-button"
                         onClick={() => {
                           setCropMode(true);
                           setPreviewDataUrl(null);
@@ -461,14 +461,14 @@ export default function ImageEditor({
                     ) : (
                       <div className="space-y-2">
                         <p className="text-sm text-gray-500">
-                          Drag or use presets to select crop area. Preview shown
-                          below.
+                          Drag or use presets to select crop area. Preview shown below.
                         </p>
                         <div className="flex gap-2">
-                          <Button onClick={handleApplyCrop} className="flex-1">
+                          <Button id="apply-crop-button" onClick={handleApplyCrop} className="flex-1">
                             Apply Crop
                           </Button>
                           <Button
+                            id="cancel-crop-button"
                             variant="outline"
                             onClick={() => {
                               setCropMode(false);
@@ -490,6 +490,7 @@ export default function ImageEditor({
 
         <CardFooter className="flex justify-between bg-white dark:bg-gray-800">
           <Button
+            id="editor-cancel-button"
             variant="outline"
             onClick={onCancel}
             className="destructiveBtn"
@@ -497,8 +498,9 @@ export default function ImageEditor({
             Cancel
           </Button>
           <Button
+            id="editor-save-button"
             onClick={handleSave}
-            className="flex items-center gap-2  affimativeBtn"
+            className="flex items-center gap-2 affimativeBtn"
           >
             <Download className="h-4 w-4" />
             Save Changes
