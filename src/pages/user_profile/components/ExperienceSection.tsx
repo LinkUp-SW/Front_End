@@ -192,7 +192,7 @@ const ExperienceSection: React.FC = () => {
         >
           <DialogHeader>
             <DialogTitle className="text-lg flex items-center gap-2">
-              <MdDeleteForever className="text-red-500" />
+              <MdDeleteForever className="text-pink-500" />
               Delete Experience?
             </DialogTitle>
             <DialogDescription className="pt-2 text-gray-600 dark:text-gray-300">
@@ -204,14 +204,14 @@ const ExperienceSection: React.FC = () => {
             <Button
               variant="outline"
               onClick={() => setDeleteDialogOpen(false)}
-              className="border-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+              className="border-gray-300 hover:bg-gray-100 dark:text-black dark:hover:bg-gray-700 dark:hover:text-white dark:border-gray-700 transition-all duration-300 ease-in-out"
             >
               Cancel
             </Button>
             <Button
               variant="destructive"
               onClick={handleConfirmDelete}
-              className="bg-red-500 hover:bg-red-600 focus-visible:ring-red-500"
+              className="bg-pink-700 hover:bg-pink-900 focus-visible:ring-pink-700 transition-all duration-300 ease-in-out"
             >
               Delete
             </Button>

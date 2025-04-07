@@ -16,14 +16,13 @@ import Header from "./modals/components/Header";
 import useFetchData from "@/hooks/useFetchData";
 import Cookies from "js-cookie";
 import { Link, useParams } from "react-router-dom";
-import { getUserLicenses,  removeLicense } from "@/endpoints/userProfile";
+import { getUserLicenses, removeLicense } from "@/endpoints/userProfile";
 import { formatExperienceDate } from "@/utils";
 import { toast } from "sonner";
 import { getErrorMessage } from "@/utils/errorHandler";
 import AddLicenseModal from "./modals/license_modal/AddLicenseModal";
 import EditLicenseModal from "./modals/license_modal/EditLicenseModal";
 import { LiaCertificateSolid } from "react-icons/lia";
-
 
 interface FetchDataResult {
   licenses: License[];
@@ -115,7 +114,7 @@ const LicenseSection: React.FC = () => {
     setLicenseToEdit(null);
   };
 
-  if(!isMe&&isEmpty) return null
+  if (!isMe && isEmpty) return null;
 
   return (
     <section
@@ -133,9 +132,7 @@ const LicenseSection: React.FC = () => {
       {isEmpty ? (
         isMe ? (
           <EmptyLicense onAddLicense={handleAddLicense} />
-        ) : (
-          null
-        )
+        ) : null
       ) : (
         <LicenseList
           licenses={licenses}
@@ -186,7 +183,7 @@ const LicenseSection: React.FC = () => {
         >
           <DialogHeader>
             <DialogTitle className="text-lg flex items-center gap-2">
-              <MdDeleteForever className="text-red-500" />
+              <MdDeleteForever className="text-pink-500" />
               Delete License?
             </DialogTitle>
             <DialogDescription className="pt-2 text-gray-600 dark:text-gray-300">
@@ -198,14 +195,14 @@ const LicenseSection: React.FC = () => {
             <Button
               variant="outline"
               onClick={() => setDeleteDialogOpen(false)}
-              className="border-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+              className="border-gray-300 hover:bg-gray-100 dark:text-black dark:hover:bg-gray-700 dark:hover:text-white dark:border-gray-700 transition-all duration-300 ease-in-out"
             >
               Cancel
             </Button>
             <Button
               variant="destructive"
               onClick={handleConfirmDelete}
-              className="bg-red-500 hover:bg-red-600 focus-visible:ring-red-500"
+              className="bg-pink-700 hover:bg-pink-900 focus-visible:ring-pink-700 transition-all duration-300 ease-in-out"
             >
               Delete
             </Button>
@@ -411,7 +408,7 @@ const EmptyLicense: React.FC<{
       >
         <div id="empty-license-icon" className="p-3 rounded-xl border-2">
           <span role="img" aria-label="license">
-            <LiaCertificateSolid size={20}/>
+            <LiaCertificateSolid size={20} />
           </span>
         </div>
         <div
@@ -465,8 +462,6 @@ const EmptyLicense: React.FC<{
     </div>
   );
 };
-
-
 
 const SkeletonLoader: React.FC = () => (
   <div className="animate-pulse space-y-4">
