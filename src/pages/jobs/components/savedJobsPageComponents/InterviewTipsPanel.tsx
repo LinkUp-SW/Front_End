@@ -1,4 +1,3 @@
-// InterviewTipsPanel.tsx
 import React from 'react';
 
 const InterviewTipsPanel: React.FC = () => {
@@ -25,7 +24,7 @@ const InterviewTipsPanel: React.FC = () => {
         </div>
       </div>
       
-      <button className="w-full mt-4 text-center py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md transition-colors">
+      <button id="see-all-questions-btn" className="w-full mt-4 text-center py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md transition-colors">
         See all questions
       </button>
     </div>
