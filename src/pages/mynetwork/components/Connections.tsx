@@ -30,6 +30,8 @@ const Connections: React.FC = () => {
 
   const observer = useRef<IntersectionObserver | null>(null);
   const hasFetchedInitial = useRef(false); // Prevents double fetching on mount
+  const [openDialogUserId, setOpenDialogUserId] = useState<string | null>(null);
+
 
   const handleRemoveConnection = useCallback(
     async (userId: string) => {
@@ -157,12 +159,17 @@ const Connections: React.FC = () => {
                   >
                     Message
                   </button>
-                  <Dialog>
+                  <Dialog
+                   open={openDialogUserId === conn.user_id}
+                   onOpenChange={(open) => {
+                     if (!open) setOpenDialogUserId(null);
+                   }}>
                     <DialogTrigger asChild>
                       <button
                         id="remove-connection-button"
                         className="flex items-center justify-center text-gray-700 dark:text-white cursor-pointer transition duration-200"
                         aria-label={`Remove connection with ${conn.name}`}
+                        onClick={() => setOpenDialogUserId(conn.user_id)}
                       >
                         <FaTimes className="mr-2 flex-shrink-0" />
                       </button>
@@ -174,6 +181,7 @@ const Connections: React.FC = () => {
                       <RemoveConnectionModal
                         userData={{ userName: conn.name, userId: conn.user_id }}
                         onConfirm={() => handleRemoveConnection(conn.user_id)}
+                        onCancel={() => setOpenDialogUserId(null)} 
                       />
                       <DialogHeader>
                         <DialogTitle></DialogTitle>

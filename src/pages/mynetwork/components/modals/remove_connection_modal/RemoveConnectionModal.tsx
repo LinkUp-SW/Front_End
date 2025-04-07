@@ -6,11 +6,14 @@ import { RemoveConnectionData } from "@/types";
 interface RemoveConnectionModalProps {
   userData: RemoveConnectionData;
   onConfirm: () => void;
+  onCancel: () => void; 
+
 }
 
 const RemoveConnectionModal: React.FC<RemoveConnectionModalProps> = ({
   userData,
   onConfirm,
+  onCancel,
 }) => {
   const dispatch = useDispatch();
 
@@ -36,7 +39,7 @@ const RemoveConnectionModal: React.FC<RemoveConnectionModalProps> = ({
           </button>
           <button
             id="cancel-remove-connection-button"
-            onClick={() => dispatch(closeModal())}
+            onClick={onCancel}
             className="px-4 py-2 bg-gray-300 text-gray-900 rounded cursor-pointer hover:bg-gray-400 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
           >
             Cancel
