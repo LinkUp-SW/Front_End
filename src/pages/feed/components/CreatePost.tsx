@@ -204,6 +204,7 @@ const CreatePost: React.FC = () => {
               <DialogTrigger asChild className="w-full">
                 <Button
                   variant="ghost"
+                  id="create-post-button"
                   className="w-[90%] h-11 border p-4 hover:bg-gray-200 dark:hover:bg-zinc-800 transition-colors hover:cursor-pointer hover:text-gray-950 dark:hover:text-neutral-200 rounded-full border-gray-400 font-medium text-black focus:outline-none text-left dark:text-neutral-300"
                 >
                   <p className="w-full">Start a post</p>

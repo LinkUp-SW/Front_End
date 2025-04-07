@@ -271,7 +271,10 @@ const UploadMediaModal: React.FC<UploadMediaModalProps> = ({
 
       {/* Footer Buttons */}
       <div className="flex w-full justify-end gap-2 px-5 mt-8 absolute top-[28.8rem] lg:top-[31.8rem] lg:right-[0.01rem]">
-        <TransparentButton onClick={() => setActiveModal("create-post")}>
+        <TransparentButton
+          id="back-button"
+          onClick={() => setActiveModal("create-post")}
+        >
           Back
         </TransparentButton>
         <BlueButton
@@ -280,6 +283,7 @@ const UploadMediaModal: React.FC<UploadMediaModalProps> = ({
             setActiveModal("create-post");
           }}
           disabled={currentSelectedMedia.length === 0}
+          id="next-button"
         >
           Next
         </BlueButton>

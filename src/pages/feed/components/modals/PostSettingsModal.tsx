@@ -35,6 +35,7 @@ const PostSettingsModal: React.FC<PostSettingsModalProps> = ({
           onClick={() => {
             setCurrentSettings("Anyone");
           }}
+          id="anyone-button"
         />
         <RadioButton
           icon={<PeopleIcon size={25} />}
@@ -43,11 +44,13 @@ const PostSettingsModal: React.FC<PostSettingsModalProps> = ({
           onClick={() => {
             setCurrentSettings("Connections only");
           }}
+          id="connections-only-button"
         />
       </div>
       <button
         className="flex items-center pl-6 mb-5 justify-between hover:cursor-pointer w-full p-2 py-5  hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
         onClick={() => setActiveModal("comment-control")}
+        id="comment-control-button"
       >
         {/* Text Content */}
         <div className="flex flex-col items-start">
@@ -78,7 +81,10 @@ const PostSettingsModal: React.FC<PostSettingsModalProps> = ({
         </div>
       </button>
       <div className="flex w-full justify-end gap-2 px-5 border-t dark:border-gray-700 pt-5">
-        <TransparentButton onClick={() => setActiveModal("create-post")}>
+        <TransparentButton
+          id="back-button"
+          onClick={() => setActiveModal("create-post")}
+        >
           Back
         </TransparentButton>
         <BlueButton
@@ -89,6 +95,7 @@ const PostSettingsModal: React.FC<PostSettingsModalProps> = ({
             }
           }}
           disabled={currentSettings == privacySetting}
+          id="done-button"
         >
           Done
         </BlueButton>

@@ -6,6 +6,7 @@ interface RadioButtonProps {
   subtitle?: string; // Optional subtitle text
   isSelected: boolean; // Whether the radio button is selected
   onClick: () => void; // Click handler
+  id?: string;
 }
 
 const RadioButton: React.FC<RadioButtonProps> = ({
@@ -14,12 +15,14 @@ const RadioButton: React.FC<RadioButtonProps> = ({
   subtitle,
   isSelected,
   onClick,
+  id,
 }) => {
   return (
     <div
       className={`flex items-center gap-4 py-4 justify-between cursor-pointer
         hover:bg-gray-100 dark:hover:bg-gray-800`}
       onClick={onClick}
+      id={id}
     >
       <div className="flex gap-4 px-4">
         {/* Icon */}

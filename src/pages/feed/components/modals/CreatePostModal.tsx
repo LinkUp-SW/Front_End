@@ -60,6 +60,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
       <div className="bg-white dark:bg-gray-900 w-full z-10 h-[5rem] pt-2 sticky -top-4">
         <div
           onClick={() => setActiveModal("settings")}
+          id="post-settings-button"
           className="flex w-fit z-0 p-2  gap-4 hover:cursor-pointer hover:bg-gray-300 dark:hover:bg-gray-700 rounded-2xl"
         >
           <Avatar className="h-12 w-12 pl-0">
@@ -145,7 +146,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
               <Popover>
                 <PopoverTrigger asChild>
                   <TooltipTrigger asChild>
-                    <IconButton>
+                    <IconButton id="emoji-button">
                       <MdOutlineEmojiEmotions />
                     </IconButton>
                   </TooltipTrigger>
@@ -179,7 +180,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
                     }}
                     asChild
                   >
-                    <IconButton>
+                    <IconButton id="add-media-button">
                       <MediaIcon />
                     </IconButton>
                   </TooltipTrigger>
@@ -195,7 +196,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
                     onClick={() => setActiveModal("add-document")}
                     asChild
                   >
-                    <IconButton>
+                    <IconButton id="add-document-button">
                       <DocumentIcon></DocumentIcon>
                     </IconButton>
                   </TooltipTrigger>
@@ -225,6 +226,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
           <BlueButton
             onClick={submitPost}
             disabled={postText.length == 0 && selectedMedia.length == 0}
+            id="post-button"
           >
             Post
           </BlueButton>

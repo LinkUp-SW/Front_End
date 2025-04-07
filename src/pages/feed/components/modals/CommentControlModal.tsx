@@ -37,6 +37,7 @@ const CommentControlModal: React.FC<CommentControlModalProps> = ({
           onClick={() => {
             setCurrentSelection("Anyone");
           }}
+          id="anyone-button"
         />
         <RadioButton
           icon={<PeopleIcon size={25} />}
@@ -46,6 +47,7 @@ const CommentControlModal: React.FC<CommentControlModalProps> = ({
           onClick={() => {
             setCurrentSelection("Connections only");
           }}
+          id="connections-only-button"
         />
         <RadioButton
           icon={<MessageCrossIcon size={25} />}
@@ -55,11 +57,15 @@ const CommentControlModal: React.FC<CommentControlModalProps> = ({
           onClick={() => {
             setCurrentSelection("No one");
           }}
+          id="no-one-button"
         />
       </div>
 
       <div className="flex w-full justify-end gap-2 px-5 border-t pt-5 dark:border-gray-700 relative top-5">
-        <TransparentButton onClick={() => setActiveModal("settings")}>
+        <TransparentButton
+          id="back-button"
+          onClick={() => setActiveModal("settings")}
+        >
           Back
         </TransparentButton>
         <BlueButton
@@ -70,6 +76,7 @@ const CommentControlModal: React.FC<CommentControlModalProps> = ({
             }
           }}
           disabled={currentSelection === commentSetting}
+          id="done-button"
         >
           Done
         </BlueButton>

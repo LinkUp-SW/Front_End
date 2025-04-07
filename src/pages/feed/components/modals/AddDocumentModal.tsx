@@ -11,10 +11,13 @@ const AddDocumentModal: React.FC<AddDocumentModalProps> = ({
   return (
     <div className="flex-col flex px-4">
       <div className="flex w-full justify-end gap-2 px-5">
-        <TransparentButton onClick={() => setActiveModal("create-post")}>
+        <TransparentButton
+          id="back-button"
+          onClick={() => setActiveModal("create-post")}
+        >
           Back
         </TransparentButton>
-        <BlueButton>Done</BlueButton>
+        <BlueButton id="done-button">Done</BlueButton>
       </div>
     </div>
   );
