@@ -202,7 +202,7 @@ const EducationSection: React.FC = () => {
             <Button
               variant="destructive"
               onClick={handleConfirmDelete}
-              className="bg-pink-700 hover:bg-pink-900 focus-visible:ring-pink-700 transition-all duration-300 ease-in-out"
+              className="destructiveBtn"
             >
               Delete
             </Button>
