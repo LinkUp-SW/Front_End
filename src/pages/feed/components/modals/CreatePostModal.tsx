@@ -106,6 +106,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
                 }}
                 size={"icon"}
                 className="text-white bg-gray-700 dark:hover:bg-neutral-400 hover:bg-gray-800 dark:text-neutral-700 dark:bg-neutral-200"
+                id="edit-button"
               >
                 <EditIcon />
               </IconButton>
@@ -116,6 +117,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
                   console.log(selectedMedia);
                 }}
                 className=" rounded-full h-10 w-10 dark:bg-gray-200 dark:hover:bg-neutral-400  text-white bg-gray-700 hover:bg-gray-800 dark:text-gray-900"
+                id="remove-media-button"
               >
                 <CloseIcon />
               </IconButton>

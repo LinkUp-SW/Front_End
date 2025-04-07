@@ -152,7 +152,11 @@ const UploadMediaModal: React.FC<UploadMediaModalProps> = ({
                 Share images or a single video in your post.
               </p>
               <div className="pb-5 pt-3">
-                <BlueButton onClick={() => triggerFileInput()} size={"sm"}>
+                <BlueButton
+                  id="upload-button"
+                  onClick={() => triggerFileInput()}
+                  size={"sm"}
+                >
                   Upload from computer
                 </BlueButton>
               </div>
@@ -169,6 +173,7 @@ const UploadMediaModal: React.FC<UploadMediaModalProps> = ({
                 <div
                   key={index}
                   onClick={() => setSelectedIndex(index)}
+                  id={"image-" + index}
                   className={`relative flex flex-col items-center justify-center border rounded-lg cursor-pointer p-2 ${
                     index === selectedIndex
                       ? "border-blue-500 dark:border-blue-400"
@@ -199,8 +204,6 @@ const UploadMediaModal: React.FC<UploadMediaModalProps> = ({
 
                   {/* Index Display */}
                   <p className="text-sm text-gray-300 mt-2">0{index + 1}</p>
-
-                  {/* Action Buttons */}
                 </div>
               ))}
             </div>
@@ -211,6 +214,7 @@ const UploadMediaModal: React.FC<UploadMediaModalProps> = ({
                     <IconButton
                       className="p-2 dark:bg-gray-800 dark:text-white rounded-full dark:hover:bg-gray-700"
                       title="Duplicate"
+                      id="duplicate-button"
                     >
                       <FaCopy />
                     </IconButton>
@@ -228,6 +232,7 @@ const UploadMediaModal: React.FC<UploadMediaModalProps> = ({
                     <IconButton
                       className=" dark:text-white !p-0 w-10 h-10  rounded-full"
                       title="Delete"
+                      id="delete-button"
                     >
                       <GarbageIcon></GarbageIcon>
                     </IconButton>
@@ -245,6 +250,7 @@ const UploadMediaModal: React.FC<UploadMediaModalProps> = ({
                     <IconButton
                       className="p-2 h-10 w-10 border-1 hover:border-2 light:border-neutral-700 dark:text-white rounded-full"
                       title="Add"
+                      id="add-button"
                     >
                       <FaPlus />
                     </IconButton>
@@ -267,6 +273,7 @@ const UploadMediaModal: React.FC<UploadMediaModalProps> = ({
         onChange={handleAdd}
         multiple
         className="hidden"
+        id="file-input"
       />
 
       {/* Footer Buttons */}

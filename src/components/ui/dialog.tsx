@@ -29,6 +29,7 @@ function DialogClose({
     <DialogPrimitive.Close
       data-slot="dialog-close"
       className="z-50"
+      id="modal-close"
       {...props}
     />
   );
