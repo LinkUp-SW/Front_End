@@ -239,3 +239,32 @@ export interface License {
   skills: string[];
   media: Media[];
 }
+
+export interface SkillForm {
+  name: string;
+  educations: string[];
+  experiences: string[];
+  licenses: string[];
+}
+
+export interface Skill {
+  _id?: string;
+  name: string;
+  endorsments: Endorsement[];
+  educations: Organization[];
+  experiences: Organization[];
+  licenses: Organization[];
+}
+
+export interface Endorsement {
+  user_id: string;
+  profile_photo: string;
+  name: string;
+}
+
+
+export interface SkillUserSections{
+  educations: Organization[];
+  experiences: Organization[];
+  licenses: Organization[];
+}

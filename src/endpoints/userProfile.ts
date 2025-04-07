@@ -6,6 +6,9 @@ import {
   License,
   Organization,
   ProfileCardType,
+  Skill,
+  SkillForm,
+  SkillUserSections,
   UserProfileBio,
 } from "@/types";
 import axios from "axios";
@@ -86,9 +89,28 @@ export const getUserEducation = async (token: string, userId: string) => {
   return response.data;
 };
 
-export const getUserSkills = async (token: string, userId: string) => {
+export const getUserSkills = async (
+  token: string,
+  userId: string
+): Promise<{ is_me: boolean; skills: Skill[] }> => {
   const response = await axiosInstance.get(
     `/api/v1/user/profile/skills/${userId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
+
+export const addUserSkills = async (
+  token: string,
+  skillsForm: SkillForm
+): Promise<{ message: string; skill: Skill }> => {
+  const response = await axiosInstance.post(
+    `/api/v1/user/add-skill`,
+    skillsForm,
     {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -335,7 +357,7 @@ export const removeLicense = async (
 
 export const deleteUserProfileImage = async (
   token: string
-): Promise<{ message: string,profilePicture:string }> => {
+): Promise<{ message: string; profilePicture: string }> => {
   const response = await axiosInstance.delete(
     `/api/v1/user/profile/profile-picture`,
     {
@@ -384,5 +406,16 @@ export const uploadUserProfileImage = async (
     }
   );
 
+  return response.data;
+};
+
+export const getUserSections = async (
+  token: string
+): Promise<SkillUserSections> => {
+  const response = await axiosInstance.get(`/api/v1/user/get-user-sections`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
   return response.data;
 };
