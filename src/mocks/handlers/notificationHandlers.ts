@@ -1,12 +1,14 @@
 import { Notification } from "@/types";
 import { createGetHandler } from "../handler_wrapper/getHandler";
+import { createPostHandler } from "../handler_wrapper/createPostHandler";
+import { HttpResponse } from "msw";
 
 // Mock notifications
 const MOCK_NOTIFICATIONS: Notification[] = [
   {
     id: "1",
     type: "post",
-    content: "<b>Ghada</b> liked your post about machine learning.",
+    content: "**Ghada** liked your post about machine learning.",
     time: "4h",
     profileImg: "/api/placeholder/50/50",
     isNew: true,
@@ -14,7 +16,7 @@ const MOCK_NOTIFICATIONS: Notification[] = [
   {
     id: "2",
     type: "post",
-    content: "<b>Nada</b> commented on your recent project update.",
+    content: "**Nada** commented on your recent project update.",
     time: "4h",
     profileImg: "/api/placeholder/50/50",
     isNew: true,
@@ -22,7 +24,7 @@ const MOCK_NOTIFICATIONS: Notification[] = [
   {
     id: "3",
     type: "recommendation",
-    content: "<b>Connection Request</b> from <b>Malak</b>",
+    content: "**Connection Request** from **Malak**",
     time: "11h",
     profileImg: "/api/placeholder/50/50",
     action: "View requests",
@@ -32,7 +34,7 @@ const MOCK_NOTIFICATIONS: Notification[] = [
   {
     id: "4",
     type: "job",
-    content: "software engineer: <b>30+ opportunities</b> in Cairo, Egypt",
+    content: "software engineer: **30+ opportunities** in Cairo, Egypt",
     time: "20h",
     profileImg: "/api/placeholder/50/50",
     action: "View jobs",
@@ -42,12 +44,12 @@ const MOCK_NOTIFICATIONS: Notification[] = [
   {
     id: "5",
     type: "job",
-    content: "frontend developer: <b>15+ opportunities</b> in Dubai, UAE",
+    content: "frontend developer: **15+ opportunities** in Dubai, UAE",
     time: "1d",
     profileImg: "/api/placeholder/50/50",
     action: "View jobs",
     actionLink: "#",
-    isNew: false,
+    isNew: true,
   },
   {
     id: "6",
@@ -55,7 +57,7 @@ const MOCK_NOTIFICATIONS: Notification[] = [
     content: "Sama replied to your comment.",
     time: "1d",
     profileImg: "/api/placeholder/50/50",
-    isNew: false,
+    isNew: true,
   },
   {
     id: "7",
@@ -65,22 +67,88 @@ const MOCK_NOTIFICATIONS: Notification[] = [
     profileImg: "/api/placeholder/50/50",
     action: "View requests",
     actionLink: "#",
-    isNew: false,
+    isNew: true,
   },
   {
     id: "8",
     type: "post",
-    content: "<b> Sama </b> shared your post.",
+    content: "** Sama ** shared your post.",
     time: "3d",
     profileImg: "/api/placeholder/50/50",
-    isNew: false,
+    isNew: true,
+  },
+  {
+    id: "m1",
+    type: "message",
+    content: "**Sarah** sent you a message about your recent post",
+    time: "1h",
+    profileImg: "/api/placeholder/50/50",
+    isNew: true
+  },
+  {
+    id: "m2",
+    type: "message",
+    content: "**Ahmed** replied to your message in the group chat",
+    time: "5h",
+    profileImg: "/api/placeholder/50/50",
+    isNew: true
+  },
+  {
+    id: "m3",
+    type: "message",
+    content: "**Leila** shared a document with you via direct message",
+    time: "1d",
+    profileImg: "/api/placeholder/50/50",
+    isNew: true
   }
 ];
 
-// Notifications
+// Keep a reference to the array so we can modify it
+const notifications = [...MOCK_NOTIFICATIONS];
+
+// Define the type for the payload of the markAsRead request
+interface MarkAsReadBody {
+  notificationId: string;
+}
+
+// Notifications handlers
 export const notificationHandlers = [
-  createGetHandler<Notification[]>(
+  // GET handler for fetching notifications
+  createGetHandler(
     "/api/notifications",
-    () => MOCK_NOTIFICATIONS
+    () => notifications
   ),
+  
+  // POST handler for marking a notification as read
+  createPostHandler<{ success: boolean }, MarkAsReadBody>(
+    "/api/notifications/read",
+    (req) => {
+      const { notificationId } = req.body;
+      
+      if (!notificationId) {
+        return new HttpResponse(null, {
+          status: 400,
+          statusText: "Bad Request: Missing notification ID"
+        });
+      }
+      
+      // Find the notification index
+      const notificationIndex = notifications.findIndex(n => n.id === notificationId);
+      
+      if (notificationIndex === -1) {
+        return new HttpResponse(null, {
+          status: 404,
+          statusText: "Not Found: Notification does not exist"
+        });
+      }
+      
+      // Update the notification's isNew status
+      notifications[notificationIndex] = {
+        ...notifications[notificationIndex],
+        isNew: false
+      };
+      
+      return { success: true };
+    }
+  )
 ];
