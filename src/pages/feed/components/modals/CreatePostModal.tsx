@@ -57,7 +57,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
 
   return (
     <div className="flex flex-col relative items-start gap-4 w-full px-4 ">
-      <div className="bg-white dark:bg-gray-900 w-full z-0 h-[5rem] pt-2 sticky -top-4">
+      <div className="bg-white dark:bg-gray-900 w-full z-10 h-[5rem] pt-2 sticky -top-4">
         <div
           onClick={() => setActiveModal("settings")}
           className="flex w-fit z-0 p-2  gap-4 hover:cursor-pointer hover:bg-gray-300 dark:hover:bg-gray-700 rounded-2xl"
@@ -104,7 +104,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
                   setActiveModal("add-media");
                 }}
                 size={"icon"}
-                className="text-white bg-gray-700 hover:bg-gray-800 dark:bg-transparent dark:text-gray-900"
+                className="text-white bg-gray-700 dark:hover:bg-neutral-400 hover:bg-gray-800 dark:text-neutral-700 dark:bg-neutral-200"
               >
                 <EditIcon />
               </IconButton>
@@ -114,7 +114,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
                   setSelectedMedia([]);
                   console.log(selectedMedia);
                 }}
-                className="border rounded-full h-10 w-10 dark:bg-gray-200  text-white bg-gray-700 hover:bg-gray-800 dark:text-gray-900"
+                className=" rounded-full h-10 w-10 dark:bg-gray-200 dark:hover:bg-neutral-400  text-white bg-gray-700 hover:bg-gray-800 dark:text-gray-900"
               >
                 <CloseIcon />
               </IconButton>
