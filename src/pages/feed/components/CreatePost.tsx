@@ -32,7 +32,7 @@ const useDismissModal = () => {
   const dismiss = () => {
     // Select the close button using its classes
     const closeButton = document.querySelector(
-      ".z-50.ring-offset-background.focus\\:ring-ring.hover\\:cursor-pointer"
+      "#modal-close-button"
     ) as HTMLButtonElement;
 
     if (closeButton) {
