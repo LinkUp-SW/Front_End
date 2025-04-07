@@ -40,13 +40,13 @@ const UploadMediaModal: React.FC<UploadMediaModalProps> = ({
   const darkMode = useSelector((state: RootState) => state.theme.theme);
 
   const handleDuplicate = () => {
-    currentSelectedMedia
-      ? setCurrentSelectedMedia([
-          ...currentSelectedMedia.slice(0, selectedIndex),
-          currentSelectedMedia[selectedIndex],
-          ...currentSelectedMedia.slice(selectedIndex),
-        ])
-      : null;
+    if (currentSelectedMedia) {
+      setCurrentSelectedMedia([
+        ...currentSelectedMedia.slice(0, selectedIndex),
+        currentSelectedMedia[selectedIndex],
+        ...currentSelectedMedia.slice(selectedIndex),
+      ]);
+    }
   };
 
   const handleDelete = () => {

@@ -83,10 +83,10 @@ const PostSettingsModal: React.FC<PostSettingsModalProps> = ({
         </TransparentButton>
         <BlueButton
           onClick={() => {
-            currentSettings != privacySetting
-              ? (setPrivacySetting(currentSettings),
-                setActiveModal("create-post"))
-              : null;
+            if (currentSettings != privacySetting) {
+              setPrivacySetting(currentSettings);
+              setActiveModal("create-post");
+            }
           }}
           disabled={currentSettings == privacySetting}
         >
