@@ -1,119 +1,87 @@
-import '@testing-library/jest-dom';
-import { describe, test, expect } from 'vitest';
+// tests/FilteredNotifications.test.tsx
+import { describe, it, expect } from 'vitest';
+import { filterNotificationsByTab, Tab, PostFilter } from '../../src/pages/notifications/NotificationsPage';
 import { Notification } from '../../src/types';
-import { filterNotificationsByTab } from '../../src/pages/notifications/NotificationsPage';
 
+const mockNotifications: Notification[] = [
+  {
+    id: '1',
+    type: 'post',
+    content: 'John commented on your post',
+    isNew: true,
+    time: '1h ago',
+    profileImg: '',
+    action: '',
+    actionLink: '',
+  },
+  {
+    id: '2',
+    type: 'post',
+    content: 'Emily liked your post',
+    isNew: false,
+    time: '2h ago',
+    profileImg: '',
+    action: '',
+    actionLink: '',
+  },
+  {
+    id: '3',
+    type: 'message',
+    content: 'You have a new message from Sarah',
+    isNew: true,
+    time: '5h ago',
+    profileImg: '',
+    action: '',
+    actionLink: '',
+  },
+  {
+    id: '4',
+    type: 'post',
+    content: 'Mike shared your post',
+    isNew: false,
+    time: '6h ago',
+    profileImg: '',
+    action: '',
+    actionLink: '',
+  },
+];
 
-describe('filterNotificationsByTab Function', () => {
-  // Use a factory function to create test notifications
-  // This makes it easier to adapt if the notification structure changes
-  const createNotification = (overrides: Partial<Notification> = {}): Notification => {
-    return {
-      id: '1',
-      type: 'post',
-      content: 'Default content',
-      time: '1h',
-      ...overrides
-    };
-  };
-
-  test('filters all notifications when tab is "all"', () => {
-    // Create notifications of different types
-    const notifications = [
-      createNotification({ type: 'post' }),
-      createNotification({ type: 'job', id: '2' })
-    ];
-    
-    const result = filterNotificationsByTab(notifications, 'all');
-    expect(result.length).toBe(2);
-    // Verify we get all notifications without filtering
-    expect(result).toEqual(notifications);
+describe('filterNotificationsByTab', () => {
+  it('returns all notifications for "all" tab', () => {
+    const result = filterNotificationsByTab(mockNotifications, 'all');
+    expect(result).toHaveLength(4);
   });
 
-  test('filters job notifications when tab is "jobs"', () => {
-    // Create mixed notification types
-    const notifications = [
-      createNotification({ type: 'post' }),
-      createNotification({ type: 'job', id: '2' }),
-      createNotification({ type: 'message', id: '3' })
-    ];
-    
-    const result = filterNotificationsByTab(notifications, 'jobs');
-    expect(result.length).toBe(1);
-    expect(result[0].type).toBe('job');
-  });
-
-  test('filters post notifications when tab is "posts" with no filter', () => {
-    // Create mixed notification types
-    const notifications = [
-      createNotification({ type: 'post' }),
-      createNotification({ type: 'job', id: '2' }),
-      createNotification({ type: 'post', id: '3' })
-    ];
-    
-    const result = filterNotificationsByTab(notifications, 'posts');
-    expect(result.length).toBe(2);
-    // Verify each result is a post notification
+  it('returns only "post" notifications for "posts" tab', () => {
+    const result = filterNotificationsByTab(mockNotifications, 'posts');
+    expect(result).toHaveLength(3);
     result.forEach(notification => {
       expect(notification.type).toBe('post');
     });
   });
 
-  test('filters post notifications with comments filter', () => {
-    // Create post notifications with different content types
-    const notifications = [
-      createNotification({ content: 'User commented on your post' }),
-      createNotification({ content: 'User replied to your post', id: '2' }),
-      createNotification({ content: 'User liked your post', id: '3' })
-    ];
-    
-    const result = filterNotificationsByTab(notifications, 'posts', 'comments');
-    expect(result.length).toBe(2);
-    // Verify we have at least one notification with each type of content
-    expect(result.some(n => n.content.includes('commented'))).toBe(true);
-    expect(result.some(n => n.content.includes('replied'))).toBe(true);
+  it('returns only "message" notifications for "messages" tab', () => {
+    const result = filterNotificationsByTab(mockNotifications, 'messages');
+    expect(result).toHaveLength(1);
+    expect(result[0].type).toBe('message');
   });
 
-  test('filters post notifications with reactions filter', () => {
-    // Create post notifications with different content types
-    const notifications = [
-      createNotification({ content: 'User liked your post' }),
-      createNotification({ content: 'User shared your post', id: '2' }),
-      createNotification({ content: 'User commented on your post', id: '3' })
-    ];
-    
-    const result = filterNotificationsByTab(notifications, 'posts', 'reactions');
-    expect(result.length).toBe(2);
-    // Verify we have at least one notification with each type of content
-    expect(result.some(n => n.content.includes('liked'))).toBe(true);
-    expect(result.some(n => n.content.includes('shared'))).toBe(true);
+  it('filters "post" notifications to only include comments', () => {
+    const result = filterNotificationsByTab(mockNotifications, 'posts', 'comments');
+    expect(result).toHaveLength(1);
+    expect(result[0].content.toLowerCase()).toContain('comment');
   });
 
-  test('filters mention notifications when tab is "mentions"', () => {
-    // Create notifications with and without mentions
-    const notifications = [
-      createNotification({ content: 'Regular post' }),
-      createNotification({ content: 'User @mentioned you', id: '2' })
-    ];
-    
-    const result = filterNotificationsByTab(notifications, 'mentions');
-    expect(result.length).toBe(1);
-    expect(result[0].content).toContain('@');
+  it('filters "post" notifications to only include reactions', () => {
+    const result = filterNotificationsByTab(mockNotifications, 'posts', 'reactions');
+    expect(result).toHaveLength(2);
+    expect(result[0].content.toLowerCase()).toMatch(/liked|shared/);
+    expect(result[1].content.toLowerCase()).toMatch(/liked|shared/);
   });
 
-  test('returns empty array when no notifications match filter', () => {
-    // Create notifications without any mentions
-    const notifications = [
-      createNotification({ content: 'No mentions here' })
-    ];
-    
-    const result = filterNotificationsByTab(notifications, 'mentions');
-    expect(result.length).toBe(0);
-  });
-
-  test('handles empty notifications array', () => {
-    const result = filterNotificationsByTab([], 'all');
-    expect(result.length).toBe(0);
-    expect(result).toEqual([]);
+  it('returns empty list if no matching notifications', () => {
+    const emptyInput: Notification[] = [];
+    const result = filterNotificationsByTab(emptyInput, 'posts');
+    expect(result).toHaveLength(0);
   });
 });
