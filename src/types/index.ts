@@ -25,9 +25,9 @@ export interface Notification {
   actionLink?: string;
   location?: string;
   count?: number;
-  isNew?: boolean;
-  read?: boolean;
+  isNew: boolean;  // Make isNew non-optional to avoid undefined checks
 }
+
 
 export interface PostType {
   user: {

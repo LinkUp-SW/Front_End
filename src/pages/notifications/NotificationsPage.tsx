@@ -8,7 +8,7 @@ import { getNotifications, markNotificationAsRead } from '@/endpoints/notificati
 import { Notification } from '../../types';
 
 // Define tab types for notification filtering
-export type Tab = 'all' | 'jobs' | 'posts' | 'mentions';
+export type Tab = 'all' | 'posts' | 'messages';
 export type PostFilter = 'all' | 'comments' | 'reactions';
 
 // Extract the filterNotificationsByTab function and export it separately
@@ -18,12 +18,6 @@ export const filterNotificationsByTab = (
   activePostFilter?: PostFilter
 ): Notification[] => {
   switch (activeTab) {
-    case 'jobs': {
-      return notifications.filter(notification => 
-        notification.type === 'job'
-      );
-    }
-
     case 'posts': {
       const postNotifications = notifications.filter(notification => 
         notification.type === 'post'
@@ -45,10 +39,10 @@ export const filterNotificationsByTab = (
 
       return postNotifications;
     }
-
-    case 'mentions': {
+    
+    case 'messages': {
       return notifications.filter(notification => 
-        notification.content.includes('@')
+        notification.type === 'message'
       );
     }
 
@@ -58,16 +52,19 @@ export const filterNotificationsByTab = (
   }
 };
 
-
 const NotificationsPage: React.FC = () => {
   // State for active tab and notifications
   const [activeTab, setActiveTab] = useState<Tab>('all');
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [unreadCount, setUnreadCount] = useState<number>(0);
   
   // State for post dropdown
   const [showPostDropdown, setShowPostDropdown] = useState<boolean>(false);
   const [activePostFilter, setActivePostFilter] = useState<PostFilter>('all');
+
+  // State for tracking clicked notifications
+  const [clickedNotifications, setClickedNotifications] = useState<Set<string>>(new Set());
 
   // State for mobile responsiveness
   const [isMobile, setIsMobile] = useState<boolean>(window.innerWidth <= 768);
@@ -75,11 +72,19 @@ const NotificationsPage: React.FC = () => {
   // Get dark mode state from Redux
   const isDarkMode = useSelector((state: RootState) => state.theme.theme === 'dark');
 
+  // Calculate unread count whenever notifications change
+  useEffect(() => {
+    const count = notifications.filter(notification => notification.isNew).length;
+    setUnreadCount(count);
+  }, [notifications]);
+
   // Fetch notifications data
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
         const response = await getNotifications('hfhfhfh');
+        
+       
         setNotifications(response);
         setLoading(false);
       } catch (error) {
@@ -134,11 +139,7 @@ const NotificationsPage: React.FC = () => {
   };
 
   // Handle tab click
-  const handleTabChange = (
-    tab: Tab, 
-    setActiveTab: (tab: Tab) => void,
-    setShowPostDropdown: (show: boolean) => void
-  ): void => {
+  const handleTabChange = (tab: Tab): void => {
     setActiveTab(tab);
     if (tab !== 'posts') {
       setShowPostDropdown(false);
@@ -146,41 +147,51 @@ const NotificationsPage: React.FC = () => {
   };
 
   // Handle post filter selection
-  const handlePostFilterSelection = (
-    filter: PostFilter,
-    setActivePostFilter: (filter: PostFilter) => void,
-    setShowPostDropdown: (show: boolean) => void
-  ): void => {
+  const handlePostFilterSelection = (filter: PostFilter): void => {
     setActivePostFilter(filter);
     setShowPostDropdown(false);
   };
   
   // Toggle post dropdown
-  const togglePostDropdown = (
-    e: React.MouseEvent,
-    showPostDropdown: boolean,
-    setShowPostDropdown: (show: boolean) => void
-  ): void => {
+  const togglePostDropdown = (e: React.MouseEvent): void => {
     e.stopPropagation();
     setShowPostDropdown(!showPostDropdown);
   };
 
   // Function to handle notification click and mark as read
-  const handleNotificationClick = async (notificationId: string) => {
+  const handleNotificationClick = async (notification: Notification) => {
+    // Immediately update UI to show the notification as read
+    setClickedNotifications(prev => {
+      const newSet = new Set(prev);
+      newSet.add(notification.id);
+      return newSet;
+    });
+    
+    if (!notification.isNew) return; // Only process unread notifications
+    
     try {
       // Call the endpoint to mark notification as read
-      await markNotificationAsRead('hfhfhfh', notificationId);
+      await markNotificationAsRead('hfhfhfh', notification.id);
       
-      // Optionally update the UI to reflect read status
+      // Update local state to mark notification as read (isNew = false)
       setNotifications(prevNotifications => 
-        prevNotifications.map(notification => 
-          notification.id === notificationId 
-            ? { ...notification, read: true } 
-            : notification
+        prevNotifications.map(item => 
+          item.id === notification.id 
+            ? { ...item, isNew: false } 
+            : item
         )
       );
+      
+      // Update unread count will happen automatically via the useEffect
+      
     } catch (error) {
       console.error('Error marking notification as read:', error);
+      // Revert UI change if API call fails
+      setClickedNotifications(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(notification.id);
+        return newSet;
+      });
     }
   };
 
@@ -199,13 +210,13 @@ const NotificationsPage: React.FC = () => {
         </>
       );
     }
-
-    if (activeTab === 'mentions') {
+    
+    if (activeTab === 'messages') {
       return (
         <>
-          <h3 className={styles.emptyStateTitle}>No new mentions</h3>
+          <h3 className={styles.emptyStateTitle}>No new messages</h3>
           <p className={styles.emptyStateDescription}>
-            When someone tags you in a post or comment, that notification will appear here.
+            Direct messages from your connections will appear here.
           </p>
         </>
       );
@@ -230,6 +241,9 @@ const NotificationsPage: React.FC = () => {
           <div className={styles.notificationSettings}>
             <h3>Manage your notifications</h3>
             <a href="#" className={styles.settingsLink}>View settings</a>
+            <div className={styles.unreadCounter}>
+              {unreadCount} unread {unreadCount === 1 ? 'notification' : 'notifications'}
+            </div>
           </div>
         </div>
 
@@ -240,14 +254,9 @@ const NotificationsPage: React.FC = () => {
             <button 
               type="button" 
               className={`${styles.tabButton} ${activeTab === 'all' ? styles.activeTab : ''}`} 
-              onClick={() => handleTabChange('all', setActiveTab, setShowPostDropdown)}>
+              onClick={() => handleTabChange('all')}>
               All
-            </button>
-            <button 
-              type="button" 
-              className={`${styles.tabButton} ${activeTab === 'jobs' ? styles.activeTab : ''}`} 
-              onClick={() => handleTabChange('jobs', setActiveTab, setShowPostDropdown)}>
-              Jobs
+              {unreadCount > 0 && <span className={styles.tabNotificationBadge}>{unreadCount}</span>}
             </button>
             
             {/* Posts Tab with Dropdown */}
@@ -255,10 +264,11 @@ const NotificationsPage: React.FC = () => {
               <button 
                 type="button" 
                 className={`${styles.tabButton} ${activeTab === 'posts' ? styles.activeTab : ''}`} 
-                onClick={() => handleTabChange('posts', setActiveTab, setShowPostDropdown)}>
-                My posts <span 
+                onClick={() => handleTabChange('posts')}>
+                My posts
+                <span 
                   className={styles.dropdownArrow} 
-                  onClick={(e) => togglePostDropdown(e, showPostDropdown, setShowPostDropdown)}>
+                  onClick={(e) => togglePostDropdown(e)}>
                   ▼
                 </span>
               </button>
@@ -271,17 +281,17 @@ const NotificationsPage: React.FC = () => {
                   </div>
                   <div 
                     className={`${styles.dropdownItem} ${activePostFilter === 'all' ? styles.activeDropdownItem : ''}`}
-                    onClick={() => handlePostFilterSelection('all', setActivePostFilter, setShowPostDropdown)}>
+                    onClick={() => handlePostFilterSelection('all')}>
                     All
                   </div>
                   <div 
                     className={`${styles.dropdownItem} ${activePostFilter === 'comments' ? styles.activeDropdownItem : ''}`}
-                    onClick={() => handlePostFilterSelection('comments', setActivePostFilter, setShowPostDropdown)}>
+                    onClick={() => handlePostFilterSelection('comments')}>
                     Comments
                   </div>
                   <div 
                     className={`${styles.dropdownItem} ${activePostFilter === 'reactions' ? styles.activeDropdownItem : ''}`}
-                    onClick={() => handlePostFilterSelection('reactions', setActivePostFilter, setShowPostDropdown)}>
+                    onClick={() => handlePostFilterSelection('reactions')}>
                     Reactions
                   </div>
                 </div>
@@ -289,9 +299,9 @@ const NotificationsPage: React.FC = () => {
             </div>
             <button 
               type="button" 
-              className={`${styles.tabButton} ${activeTab === 'mentions' ? styles.activeTab : ''}`} 
-              onClick={() => handleTabChange('mentions', setActiveTab, setShowPostDropdown)}>
-              Mentions
+              className={`${styles.tabButton} ${activeTab === 'messages' ? styles.activeTab : ''}`} 
+              onClick={() => handleTabChange('messages')}>
+              Messages
             </button>
           </div>
 
@@ -306,11 +316,14 @@ const NotificationsPage: React.FC = () => {
                   <div 
                     key={notification.id} 
                     className={`${styles.notificationItem} ${
-                      !notification.read ? styles.unreadNotification : styles.readNotification
+                      !notification.isNew || clickedNotifications.has(notification.id) ? 
+                        styles.readNotification : styles.unreadNotification
+                    } ${
+                      clickedNotifications.has(notification.id) ? styles.clickedNotification : ''
                     }`}
-                    onClick={() => handleNotificationClick(notification.id)}
+                    onClick={() => handleNotificationClick(notification)}
                   >
-                    {!notification.read && (
+                    {notification.isNew && !clickedNotifications.has(notification.id) && (
                       <div className={styles.notificationIndicator}></div>
                     )}
                     <div className={styles.notificationImage}>
@@ -319,7 +332,11 @@ const NotificationsPage: React.FC = () => {
                     <div className={styles.notificationContent}>
                       <p dangerouslySetInnerHTML={{ __html: notification.content }}></p>
                       {notification.action && (
-                        <a href={notification.actionLink || "#"} className={styles.actionButton}>
+                        <a 
+                          href={notification.actionLink || "#"} 
+                          className={styles.actionButton}
+                          onClick={(e) => e.stopPropagation()} // Prevent triggering parent onClick
+                        >
                           {notification.action}
                         </a>
                       )}
@@ -328,7 +345,13 @@ const NotificationsPage: React.FC = () => {
                       {notification.time}
                     </div>
                     <div className={styles.notificationOptions}>
-                      <button type="button" aria-label="More options">...</button>
+                      <button 
+                        type="button" 
+                        aria-label="More options"
+                        onClick={(e) => e.stopPropagation()} // Prevent triggering parent onClick
+                      >
+                        ...
+                      </button>
                     </div>
                   </div>
                 ))
