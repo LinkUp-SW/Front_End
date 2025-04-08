@@ -1,6 +1,6 @@
 // tests/FilteredNotifications.test.tsx
 import { describe, it, expect } from 'vitest';
-import { filterNotificationsByTab, Tab, PostFilter } from '../../src/pages/notifications/NotificationsPage';
+import { filterNotificationsByTab} from '../../src/pages/notifications/NotificationsPage';
 import { Notification } from '../../src/types';
 
 const mockNotifications: Notification[] = [
