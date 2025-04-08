@@ -37,7 +37,8 @@ const SkillsSection = () => {
   const authToken = Cookies.get("linkup_auth_token");
   const { id } = useParams();
   const { data, loading, error } = useFetchData<FetchDataResult | null>(
-    () => authToken && id ? getUserSkills(authToken, id) : Promise.resolve(null),
+    () =>
+      authToken && id ? getUserSkills(authToken, id) : Promise.resolve(null),
     [id] // add id as a dependency so that when it changes, the effect runs again
   );
   const [skills, setSkills] = useState<Skill[]>([]);
@@ -223,7 +224,7 @@ const SkillsSection = () => {
                     {skill.endorsments.length > 0 ? (
                       skill.endorsments.map((endorsement) => (
                         <Link
-                        to={`/user-profile/${endorsement.user_id}`}
+                          to={`/user-profile/${endorsement.user_id}`}
                           key={endorsement.user_id}
                           className="flex w-full  items-center gap-4 p-2 hover:bg-gray-50 dark:hover:bg-gray-700  transition-colors"
                         >
