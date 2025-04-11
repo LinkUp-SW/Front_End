@@ -69,10 +69,9 @@ const AddSkillModal: React.FC<AddSkillModalProps> = ({
         licenses: response.skill.licenses,
       });
 
-      toast.success('Skill Added Successfully!')
+      toast.success("Skill Added Successfully!");
       // Close the modal
       onClose?.();
-      
     } catch (error) {
       toast.error(getErrorMessage(error));
     } finally {
