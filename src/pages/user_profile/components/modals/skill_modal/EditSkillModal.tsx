@@ -212,12 +212,12 @@ const EditSkillModal: React.FC<EditSkillModalProps> = ({
       </div>
 
       <div className="flex justify-end gap-3 pt-4 border-t dark:border-gray-700">
-        <Button variant="outline" onClick={onClose} disabled={isSubmitting}>
+        <Button variant="outline" className="destructiveBtn" onClick={onClose} disabled={isSubmitting}>
           Cancel
         </Button>
         <Button
           onClick={handleSubmit}
-          className="bg-blue-600 hover:bg-blue-700"
+          className="affimativeBtn"
           disabled={isSubmitting}
         >
           {isSubmitting ? "Saving..." : "Save Changes"}
