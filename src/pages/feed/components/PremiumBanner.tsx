@@ -1,5 +1,4 @@
 import { Card, CardContent } from "../../../components/ui/card";
-import { Button } from "../../../components/ui/button";
 import { PiSquareHalfFill } from "react-icons/pi";
 import { Link } from "react-router-dom";
 

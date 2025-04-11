@@ -10,7 +10,6 @@ import { RxHamburgerMenu } from "react-icons/rx";
 import styles from "./styles.module.css"; // Import your CSS module
 import { convertStringsArrayToLowerCase } from "../../../../../utils";
 import { IoMdAdd } from "react-icons/io";
-import Header from "../components/Header";
 
 const AboutModal = () => {
   const [wordCount, setWordCount] = useState<number>(0);
@@ -184,12 +183,7 @@ const AboutModal = () => {
 
   return (
     <div className="max-w-5xl md:w-[40rem] w-full">
-      <Header title="Edit About" />
       <section className="grid grid-cols-1 gap-1 relative pb-7">
-        <p className="text-sm text-gray-500 dark:text-gray-300">
-          You can write about your years of experience, industry, or skills.
-          People also talk about their achievements or previous job experiences.
-        </p>
         <textarea
           maxLength={2600}
           name="about"

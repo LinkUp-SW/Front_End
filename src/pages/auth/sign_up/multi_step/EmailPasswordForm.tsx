@@ -33,6 +33,7 @@ const EmailPasswordForm = ({
     try {
       await verifyEmail(email.toLowerCase());
     } catch (error) {
+      console.log("Already Exists")
       return toast.error(getErrorMessage(error));
     }
     if (password.length === 0) return toast.error("please enter your password");
@@ -95,7 +96,7 @@ const EmailPasswordForm = ({
             alt="Google Logo"
             className="w-7 aspect-square object-contain bg-white p-1 rounded-full dark:bg-gray-100"
           />
-          <span>Continue with Google</span>
+          <span className="sm:text-base text-xs">Continue with Google</span>
         </button>
       </div>
     </section>

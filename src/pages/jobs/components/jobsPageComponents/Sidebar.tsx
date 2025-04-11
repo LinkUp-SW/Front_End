@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { FaSortDown } from "react-icons/fa6";
 import { FaEdit } from "react-icons/fa";
 import { SIDEBAR_MENU_ITEMS, FOOTER_LINKS } from '../../../../constants/index';

@@ -9,8 +9,6 @@ import {
   MyNetworkPage,
   JobsPage,
   SeeMorePage,
-  FollowingFollowers,
-  Connections,
   MessagingPage,
   InvitationsManagerPage,
   SignInPage,
@@ -20,8 +18,12 @@ import {
   EmailVerification,
   ForgetPasswordPage,
   ResetPasswordPage,
-  NotFoundPage
-, SavedJobsPage} from "./pages";
+  NotFoundPage,
+  SavedJobsPage,
+  ConnectionsPage,
+  FollowingFollowersPage,
+  SearchPage,
+} from "./pages";
 
 import React from "react";
 
@@ -62,11 +64,11 @@ const routes: RouteObject[] = [
   },
 
   {
-    path: "/followingfollowers",
-    element: React.createElement(FollowingFollowers),
+    path: "/following-followers",
+    element: React.createElement(FollowingFollowersPage),
   },
 
-  { path: "/connections", element: React.createElement(Connections) },
+  { path: "/connections", element: React.createElement(ConnectionsPage) },
 
   {
     path: "/manage-invitations",
@@ -75,7 +77,7 @@ const routes: RouteObject[] = [
 
   {
     path: "/saved-jobs",
-    element:  React.createElement(SavedJobsPage)
+    element: React.createElement(SavedJobsPage),
   },
 
   {
@@ -103,12 +105,16 @@ const routes: RouteObject[] = [
     element: React.createElement(ForgetPasswordPage),
   },
   {
-    path:'/reset-password/:token',
-    element:React.createElement(ResetPasswordPage)
+    path: "/reset-password/:token",
+    element: React.createElement(ResetPasswordPage),
   },
   {
     path: "*",
     element: React.createElement(NotFoundPage),
+  },
+  {
+    path: "/search/:query",
+    element: React.createElement(SearchPage),
   },
 ];
 

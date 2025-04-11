@@ -41,6 +41,25 @@ import {
 } from "./ui/input-otp";
 import UserAuthLayout from "./hoc/UserAuthLayout";
 import { Switch } from "./ui/switch";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogOverlay,
+  DialogPortal,
+  DialogTitle,
+  DialogTrigger,
+} from "./ui/dialog";
+import PhoneNumberBanner from "./phonenumber_banner/PhoneNumberBanner";
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+  PopoverAnchor,
+} from "./ui/popover";
 
 export {
   UserList,
@@ -82,5 +101,20 @@ export {
   InputOTPSlot,
   InputOTPSeparator,
   UserAuthLayout,
-  Switch
+  Switch,
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogOverlay,
+  DialogPortal,
+  DialogTitle,
+  DialogTrigger,
+  PhoneNumberBanner,
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+  PopoverAnchor,
 };

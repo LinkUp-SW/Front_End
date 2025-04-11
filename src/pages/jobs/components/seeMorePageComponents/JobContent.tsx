@@ -47,7 +47,7 @@ const JobContent: React.FC<JobContentProps> = ({ job }) => {
       <div>
         <h2 className="text-lg font-semibold mb-2 dark:text-white">About the job</h2>
         <p className="text-sm text-gray-700 dark:text-gray-400">
-          Managing the Product Backlog: Keep the product backlog organized...
+          {job.description || "No description available"}
         </p>
         
         <div className="mt-6">

@@ -10,10 +10,7 @@ import { useFormStatus } from "@/hooks/useFormStatus";
 import SkillsManager from "./components/SkillsManager";
 import MediaManager from "./components/MediaManager";
 import { MediaItem } from "./types";
-import Header from "../components/Header";
 import { JobTypeEnum } from "@/types";
-
-
 
 export interface ExperienceFormData {
   title: string;
@@ -68,15 +65,19 @@ const AddExperienceModal: React.FC = () => {
       console.log("Submitted form data:", formData);
       // ... handle success, close modal, etc.
     } catch (err) {
-      // ... handle error
       console.error(err);
     } finally {
       stopSubmitting();
     }
   };
+
   return (
-    <div className="max-w-5xl sm:w-[35rem] w-full">
+    <div
+      id="add-experience-modal-container"
+      className="max-w-5xl sm:w-[35rem] w-full"
+    >
       <form
+        id="experience-form"
         onSubmit={handleSubmit}
         onKeyDown={(e) => {
           if (e.key === "Enter") {
@@ -84,11 +85,6 @@ const AddExperienceModal: React.FC = () => {
           }
         }}
       >
-        <Header title="Add Experience" />
-        <p className="text-sm text-gray-500 dark:text-gray-400">
-          *Indicates required
-        </p>
-
         <FormInput
           label="Title*"
           placeholder="Ex: Retail Sales Manager"
@@ -111,7 +107,7 @@ const AddExperienceModal: React.FC = () => {
           placeholder="Ex: Microsoft"
           value={formData.company}
           onChange={(e) => handleChange("company", e.target.value)}
-          id='company-name'
+          id="company-name"
           name="company"
         />
         <FormCheckbox
@@ -129,6 +125,7 @@ const AddExperienceModal: React.FC = () => {
           year={formData.startYear}
           onMonthChange={(value) => handleChange("startMonth", value)}
           onYearChange={(value) => handleChange("startYear", value)}
+          id="start-date"
         />
         <DatePicker
           label="End date*"
@@ -137,6 +134,7 @@ const AddExperienceModal: React.FC = () => {
           onMonthChange={(value) => handleChange("endMonth", value)}
           onYearChange={(value) => handleChange("endYear", value)}
           disabled={formData.currentlyWorking}
+          id="end-date"
         />
         <FormInput
           label="Location"
@@ -187,19 +185,22 @@ const AddExperienceModal: React.FC = () => {
         <SkillsManager
           skills={formData.skills}
           setSkills={(newSkills) => handleChange("skills", newSkills)}
+          id="skills-manager"
         />
 
         {/* Media Manager */}
         <MediaManager
           media={formData.media}
           setMedia={(newMedia) => handleChange("media", newMedia)}
+          id="media-manager"
         />
 
         {/* Submit Button with Loading State */}
-        <div className="pt-5">
+        <div id="experience-submit-container" className="pt-5">
           <button
             type="submit"
             disabled={isSubmitting}
+            id="experience-submit-button"
             className="bg-blue-600 disabled:opacity-70 cursor-pointer ease-in-out text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-all duration-300"
           >
             {isSubmitting ? "Submitting..." : "Save Experience"}
