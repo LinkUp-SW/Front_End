@@ -23,6 +23,7 @@ import {
   ConnectionsPage,
   FollowingFollowersPage,
   SearchPage,
+  UserSkillsPage,
 } from "./pages";
 
 import React from "react";
@@ -115,6 +116,10 @@ const routes: RouteObject[] = [
   {
     path: "/search/:query",
     element: React.createElement(SearchPage),
+  },
+  {
+    path: "/user-profile/skills/:id",
+    element: React.createElement(UserSkillsPage),
   },
 ];
 
