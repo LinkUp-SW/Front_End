@@ -16,7 +16,6 @@ import Cookies from "js-cookie";
 import { Link, useParams } from "react-router-dom";
 import { deleteUserSkills, getUserSkills } from "@/endpoints/userProfile";
 import AddSkillModal from "../modals/skill_modal/AddSkillModal";
-import { GoPlus } from "react-icons/go";
 import Header from "../modals/components/Header";
 import { MdDeleteForever } from "react-icons/md";
 import EditSkillModal from "../modals/skill_modal/EditSkillModal";
@@ -24,6 +23,8 @@ import { useFormStatus } from "@/hooks/useFormStatus";
 import { toast } from "sonner";
 import { getErrorMessage } from "@/utils/errorHandler";
 import SkillsList from "./SkillsList";
+import SkillsSkeleton from "./SkillsSkeleton";
+import SkillsActionButtons from "./SkillsActionButtons";
 
 interface FetchDataResult {
   skills: Skill[];
@@ -122,13 +123,14 @@ const SkillsSection = () => {
     >
       <header className="w-full flex items-center justify-between">
         <h2 className="text-xl font-bold">Skills</h2>
-        {!isEmpty && isMe && <ActionButtons onAddSkill={handleAddSkill} />}
+        {!isEmpty && isMe && (
+          <SkillsActionButtons onAddSkill={handleAddSkill} />
+        )}
       </header>
       {/* Use divide-y to place horizontal lines between skills */}
       <div className="mt-2 divide-y divide-gray-200 dark:divide-gray-700">
         {skills.slice(0, 2).map((skill, idx) => (
           <Fragment key={skill._id}>
-
             <SkillsList
               skill={skill}
               setDeleteDialogOpen={setDeleteDialogOpen}
@@ -215,51 +217,6 @@ const SkillsSection = () => {
   );
 };
 
-interface ActionButtonsProps {
-  onAddSkill: (skill: Skill) => void;
-}
-const ActionButtons: React.FC<ActionButtonsProps> = ({ onAddSkill }) => {
-  const [open, setOpen] = useState(false);
-  return (
-    <div id="skill-section-action-buttons" className="flex items-center gap-2">
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger asChild>
-          <button
-            id="skill-add-button"
-            aria-label="Add skill"
-            className="hover:bg-gray-300 dark:hover:text-black rounded-full transition-all duration-200 ease-in-out"
-          >
-            <GoPlus size={30} />
-          </button>
-        </DialogTrigger>
-        <DialogContent
-          aria-describedby={undefined}
-          id="skill-add-dialog-content"
-          className="max-h-[45rem] overflow-y-auto dark:bg-gray-900 overflow-x-hidden !max-w-5xl sm:!w-[38.5rem] !w-full"
-        >
-          <DialogTitle className="hidden"></DialogTitle>
-          <DialogHeader id="skill-add-dialog-header">
-            <Header title="Add Skill" />
-            <DialogDescription
-              id="skill-add-dialog-description"
-              className="text-sm text-gray-500 mb-[-1rem] dark:text-gray-300"
-            >
-              *Indicates required
-            </DialogDescription>
-          </DialogHeader>
-          <AddSkillModal
-            onClose={() => setOpen(false)}
-            onSuccess={(newSkill) => {
-              onAddSkill(newSkill);
-              setOpen(false);
-            }}
-          />
-        </DialogContent>
-      </Dialog>
-    </div>
-  );
-};
-
 const EmptySkills: React.FC<{ onAddSkill: (skill: Skill) => void }> = ({
   onAddSkill,
 }) => {
@@ -303,22 +260,5 @@ const EmptySkills: React.FC<{ onAddSkill: (skill: Skill) => void }> = ({
     </div>
   );
 };
-
-const SkillsSkeleton: React.FC = () => (
-  <div className="animate-pulse space-y-4">
-    <div className="h-6 w-24 bg-gray-300 dark:bg-gray-700 rounded" />
-    <div className="space-y-4">
-      {[1].map((i) => (
-        <div key={i} className="space-y-2">
-          <div className="h-5 w-32 bg-gray-300 dark:bg-gray-700 rounded" />
-          <div className="pl-4 space-y-1">
-            <div className="h-4 w-48 bg-gray-300 dark:bg-gray-700 rounded" />
-            <div className="h-4 w-48 bg-gray-300 dark:bg-gray-700 rounded" />
-          </div>
-        </div>
-      ))}
-    </div>
-  </div>
-);
 
 export default SkillsSection;
