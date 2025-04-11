@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from "react";
-import { BsPencil } from "react-icons/bs";
+import React, { Fragment, useEffect, useState } from "react";
 import { GoPlus } from "react-icons/go";
 import { MdDeleteForever } from "react-icons/md";
 import { License } from "@/types"; // Ensure your Education type is defined here
@@ -17,12 +16,12 @@ import useFetchData from "@/hooks/useFetchData";
 import Cookies from "js-cookie";
 import { Link, useParams } from "react-router-dom";
 import { getUserLicenses, removeLicense } from "@/endpoints/userProfile";
-import { formatExperienceDate } from "@/utils";
 import { toast } from "sonner";
 import { getErrorMessage } from "@/utils/errorHandler";
 import AddLicenseModal from "../modals/license_modal/AddLicenseModal";
 import EditLicenseModal from "../modals/license_modal/EditLicenseModal";
 import { LiaCertificateSolid } from "react-icons/lia";
+import LicensesList from "./LicensesList";
 
 interface FetchDataResult {
   licenses: License[];
@@ -134,8 +133,9 @@ const LicenseSection: React.FC = () => {
           <EmptyLicense onAddLicense={handleAddLicense} />
         ) : null
       ) : (
-        <LicenseList
+        <LicenseListContainer
           licenses={licenses}
+          userId={id as string}
           isMe={isMe}
           onStartEdit={(edu) => {
             setLicenseToEdit(edu);
@@ -297,97 +297,37 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({ onAddLicense }) => {
 };
 
 /* Education List */
-interface LicenseListProps {
+interface LicenseListContainerProps {
   licenses: License[];
   isMe: boolean;
   onStartEdit: (lic: License) => void;
   onDeleteClick: (licenseId: string) => void;
+  userId: string;
 }
 
-const LicenseList: React.FC<LicenseListProps> = ({
+const LicenseListContainer: React.FC<LicenseListContainerProps> = ({
   licenses,
   isMe,
   onStartEdit,
   onDeleteClick,
+  userId,
 }) => (
   <div id="license-list-container" className="space-y-4">
     {licenses.slice(0, 3).map((lic, idx) => (
-      <div
-        id={`license-item-${lic._id}`}
-        key={idx}
-        className="border-l-2 border-blue-600 pl-4 relative"
-      >
-        <h3 id={`license-name-${lic._id}`} className="font-bold">
-          {lic.name}
-        </h3>
-        <p
-          id={`license-organization-${lic._id}`}
-          className="text-gray-600 dark:text-gray-300"
-        >
-          {lic.issuing_organization?.name}
-        </p>
-        <p
-          id={`license-credential-url-${lic._id}`}
-          className="text-sm text-gray-500 dark:text-gray-200"
-        >
-          {lic.credintial_url}
-        </p>
-        <p className="text-xs capitalize inline-flex gap-2 text-gray-500 dark:text-gray-200">
-          <span>{formatExperienceDate(lic.issue_date)}</span>
-          <span>-</span>
-          <span>{formatExperienceDate(lic.expiration_date)}</span>
-        </p>
-        {lic.skills.length > 0 && (
-          <div className="text-xs font-semibold flex items-center gap-2">
-            <h2 className="font-bold text-sm">Skills:</h2>
-            {lic.skills.join(", ")}
-          </div>
-        )}
-        {lic.media.length > 0 && (
-          <div className="mt-2">
-            {lic.media.map((med, idx) => (
-              <div
-                key={`${med.media}-${idx}`}
-                className="text-xs font-semibold flex items-start gap-2"
-              >
-                <img
-                  src={med.media}
-                  alt="school-logo"
-                  className="h-24 w-24 object-contain rounded-lg"
-                />
-                <div className="flex flex-col mt-2">
-                  <h2 className="text-base font-bold">{med.title}</h2>
-                  <p>{med.description}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-        {isMe && (
-          <div className="absolute top-[-1rem] h-full right-0 flex gap-2 flex-col justify-between">
-            <button
-              id={`license-edit-button-${idx}`}
-              aria-label="Edit License"
-              className="hover:bg-gray-300 dark:hover:text-black p-2 rounded-full transition-all duration-200 ease-in-out"
-              onClick={() => onStartEdit(lic)}
-            >
-              <BsPencil size={20} />
-            </button>
-            <button
-              id={`license-delete-button-${idx}`}
-              aria-label="Delete License"
-              className="bg-red-100 dark:bg-red-200 dark:text-gray-700 hover:bg-red-500 hover:text-white p-2 rounded-full transition-all duration-200 ease-in-out"
-              onClick={() => onDeleteClick(lic._id as string)}
-            >
-              <MdDeleteForever size={20} />
-            </button>
-          </div>
-        )}
-      </div>
+      <Fragment key={idx}>
+        <LicensesList
+          isMe={isMe}
+          onStartEdit={onStartEdit}
+          onDeleteClick={onDeleteClick}
+          license={lic}
+          idx={idx}
+        />
+      </Fragment>
     ))}
     {licenses.length > 3 && (
       <Link
-        to="#"
+        to={`/user-profile/licenses/${userId}`}
+        id="show-more-licenses-link"
         className="block w-full text-center text-blue-700 hover:underline transition-all duration-300 ease-in-out dark:text-blue-400 font-semibold"
       >
         Show More
