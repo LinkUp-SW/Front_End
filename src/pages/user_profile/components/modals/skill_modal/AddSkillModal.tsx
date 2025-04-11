@@ -1,11 +1,10 @@
-import { FormInput } from "@/components";
+import { FormCheckbox, FormInput } from "@/components";
 import { addUserSkills, getUserSections } from "@/endpoints/userProfile";
 import useFetchData from "@/hooks/useFetchData";
 import { Skill, SkillForm, SkillUserSections } from "@/types";
 import Cookies from "js-cookie";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { useFormStatus } from "@/hooks/useFormStatus";
 import { getErrorMessage } from "@/utils/errorHandler";
@@ -110,17 +109,16 @@ const AddSkillModal: React.FC<AddSkillModalProps> = ({
                 <div className="space-y-2 pl-4">
                   {data.experiences.map((exp) => (
                     <div key={exp._id} className="flex items-center gap-2">
-                      <Checkbox
+                      <FormCheckbox
+                        label={exp.name}
                         id={`exp-${exp._id}`}
                         checked={formData.experiences.includes(exp._id)}
                         onCheckedChange={handleCheckboxChange(
                           "experiences",
                           exp._id
                         )}
+                        name={`${exp.name} checkbox`}
                       />
-                      <label htmlFor={`exp-${exp._id}`} className="text-sm">
-                        {exp.name}
-                      </label>
                     </div>
                   ))}
                 </div>
@@ -133,17 +131,16 @@ const AddSkillModal: React.FC<AddSkillModalProps> = ({
                 <div className="space-y-2 pl-4">
                   {data.educations.map((edu) => (
                     <div key={edu._id} className="flex items-center gap-2">
-                      <Checkbox
+                      <FormCheckbox
+                        label={edu.name}
                         id={`edu-${edu._id}`}
                         checked={formData.educations.includes(edu._id)}
                         onCheckedChange={handleCheckboxChange(
                           "educations",
                           edu._id
                         )}
+                        name={`${edu.name} checkbox`}
                       />
-                      <label htmlFor={`edu-${edu._id}`} className="text-sm">
-                        {edu.name}
-                      </label>
                     </div>
                   ))}
                 </div>
@@ -156,20 +153,16 @@ const AddSkillModal: React.FC<AddSkillModalProps> = ({
                 <div className="space-y-2 pl-4">
                   {data.licenses.map((license) => (
                     <div key={license._id} className="flex items-center gap-2">
-                      <Checkbox
+                      <FormCheckbox
+                        label={license.name}
                         id={`license-${license._id}`}
                         checked={formData.licenses.includes(license._id)}
                         onCheckedChange={handleCheckboxChange(
                           "licenses",
                           license._id
                         )}
+                        name={`${license.name} checkbox`}
                       />
-                      <label
-                        htmlFor={`license-${license._id}`}
-                        className="text-sm"
-                      >
-                        {license.name}
-                      </label>
                     </div>
                   ))}
                 </div>
