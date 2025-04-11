@@ -1,7 +1,7 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 import Cookies from "js-cookie";
 import { toast } from "sonner";
-import { DatePicker, FormInput } from "@/components";
+import { DatePicker, FormInput, OrganizationSearch } from "@/components";
 
 import { License, Organization } from "@/types";
 import {
@@ -52,11 +52,6 @@ const EditLicenseModal: React.FC<AddLicenseModalProps> = ({
   const authToken = Cookies.get("linkup_auth_token");
   const { isSubmitting, startSubmitting, stopSubmitting } = useFormStatus();
 
-  const [schools, setSchools] = useState<Organization[]>([]);
-  const [schoolSearch, setSchoolSearch] = useState("");
-  const [isSchoolsLoading, setIsSchoolsLoading] = useState(false);
-  const schoolTimer = useRef<NodeJS.Timeout | null>(null);
-
   const [formData, setFormData] = useState<LicenseFormData>({
     issuing_organization: license.issuing_organization || {
       _id: "",
@@ -74,38 +69,8 @@ const EditLicenseModal: React.FC<AddLicenseModalProps> = ({
     media: license.media.map((l) => ({ ...l, id: generateTempId() })) || [],
   });
 
-  useEffect(() => {
-    setSchoolSearch(formData.issuing_organization.name || "");
-  }, [formData.issuing_organization]);
-
   const handleChange = (field: keyof LicenseFormData, value: unknown) => {
-    if (field === "issuing_organization") {
-      const searchValue = value as string;
-      setSchoolSearch(searchValue);
-
-      if (schoolTimer.current) clearTimeout(schoolTimer.current);
-
-      if (!searchValue) {
-        setSchools([]);
-        return;
-      }
-
-      setIsSchoolsLoading(true);
-      schoolTimer.current = setTimeout(() => {
-        getOrganizationsAndSchoolsList(searchValue)
-          .then((data) => setSchools(data.data))
-          .catch(() => toast.error("Failed to search schools"))
-          .finally(() => setIsSchoolsLoading(false));
-      }, 500);
-    } else {
-      setFormData((prev) => ({ ...prev, [field]: value }));
-    }
-  };
-
-  const handleSelectSchool = (issuing_organization: Organization) => {
-    setFormData((prev) => ({ ...prev, issuing_organization }));
-    setSchoolSearch(issuing_organization.name);
-    setSchools([]);
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const validateForm = () => {
@@ -138,12 +103,6 @@ const EditLicenseModal: React.FC<AddLicenseModalProps> = ({
     return true;
   };
 
-  useEffect(() => {
-    if (schoolSearch.trim() === "") {
-      setIsSchoolsLoading(false);
-    }
-  }, [isSchoolsLoading, schoolSearch]);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     startSubmitting();
@@ -174,7 +133,7 @@ const EditLicenseModal: React.FC<AddLicenseModalProps> = ({
         newLicense
       );
       toast.success(response.message);
-      onSuccess?.({ ...newLicense, _id: response.education._id });
+      onSuccess?.({ ...newLicense, _id: response.license._id });
       onClose?.();
     } catch (error) {
       toast.error(getErrorMessage(error));
@@ -199,43 +158,23 @@ const EditLicenseModal: React.FC<AddLicenseModalProps> = ({
           id="license-name"
           name="name"
         />
-        {/* School Search */}
-        <div className="relative">
-          <FormInput
-            label="Issuing Organization*"
-            value={schoolSearch}
-            onChange={(e) =>
-              handleChange("issuing_organization", e.target.value)
-            }
-            placeholder="Enter your school"
-            id="issuing-organization"
-            name="issuing_organization"
-          />
-          {(isSchoolsLoading || schools.length !== 0) && (
-            <div className="w-full max-h-fit p-2 bg-white dark:border-gray-400 border dark:bg-gray-800 rounded-lg absolute top-22">
-              {isSchoolsLoading ? (
-                <OrganizationSchoolSkeleton />
-              ) : (
-                <ul className="space-y-2">
-                  {schools.map((s) => (
-                    <li
-                      key={s._id}
-                      className="flex items-center gap-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 rounded p-1"
-                      onClick={() => handleSelectSchool(s)}
-                    >
-                      <img
-                        src={s.logo}
-                        alt="school-logo"
-                        className="h-10 w-10 object-contain rounded-lg"
-                      />
-                      <p>{s.name}</p>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          )}
-        </div>
+        {/* Organization Search */}
+        <OrganizationSearch
+          label="Issuing Organization*"
+          selectedOrganization={formData.issuing_organization}
+          onSelect={(org) =>
+            setFormData((prev) => ({
+              ...prev,
+              issuing_organization: org,
+            }))
+          }
+          fetchOrganizations={(query) =>
+            getOrganizationsAndSchoolsList(query).then((res) => res.data)
+          }
+          placeholder="Enter your school"
+          id="issuing-organization"
+          name="issuing_organization"
+        />
 
         <DatePicker
           label="Start Date*"
@@ -295,16 +234,5 @@ const EditLicenseModal: React.FC<AddLicenseModalProps> = ({
     </div>
   );
 };
-
-const OrganizationSchoolSkeleton = () => (
-  <div className="space-y-2 animate-pulse">
-    {[...Array(3)].map((_, index) => (
-      <div key={index} className="flex items-center gap-2">
-        <div className="h-10 w-10 bg-gray-300 dark:bg-gray-700 rounded-lg" />
-        <div className="h-4 w-32 bg-gray-300 dark:bg-gray-700 rounded" />
-      </div>
-    ))}
-  </div>
-);
 
 export default EditLicenseModal;
