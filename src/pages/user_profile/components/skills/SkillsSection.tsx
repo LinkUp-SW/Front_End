@@ -52,7 +52,7 @@ const SkillsSection = () => {
   };
 
   // Handler for updating an existing skill
-  const handleEditLicense = (updatedSkill: Skill) => {
+  const handleEditSkill = (updatedSkill: Skill) => {
     setSkills((prev) =>
       prev.map((skill) =>
         skill._id === updatedSkill._id ? updatedSkill : skill
@@ -169,7 +169,7 @@ const SkillsSection = () => {
                 setEditOpen(false);
                 setSkillToEdit(null);
               }}
-              onSuccess={handleEditLicense}
+              onSuccess={handleEditSkill}
             />
           )}
         </DialogContent>
