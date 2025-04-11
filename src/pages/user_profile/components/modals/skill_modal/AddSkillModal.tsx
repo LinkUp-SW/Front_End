@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useFormStatus } from "@/hooks/useFormStatus";
 import { getErrorMessage } from "@/utils/errorHandler";
+import SectionsSkeletonLoader from "./SectionsSkeletonLoader";
 
 interface AddSkillModalProps {
   onClose?: () => void;
@@ -25,7 +26,7 @@ const AddSkillModal: React.FC<AddSkillModalProps> = ({
     experiences: [],
     licenses: [],
   });
-  const { data } = useFetchData<SkillUserSections | null>(() =>
+  const { data, loading } = useFetchData<SkillUserSections | null>(() =>
     authToken ? getUserSections(authToken) : Promise.resolve(null)
   );
   const { isSubmitting, startSubmitting, stopSubmitting } = useFormStatus();
@@ -94,81 +95,93 @@ const AddSkillModal: React.FC<AddSkillModalProps> = ({
         id="skill-name"
         name="skillName"
       />
-
-      {data && !hasNoData && (
+      {loading ? (
+        <SectionsSkeletonLoader />
+      ) : hasNoData ? (
+        <div className="py-4 text-left text-sm text-gray-500 dark:text-gray-400">
+          No associated items found
+        </div>
+      ) : (
         <>
-          <div className="space-y-4">
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              75% of hirers value skill context. Select at least one item to
-              show where you used this skill.
-            </p>
+          {data && !hasNoData && (
+            <>
+              <div className="space-y-4">
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  75% of hirers value skill context. Select at least one item to
+                  show where you used this skill.
+                </p>
 
-            {data?.experiences?.length > 0 && (
-              <div className="space-y-2">
-                <h3 className="font-semibold">Experience</h3>
-                <div className="space-y-2 pl-4">
-                  {data.experiences.map((exp) => (
-                    <div key={exp._id} className="flex items-center gap-2">
-                      <FormCheckbox
-                        label={exp.name}
-                        id={`exp-${exp._id}`}
-                        checked={formData.experiences.includes(exp._id)}
-                        onCheckedChange={handleCheckboxChange(
-                          "experiences",
-                          exp._id
-                        )}
-                        name={`${exp.name} checkbox`}
-                      />
+                {data?.experiences?.length > 0 && (
+                  <div className="space-y-2">
+                    <h3 className="font-semibold">Experience</h3>
+                    <div className="space-y-2 pl-4">
+                      {data.experiences.map((exp) => (
+                        <div key={exp._id} className="flex items-center gap-2">
+                          <FormCheckbox
+                            label={exp.name}
+                            id={`exp-${exp._id}`}
+                            checked={formData.experiences.includes(exp._id)}
+                            onCheckedChange={handleCheckboxChange(
+                              "experiences",
+                              exp._id
+                            )}
+                            name={`${exp.name} checkbox`}
+                          />
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
-              </div>
-            )}
+                  </div>
+                )}
 
-            {data?.educations?.length > 0 && (
-              <div className="space-y-2">
-                <h3 className="font-semibold">Education</h3>
-                <div className="space-y-2 pl-4">
-                  {data.educations.map((edu) => (
-                    <div key={edu._id} className="flex items-center gap-2">
-                      <FormCheckbox
-                        label={edu.name}
-                        id={`edu-${edu._id}`}
-                        checked={formData.educations.includes(edu._id)}
-                        onCheckedChange={handleCheckboxChange(
-                          "educations",
-                          edu._id
-                        )}
-                        name={`${edu.name} checkbox`}
-                      />
+                {data?.educations?.length > 0 && (
+                  <div className="space-y-2">
+                    <h3 className="font-semibold">Education</h3>
+                    <div className="space-y-2 pl-4">
+                      {data.educations.map((edu) => (
+                        <div key={edu._id} className="flex items-center gap-2">
+                          <FormCheckbox
+                            label={edu.name}
+                            id={`edu-${edu._id}`}
+                            checked={formData.educations.includes(edu._id)}
+                            onCheckedChange={handleCheckboxChange(
+                              "educations",
+                              edu._id
+                            )}
+                            name={`${edu.name} checkbox`}
+                          />
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
-              </div>
-            )}
+                  </div>
+                )}
 
-            {data?.licenses?.length > 0 && (
-              <div className="space-y-2">
-                <h3 className="font-semibold">Licenses</h3>
-                <div className="space-y-2 pl-4">
-                  {data.licenses.map((license) => (
-                    <div key={license._id} className="flex items-center gap-2">
-                      <FormCheckbox
-                        label={license.name}
-                        id={`license-${license._id}`}
-                        checked={formData.licenses.includes(license._id)}
-                        onCheckedChange={handleCheckboxChange(
-                          "licenses",
-                          license._id
-                        )}
-                        name={`${license.name} checkbox`}
-                      />
+                {data?.licenses?.length > 0 && (
+                  <div className="space-y-2">
+                    <h3 className="font-semibold">Licenses</h3>
+                    <div className="space-y-2 pl-4">
+                      {data.licenses.map((license) => (
+                        <div
+                          key={license._id}
+                          className="flex items-center gap-2"
+                        >
+                          <FormCheckbox
+                            label={license.name}
+                            id={`license-${license._id}`}
+                            checked={formData.licenses.includes(license._id)}
+                            onCheckedChange={handleCheckboxChange(
+                              "licenses",
+                              license._id
+                            )}
+                            name={`${license.name} checkbox`}
+                          />
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
+                  </div>
+                )}
               </div>
-            )}
-          </div>
+            </>
+          )}
         </>
       )}
 

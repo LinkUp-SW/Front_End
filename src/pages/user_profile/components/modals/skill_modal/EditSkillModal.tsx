@@ -8,20 +8,13 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { getErrorMessage } from "@/utils/errorHandler";
+import SectionsSkeletonLoader from "./SectionsSkeletonLoader";
 
 interface EditSkillModalProps {
   skill: Skill;
   onClose?: () => void;
   onSuccess?: (updatedSkill: Skill) => void;
 }
-
-const SkeletonLoader: React.FC = () => (
-  <div className="animate-pulse space-y-4">
-    <div className="h-6 bg-gray-300 dark:bg-gray-700 rounded w-1/2" />
-    <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-full" />
-    <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-full" />
-  </div>
-);
 
 const EditSkillModal: React.FC<EditSkillModalProps> = ({
   skill,
@@ -129,9 +122,9 @@ const EditSkillModal: React.FC<EditSkillModalProps> = ({
         </p>
 
         {loading ? (
-          <SkeletonLoader />
+          <SectionsSkeletonLoader />
         ) : hasNoData ? (
-          <div className="py-4 text-center text-sm text-gray-500 dark:text-gray-400">
+          <div className="py-4 text-left text-sm text-gray-500 dark:text-gray-400">
             No associated items found
           </div>
         ) : (
@@ -212,7 +205,12 @@ const EditSkillModal: React.FC<EditSkillModalProps> = ({
       </div>
 
       <div className="flex justify-end gap-3 pt-4 border-t dark:border-gray-700">
-        <Button variant="outline" className="destructiveBtn" onClick={onClose} disabled={isSubmitting}>
+        <Button
+          variant="outline"
+          className="destructiveBtn"
+          onClick={onClose}
+          disabled={isSubmitting}
+        >
           Cancel
         </Button>
         <Button
