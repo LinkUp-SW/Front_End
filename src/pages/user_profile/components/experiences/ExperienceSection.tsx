@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import { GoPlus } from "react-icons/go";
 import { IoIosBriefcase } from "react-icons/io";
 import { MdDeleteForever } from "react-icons/md";
@@ -333,13 +333,15 @@ const ExperienceListContainer: React.FC<ExperienceListContainerProps> = ({
 }) => (
   <div id="experience-list-container" className="space-y-4">
     {experiences.slice(0, 3).map((experience, idx) => (
-      <ExperiencesList
-        isMe={isMe}
-        onStartEdit={onStartEdit}
-        onDeleteClick={onDeleteClick}
-        experience={experience}
-        idx={idx}
-      />
+      <Fragment key={idx}>
+        <ExperiencesList
+          isMe={isMe}
+          onStartEdit={onStartEdit}
+          onDeleteClick={onDeleteClick}
+          experience={experience}
+          idx={idx}
+        />
+      </Fragment>
     ))}
 
     {experiences.length > 3 && (
