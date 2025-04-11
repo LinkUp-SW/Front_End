@@ -54,6 +54,17 @@ const SkillsSection = () => {
     setSkills((prev) => [...prev, newSkill]);
   };
 
+  // Handler for updating an existing skill
+  const handleEditLicense = (updatedSkill: Skill) => {
+    setSkills((prev) =>
+      prev.map((skill) =>
+        skill._id === updatedSkill._id ? updatedSkill : skill
+      )
+    );
+    setEditOpen(false);
+    setSkillToEdit(null);
+  };
+
   useEffect(() => {
     if (data?.skills) {
       setSkills(data.skills);
@@ -307,7 +318,7 @@ const SkillsSection = () => {
                 setEditOpen(false);
                 setSkillToEdit(null);
               }}
-              onSuccess={() => {}}
+              onSuccess={handleEditLicense}
             />
           )}
         </DialogContent>

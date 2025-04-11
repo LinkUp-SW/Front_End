@@ -85,13 +85,28 @@ const EditSkillModal: React.FC<EditSkillModalProps> = ({
     try {
       // Only updating the arrays; the name remains unchanged
       console.log(skill._id);
-      const updatedSkill: Skill = await updateUserSkill(
+      const updatedSkill = await updateUserSkill(
         authToken,
         skill._id,
         formData
       );
-      console.log(updatedSkill);
-      onSuccess?.(updatedSkill);
+      console.log(skill);
+      // console.log(formData)
+      // Call onSuccess with complete updated skill data
+      onSuccess?.({
+        ...skill,
+        _id: skill._id,
+        name: skill.name,
+        educations: updatedSkill.skill.educations.map(
+          (ed: Skill["educations"]) => ({ ...ed })
+        ),
+        experiences: updatedSkill.skill.experiences.map(
+          (ex: Skill["experiences"]) => ({ ...ex })
+        ),
+        licenses: updatedSkill.skill.licenses.map((li: Skill["licenses"]) => ({
+          ...li,
+        })),
+      });
       onClose?.();
       toast.success("Skill updated successfully");
     } catch (error) {
