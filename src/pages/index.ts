@@ -48,5 +48,5 @@ export {
   ConnectionsPage,
   FollowingFollowersPage,
   SearchPage,
-  UserSkillsPage
+  UserSkillsPage,
 };
