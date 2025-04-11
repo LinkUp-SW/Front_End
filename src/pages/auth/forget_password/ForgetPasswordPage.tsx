@@ -11,7 +11,10 @@ const ForgetPasswordPage = () => {
   const { isSubmitting, startSubmitting, stopSubmitting } = useFormStatus();
 
   const handleForgetPassword = async () => {
-    if (email.length === 0) return toast.error("Please Enter your email");
+    if (email.length === 0) {
+      console.error("Please Enter your email");
+      return toast.error("Please Enter your email");
+    }
     if (!validateEmail(email)) return toast.error("Invalid email format");
 
     try {
@@ -22,7 +25,8 @@ const ForgetPasswordPage = () => {
 
       // Await the result of the toast promise
       const data = await toastResult.unwrap();
-      console.log(data);
+      console.log(data.reset_link);
+    
       toast.success(`${data.message}`);
     } catch (error) {
       const err = getErrorMessage(error);

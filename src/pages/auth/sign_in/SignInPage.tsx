@@ -35,10 +35,12 @@ const SignInPage: React.FC = () => {
   ) => {
     if (!validateIdentifier(identifier)) {
       toast.error("Please enter a valid email address or phone number.");
+      console.log("Please enter a valid email address or phone number.");
       return false;
     }
     if (password.length === 0) {
       toast.error("Please enter your password");
+      console.log("Please enter your password");
       return false;
     }
     
