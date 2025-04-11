@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { BsPencil } from "react-icons/bs";
 import { GoPlus } from "react-icons/go";
+import { IoIosBriefcase } from "react-icons/io";
 import { MdDeleteForever } from "react-icons/md";
-import { License } from "@/types"; // Ensure your Education type is defined here
+import { Experience } from "@/types";
 import {
   Button,
   Dialog,
@@ -12,63 +13,68 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components";
-import Header from "./modals/components/Header";
+import AddExperienceModal from "../modals/experience_modal/AddExperienceModal";
+import EditExperienceModal from "../modals/experience_modal/EditExperienceModal"; // <--- NEW
+import Header from "../modals/components/Header";
 import useFetchData from "@/hooks/useFetchData";
 import Cookies from "js-cookie";
 import { Link, useParams } from "react-router-dom";
-import { getUserLicenses, removeLicense } from "@/endpoints/userProfile";
+import {
+  getUserExperience,
+  removeWorkExperience,
+} from "@/endpoints/userProfile";
 import { formatExperienceDate } from "@/utils";
 import { toast } from "sonner";
 import { getErrorMessage } from "@/utils/errorHandler";
-import AddLicenseModal from "./modals/license_modal/AddLicenseModal";
-import EditLicenseModal from "./modals/license_modal/EditLicenseModal";
-import { LiaCertificateSolid } from "react-icons/lia";
 
 interface FetchDataResult {
-  licenses: License[];
+  work_experience: Experience[];
   is_me: boolean;
 }
 
-const LicenseSection: React.FC = () => {
+const ExperienceSection: React.FC = () => {
   const authToken = Cookies.get("linkup_auth_token");
   const { id } = useParams();
-  const [licenses, setLicenses] = useState<License[]>([]);
+  const [experiences, setExperiences] = useState<Experience[]>([]);
   const [editOpen, setEditOpen] = useState(false);
-  const [licenseToEdit, setLicenseToEdit] = useState<License | null>(null);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [selectedEducationId, setSelectedEducationId] = useState<string | null>(
+  const [experienceToEdit, setExperienceToEdit] = useState<Experience | null>(
     null
   );
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [selectedExperienceId, setSelectedExperienceId] = useState<
+    string | null
+  >(null);
 
   const { data, loading, error } = useFetchData<FetchDataResult | null>(() => {
     if (authToken && id) {
-      return getUserLicenses(authToken, id);
+      return getUserExperience(authToken, id);
     }
     return Promise.resolve(null);
   }, [authToken, id]);
 
   useEffect(() => {
-    console.log("License", data);
-    // console.log(data?.education);
-    if (data?.licenses) {
-      setLicenses(data.licenses);
+    if (data?.work_experience) {
+      setExperiences(data.work_experience);
     }
   }, [data]);
 
   const handleConfirmDelete = async () => {
-    if (authToken && selectedEducationId) {
+    if (authToken && selectedExperienceId) {
       try {
-        const response = await removeLicense(authToken, selectedEducationId);
-        setLicenses((prev) =>
-          prev.filter((edu) => edu._id !== selectedEducationId)
+        const response = await removeWorkExperience(
+          authToken,
+          selectedExperienceId
+        );
+        setExperiences((prev) =>
+          prev.filter((exp) => exp._id !== selectedExperienceId)
         );
         toast.success(response.message);
       } catch (error) {
-        console.error("Failed to delete education", error);
+        console.error("Failed to delete experience", error);
         toast.error(getErrorMessage(error));
       } finally {
         setDeleteDialogOpen(false);
-        setSelectedEducationId(null);
+        setSelectedExperienceId(null);
       }
     }
   };
@@ -76,7 +82,7 @@ const LicenseSection: React.FC = () => {
   if (loading) {
     return (
       <section
-        id="license-section"
+        id="experience-section"
         className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow outline-dotted dark:outline-blue-300 outline-blue-500"
       >
         <SkeletonLoader />
@@ -87,38 +93,36 @@ const LicenseSection: React.FC = () => {
   if (error) {
     return (
       <section
-        id="license-section"
+        id="experience-section"
         className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow"
       >
         <p className="text-red-500">
-          Failed to load educations. Please try again later.
+          Failed to load experiences. Please try again later.
         </p>
       </section>
     );
   }
 
   const isMe = data?.is_me ?? false;
-  const isEmpty = licenses.length === 0;
+  const isEmpty = experiences.length === 0;
 
-  // Handler for adding a new education
-  const handleAddLicense = (newLicense: License) => {
-    setLicenses((prev) => [...prev, newLicense]);
+  // Handler for adding a new experience
+  const handleAddExperience = (newExperience: Experience) => {
+    setExperiences((prev) => [...prev, newExperience]);
   };
 
-  // Handler for updating an existing Licsense
-  const handleEditLicense = (updatedEdu: License) => {
-    setLicenses((prev) =>
-      prev.map((edu) => (edu._id === updatedEdu._id ? updatedEdu : edu))
+  // Handler for updating an existing experience
+  const handleEditExperience = (updatedExp: Experience) => {
+    setExperiences((prev) =>
+      prev.map((exp) => (exp._id === updatedExp._id ? updatedExp : exp))
     );
     setEditOpen(false);
-    setLicenseToEdit(null);
+    setExperienceToEdit(null);
   };
-
-  if (!isMe && isEmpty) return null;
 
   return (
     <section
-      id="education-section"
+      id="experience-section"
       className={`bg-white dark:bg-gray-900 p-6 rounded-lg shadow ${
         isEmpty ? "outline-dotted dark:outline-blue-300 outline-blue-500" : ""
       }`}
@@ -126,50 +130,55 @@ const LicenseSection: React.FC = () => {
       <HeaderSection
         isMe={isMe}
         isEmpty={isEmpty}
-        onAddLicense={handleAddLicense}
+        onAddExperience={handleAddExperience}
       />
 
       {isEmpty ? (
         isMe ? (
-          <EmptyLicense onAddLicense={handleAddLicense} />
-        ) : null
+          <EmptyExperience onAddExperience={handleAddExperience} />
+        ) : (
+          <EmptyExperienceReadOnly />
+        )
       ) : (
-        <LicenseList
-          licenses={licenses}
+        <ExperienceList
+          experiences={experiences}
           isMe={isMe}
-          onStartEdit={(edu) => {
-            setLicenseToEdit(edu);
+          onStartEdit={(exp) => {
+            setExperienceToEdit(exp);
             setEditOpen(true);
           }}
           onDeleteClick={(id) => {
-            setSelectedEducationId(id);
+            setSelectedExperienceId(id);
             setDeleteDialogOpen(true);
           }}
         />
       )}
 
-      {/* Edit modal */}
+      {/* Edit modal (only shown if experienceToEdit is set) */}
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
         <DialogContent
           aria-describedby={undefined}
-          id="edit-education-dialog-content"
+          id="edit-experience-dialog-content"
           className="max-h-[45rem] overflow-y-auto dark:bg-gray-900 overflow-x-hidden !max-w-5xl sm:!w-[38.5rem] !w-full"
         >
           <DialogTitle className="hidden"></DialogTitle>
           <DialogHeader>
-            <Header title="Edit Education" />
+            <Header title="Edit Experience" />
+
             <DialogDescription className="text-sm text-gray-500 dark:text-gray-300">
               *Indicates required
             </DialogDescription>
           </DialogHeader>
-          {licenseToEdit && (
-            <EditLicenseModal
-              license={licenseToEdit}
+
+          {/* Render only if we have an experience to edit */}
+          {experienceToEdit && (
+            <EditExperienceModal
+              experience={experienceToEdit}
               onClose={() => {
                 setEditOpen(false);
-                setLicenseToEdit(null);
+                setExperienceToEdit(null);
               }}
-              onSuccess={handleEditLicense}
+              onSuccess={handleEditExperience}
             />
           )}
         </DialogContent>
@@ -184,11 +193,11 @@ const LicenseSection: React.FC = () => {
           <DialogHeader>
             <DialogTitle className="text-lg flex items-center gap-2">
               <MdDeleteForever className="text-pink-500" />
-              Delete License?
+              Delete Experience?
             </DialogTitle>
             <DialogDescription className="pt-2 text-gray-600 dark:text-gray-300">
               This action cannot be undone. Are you sure you want to permanently
-              delete this license from your profile?
+              delete this experience from your profile?
             </DialogDescription>
           </DialogHeader>
           <div className="flex justify-end gap-3 mt-4">
@@ -213,56 +222,64 @@ const LicenseSection: React.FC = () => {
   );
 };
 
-/* Header Section */
+/* ------------------------------------------------------------------
+   Header Section
+------------------------------------------------------------------ */
 interface HeaderSectionProps {
   isEmpty: boolean;
   isMe: boolean;
-  onAddLicense: (lic: License) => void;
+  onAddExperience: (exp: Experience) => void;
 }
 
 const HeaderSection: React.FC<HeaderSectionProps> = ({
   isEmpty,
   isMe,
-  onAddLicense,
+  onAddExperience,
 }) => (
   <header
-    id="license-section-header"
+    id="experience-section-header"
     className={`flex justify-between items-center mb-4 ${
       isEmpty ? "opacity-65" : ""
     }`}
   >
-    <div id="license-section-title-container">
+    <div id="experience-section-title-container">
       <h2
-        id="license-section-title"
+        id="experience-section-title"
         className="text-xl text-black dark:text-white font-bold"
       >
-        License
+        Experiences
       </h2>
       {isEmpty && isMe && (
-        <p id="license-section-description" className="text-sm">
-          Add your license details to showcase your academic background.
+        <p id="experience-section-description" className="text-sm">
+          Showcase your accomplishments and get up to 2X as many profile views
+          and connections
         </p>
       )}
     </div>
-    {!isEmpty && isMe && <ActionButtons onAddLicense={onAddLicense} />}
+    {/* Only show "+ Add Experience" button if user is the owner and the list is not empty */}
+    {!isEmpty && isMe && <ActionButtons onAddExperience={onAddExperience} />}
   </header>
 );
 
+/* ------------------------------------------------------------------
+   ActionButtons
+------------------------------------------------------------------ */
 interface ActionButtonsProps {
-  onAddLicense: (lic: License) => void;
+  onAddExperience: (exp: Experience) => void;
 }
-const ActionButtons: React.FC<ActionButtonsProps> = ({ onAddLicense }) => {
+const ActionButtons: React.FC<ActionButtonsProps> = ({ onAddExperience }) => {
   const [open, setOpen] = useState(false);
+
   return (
     <div
-      id="license-section-action-buttons"
+      id="experience-section-action-buttons"
       className="flex items-center gap-2"
     >
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
           <button
-            id="license-add-button"
-            aria-label="Add License"
+            id="experience-add-button"
+            aria-label="Add Experience"
             className="hover:bg-gray-300 dark:hover:text-black rounded-full transition-all duration-200 ease-in-out"
           >
             <GoPlus size={30} />
@@ -270,23 +287,23 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({ onAddLicense }) => {
         </DialogTrigger>
         <DialogContent
           aria-describedby={undefined}
-          id="license-add-dialog-content"
+          id="experience-add-dialog-content"
           className="max-h-[45rem] overflow-y-auto dark:bg-gray-900 overflow-x-hidden !max-w-5xl sm:!w-[38.5rem] !w-full"
         >
           <DialogTitle className="hidden"></DialogTitle>
-          <DialogHeader id="license-add-dialog-header">
-            <Header title="Add License" />
+          <DialogHeader id="experience-add-dialog-header">
+            <Header title="Add Experience" />
             <DialogDescription
-              id="license-add-dialog-description"
+              id="experience-add-dialog-description"
               className="text-sm text-gray-500 dark:text-gray-300"
             >
               *Indicates required
             </DialogDescription>
           </DialogHeader>
-          <AddLicenseModal
+          <AddExperienceModal
             onClose={() => setOpen(false)}
-            onSuccess={(newLic) => {
-              onAddLicense(newLic);
+            onSuccess={(newExp) => {
+              onAddExperience(newExp);
               setOpen(false);
             }}
           />
@@ -296,63 +313,71 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({ onAddLicense }) => {
   );
 };
 
-/* Education List */
-interface LicenseListProps {
-  licenses: License[];
+/* ------------------------------------------------------------------
+   ExperienceList
+------------------------------------------------------------------ */
+interface ExperienceListProps {
+  experiences: Experience[];
   isMe: boolean;
-  onStartEdit: (lic: License) => void;
-  onDeleteClick: (licenseId: string) => void;
+  onStartEdit: (exp: Experience) => void;
+  onDeleteClick: (experienceId: string) => void;
 }
 
-const LicenseList: React.FC<LicenseListProps> = ({
-  licenses,
+const ExperienceList: React.FC<ExperienceListProps> = ({
+  experiences,
   isMe,
   onStartEdit,
   onDeleteClick,
 }) => (
-  <div id="license-list-container" className="space-y-4">
-    {licenses.slice(0, 3).map((lic, idx) => (
+  <div id="experience-list-container" className="space-y-4">
+    {experiences.slice(0, 3).map((experience, idx) => (
       <div
-        id={`license-item-${lic._id}`}
+        id={`experience-item-${experience._id}`}
         key={idx}
         className="border-l-2 border-blue-600 pl-4 relative"
       >
-        <h3 id={`license-name-${lic._id}`} className="font-bold">
-          {lic.name}
+        <h3 id={`experience-title-${experience._id}`} className="font-bold">
+          {experience.title}
         </h3>
         <p
-          id={`license-organization-${lic._id}`}
+          id={`experience-company-${experience._id}`}
           className="text-gray-600 dark:text-gray-300"
         >
-          {lic.issuing_organization?.name}
+          {experience.organization?.name}
         </p>
         <p
-          id={`license-credential-url-${lic._id}`}
+          id={`experience-employee-type-${experience._id}`}
           className="text-sm text-gray-500 dark:text-gray-200"
         >
-          {lic.credintial_url}
+          {experience.employee_type}
         </p>
         <p className="text-xs capitalize inline-flex gap-2 text-gray-500 dark:text-gray-200">
-          <span>{formatExperienceDate(lic.issue_date)}</span>
+          <span>{formatExperienceDate(experience.start_date)}</span>
           <span>-</span>
-          <span>{formatExperienceDate(lic.expiration_date)}</span>
+          <span>
+            {experience.is_current
+              ? "present"
+              : formatExperienceDate(experience.end_date as Date)}
+          </span>
         </p>
-        {lic.skills.length > 0 && (
+
+        {experience.skills.length > 0 && (
           <div className="text-xs font-semibold flex items-center gap-2">
             <h2 className="font-bold text-sm">Skills:</h2>
-            {lic.skills.join(", ")}
+            {experience.skills.join(", ")}
           </div>
         )}
-        {lic.media.length > 0 && (
+
+        {experience.media.length > 0 && (
           <div className="mt-2">
-            {lic.media.map((med, idx) => (
+            {experience.media.map((med, idx) => (
               <div
                 key={`${med.media}-${idx}`}
                 className="text-xs font-semibold flex items-start gap-2"
               >
                 <img
                   src={med.media}
-                  alt="school-logo"
+                  alt="org-logo"
                   className="h-24 w-24 object-contain rounded-lg"
                 />
                 <div className="flex flex-col mt-2">
@@ -363,21 +388,22 @@ const LicenseList: React.FC<LicenseListProps> = ({
             ))}
           </div>
         )}
+
         {isMe && (
           <div className="absolute top-[-1rem] h-full right-0 flex gap-2 flex-col justify-between">
             <button
-              id={`license-edit-button-${idx}`}
-              aria-label="Edit License"
+              id={`experience-edit-button-${idx}`}
+              aria-label="Edit Experience"
               className="hover:bg-gray-300 dark:hover:text-black p-2 rounded-full transition-all duration-200 ease-in-out"
-              onClick={() => onStartEdit(lic)}
+              onClick={() => onStartEdit(experience)}
             >
               <BsPencil size={20} />
             </button>
             <button
-              id={`license-delete-button-${idx}`}
-              aria-label="Delete License"
+              id={`experience-delete-button-${idx}`}
+              aria-label="Delete Experience"
               className="bg-red-100 dark:bg-red-200 dark:text-gray-700 hover:bg-red-500 hover:text-white p-2 rounded-full transition-all duration-200 ease-in-out"
-              onClick={() => onDeleteClick(lic._id as string)}
+              onClick={() => onDeleteClick(experience._id as string)}
             >
               <MdDeleteForever size={20} />
             </button>
@@ -385,7 +411,8 @@ const LicenseList: React.FC<LicenseListProps> = ({
         )}
       </div>
     ))}
-    {licenses.length > 3 && (
+
+    {experiences.length > 3 && (
       <Link
         to="#"
         className="block w-full text-center text-blue-700 hover:underline transition-all duration-300 ease-in-out dark:text-blue-400 font-semibold"
@@ -396,64 +423,70 @@ const LicenseList: React.FC<LicenseListProps> = ({
   </div>
 );
 
-const EmptyLicense: React.FC<{
-  onAddLicense: (lic: License) => void;
-}> = ({ onAddLicense }) => {
+/* ------------------------------------------------------------------
+   EmptyExperience (for isMe === true when no experiences)
+------------------------------------------------------------------ */
+interface EmptyExperienceProps {
+  onAddExperience: (exp: Experience) => void;
+}
+const EmptyExperience: React.FC<EmptyExperienceProps> = ({
+  onAddExperience,
+}) => {
   const [open, setOpen] = useState(false);
+
   return (
-    <div id="empty-license-container" className="grid gap-2">
+    <div id="empty-experience-container" className="grid gap-2">
       <div
-        id="empty-license-info"
+        id="empty-experience-info"
         className="opacity-65 flex gap-2 items-center"
       >
-        <div id="empty-license-icon" className="p-3 rounded-xl border-2">
-          <span role="img" aria-label="license">
-            <LiaCertificateSolid size={20} />
-          </span>
+        <div id="empty-experience-icon" className="p-3 rounded-xl border-2">
+          <IoIosBriefcase size={25} />
         </div>
         <div
-          id="empty-license-details"
+          id="empty-experience-details"
           className="flex flex-col justify-center"
         >
-          <h2 id="empty-license-name" className="font-semibold">
-            License Name
+          <h2 id="empty-experience-job-title" className="font-semibold">
+            Job Title
           </h2>
-          <p id="empty-license-organization" className="text-sm">
-            Issuing Organization Name
+          <p id="empty-experience-organization" className="text-sm">
+            Organization
           </p>
-          <p id="empty-license-duration" className="text-sm">
-            2018 - 2022
+          <p id="empty-experience-duration" className="text-sm">
+            2023 - present
           </p>
         </div>
       </div>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
           <button
-            id="license-add-button"
+            id="experience-add-button"
             className="w-fit py-1.5 px-4 border-2 rounded-full dark:border-blue-400 font-semibold text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-600 dark:hover:bg-blue-400 hover:text-white transition-all duration-300 ease-in-out border-blue-600 cursor-pointer"
           >
-            Add License
+            Add Experience
           </button>
         </DialogTrigger>
         <DialogContent
           aria-describedby={undefined}
-          id="empty-license-dialog-content"
+          id="empty-experience-dialog-content"
           className="max-h-[45rem] dark:bg-gray-900 overflow-y-auto overflow-x-hidden !max-w-5xl sm:!w-[38.5rem] !w-full"
         >
           <DialogTitle className="hidden"></DialogTitle>
-          <DialogHeader id="empty-license-dialog-header">
-            <Header title="Add License" />
+          <DialogHeader id="empty-experience-dialog-header">
+            <Header title="Add Experience" />
+
             <DialogDescription
-              id="empty-license-dialog-description"
+              id="empty-experience-dialog-description"
               className="text-sm text-gray-500 dark:text-gray-300"
             >
               *Indicates required
             </DialogDescription>
           </DialogHeader>
-          <AddLicenseModal
+          <AddExperienceModal
             onClose={() => setOpen(false)}
-            onSuccess={(newLic) => {
-              onAddLicense(newLic);
+            onSuccess={(newExp) => {
+              onAddExperience(newExp);
               setOpen(false);
             }}
           />
@@ -463,6 +496,26 @@ const EmptyLicense: React.FC<{
   );
 };
 
+/* ------------------------------------------------------------------
+   EmptyExperienceReadOnly (for isMe === false && isEmpty)
+------------------------------------------------------------------ */
+const EmptyExperienceReadOnly: React.FC = () => (
+  <div id="empty-experience-readonly-container" className="grid gap-2">
+    <div className="opacity-65 flex gap-2 items-center">
+      <div className="p-3 rounded-xl border-2">
+        <IoIosBriefcase size={25} />
+      </div>
+      <div className="flex flex-col justify-center">
+        <h2 className="font-semibold">No Experience</h2>
+        <p className="text-sm">This user has not added any experience yet.</p>
+      </div>
+    </div>
+  </div>
+);
+
+/* ------------------------------------------------------------------
+   Skeleton Loader
+------------------------------------------------------------------ */
 const SkeletonLoader: React.FC = () => (
   <div className="animate-pulse space-y-4">
     <div className="h-6 w-1/2 bg-gray-300 dark:bg-gray-700 rounded" />
@@ -472,4 +525,4 @@ const SkeletonLoader: React.FC = () => (
   </div>
 );
 
-export default LicenseSection;
+export default ExperienceSection;

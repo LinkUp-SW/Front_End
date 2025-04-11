@@ -5,10 +5,10 @@ import {
   ExperienceSection,
   LicenseSection,
   ResourcesSection,
+  SkillsSection,
   UserInfo,
   ViewedSection,
 } from "./components";
-import SkillsSection from "./components/SkillsSection";
 
 const UserProfilePage = () => {
   return (

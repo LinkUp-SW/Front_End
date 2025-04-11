@@ -1,11 +1,12 @@
 import AboutSection from "./AboutSection";
 import AnalyticsSection from "./AnalyticsSection";
-import ExperienceSection from "./ExperienceSection";
+import ExperienceSection from "./experiences/ExperienceSection";
 import ResourcesSection from "./ResourcesSection";
 import UserInfo from "./user_info/UserInfo";
 import ViewedSection from "./ViewedSection";
-import EducationSection from "./EducationSection";
-import LicenseSection from "./LicenseSection";
+import EducationSection from "./educations/EducationSection";
+import LicenseSection from "./licenses/LicenseSection";
+import SkillsSection from "./skills/SkillsSection";
 
 export {
   AboutSection,
@@ -16,4 +17,5 @@ export {
   ViewedSection,
   EducationSection,
   LicenseSection,
+  SkillsSection
 };
