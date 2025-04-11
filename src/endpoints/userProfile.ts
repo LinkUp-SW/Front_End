@@ -341,7 +341,7 @@ export const editLicense = async (
   token: string,
   id: string,
   lisenceForm: License
-) => {
+): Promise<{ message: string; license: License }> => {
   const response = await axiosInstance.put(
     `/api/v1/user/update-license/${id}`,
     lisenceForm,
