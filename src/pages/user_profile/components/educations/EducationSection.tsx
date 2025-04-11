@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from "react";
-import { BsPencil } from "react-icons/bs";
+import React, { Fragment, useEffect, useState } from "react";
 import { GoPlus } from "react-icons/go";
 import { MdDeleteForever } from "react-icons/md";
 import { Education } from "@/types"; // Ensure your Education type is defined here
@@ -18,10 +17,10 @@ import useFetchData from "@/hooks/useFetchData";
 import Cookies from "js-cookie";
 import { Link, useParams } from "react-router-dom";
 import { getUserEducation, removeEducation } from "@/endpoints/userProfile";
-import { formatExperienceDate } from "@/utils";
 import { toast } from "sonner";
 import { getErrorMessage } from "@/utils/errorHandler";
 import EditEducationModal from "../modals/education_modal/EditEducationModal";
+import EducationsList from "./EducationsList";
 
 interface FetchDataResult {
   education: Education[];
@@ -141,6 +140,7 @@ const EducationSection: React.FC = () => {
             setEducationToEdit(edu);
             setEditOpen(true);
           }}
+          userId={id as string}
           onDeleteClick={(id) => {
             setSelectedEducationId(id);
             setDeleteDialogOpen(true);
@@ -302,6 +302,7 @@ interface EducationListProps {
   isMe: boolean;
   onStartEdit: (edu: Education) => void;
   onDeleteClick: (educationId: string) => void;
+  userId: string;
 }
 
 const EducationList: React.FC<EducationListProps> = ({
@@ -309,85 +310,24 @@ const EducationList: React.FC<EducationListProps> = ({
   isMe,
   onStartEdit,
   onDeleteClick,
+  userId,
 }) => (
   <div id="education-list-container" className="space-y-4">
     {educations.slice(0, 3).map((edu, idx) => (
-      <div
-        id={`education-item-${edu._id}`}
-        key={idx}
-        className="border-l-2 border-blue-600 pl-4 relative"
-      >
-        <h3 id={`education-degree-${edu._id}`} className="font-bold">
-          {edu.degree}
-        </h3>
-        <p
-          id={`education-school-${edu._id}`}
-          className="text-gray-600 dark:text-gray-300"
-        >
-          {edu.school?.name}
-        </p>
-        <p
-          id={`education-field-${edu._id}`}
-          className="text-sm text-gray-500 dark:text-gray-200"
-        >
-          {edu.field_of_study}
-        </p>
-        <p className="text-xs capitalize inline-flex gap-2 text-gray-500 dark:text-gray-200">
-          <span>{formatExperienceDate(edu.start_date)}</span>
-          <span>-</span>
-          <span>{formatExperienceDate(edu.end_date)}</span>
-        </p>
-        {edu.skills.length > 0 && (
-          <div className="text-xs font-semibold flex items-center gap-2">
-            <h2 className="font-bold text-sm">Skills:</h2>
-            {edu.skills.join(", ")}
-          </div>
-        )}
-        {edu.media.length > 0 && (
-          <div className="mt-2">
-            {edu.media.map((med, idx) => (
-              <div
-                key={`${med.media}-${idx}`}
-                className="text-xs font-semibold flex items-start gap-2"
-              >
-                <img
-                  src={med.media}
-                  alt="school-logo"
-                  className="h-24 w-24 object-contain rounded-lg"
-                />
-                <div className="flex flex-col mt-2">
-                  <h2 className="text-base font-bold">{med.title}</h2>
-                  <p>{med.description}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-        {isMe && (
-          <div className="absolute top-[-1rem] h-full right-0 flex gap-2 flex-col justify-between">
-            <button
-              id={`education-edit-button-${idx}`}
-              aria-label="Edit Education"
-              className="hover:bg-gray-300 dark:hover:text-black p-2 rounded-full transition-all duration-200 ease-in-out"
-              onClick={() => onStartEdit(edu)}
-            >
-              <BsPencil size={20} />
-            </button>
-            <button
-              id={`education-delete-button-${idx}`}
-              aria-label="Delete Education"
-              className="bg-red-100 dark:bg-red-200 dark:text-gray-700 hover:bg-red-500 hover:text-white p-2 rounded-full transition-all duration-200 ease-in-out"
-              onClick={() => onDeleteClick(edu._id as string)}
-            >
-              <MdDeleteForever size={20} />
-            </button>
-          </div>
-        )}
-      </div>
+      <Fragment key={idx}>
+        <EducationsList
+          isMe={isMe}
+          onStartEdit={onStartEdit}
+          onDeleteClick={onDeleteClick}
+          idx={idx}
+          education={edu}
+        />
+      </Fragment>
     ))}
     {educations.length > 3 && (
       <Link
-        to="#"
+        to={`/user-profile/educations/${userId}`}
+        id="show-more-educations-link"
         className="block w-full text-center text-blue-700 hover:underline transition-all duration-300 ease-in-out dark:text-blue-400 font-semibold"
       >
         Show More
