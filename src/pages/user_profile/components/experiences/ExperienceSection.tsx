@@ -146,6 +146,7 @@ const ExperienceSection: React.FC = () => {
             setExperienceToEdit(exp);
             setEditOpen(true);
           }}
+          userId={id as string}
           onDeleteClick={(id) => {
             setSelectedExperienceId(id);
             setDeleteDialogOpen(true);
@@ -320,6 +321,7 @@ interface ExperienceListContainerProps {
   isMe: boolean;
   onStartEdit: (exp: Experience) => void;
   onDeleteClick: (experienceId: string) => void;
+  userId:string
 }
 
 const ExperienceListContainer: React.FC<ExperienceListContainerProps> = ({
@@ -327,6 +329,7 @@ const ExperienceListContainer: React.FC<ExperienceListContainerProps> = ({
   isMe,
   onStartEdit,
   onDeleteClick,
+  userId
 }) => (
   <div id="experience-list-container" className="space-y-4">
     {experiences.slice(0, 3).map((experience, idx) => (
@@ -341,7 +344,8 @@ const ExperienceListContainer: React.FC<ExperienceListContainerProps> = ({
 
     {experiences.length > 3 && (
       <Link
-        to="#"
+        to={`/user-profile/experiences/${userId}`}
+        id="show-more-experiences-link"
         className="block w-full text-center text-blue-700 hover:underline transition-all duration-300 ease-in-out dark:text-blue-400 font-semibold"
       >
         Show More
