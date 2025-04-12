@@ -1,5 +1,4 @@
 import React, { Fragment, useEffect, useState } from "react";
-import { GoPlus } from "react-icons/go";
 import { MdDeleteForever } from "react-icons/md";
 import { Education } from "@/types"; // Ensure your Education type is defined here
 import {
@@ -21,6 +20,8 @@ import { toast } from "sonner";
 import { getErrorMessage } from "@/utils/errorHandler";
 import EditEducationModal from "../modals/education_modal/EditEducationModal";
 import EducationsList from "./EducationsList";
+import EducationSkeletonLoader from "./EducationSkeletonLoader";
+import EducationHeaderSection from "./EducationHeaderSection";
 
 interface FetchDataResult {
   education: Education[];
@@ -78,7 +79,7 @@ const EducationSection: React.FC = () => {
         id="education-section"
         className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow outline-dotted dark:outline-blue-300 outline-blue-500"
       >
-        <SkeletonLoader />
+        <EducationSkeletonLoader />
       </section>
     );
   }
@@ -120,7 +121,7 @@ const EducationSection: React.FC = () => {
         isEmpty ? "outline-dotted dark:outline-blue-300 outline-blue-500" : ""
       }`}
     >
-      <HeaderSection
+      <EducationHeaderSection
         isMe={isMe}
         isEmpty={isEmpty}
         onAddEducation={handleAddEducation}
@@ -133,7 +134,7 @@ const EducationSection: React.FC = () => {
           <EmptyEducationReadOnly />
         )
       ) : (
-        <EducationList
+        <EducationListContainer
           educations={educations}
           isMe={isMe}
           onStartEdit={(edu) => {
@@ -213,91 +214,8 @@ const EducationSection: React.FC = () => {
   );
 };
 
-/* Header Section */
-interface HeaderSectionProps {
-  isEmpty: boolean;
-  isMe: boolean;
-  onAddEducation: (edu: Education) => void;
-}
-
-const HeaderSection: React.FC<HeaderSectionProps> = ({
-  isEmpty,
-  isMe,
-  onAddEducation,
-}) => (
-  <header
-    id="education-section-header"
-    className={`flex justify-between items-center mb-4 ${
-      isEmpty ? "opacity-65" : ""
-    }`}
-  >
-    <div id="education-section-title-container">
-      <h2
-        id="education-section-title"
-        className="text-xl text-black dark:text-white font-bold"
-      >
-        Education
-      </h2>
-      {isEmpty && isMe && (
-        <p id="education-section-description" className="text-sm">
-          Add your education details to showcase your academic background.
-        </p>
-      )}
-    </div>
-    {!isEmpty && isMe && <ActionButtons onAddEducation={onAddEducation} />}
-  </header>
-);
-
-interface ActionButtonsProps {
-  onAddEducation: (edu: Education) => void;
-}
-const ActionButtons: React.FC<ActionButtonsProps> = ({ onAddEducation }) => {
-  const [open, setOpen] = useState(false);
-  return (
-    <div
-      id="education-section-action-buttons"
-      className="flex items-center gap-2"
-    >
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger asChild>
-          <button
-            id="education-add-button"
-            aria-label="Add Education"
-            className="hover:bg-gray-300 dark:hover:text-black rounded-full transition-all duration-200 ease-in-out"
-          >
-            <GoPlus size={30} />
-          </button>
-        </DialogTrigger>
-        <DialogContent
-          aria-describedby={undefined}
-          id="education-add-dialog-content"
-          className="max-h-[45rem] overflow-y-auto dark:bg-gray-900 overflow-x-hidden !max-w-5xl sm:!w-[38.5rem] !w-full"
-        >
-          <DialogTitle className="hidden"></DialogTitle>
-          <DialogHeader id="education-add-dialog-header">
-            <Header title="Add Education" />
-            <DialogDescription
-              id="education-add-dialog-description"
-              className="text-sm text-gray-500 dark:text-gray-300"
-            >
-              *Indicates required
-            </DialogDescription>
-          </DialogHeader>
-          <AddEducationModal
-            onClose={() => setOpen(false)}
-            onSuccess={(newEdu) => {
-              onAddEducation(newEdu);
-              setOpen(false);
-            }}
-          />
-        </DialogContent>
-      </Dialog>
-    </div>
-  );
-};
-
 /* Education List */
-interface EducationListProps {
+interface EducationListContainerProps {
   educations: Education[];
   isMe: boolean;
   onStartEdit: (edu: Education) => void;
@@ -305,7 +223,7 @@ interface EducationListProps {
   userId: string;
 }
 
-const EducationList: React.FC<EducationListProps> = ({
+const EducationListContainer: React.FC<EducationListContainerProps> = ({
   educations,
   isMe,
   onStartEdit,
@@ -416,15 +334,6 @@ const EmptyEducationReadOnly: React.FC = () => (
         <p className="text-sm">This user has not added any education yet.</p>
       </div>
     </div>
-  </div>
-);
-
-const SkeletonLoader: React.FC = () => (
-  <div className="animate-pulse space-y-4">
-    <div className="h-6 w-1/2 bg-gray-300 dark:bg-gray-700 rounded" />
-    <div className="h-4 w-full bg-gray-300 dark:bg-gray-700 rounded" />
-    <div className="h-4 w-full bg-gray-300 dark:bg-gray-700 rounded" />
-    <div className="h-24 w-full bg-gray-300 dark:bg-gray-700 rounded" />
   </div>
 );
 
