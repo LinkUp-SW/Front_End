@@ -1,9 +1,11 @@
 import { Modal, WithNavBar } from "../../components";
 import {
   AboutSection,
-  AnalyticsSection,
+  EducationSection,
   ExperienceSection,
+  LicenseSection,
   ResourcesSection,
+  SkillsSection,
   UserInfo,
   ViewedSection,
 } from "./components";
@@ -15,9 +17,11 @@ const UserProfilePage = () => {
         {/* Main Content Column */}
         <div className="lg:col-span-2 space-y-4">
           <UserInfo />
-          <AnalyticsSection />
           <AboutSection />
           <ExperienceSection />
+          <EducationSection />
+          <LicenseSection />
+          <SkillsSection />
         </div>
 
         {/* Right Sidebar */}

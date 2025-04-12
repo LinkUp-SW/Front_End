@@ -10,16 +10,29 @@ import { RxHamburgerMenu } from "react-icons/rx";
 import styles from "./styles.module.css"; // Import your CSS module
 import { convertStringsArrayToLowerCase } from "../../../../../utils";
 import { IoMdAdd } from "react-icons/io";
+import { editUserAbout } from "@/endpoints/userProfile";
+import Cookies from "js-cookie";
+import { useFormStatus } from "@/hooks/useFormStatus";
+import FormSpinner from "@/components/form/form_spinner/FormSpinner";
+import { toast } from "sonner";
+import { getErrorMessage } from "@/utils/errorHandler";
+import { About } from "@/types";
 
-const AboutModal = () => {
+const AboutModal = ({
+  description,
+  fetchedSkills,
+  setAboutData,
+  setIsOpenModal,
+}: {
+  description: string;
+  fetchedSkills: string[];
+  setAboutData: (aboutData: About) => void;
+  setIsOpenModal: (isOpenModal: boolean) => void;
+}) => {
   const [wordCount, setWordCount] = useState<number>(0);
-  const [aboutText, setAboutText] = useState<string>("");
+  const [aboutText, setAboutText] = useState<string>(description || "");
   const [isAddSkillTriggred, setIsAddSkillTriggred] = useState(false);
-  const [skills, setSkills] = useState<string[]>([
-    "Web Development",
-    "Data Analysis",
-    "Machine Learning",
-  ]);
+  const [skills, setSkills] = useState<string[]>(fetchedSkills || []);
   const [newSkill, setNewSkill] = useState<string>("");
   const [draggingIndex, setDraggingIndex] = useState<number | null>(null);
 
@@ -27,6 +40,11 @@ const AboutModal = () => {
   const itemRefs = useRef<Map<string, HTMLLIElement>>(new Map());
   const positions = useRef<Map<string, DOMRect>>(new Map());
   const touchStartY = useRef<number | null>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  //accessing user token and using Custom hook
+  const authToken = Cookies.get("linkup_auth_token");
+  const { isSubmitting, startSubmitting, stopSubmitting } = useFormStatus();
 
   // Measure and store positions of each list item
   const measurePositions = () => {
@@ -69,6 +87,13 @@ const AboutModal = () => {
 
   useEffect(() => {
     setWordCount(aboutText.length);
+  }, [aboutText]);
+
+  useLayoutEffect(() => {
+    if (textareaRef.current) {
+      const len = textareaRef.current.value.length;
+      textareaRef.current.setSelectionRange(len, len);
+    }
   }, [aboutText]);
 
   // Apply FLIP animation when the skills array changes
@@ -181,6 +206,27 @@ const AboutModal = () => {
     });
   };
 
+  const handleSaveAbout = async () => {
+    if (aboutText.trim() === "")
+      return toast.error("About Description is Required");
+    if (!authToken)
+      return toast.error("You are not allowed to perform this action");
+    startSubmitting();
+    try {
+      const response = await editUserAbout(authToken, {
+        about: aboutText,
+        skills: skills,
+      });
+      setAboutData({ about: aboutText, skills: skills });
+      toast.success(response.message);
+      setIsOpenModal(false);
+    } catch (error) {
+      toast.error(getErrorMessage(error));
+    } finally {
+      stopSubmitting();
+    }
+  };
+
   return (
     <div className="max-w-5xl md:w-[40rem] w-full">
       <section className="grid grid-cols-1 gap-1 relative pb-7">
@@ -189,9 +235,10 @@ const AboutModal = () => {
           name="about"
           id="about"
           value={aboutText}
+          ref={textareaRef}
           onChange={handleAboutText}
           rows={10}
-          className="border-gray-50 border outline-1 outline-gray-400 dark:outline-gray-300 focus:outline-1 rounded-md text-sm p-2"
+          className="border-gray-50 border outline-1 outline-gray-400 dark:outline-gray-600 focus:outline-1 rounded-md text-sm p-2"
         />
         <span className="absolute bottom-0 right-0 text-sm text-gray-700 dark:text-gray-400">
           {wordCount} / 2600
@@ -231,10 +278,12 @@ const AboutModal = () => {
                 <span className="inline-flex gap-2 items-center">
                   <span
                     onClick={() => handleRemoveSkill(skill)}
+                    onTouchStart={(e) => e.stopPropagation()} // Prevents the touch event from reaching the parent
                     className="cursor-pointer hover:bg-gray-300 hover:text-black rounded-full p-[0.15rem] transition-all duration-300 ease-in-out"
                   >
                     <IoMdClose />
                   </span>
+
                   <span className="text-base font-semibold">{skill}</span>
                 </span>
                 <span className="cursor-grab">
@@ -286,6 +335,15 @@ const AboutModal = () => {
             )}
           </div>
         )}
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          id="about-submit-button"
+          onClick={handleSaveAbout}
+          className="bg-purple-600 mt-2 hover:bg-purple-700 w-full disabled:opacity-60 disabled:hover:bg-purple-600 disabled:cursor-not-allowed cursor-pointer text-white py-2 px-4 rounded-full transition-all duration-300"
+        >
+          {isSubmitting ? <FormSpinner /> : "Save About"}
+        </button>
       </section>
     </div>
   );

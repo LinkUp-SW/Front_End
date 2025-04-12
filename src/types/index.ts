@@ -15,7 +15,6 @@ export interface WithdrawInvitationType {
   userName: string;
 }
 
-
 export interface Notification {
   id: string;
   type: "job" | "post" | "recommendation" | "message" | "connection";
@@ -26,9 +25,9 @@ export interface Notification {
   actionLink?: string;
   location?: string;
   count?: number;
-  isNew?: boolean;
-  read?:boolean;
+  isNew: boolean;  // Make isNew non-optional to avoid undefined checks
 }
+
 
 export interface PostType {
   user: {
@@ -42,6 +41,8 @@ export interface PostType {
     content: string;
     date: number;
     images?: string[];
+    video?: string;
+    pdf?: string;
     public: boolean;
     edited?: boolean;
   };
@@ -98,37 +99,32 @@ export interface CommentType {
 
 export type PostFilter = "all" | "comments" | "reactions" | "reposts";
 
-export interface Experience {
+export interface Organization {
   _id: string;
+  logo: string;
+  name: string;
+}
+
+export interface Experience {
+  _id?: string;
   title: string;
   employee_type: string;
-  company: string;
+  organization: Organization;
   is_current: boolean;
   start_date: Date;
   end_date?: Date;
   location: string;
   description: string;
   location_type: string;
-  where_did_you_find_us: string;
   skills: string[];
-  media: Media;
-}
-
-export interface Skill {
-  name: string;
-  endorsments: string[];
-  used_where: [
-    education: string[],
-    certificate: string[],
-    experience: string[]
-  ];
+  media: Media[];
 }
 
 export interface Media {
-  image: string[];
-  video: string[];
+  media: string;
+  title: string;
+  description: string;
 }
-
 export enum JobTypeEnum {
   full_time = "Full-time",
   part_time = "Part-time",
@@ -157,12 +153,12 @@ export interface UserStarterInterface {
   city: string;
   isStudent: boolean;
   jobTitle?: string;
-  school?: string;
+  school?: Organization;
   schoolStartYear?: string;
   schoolEndYear?: string;
   is16OrAbove?: boolean;
   employeeType?: string;
-  recentCompany?: string;
+  recentCompany?: Organization;
   birthDate?: Date;
   is_verified: boolean;
 }
@@ -206,5 +202,97 @@ export interface UserProfileBio {
   is_in_sent_connections?: boolean;
   name_of_one_mutual_connection?: string;
   isInConnections?: boolean;
+  isConnectByEmail: boolean;
   isAlreadyFollowing?: boolean;
+  is_default_profile_photo: boolean;
+  education: Organization | null;
+  work_experience: Organization | null;
+  is_defult_cover_photo: boolean;
+}
+
+// Add to types.ts
+export interface Education {
+  _id?: string;
+  school: Organization; // Reusing Organization type assuming it has name/logo
+  degree: string;
+  field_of_study: string;
+  start_date: Date;
+  end_date: Date;
+  grade: string;
+  activities_and_socials: string;
+  skills: string[];
+  description: string;
+  media: Media[];
+}
+
+export interface About {
+  about: string;
+  skills: string[];
+}
+
+export interface License {
+  _id?: string;
+  name: string;
+  issuing_organization: Organization;
+  issue_date: Date;
+  expiration_date: Date;
+  credintial_id: string;
+  credintial_url: string;
+  skills: string[];
+  media: Media[];
+}
+
+export interface SkillForm {
+  name: string;
+  educations: string[];
+  experiences: string[];
+  licenses: string[];
+}
+
+export interface Skill {
+  _id?: string;
+  name: string;
+  endorsments: Endorsement[];
+  educations: Organization[];
+  experiences: Organization[];
+  licenses: Organization[];
+  total_endorsements?:number
+}
+
+export interface Endorsement {
+  user_id: string;
+  profilePicture: string;
+  name: string;
+}
+
+export interface SkillUserSections {
+  educations: Organization[];
+  experiences: Organization[];
+  licenses: Organization[];
+}
+
+export interface MenuAction {
+  name: string;
+  action: () => void;
+  subtext?: string;
+  icon: React.ReactNode;
+}
+
+export enum MediaType {
+  image = "image",
+  images = "images",
+  video = "video",
+  pdf = "pdf",
+  post = "post",
+  link = "link",
+  none = "none",
+}
+
+export interface PostDBObject {
+  content: string; // Text content of the post
+  mediaType: MediaType; // Type of media (e.g., "image", "video", etc.)
+  media: string[]; // Array of media URLs or Base64 strings
+  commentsDisabled: string; // Indicates if comments are disabled (e.g., "true" or "false")
+  publicPost: boolean; // Whether the post is public or not
+  taggedUsers: string[]; // Array of user IDs tagged in the post
 }

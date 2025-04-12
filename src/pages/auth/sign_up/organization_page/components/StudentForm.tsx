@@ -1,5 +1,5 @@
 import {
-  FormInput,
+  OrganizationSearch,
   Select,
   SelectContent,
   SelectItem,
@@ -7,11 +7,12 @@ import {
   SelectValue,
   Switch,
 } from "@/components";
-import { UserStarterInterface } from "@/types";
+import { getSchoolsList } from "@/endpoints/userProfile";
+import { Organization, UserStarterInterface } from "@/types";
 import React, { useEffect, useState } from "react";
 
 interface SchoolFormData {
-  school: string;
+  school: Organization;
   schoolStartYear: string;
   schoolEndYear: string;
   birthDate?: Date;
@@ -28,7 +29,7 @@ const StudentForm: React.FC<StudentFormProps> = ({
 }) => {
   const [is16OrAbove, setIs16OrAbove] = useState(true);
   const [formData, setFormData] = useState<SchoolFormData>({
-    school: "",
+    school: { _id: "", name: "", logo: "" },
     schoolStartYear: "",
     schoolEndYear: "",
     birthDate: undefined,
@@ -87,12 +88,19 @@ const StudentForm: React.FC<StudentFormProps> = ({
 
   return (
     <section className="flex w-full py-2 flex-col items-center">
-      <FormInput
+      <OrganizationSearch
         label="School or College/University*"
+        selectedOrganization={formData.school}
+        onSelect={(org) =>
+          setFormData((prev) => ({
+            ...prev,
+            school: org,
+          }))
+        }
+        fetchOrganizations={(query) =>
+          getSchoolsList(query).then((res) => res.data)
+        }
         placeholder="Enter your school/college name"
-        value={formData.school}
-        onChange={(e) => handleChange("school", e.target.value)}
-        extraClassName="w-full"
         id="school-name"
         name="schoolName"
       />

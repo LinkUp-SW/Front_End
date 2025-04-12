@@ -23,6 +23,12 @@ import {
   ConnectionsPage,
   FollowingFollowersPage,
   SearchPage,
+  UserSkillsPage,
+  UserEducationsPage,
+  UserExperiencesPage,
+  UserLicensesPage,
+  SignInAndSecurityPage,
+  ChangePasswordPage
 } from "./pages";
 
 import React from "react";
@@ -55,7 +61,7 @@ const routes: RouteObject[] = [
     element: React.createElement(NotificationsPage),
   },
   {
-    path: "/collections",
+    path: "/jobs/see-more",
     element: React.createElement(SeeMorePage),
   },
   {
@@ -68,7 +74,9 @@ const routes: RouteObject[] = [
     element: React.createElement(FollowingFollowersPage),
   },
 
-  { path: "/connections", element: React.createElement(ConnectionsPage) },
+  { path: "/connections/:id", 
+    element: React.createElement(ConnectionsPage) 
+  },
 
   {
     path: "/manage-invitations",
@@ -115,6 +123,30 @@ const routes: RouteObject[] = [
   {
     path: "/search/:query",
     element: React.createElement(SearchPage),
+  },
+  {
+    path: "/user-profile/skills/:id",
+    element: React.createElement(UserSkillsPage),
+  },
+  {
+    path: "/user-profile/educations/:id",
+    element: React.createElement(UserEducationsPage),
+  },
+  {
+    path: "/user-profile/experiences/:id",
+    element: React.createElement(UserExperiencesPage),
+  },
+  {
+    path: "/user-profile/licenses/:id",
+    element: React.createElement(UserLicensesPage),
+  },
+  {
+    path: "/settings/security",
+    element: React.createElement(SignInAndSecurityPage),
+  },
+  {
+    path: "/settings/security/changepassword",
+    element: React.createElement(ChangePasswordPage),
   },
 ];
 

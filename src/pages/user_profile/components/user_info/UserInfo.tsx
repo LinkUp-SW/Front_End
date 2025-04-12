@@ -14,6 +14,7 @@ import {
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { getErrorMessage } from "@/utils/errorHandler";
+import { AxiosError } from "axios";
 
 const UserInfo = () => {
   const token = Cookies.get("linkup_auth_token");
@@ -43,7 +44,7 @@ const UserInfo = () => {
     if (data) console.log(data); // Remove in production
   }, [data]);
 
-  if (!id||getErrorMessage(error).toLocaleLowerCase()==='user not found') {
+  if (!id || getErrorMessage(error).toLocaleLowerCase() === "user not found") {
     window.location.replace("/user-not-found");
     return null;
   }
@@ -64,12 +65,19 @@ const UserInfo = () => {
 
       <div className="pt-20 px-6 pb-6">
         <ProfileHeader
+          userid={id}
           user={data.bio}
+          intros={{
+            work_experience: data.work_experience,
+            education: data.education,
+          }}
           connectionsCount={data.number_of_connections}
         />
 
         <ProfileActionButtons
           isOwner={data.is_me}
+          isConnectByEmail={data.isConnectByEmail}
+          email={data.email}
           followStatus={{
             isFollowing: data.isAlreadyFollowing,
             isPending: data.is_in_sent_connections,
@@ -82,10 +90,18 @@ const UserInfo = () => {
   );
 };
 
-const ErrorFallback = ({error}:{error:unknown}) => (
-  <div className="text-red-500 p-4 bg-red-100 rounded-lg">
-    {getErrorMessage(error)}
-  </div>
-);
+const ErrorFallback = ({ error }: { error: unknown }) => {
+  console.log(error);
+  if (error instanceof AxiosError) {
+    if (error.response?.status === 403) {
+      window.location.replace("/user-not-found");
+    }
+  }
+  return (
+    <div className="text-red-500 p-4 bg-red-100 rounded-lg">
+      {getErrorMessage(error)}
+    </div>
+  );
+};
 
 export default UserInfo;

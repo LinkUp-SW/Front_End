@@ -16,7 +16,10 @@ const AddSectionModal: React.FC = () => (
         Add profile section
       </CustomButton>
     </DialogTrigger>
-    <DialogContent className="!max-w-5xl gap-0 md:!w-[33rem] overflow-y-auto rounded-lg dark:bg-gray-900 p-6 max-h-[45rem]">
+    <DialogContent
+      aria-describedby={undefined}
+      className="!max-w-5xl gap-0 md:!w-[33rem] overflow-y-auto rounded-lg dark:bg-gray-900 p-6 max-h-[45rem]"
+    >
       <DialogHeader>
         <DialogTitle className="text-xl font-bold">Add To Profile</DialogTitle>
       </DialogHeader>

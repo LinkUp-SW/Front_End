@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { JSX, useEffect, useState } from "react";
 import moment from "moment";
 import { Button } from "../../../components/ui/button";
 
@@ -12,14 +12,13 @@ import { HiOutlineLightBulb as InsightfulIcon } from "react-icons/hi";
 import { PiHandPalmBold as SupportIcon } from "react-icons/pi";
 import { Link } from "react-router-dom";
 import { CommentType, PostType } from "@/types";
-
 import { POST_ACTIONS } from "@/constants";
 import PostHeader from "./PostHeader";
 import PostFooter from "./PostFooter";
-import { getEngagementButtons, getMenuActions } from "./menus";
-import { Dialog, DialogContent, DialogTrigger } from "@/components";
+import { getEngagementButtons, getMenuActions } from "../components/Menus";
+import { Dialog, DialogContent, DialogTrigger, TruncatedText } from "@/components";
 import ReactionsModal from "./modals/ReactionsModal";
-import TruncatedText from "./TruncatedText";
+import PostImages from "./PostImages";
 
 interface PostProps {
   postData: PostType;
@@ -30,6 +29,7 @@ const Post: React.FC<PostProps> = ({ postData, comments }) => {
   const { user, post, stats, action } = postData;
 
   const [liked, setLiked] = useState(false);
+  const [isLandscape, setIsLandscape] = useState<boolean>(false);
 
   const [postMenuOpen, setPostMenuOpen] = useState(false);
   const [sortingMenu, setSortingMenu] = useState(false);
@@ -39,7 +39,15 @@ const Post: React.FC<PostProps> = ({ postData, comments }) => {
     setSortingState(selectedState);
   };
 
-  // If not expanded, show only 40 words + ...
+  useEffect(() => {
+    if (post.images && post.images.length > 0) {
+      const img = new Image();
+      img.src = post.images[0];
+      img.onload = () => {
+        setIsLandscape(img.width > img.height); // Check if the image is landscape
+      };
+    }
+  }, [post.images]);
 
   const menuActions = getMenuActions();
 
@@ -74,9 +82,9 @@ const Post: React.FC<PostProps> = ({ postData, comments }) => {
 
   return (
     <Card className="p-2 bg-white border-0 mb-4 pl-0 dark:bg-gray-900 dark:text-neutral-200">
-      <CardContent className="flex flex-col items-center">
+      <CardContent className="flex flex-col items-center pl-0 w-full">
         {action && (
-          <header className="flex justify-start items-center w-full border-b gap-2 pb-2 dark:border-neutral-700">
+          <header className="flex pl-4 justify-start items-center w-full border-b gap-2 pb-2 dark:border-neutral-700">
             <img
               src={action.profileImage}
               alt={action.name}
@@ -103,19 +111,28 @@ const Post: React.FC<PostProps> = ({ postData, comments }) => {
           timeAgo={timeAgo}
           post={post}
         />
-        <TruncatedText content={post.content} lineCount={3} />
+        <TruncatedText id="post-content" content={post.content} lineCount={3} />
 
         {/* Post Image(s) */}
-        {post.images && post.images.length > 0 && (
-          <div className="mt-3">
-            <img
-              src={post.images[0]}
-              alt="Post content"
-              className="w-full h-48 object-cover rounded-md"
-            />
+        <PostImages images={post.images || []} isLandscape={isLandscape} />
+
+        {post.video && (
+          <div className="flex w-[108%] relative left-4 justify-end">
+            <video className="w-full pt-4" controls src={post.video}></video>
           </div>
         )}
-        <footer className="flex justify-between w-full items-center pt-4">
+        {post.pdf && (
+          <div className="h-[50rem] w-[27.5rem] relative left-4.5 pt-4">
+            {/* <EmbedPDF
+              mode="inline"
+              className="w-full h-full"
+              companyIdentifier="react-viewer"
+              documentURL={post.pdf}
+            /> */}
+          </div>
+        )}
+
+        <footer className="flex justify-between w-full items-center pt-4 pl-4">
           <Dialog>
             <DialogTrigger asChild>
               <button className="flex relative text-gray-500 dark:text-neutral-400 text-sm hover:underline hover:cursor-pointer hover:text-blue-600 dark:hover:text-blue-400">
@@ -144,22 +161,27 @@ const Post: React.FC<PostProps> = ({ postData, comments }) => {
         </footer>
         {/* Engagement Buttons */}
         <footer className="mt-3 flex justify-around text-gray-600 dark:text-neutral-400 text-sm w-full">
-          {engagementButtons.map((button, index) => (
-            <Button
-              key={index}
-              variant="ghost"
-              size="lg"
-              onClick={button.callback}
-              className={`flex dark:hover:bg-zinc-800 dark:hover:text-neutral-200 ${
-                button.name == "Like" &&
-                liked &&
-                "text-blue-400 hover:text-blue-400 dark:hover:text-blue-400"
-              } items-center gap-2 hover:cursor-pointer  transition-all`}
-            >
-              {button.icon}
-              {button.name}
-            </Button>
-          ))}
+          {engagementButtons.map(
+            (
+              button: { name: string; icon: JSX.Element; callback: () => void },
+              index: number
+            ) => (
+              <Button
+                key={index}
+                variant="ghost"
+                size="lg"
+                onClick={button.callback}
+                className={`flex dark:hover:bg-zinc-800 dark:hover:text-neutral-200 ${
+                  button.name == "Like" &&
+                  liked &&
+                  "text-blue-400 hover:text-blue-400 dark:hover:text-blue-400"
+                } items-center gap-2 hover:cursor-pointer  transition-all`}
+              >
+                {button.icon}
+                {button.name}
+              </Button>
+            )
+          )}
         </footer>
       </CardContent>
       <CardFooter>

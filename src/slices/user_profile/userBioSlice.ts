@@ -1,6 +1,6 @@
 import { getUserBio } from "@/endpoints/userProfile";
 import { UserProfileBio } from "@/types";
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { AxiosError } from "axios";
 
 interface UserBioState {
@@ -63,6 +63,12 @@ const userBioSlice = createSlice({
       state.data = null;
       state.error = null;
     },
+    // New action to edit/update user bio fields in the state.
+    editUserBio(state, action: PayloadAction<Partial<UserProfileBio>>) {
+      if (state.data) {
+        state.data = { ...state.data, ...action.payload };
+      }
+    },
   },
   extraReducers: (builder) => {
     // Handlers for fetchUserBio
@@ -101,5 +107,5 @@ const userBioSlice = createSlice({
   },
 });
 
-export const { clearError, resetUserBio } = userBioSlice.actions;
+export const { clearError, resetUserBio, editUserBio } = userBioSlice.actions;
 export default userBioSlice.reducer;

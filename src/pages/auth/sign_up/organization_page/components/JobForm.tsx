@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { FormInput, FormSelect } from "@/components";
-import { JobTypeEnum, UserStarterInterface } from "@/types";
+import { FormInput, FormSelect, OrganizationSearch } from "@/components";
+import { JobTypeEnum, Organization, UserStarterInterface } from "@/types";
+import { getCompaniesList } from "@/endpoints/userProfile";
 
 interface ExperienceFormData {
   jobTitle: string;
   employeeType: string;
-  recentCompany: string;
+  recentCompany: Organization;
 }
 
 interface JobFormProps {
@@ -18,7 +19,7 @@ const JobForm: React.FC<JobFormProps> = ({ setPartialUserStarterData }) => {
   const [formData, setFormData] = useState({
     jobTitle: "",
     employeeType: "",
-    recentCompany: "",
+    recentCompany: { _id: "", name: "", logo: "" },
   });
 
   // Update form data
@@ -53,12 +54,20 @@ const JobForm: React.FC<JobFormProps> = ({ setPartialUserStarterData }) => {
             id="employee-type"
             name="employeeType"
           />
-          <FormInput
+
+          <OrganizationSearch
             label="Most Recent Company*"
+            selectedOrganization={formData.recentCompany}
+            onSelect={(org) =>
+              setFormData((prev) => ({
+                ...prev,
+                recentCompany: org,
+              }))
+            }
+            fetchOrganizations={(query) =>
+              getCompaniesList(query).then((res) => res.data)
+            }
             placeholder="Enter your job title"
-            value={formData.recentCompany}
-            onChange={(e) => handleChange("recentCompany", e.target.value)}
-            extraClassName="w-full"
             id="recent-company"
             name="recentCompany"
           />

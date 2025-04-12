@@ -17,13 +17,16 @@ export interface ResourcesPopoverProps {
   isInConnection?: boolean;
   onFollow?: () => void;
   onUnfollow?: () => void;
-  onConnect?: () => void;
+  onConnect?: (email: string) => void;
   onCancelRequest?: () => void;
   onRemoveConnection?: () => void;
   onBlock?: () => void;
   onViewActivity?: () => void;
   onViewBlockedUsers?: () => void;
   onAboutProfile?: () => void;
+  email: string;
+  isConnectByEmail: boolean;
+  setOpenEmailDialog(open: boolean): void;
 }
 
 const ResourcesPopover: React.FC<ResourcesPopoverProps> = (props) => {
@@ -43,6 +46,9 @@ const ResourcesPopover: React.FC<ResourcesPopoverProps> = (props) => {
     onAboutProfile,
     onViewActivity,
     onViewBlockedUsers,
+    email,
+    isConnectByEmail,
+    setOpenEmailDialog,
   } = props;
 
   return (
@@ -52,7 +58,7 @@ const ResourcesPopover: React.FC<ResourcesPopoverProps> = (props) => {
           {title}
         </CustomButton>
       </PopoverTrigger>
-      <PopoverContent className="w-44 dark:bg-gray-900 dark:border-gray-700 dark:text-white">
+      <PopoverContent className="w-48 dark:bg-gray-900 dark:border-gray-700 dark:text-white">
         {isOwner ? (
           <OwnerPopoverContent
             onViewBlockedUsers={onViewBlockedUsers}
@@ -72,6 +78,9 @@ const ResourcesPopover: React.FC<ResourcesPopoverProps> = (props) => {
             onRemoveConnection={onRemoveConnection}
             onBlock={onBlock}
             onAboutProfile={onAboutProfile}
+            isConnectByEmail={isConnectByEmail}
+            email={email}
+            setOpenEmailDialog={setOpenEmailDialog}
           />
         )}
       </PopoverContent>
@@ -125,11 +134,15 @@ interface NonOwnerPopoverContentProps {
   isInConnection?: boolean;
   onFollow?: () => void;
   onUnfollow?: () => void;
-  onConnect?: () => void;
+  onConnect?: (email: string) => void;
   onCancelRequest?: () => void;
   onRemoveConnection?: () => void;
   onBlock?: () => void;
   onAboutProfile?: () => void;
+
+  email: string;
+  isConnectByEmail: boolean;
+  setOpenEmailDialog(open: boolean): void;
 }
 
 const NonOwnerPopoverContent: React.FC<NonOwnerPopoverContentProps> = ({
@@ -144,6 +157,10 @@ const NonOwnerPopoverContent: React.FC<NonOwnerPopoverContentProps> = ({
   onRemoveConnection,
   onBlock,
   onAboutProfile,
+
+  email,
+  isConnectByEmail,
+  setOpenEmailDialog,
 }) => (
   <div className="grid gap-2">
     {!followPrimary ? (
@@ -172,7 +189,11 @@ const NonOwnerPopoverContent: React.FC<NonOwnerPopoverContentProps> = ({
             ? onCancelRequest
             : isInConnection
             ? onRemoveConnection
+            : isConnectByEmail
+            ? () => setOpenEmailDialog(true)
             : onConnect
+            ? () => onConnect(email as string)
+            : undefined
         }
         className="w-full dark:hover:bg-gray-700 inline-flex text-xs font-semibold cursor-pointer transition-all duration-300 ease-in-out hover:bg-gray-200 p-2 rounded items-center gap-2"
       >
