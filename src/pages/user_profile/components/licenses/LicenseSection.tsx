@@ -1,5 +1,4 @@
 import React, { Fragment, useEffect, useState } from "react";
-import { GoPlus } from "react-icons/go";
 import { MdDeleteForever } from "react-icons/md";
 import { License } from "@/types"; // Ensure your Education type is defined here
 import {
@@ -22,6 +21,8 @@ import AddLicenseModal from "../modals/license_modal/AddLicenseModal";
 import EditLicenseModal from "../modals/license_modal/EditLicenseModal";
 import { LiaCertificateSolid } from "react-icons/lia";
 import LicensesList from "./LicensesList";
+import LicensesSkeletonLoader from "./LicensesSkeletonLoader";
+import LicenseHeaderSection from "./LicenseHeaderSection";
 
 interface FetchDataResult {
   licenses: License[];
@@ -78,7 +79,7 @@ const LicenseSection: React.FC = () => {
         id="license-section"
         className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow outline-dotted dark:outline-blue-300 outline-blue-500"
       >
-        <SkeletonLoader />
+        <LicensesSkeletonLoader />
       </section>
     );
   }
@@ -122,7 +123,7 @@ const LicenseSection: React.FC = () => {
         isEmpty ? "outline-dotted dark:outline-blue-300 outline-blue-500" : ""
       }`}
     >
-      <HeaderSection
+      <LicenseHeaderSection
         isMe={isMe}
         isEmpty={isEmpty}
         onAddLicense={handleAddLicense}
@@ -210,89 +211,6 @@ const LicenseSection: React.FC = () => {
         </DialogContent>
       </Dialog>
     </section>
-  );
-};
-
-/* Header Section */
-interface HeaderSectionProps {
-  isEmpty: boolean;
-  isMe: boolean;
-  onAddLicense: (lic: License) => void;
-}
-
-const HeaderSection: React.FC<HeaderSectionProps> = ({
-  isEmpty,
-  isMe,
-  onAddLicense,
-}) => (
-  <header
-    id="license-section-header"
-    className={`flex justify-between items-center mb-4 ${
-      isEmpty ? "opacity-65" : ""
-    }`}
-  >
-    <div id="license-section-title-container">
-      <h2
-        id="license-section-title"
-        className="text-xl text-black dark:text-white font-bold"
-      >
-        License
-      </h2>
-      {isEmpty && isMe && (
-        <p id="license-section-description" className="text-sm">
-          Add your license details to showcase your academic background.
-        </p>
-      )}
-    </div>
-    {!isEmpty && isMe && <ActionButtons onAddLicense={onAddLicense} />}
-  </header>
-);
-
-interface ActionButtonsProps {
-  onAddLicense: (lic: License) => void;
-}
-const ActionButtons: React.FC<ActionButtonsProps> = ({ onAddLicense }) => {
-  const [open, setOpen] = useState(false);
-  return (
-    <div
-      id="license-section-action-buttons"
-      className="flex items-center gap-2"
-    >
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger asChild>
-          <button
-            id="license-add-button"
-            aria-label="Add License"
-            className="hover:bg-gray-300 dark:hover:text-black rounded-full transition-all duration-200 ease-in-out"
-          >
-            <GoPlus size={30} />
-          </button>
-        </DialogTrigger>
-        <DialogContent
-          aria-describedby={undefined}
-          id="license-add-dialog-content"
-          className="max-h-[45rem] overflow-y-auto dark:bg-gray-900 overflow-x-hidden !max-w-5xl sm:!w-[38.5rem] !w-full"
-        >
-          <DialogTitle className="hidden"></DialogTitle>
-          <DialogHeader id="license-add-dialog-header">
-            <Header title="Add License" />
-            <DialogDescription
-              id="license-add-dialog-description"
-              className="text-sm text-gray-500 dark:text-gray-300"
-            >
-              *Indicates required
-            </DialogDescription>
-          </DialogHeader>
-          <AddLicenseModal
-            onClose={() => setOpen(false)}
-            onSuccess={(newLic) => {
-              onAddLicense(newLic);
-              setOpen(false);
-            }}
-          />
-        </DialogContent>
-      </Dialog>
-    </div>
   );
 };
 
@@ -402,14 +320,5 @@ const EmptyLicense: React.FC<{
     </div>
   );
 };
-
-const SkeletonLoader: React.FC = () => (
-  <div className="animate-pulse space-y-4">
-    <div className="h-6 w-1/2 bg-gray-300 dark:bg-gray-700 rounded" />
-    <div className="h-4 w-full bg-gray-300 dark:bg-gray-700 rounded" />
-    <div className="h-4 w-full bg-gray-300 dark:bg-gray-700 rounded" />
-    <div className="h-24 w-full bg-gray-300 dark:bg-gray-700 rounded" />
-  </div>
-);
 
 export default LicenseSection;

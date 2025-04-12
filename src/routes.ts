@@ -24,6 +24,9 @@ import {
   FollowingFollowersPage,
   SearchPage,
   UserSkillsPage,
+  UserEducationsPage,
+  UserExperiencesPage,
+  UserLicensesPage,
 } from "./pages";
 
 import React from "react";
@@ -120,6 +123,18 @@ const routes: RouteObject[] = [
   {
     path: "/user-profile/skills/:id",
     element: React.createElement(UserSkillsPage),
+  },
+  {
+    path: "/user-profile/educations/:id",
+    element: React.createElement(UserEducationsPage),
+  },
+  {
+    path: "/user-profile/experiences/:id",
+    element: React.createElement(UserExperiencesPage),
+  },
+  {
+    path: "/user-profile/licenses/:id",
+    element: React.createElement(UserLicensesPage),
   },
 ];
 

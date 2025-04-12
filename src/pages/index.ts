@@ -23,6 +23,9 @@ import ConnectionsPage from "./mynetwork/ConnectionsPage";
 import FollowingFollowersPage from "./mynetwork/FollowingFollowersPage";
 import SearchPage from "./search/SearchPage";
 import UserSkillsPage from "./user_profile/user_skills/UserSkillsPage";
+import UserEducationsPage from "./user_profile/user_educations/UserEducationsPage";
+import UserLicensesPage from "./user_profile/user_licenses/UserLicensesPage";
+import UserExperiencesPage from "./user_profile/user_experiences/UserExperiencesPage";
 //Export the Imported Pages
 export {
   LandingPage,
@@ -49,4 +52,7 @@ export {
   FollowingFollowersPage,
   SearchPage,
   UserSkillsPage,
+  UserEducationsPage,
+  UserLicensesPage,
+  UserExperiencesPage,
 };
