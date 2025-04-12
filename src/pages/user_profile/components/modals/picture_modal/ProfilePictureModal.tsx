@@ -155,9 +155,11 @@ const ProfilePictureModal = ({
     }
   };
 
-
   return (
-    <div id="profile-picture-modal" className="grid w-full gap-4 place-items-center">
+    <div
+      id="profile-picture-modal"
+      className="grid w-full gap-4 place-items-center"
+    >
       {showEditor ? (
         <div id="image-editor-container" className="animate-fade-in-up w-full">
           <ImageEditor
@@ -187,7 +189,10 @@ const ProfilePictureModal = ({
               className="w-40 h-40 md:w-56 md:h-56 rounded-full ring-4 ring-gray-200 dark:ring-gray-600 transition-all duration-300"
             />
           </div>
-          <div id="profile-actions" className="flex flex-grow flex-wrap w-full items-center gap-4 p-4 bg-white dark:bg-gray-800 rounded-xl shadow-lg transition-colors duration-300">
+          <div
+            id="profile-actions"
+            className="flex flex-grow flex-wrap w-full items-center gap-4 p-4 bg-white dark:bg-gray-800 rounded-xl shadow-lg transition-colors duration-300"
+          >
             <button
               id="edit-button"
               disabled={
