@@ -1,5 +1,4 @@
 import React, { Fragment, useEffect, useState } from "react";
-import { GoPlus } from "react-icons/go";
 import { IoIosBriefcase } from "react-icons/io";
 import { MdDeleteForever } from "react-icons/md";
 import { Experience } from "@/types";
@@ -25,6 +24,8 @@ import {
 import { toast } from "sonner";
 import { getErrorMessage } from "@/utils/errorHandler";
 import ExperiencesList from "./ExperiencesList";
+import ExperienceSkeletonLoader from "./ExperienceSkeletonLoader";
+import ExperienceHeaderSection from "./ExperienceHeaderSection";
 
 interface FetchDataResult {
   work_experience: Experience[];
@@ -84,7 +85,7 @@ const ExperienceSection: React.FC = () => {
         id="experience-section"
         className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow outline-dotted dark:outline-blue-300 outline-blue-500"
       >
-        <SkeletonLoader />
+        <ExperienceSkeletonLoader />
       </section>
     );
   }
@@ -126,7 +127,7 @@ const ExperienceSection: React.FC = () => {
         isEmpty ? "outline-dotted dark:outline-blue-300 outline-blue-500" : ""
       }`}
     >
-      <HeaderSection
+      <ExperienceHeaderSection
         isMe={isMe}
         isEmpty={isEmpty}
         onAddExperience={handleAddExperience}
@@ -223,97 +224,6 @@ const ExperienceSection: React.FC = () => {
 };
 
 /* ------------------------------------------------------------------
-   Header Section
------------------------------------------------------------------- */
-interface HeaderSectionProps {
-  isEmpty: boolean;
-  isMe: boolean;
-  onAddExperience: (exp: Experience) => void;
-}
-
-const HeaderSection: React.FC<HeaderSectionProps> = ({
-  isEmpty,
-  isMe,
-  onAddExperience,
-}) => (
-  <header
-    id="experience-section-header"
-    className={`flex justify-between items-center mb-4 ${
-      isEmpty ? "opacity-65" : ""
-    }`}
-  >
-    <div id="experience-section-title-container">
-      <h2
-        id="experience-section-title"
-        className="text-xl text-black dark:text-white font-bold"
-      >
-        Experiences
-      </h2>
-      {isEmpty && isMe && (
-        <p id="experience-section-description" className="text-sm">
-          Showcase your accomplishments and get up to 2X as many profile views
-          and connections
-        </p>
-      )}
-    </div>
-    {/* Only show "+ Add Experience" button if user is the owner and the list is not empty */}
-    {!isEmpty && isMe && <ActionButtons onAddExperience={onAddExperience} />}
-  </header>
-);
-
-/* ------------------------------------------------------------------
-   ActionButtons
------------------------------------------------------------------- */
-interface ActionButtonsProps {
-  onAddExperience: (exp: Experience) => void;
-}
-const ActionButtons: React.FC<ActionButtonsProps> = ({ onAddExperience }) => {
-  const [open, setOpen] = useState(false);
-
-  return (
-    <div
-      id="experience-section-action-buttons"
-      className="flex items-center gap-2"
-    >
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger asChild>
-          <button
-            id="experience-add-button"
-            aria-label="Add Experience"
-            className="hover:bg-gray-300 dark:hover:text-black rounded-full transition-all duration-200 ease-in-out"
-          >
-            <GoPlus size={30} />
-          </button>
-        </DialogTrigger>
-        <DialogContent
-          aria-describedby={undefined}
-          id="experience-add-dialog-content"
-          className="max-h-[45rem] overflow-y-auto dark:bg-gray-900 overflow-x-hidden !max-w-5xl sm:!w-[38.5rem] !w-full"
-        >
-          <DialogTitle className="hidden"></DialogTitle>
-          <DialogHeader id="experience-add-dialog-header">
-            <Header title="Add Experience" />
-            <DialogDescription
-              id="experience-add-dialog-description"
-              className="text-sm text-gray-500 dark:text-gray-300"
-            >
-              *Indicates required
-            </DialogDescription>
-          </DialogHeader>
-          <AddExperienceModal
-            onClose={() => setOpen(false)}
-            onSuccess={(newExp) => {
-              onAddExperience(newExp);
-              setOpen(false);
-            }}
-          />
-        </DialogContent>
-      </Dialog>
-    </div>
-  );
-};
-
-/* ------------------------------------------------------------------
    ExperienceListContainer
 ------------------------------------------------------------------ */
 interface ExperienceListContainerProps {
@@ -321,7 +231,7 @@ interface ExperienceListContainerProps {
   isMe: boolean;
   onStartEdit: (exp: Experience) => void;
   onDeleteClick: (experienceId: string) => void;
-  userId:string
+  userId: string;
 }
 
 const ExperienceListContainer: React.FC<ExperienceListContainerProps> = ({
@@ -329,7 +239,7 @@ const ExperienceListContainer: React.FC<ExperienceListContainerProps> = ({
   isMe,
   onStartEdit,
   onDeleteClick,
-  userId
+  userId,
 }) => (
   <div id="experience-list-container" className="space-y-4">
     {experiences.slice(0, 3).map((experience, idx) => (
@@ -443,18 +353,6 @@ const EmptyExperienceReadOnly: React.FC = () => (
         <p className="text-sm">This user has not added any experience yet.</p>
       </div>
     </div>
-  </div>
-);
-
-/* ------------------------------------------------------------------
-   Skeleton Loader
------------------------------------------------------------------- */
-const SkeletonLoader: React.FC = () => (
-  <div className="animate-pulse space-y-4">
-    <div className="h-6 w-1/2 bg-gray-300 dark:bg-gray-700 rounded" />
-    <div className="h-4 w-full bg-gray-300 dark:bg-gray-700 rounded" />
-    <div className="h-4 w-full bg-gray-300 dark:bg-gray-700 rounded" />
-    <div className="h-24 w-full bg-gray-300 dark:bg-gray-700 rounded" />
   </div>
 );
 
