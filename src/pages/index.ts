@@ -18,7 +18,6 @@ import EmailVerification from "./auth/email_verification/EmailVerification";
 import ForgetPasswordPage from "./auth/forget_password/ForgetPasswordPage";
 import ResetPasswordPage from "./auth/reset_password/ResetPasswordPage";
 import NotFoundPage from "./404/NotFoundPage";
-import SavedJobsPage from "./jobs/SavedJobsPage";
 import ConnectionsPage from "./mynetwork/ConnectionsPage";
 import FollowingFollowersPage from "./mynetwork/FollowingFollowersPage";
 import SearchPage from "./search/SearchPage";
@@ -29,6 +28,8 @@ import UserExperiencesPage from "./user_profile/user_experiences/UserExperiences
 
 import SignInAndSecurityPage from "./settings/SignInAndSecurityPage";
 import ChangePasswordPage from "./settings/ChangePasswordPage";
+import MyItemsPage from "./my_items/MyItemsPage";
+
 //Export the Imported Pages
 export {
   LandingPage,
@@ -50,7 +51,6 @@ export {
   ForgetPasswordPage,
   ResetPasswordPage,
   NotFoundPage,
-  SavedJobsPage,
   ConnectionsPage,
   FollowingFollowersPage,
   SearchPage,
@@ -59,5 +59,6 @@ export {
   UserLicensesPage,
   UserExperiencesPage,
   SignInAndSecurityPage,
-  ChangePasswordPage
+  ChangePasswordPage,
+  MyItemsPage,
 };

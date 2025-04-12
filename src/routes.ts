@@ -19,7 +19,6 @@ import {
   ForgetPasswordPage,
   ResetPasswordPage,
   NotFoundPage,
-  SavedJobsPage,
   ConnectionsPage,
   FollowingFollowersPage,
   SearchPage,
@@ -28,7 +27,8 @@ import {
   UserExperiencesPage,
   UserLicensesPage,
   SignInAndSecurityPage,
-  ChangePasswordPage
+  ChangePasswordPage,
+  MyItemsPage,
 } from "./pages";
 
 import React from "react";
@@ -74,9 +74,7 @@ const routes: RouteObject[] = [
     element: React.createElement(FollowingFollowersPage),
   },
 
-  { path: "/connections/:id", 
-    element: React.createElement(ConnectionsPage) 
-  },
+  { path: "/connections/:id", element: React.createElement(ConnectionsPage) },
 
   {
     path: "/manage-invitations",
@@ -84,8 +82,16 @@ const routes: RouteObject[] = [
   },
 
   {
-    path: "/saved-jobs",
-    element: React.createElement(SavedJobsPage),
+    path: "/my-items/saved-jobs",
+    element: React.createElement(MyItemsPage),
+  },
+  {
+    path: "/my-items",
+    element: React.createElement(MyItemsPage),
+  },
+  {
+    path: "/my-items/saved-posts",
+    element: React.createElement(MyItemsPage),
   },
 
   {
