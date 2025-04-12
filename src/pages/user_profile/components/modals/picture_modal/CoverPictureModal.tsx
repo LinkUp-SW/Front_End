@@ -121,7 +121,7 @@ const CoverPictureModal: React.FC<CoverPictureModalProps> = ({
           editUserBio({
             ...userBio,
             is_defult_cover_photo: false,
-            profile_photo: data.coverPhoto,
+            cover_photo: data.coverPhoto,
           })
         );
         // Update the preview image and propagate the change to parent.
@@ -161,7 +161,7 @@ const CoverPictureModal: React.FC<CoverPictureModalProps> = ({
         editUserBio({
           ...userBio,
           is_defult_cover_photo: true,
-          profile_photo: data.coverPhoto,
+          cover_photo: data.coverPhoto,
         })
       );
     } catch (error) {
@@ -215,13 +215,13 @@ const CoverPictureModal: React.FC<CoverPictureModalProps> = ({
               onClick={() => inputRef.current?.click()}
               disabled={isSubmitting}
               id="upload-cover-photo-btn"
-              className="flex items-center gap-2 text-gray-600 dark:text-gray-300 hover:text-green-500 dark:hover:text-green-500 transition-colors duration-200"
+              className="flex disabled:cursor-not-allowed items-center gap-2 text-gray-600 dark:text-gray-300 hover:text-green-500 dark:hover:text-green-500 transition-colors duration-200"
             >
               <LuImageUp className="w-5 h-5" />
               Upload New
             </Button>
             <Button
-              className="affimativeBtn flex gap-2"
+              className="affimativeBtn flex disabled:cursor-not-allowed gap-2"
               onClick={handleSave}
               disabled={isSubmitting}
             >
@@ -232,7 +232,7 @@ const CoverPictureModal: React.FC<CoverPictureModalProps> = ({
               variant="outline"
               onClick={handleCancel}
               id="cancel-btn"
-              className="destructiveBtn"
+              className="destructiveBtn disabled:cursor-not-allowed"
               disabled={isSubmitting}
             >
               Cancel
@@ -245,7 +245,7 @@ const CoverPictureModal: React.FC<CoverPictureModalProps> = ({
               onClick={() => setIsEditing(true)}
               disabled={isSubmitting || userBio?.is_defult_cover_photo}
               id="edit-cover-photo-btn"
-              className="flex disabled:opacity-65 cursor-not-allowed items-center gap-2 text-gray-600 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-500 transition-colors duration-200"
+              className="flex disabled:cursor-not-allowed disabled:opacity-65 cursor-not-allowed items-center gap-2 text-gray-600 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-500 transition-colors duration-200"
             >
               <FiEdit className="w-5 h-5" />
               Edit
@@ -255,7 +255,7 @@ const CoverPictureModal: React.FC<CoverPictureModalProps> = ({
               id="upload-cover-photo-btn"
               onClick={() => inputRef.current?.click()}
               disabled={isSubmitting}
-              className="flex items-center gap-2 text-gray-600 dark:text-gray-300 hover:text-green-500 dark:hover:text-green-500 transition-colors duration-200"
+              className="flex disabled:cursor-not-allowed items-center gap-2 text-gray-600 dark:text-gray-300 hover:text-green-500 dark:hover:text-green-500 transition-colors duration-200"
             >
               <LuImageUp className="w-5 h-5" />
               Upload New
@@ -266,7 +266,7 @@ const CoverPictureModal: React.FC<CoverPictureModalProps> = ({
               onClick={handleDelete}
               id="delete-cover-photo-btn"
               disabled={isSubmitting || userBio?.is_defult_cover_photo}
-              className="destructiveBtn flex gap-2"
+              className="destructiveBtn disabled:cursor-not-allowed flex gap-2"
             >
               <FiTrash className="w-5 h-5" />
               Delete
