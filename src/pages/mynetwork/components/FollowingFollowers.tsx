@@ -17,6 +17,7 @@ import {
 } from "@/components";
 import UnfollowUserModal from "./modals/UnfollowUserModal";
 import { DialogDescription, DialogTitle } from "@radix-ui/react-dialog";
+import { useNavigate } from "react-router-dom";
 
 const LIMIT = 100; // Number of items per page
 
@@ -35,6 +36,11 @@ const FollowingFollowers: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const observerRef = useRef<HTMLDivElement | null>(null);
+  const navigate = useNavigate();
+
+  const navigateToUser = (user_id: string) => {
+    return navigate(`/user-profile/${user_id}`);
+  };
 
   const token = Cookies.get("linkup_auth_token");
 
@@ -215,9 +221,14 @@ const FollowingFollowers: React.FC = () => {
               src={user.profilePicture}
               alt={user.name}
               className="w-12 h-12 rounded-full border border-gray-300"
+              onClick={() => navigateToUser(user.user_id)}
             />
             <div className="ml-4 flex-1">
-              <p className="text-lg font-medium text-gray-900 dark:text-white">
+              <p
+                className="text-lg font-medium text-gray-900 dark:text-white cursor-pointer"
+                onClick={() => navigateToUser(user.user_id)}
+                id="user-name-link"
+              >
                 {user.name}
               </p>
               <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -234,7 +245,10 @@ const FollowingFollowers: React.FC = () => {
                     Unfollow
                   </button>
                 </DialogTrigger>
-                <DialogContent>
+                <DialogContent
+                  id="unfollow-dialog1-content"
+                  className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg shadow-lg p-6"
+                >
                   <UnfollowUserModal
                     userData={{ userName: user.name, userId: user.user_id }}
                     onConfirm={() => handleUnfollowUser(user.user_id)}
@@ -255,7 +269,10 @@ const FollowingFollowers: React.FC = () => {
                     Unfollow
                   </button>
                 </DialogTrigger>
-                <DialogContent>
+                <DialogContent
+                  id="unfollow-dialog2-content"
+                  className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg shadow-lg p-6"
+                >
                   <UnfollowUserModal
                     userData={{ userName: user.name, userId: user.user_id }}
                     onConfirm={() => handleUnfollowUser(user.user_id)}

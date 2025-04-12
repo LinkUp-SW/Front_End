@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Job } from "../../types";
 
 interface JobContentProps {
@@ -6,6 +6,15 @@ interface JobContentProps {
 }
 
 const JobContent: React.FC<JobContentProps> = ({ job }) => {
+  const [showFullDescription, setShowFullDescription] = useState(false);
+  const [activeSection, setActiveSection] = useState<'responsibilities' | 'qualifications' | 'benefits'>('responsibilities');
+  
+  const descriptionText = job.description || "";
+  
+  const responsibilities = Array.isArray(job.responsibilities) ? job.responsibilities : [];
+  const qualifications = Array.isArray(job.qualifications) ? job.qualifications : [];
+  const benefits = Array.isArray(job.benefits) ? job.benefits : [];
+  
   return (
     <>
       <div className="mb-6">
@@ -15,16 +24,19 @@ const JobContent: React.FC<JobContentProps> = ({ job }) => {
         </p>
         
         <div className="flex space-x-3 mt-3 overflow-x-auto">
-          <button className="border border-gray-300 dark:border-gray-600 rounded-full px-4 py-2 text-sm flex items-center whitespace-nowrap dark:text-gray-300">
-            <span className="text-amber-500 dark:text-amber-400 mr-2">★</span>
+          <button 
+            id="btn-tailor-resume" 
+            className="border border-gray-300 dark:border-gray-600 rounded-full px-4 py-2 text-sm flex items-center whitespace-nowrap dark:text-gray-300"
+          >
+            <span className="text-gray-500 dark:text-gray-400 mr-2">★</span>
             <span>Tailor my resume to this job</span>
           </button>
-          <button className="border border-gray-300 dark:border-gray-600 rounded-full px-4 py-2 text-sm flex items-center whitespace-nowrap dark:text-gray-300">
-            <span className="text-amber-500 dark:text-amber-400 mr-2">★</span>
+          <button 
+            id="btn-job-fit" 
+            className="border border-gray-300 dark:border-gray-600 rounded-full px-4 py-2 text-sm flex items-center whitespace-nowrap dark:text-gray-300"
+          >
+            <span className="text-gray-500 dark:text-gray-400 mr-2">★</span>
             <span>Am I a good fit for this job?</span>
-          </button>
-          <button className="w-8 h-8 flex items-center justify-center border border-gray-300 dark:border-gray-600 rounded-full ml-2 dark:text-gray-300">
-            <span>›</span>
           </button>
         </div>
       </div>
@@ -33,12 +45,15 @@ const JobContent: React.FC<JobContentProps> = ({ job }) => {
         <h2 className="text-lg font-semibold mb-3 dark:text-white">People you can reach out to</h2>
         <div className="flex items-center justify-between border border-gray-200 dark:border-gray-700 rounded-lg p-3">
           <div className="flex items-center">
-            <div className="w-8 h-8 bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center rounded-md mr-2">
-              <span className="text-amber-800 dark:text-amber-400">🎓</span>
+            <div className="w-8 h-8 bg-gray-100 dark:bg-gray-800 flex items-center justify-center rounded-md mr-2">
+              <span className="text-gray-500 dark:text-gray-400">🎓</span>
             </div>
             <span className="text-sm dark:text-gray-300">School alumni from Cairo University</span>
           </div>
-          <button className="border border-gray-300 dark:border-gray-600 rounded-full px-4 py-1 text-sm dark:text-gray-300">
+          <button 
+            id="btn-show-connections" 
+            className="border border-gray-300 dark:border-gray-600 rounded-full px-4 py-1 text-sm dark:text-gray-300"
+          >
             Show all
           </button>
         </div>
@@ -46,45 +61,86 @@ const JobContent: React.FC<JobContentProps> = ({ job }) => {
       
       <div>
         <h2 className="text-lg font-semibold mb-2 dark:text-white">About the job</h2>
-        <p className="text-sm text-gray-700 dark:text-gray-400">
-          {job.description || "No description available"}
-        </p>
+        {descriptionText && (
+          <div className="text-sm text-gray-700 dark:text-gray-400">
+            {showFullDescription ? descriptionText : (
+              descriptionText.length > 200 ? `${descriptionText.slice(0, 200)}...` : descriptionText
+            )}
+            {descriptionText.length > 200 && (
+              <button 
+                id="btn-toggle-description"
+                onClick={() => setShowFullDescription(!showFullDescription)}
+                className="text-blue-600 dark:text-blue-400 ml-1 hover:underline"
+              >
+                {showFullDescription ? 'Show less' : 'Show more'}
+              </button>
+            )}
+          </div>
+        )}
         
-        <div className="mt-6">
-          <h3 className="font-semibold mb-2 dark:text-white">Responsibilities:</h3>
-          <ul className="list-disc pl-5 text-sm text-gray-700 dark:text-gray-400 space-y-2">
-            <li>Develop and maintain the product roadmap</li>
-            <li>Collaborate with stakeholders to gather requirements</li>
-            <li>Prioritize features and enhancements</li>
-            <li>Work closely with development teams</li>
-            <li>Monitor market trends and competitor analysis</li>
-            <li>Create detailed product specifications</li>
-            <li>Conduct user research and testing</li>
-            <li>Present product updates to leadership</li>
-          </ul>
+        <div className="mt-6 border-b border-gray-200 dark:border-gray-700">
+          <div className="flex space-x-4 mb-2">
+            <button 
+              id="tab-responsibilities"
+              className={`pb-2 font-medium text-sm ${activeSection === 'responsibilities' ? 'border-b-2 border-blue-600 dark:border-blue-400 text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-400'}`}
+              onClick={() => setActiveSection('responsibilities')}
+            >
+              Responsibilities
+            </button>
+            <button 
+              id="tab-qualifications"
+              className={`pb-2 font-medium text-sm ${activeSection === 'qualifications' ? 'border-b-2 border-blue-600 dark:border-blue-400 text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-400'}`}
+              onClick={() => setActiveSection('qualifications')}
+            >
+              Qualifications
+            </button>
+            <button 
+              id="tab-benefits"
+              className={`pb-2 font-medium text-sm ${activeSection === 'benefits' ? 'border-b-2 border-blue-600 dark:border-blue-400 text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-400'}`}
+              onClick={() => setActiveSection('benefits')}
+            >
+              Benefits
+            </button>
+          </div>
         </div>
-        <div className="mt-6">
-          <h3 className="font-semibold mb-2 dark:text-white">Qualifications:</h3>
-          <ul className="list-disc pl-5 text-sm text-gray-700 dark:text-gray-400 space-y-2">
-            <li>5+ years of experience in product management</li>
-            <li>Strong understanding of fintech industry</li>
-            <li>Experience with agile methodologies</li>
-            <li>Excellent communication skills</li>
-            <li>Bachelor's degree in business, technology, or related field</li>
-            <li>Problem-solving mindset</li>
-            <li>Ability to work in a fast-paced environment</li>
-          </ul>
-        </div>
-        <div className="mt-6 mb-12">
-          <h3 className="font-semibold mb-2 dark:text-white">Benefits:</h3>
-          <ul className="list-disc pl-5 text-sm text-gray-700 dark:text-gray-400 space-y-2">
-            <li>Competitive salary package</li>
-            <li>Health insurance</li>
-            <li>Annual bonus opportunities</li>
-            <li>Professional development budget</li>
-            <li>Flexible working arrangements</li>
-            <li>Team building activities</li>
-          </ul>
+        
+        {activeSection === 'responsibilities' && responsibilities.length > 0 && (
+          <div className="mt-4">
+            <ul className="list-disc pl-5 text-sm text-gray-700 dark:text-gray-400 space-y-2">
+              {responsibilities.map((item: string, index: number) => (
+                <li key={`resp-${index}`}>{item}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+        
+        {activeSection === 'qualifications' && qualifications.length > 0 && (
+          <div className="mt-4">
+            <ul className="list-disc pl-5 text-sm text-gray-700 dark:text-gray-400 space-y-2">
+              {qualifications.map((item: string, index: number) => (
+                <li key={`qual-${index}`}>{item}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+        
+        {activeSection === 'benefits' && benefits.length > 0 && (
+          <div className="mt-4">
+            <ul className="list-disc pl-5 text-sm text-gray-700 dark:text-gray-400 space-y-2">
+              {benefits.map((item: string, index: number) => (
+                <li key={`ben-${index}`}>{item}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+        
+        <div className="mt-8 mb-6">
+          <button 
+            id="btn-apply-now"
+            className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg"
+          >
+            Apply Now
+          </button>
         </div>
       </div>
     </>

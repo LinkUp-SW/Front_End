@@ -7,7 +7,7 @@ import { HiOutlineDocumentText } from "react-icons/hi";
 import { BsBarChartLine } from "react-icons/bs";
 import { CgTimelapse } from "react-icons/cg";
 import { RiMoreLine } from "react-icons/ri";
-import { Job } from "../pages/jobs/types";
+
 
 export const LARGE_SCREEN_NAV_ITEMS = [
   {
@@ -150,126 +150,7 @@ export const JOB_COLLECTIONS = [
   { id: "more", title: "More", icon: RiMoreLine },
 ];
 
-export const JOB_CATEGORIES = [
-  "For You",
-  "Easy Apply",
-  "Remote",
-  "Part-time",
-  "Hybrid",
-  "IT",
-  "Sustainability",
-  "Government",
-  "Healthcare",
-  "Biotech",
-  "Finance",
-  "Construction",
-  "HR",
-  "Education",
-  "Pharma",
-  "Defense & Space",
-  "Manufacturing",
-  "Hospitality",
-  "Social Impact",
-  "Small Biz",
-  "Real Estate",
-  "Higher Ed",
-  "Logistics",
-  "Civil Eng",
-  "Human Services",
-  "Non-Profit",
-  "Career Growth",
-  "Media",
-  "Food & Bev",
-  "Recruiting",
-  "Work Life Balance",
-  "Marketing",
-  "Fashion",
-  "Retail",
-  "Veterinary Med",
-  "Digital Security",
-];
 
-export const SAMPLE_JOBS: Job[] = [
-  {
-    id: "1",
-    title: "Project Manager (Remote)",
-    company: "Virtual Worker Now",
-    location: "Egypt (Remote)",
-    experience_level: "Mid-Senior level",
-    isRemote: true,
-    isSaved: false,
-    logo: "/api/placeholder/60/60",
-    isPromoted: true,
-    hasEasyApply: true,
-    reviewTime: "4 days",
-    workMode: "Remote",
-    salary: "Confidential",
-  },
-  {
-    id: "2",
-    title: "Business Analyst",
-    company: "PSA BDP",
-    location: "Cairo, Cairo, Egypt (On-site)",
-    experience_level: "Entry level",
-    isRemote: false,
-    isSaved: true,
-    logo: "/api/placeholder/60/60",
-    isPromoted: true,
-    hasEasyApply: true,
-    alumniCount: 2,
-    workMode: "On-site",
-    salary: "$3,000 - $4,500/month",
-  },
-  {
-    id: "3",
-    title: "Digital Product Manager",
-    company: "Vezeeta",
-    location: "Cairo, Egypt (On-site)",
-    experience_level: "Associate",
-    isRemote: false,
-    isSaved: true,
-    logo: "/api/placeholder/60/60",
-    isPromoted: false,
-    hasEasyApply: false,
-    alumniCount: 21,
-    applied: true,
-    workMode: "On-site",
-    salary: "$5,000 - $6,500/month",
-  },
-];
-
-export const MORE_JOBS: Job[] = [
-  {
-    id: "6",
-    title: "Mid Level Software Project Manager",
-    company: "Arcsen",
-    location: "Cairo, Cairo, Egypt (On-site)",
-    experience_level: "Mid-Senior level",
-    isRemote: false,
-    isSaved: false,
-    logo: "/api/placeholder/60/60",
-    isPromoted: false,
-    hasEasyApply: true,
-    alumniCount: 5,
-    postedTime: "5 months ago",
-    workMode: "On-site",
-    salary: "$4,500 - $6,000/month",
-  },
-  {
-    id: "7",
-    title: "Product Manager",
-    company: "Clay",
-    location: "Egypt (Remote)",
-    experience_level: "Mid-Senior level",
-    isRemote: true,
-    isSaved: false,
-    logo: "/api/placeholder/60/60",
-    isPromoted: true,
-    hasEasyApply: true,
-    workMode: "Remote",
-    salary: "Confidential",
-  },
-];
 
 export const RECENT_SEARCHES = [
   { query: "project manager", location: "Cairo, Egypt", applyOn: true },

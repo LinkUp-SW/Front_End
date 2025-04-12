@@ -64,6 +64,12 @@ import TruncatedText from "./truncate_text/TruncatedText";
 import { Slider } from "./ui/slider";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "./ui/tabs";
 import OrganizationSearch from "./organizations_search/OrganizationSearch";
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+  TooltipProvider,
+} from "@/components/ui/tooltip";
 
 export {
   UserList,
@@ -127,5 +133,9 @@ export {
   TabsList,
   TabsTrigger,
   TabsContent,
-  OrganizationSearch
+  OrganizationSearch,
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
 };

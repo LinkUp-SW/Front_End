@@ -70,6 +70,7 @@ const Modal: React.FC = () => {
           <RemoveConnectionModal
             userData={userInfo}
             onConfirm={handleConfirm}
+            onCancel={() => dispatch(closeModal())} // Close modal on cancel
           />
         );
       }

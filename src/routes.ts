@@ -27,6 +27,8 @@ import {
   UserEducationsPage,
   UserExperiencesPage,
   UserLicensesPage,
+  SignInAndSecurityPage,
+  ChangePasswordPage
 } from "./pages";
 
 import React from "react";
@@ -59,7 +61,7 @@ const routes: RouteObject[] = [
     element: React.createElement(NotificationsPage),
   },
   {
-    path: "/collections",
+    path: "/jobs/see-more",
     element: React.createElement(SeeMorePage),
   },
   {
@@ -72,7 +74,9 @@ const routes: RouteObject[] = [
     element: React.createElement(FollowingFollowersPage),
   },
 
-  { path: "/connections/:id", element: React.createElement(ConnectionsPage) },
+  { path: "/connections/:id", 
+    element: React.createElement(ConnectionsPage) 
+  },
 
   {
     path: "/manage-invitations",
@@ -135,6 +139,14 @@ const routes: RouteObject[] = [
   {
     path: "/user-profile/licenses/:id",
     element: React.createElement(UserLicensesPage),
+  },
+  {
+    path: "/settings/security",
+    element: React.createElement(SignInAndSecurityPage),
+  },
+  {
+    path: "/settings/security/changepassword",
+    element: React.createElement(ChangePasswordPage),
   },
 ];
 

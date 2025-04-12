@@ -1,16 +1,20 @@
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
-import { selectMessage } from "../../slices/messaging/messagingSlice";
+import {
+  selectMessage,
+  selectUserName,
+  selectUserStatus,
+} from "../../slices/messaging/messagingSlice";
+import { toggleStarred } from "../../slices/messaging/messagingSlice";
 import * as Popover from "@radix-ui/react-popover";
 import { FaStar } from "react-icons/fa";
 import { HiOutlineDotsHorizontal } from "react-icons/hi";
-import { FaCheckSquare } from "react-icons/fa";
 import { IoIosClose } from "react-icons/io";
 import { MdOutlineMarkAsUnread } from "react-icons/md";
 import { IoArchiveOutline } from "react-icons/io5";
 import { MdOutlineDelete } from "react-icons/md";
 import { FILTER_OPTIONS_MESSAGES } from "../../constants/index.ts";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const SideBar = () => {
   const dispatch = useDispatch();
@@ -20,6 +24,7 @@ const SideBar = () => {
   const search = useSelector((state: RootState) => state.messaging.search);
 
   /*const [deleted, setDeleted] = useState(false);*/
+  const [dotAppearance, setDotAppearance] = useState<number[]>([]);
   const [unread, setUnread] = useState(false);
   const [hoveredItems, setHoveredItems] = useState<number[]>([]);
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
@@ -28,82 +33,121 @@ const SideBar = () => {
   const [dataInfo, setDataInfo] = useState([
     {
       conversationID: 1,
-      recieverID: 1,
-      senderID: 10,
-      profileImg:
-        "https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg",
-      messages: {
-        id: 100,
-        Img: "https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg",
-        name: "Mohanad Tarek",
+      user1_id: 100,
+      user2_id: 10,
+      user2_name: "7amada",
+      last_message_time: "1h ago",
+      user1_sent_messages: {
+        id: "100",
         message: " you: Lorem ipsum dolor ...",
-        date: "1h ago",
+        media: [],
+        media_type: [],
+        timestamp: "1h ago",
+        reacted: false,
+        is_seen: true,
+        user1_img:
+          "https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg",
+        user2_img:
+          "https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg",
       },
+      last_message_text: "you: Lorem ipsum dolor ...",
+      profileImg_user2:
+        "https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg",
       type: ["myconnections"],
+      status: "offline",
     },
     {
       conversationID: 2,
-      recieverID: 2,
-      senderID: 11,
-      profileImg:
-        "https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg",
-      messages: {
-        id: 3,
-        Img: "https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg",
-        name: "Aly Mohamed unread",
-        message: " you: Lorem ipsum dolor ...",
-        date: "2h ago",
-        type: ["unread"],
-      },
+      user1_id: 200,
+      user2_id: 20,
+      user2_name: "Ahmed",
+      last_message_time: "30m ago",
+      user1_sent_messages: [
+        {
+          id: "202",
+          message: "See you at the meeting!",
+          media: [],
+          media_type: [],
+          timestamp: "30m ago",
+          reacted: true,
+          is_seen: false,
+          user1_img:
+            "https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg",
+          user2_img:
+            "https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg",
+        },
+      ],
+      last_message_text: "See you at the meeting!",
+      profileImg_user2:
+        "https://images.pexels.com/photos/769772/pexels-photo-769772.jpeg",
       type: ["inmail"],
+      status: "online",
     },
+
     {
       conversationID: 3,
-      recieverID: 3,
-      senderID: 13,
-      profileImg:
-        "https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg",
-      messages: {
-        id: 103,
-        Img: "https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg",
-        name: "Mohanad Tarek",
-        message: " you: Lorem ipsum dolor ...",
-        date: "2h ago",
-      },
+      user1_id: 300,
+      user2_id: 30,
+      user2_name: "Mariam",
+      last_message_time: "5m ago",
+      user1_sent_messages: [
+        {
+          id: "303",
+          message: "Let's grab coffee later!",
+          media: [],
+          media_type: [],
+          timestamp: "5m ago",
+          reacted: false,
+          is_seen: false,
+          user1_img:
+            "https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg",
+          user2_img:
+            "https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg",
+        },
+      ],
+      last_message_text: "Let's grab coffee later!",
+      profileImg_user2:
+        "https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg",
       type: ["myconnections"],
+      status: "offline",
     },
     {
       conversationID: 4,
-      recieverID: 4,
-      senderID: 14,
-      profileImg:
-        "https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg",
-      messages: {
-        id: 104,
-        Img: "https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg",
-        name: "Amr Doma",
-        message: " you: Lorem ipsum dolor ...",
-        date: "2h ago",
-      },
+      user1_id: 400,
+      user2_id: 40,
+      user2_name: "Sara",
+      last_message_time: "10m ago",
+      user1_sent_messages: [
+        {
+          id: "404",
+          message: "Did you check the new project?",
+          media: [],
+          media_type: [],
+          timestamp: "10m ago",
+          reacted: true,
+          is_seen: true,
+          user1_img:
+            "https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg",
+          user2_img:
+            "https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg",
+        },
+      ],
+      last_message_text: "Did you check the new project?",
+      profileImg_user2:
+        "https://images.pexels.com/photos/2379005/pexels-photo-2379005.jpeg",
       type: ["starred"],
-    },
-    {
-      conversationID: 5,
-      recieverID: 5,
-      senderID: 15,
-      profileImg:
-        "https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg",
-      messages: {
-        id: 105,
-        Img: "https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg",
-        name: "Amr Doma2",
-        message: " you: Lorem ipsum dolor ...",
-        date: "2h ago",
-      },
-      type: ["starred"],
+      status: "online",
     },
   ]);
 
+  useEffect(() => {
+    dataInfo.forEach((conversation) => {
+      // Dispatch only if the conversation is starred.
+      if (conversation.type.includes("starred")) {
+        dispatch(toggleStarred(conversation.conversationID.toString()));
+      }
+    });
+  }, []);
   const filterButtonData = {
     Focused: dataInfo,
     [FILTER_OPTIONS_MESSAGES.UNREAD]: dataInfo.filter((info) =>
@@ -122,15 +166,19 @@ const SideBar = () => {
 
   const filteredMessagesSearch = filterButtonData[activeFilter].filter(
     (info) =>
-      info.messages.name.toLowerCase().includes(search.toLowerCase()) ||
-      info.messages.message.toLowerCase().includes(search.toLowerCase())
+      info.user2_name.toLowerCase().includes(search.toLowerCase()) ||
+      info.last_message_text.toLowerCase().includes(search.toLowerCase())
   );
 
   const handleSelectConversation = (
     conversationID: number,
-    dataType: string[]
+    dataType: string[],
+    user2Name: string,
+    userStatus: string
   ) => {
     dispatch(selectMessage(conversationID.toString()));
+    dispatch(selectUserName(user2Name));
+    dispatch(selectUserStatus(userStatus));
     if (dataType.includes("unread")) {
       setDataInfo((prevData) =>
         prevData.map((message) =>
@@ -160,6 +208,19 @@ const SideBar = () => {
     }
   };
 
+  const dotHoverEnter = (conversationID: number) => {
+    if (!selectedItems.includes(conversationID)) {
+      setDotAppearance((prevItems) => [...prevItems, conversationID]);
+    }
+  };
+  const dotHoverLeave = (conversationID: number) => {
+    if (dotAppearance.includes(conversationID)) {
+      setDotAppearance((prevItems) =>
+        prevItems.filter((id) => id !== conversationID)
+      );
+    }
+  };
+
   const toggleSelectedConversation = (conversationID: number) => {
     setSelectedItems((prevItems) =>
       prevItems.includes(conversationID)
@@ -184,6 +245,8 @@ const SideBar = () => {
   };
 
   const starredFiltering = (conversationID: number) => {
+    dispatch(toggleStarred(conversationID.toString()));
+
     setDataInfo((prevData) =>
       prevData.map((message) =>
         message.conversationID === conversationID
@@ -200,157 +263,222 @@ const SideBar = () => {
 
   return (
     <>
-      <div className="h-full w-2/5 border-1 border-[#e8e8e8] overflow-y-auto ">
+      <div className="h-full w-full border-r border-gray-200 overflow-y-auto bg-white">
         {selectedItems.length != 0 ? (
-          <div className="bg-[#f7f9fc] p-3 pl-5 flex justify-between">
-            <div>
+          <div className="bg-[#f3f6fa] p-3 pl-5 flex justify-between items-center border-b border-gray-200 sticky top-0 z-10">
+            <div className="flex items-center">
               <IoIosClose
                 size={30}
-                className="inline-block hover:cursor-pointer hover:bg-gray-200 hover:rounded-full"
+                className="inline-block hover:cursor-pointer hover:bg-gray-200 hover:rounded-full p-1 mr-2"
                 onClick={() => {
                   setSelectedItems([]);
                   setHoveredItems([]);
                 }}
               />
-              <span>{selectedItems.length} selected</span>
+
+              <span className="text-sm font-medium">
+                {selectedItems.length} selected
+              </span>
             </div>
-            <div>
-              <MdOutlineMarkAsUnread
-                size={25}
-                className="inline-block mr-3 hover:cursor-pointer  hover:bg-gray-200 hover:rounded-full"
-                onClick={() => setUnread(!unread)}
-              />
-              <MdOutlineDelete
-                size={25}
-                className="inline-block mr-3 hover:cursor-pointer hover:bg-gray-200 hover:rounded-full"
-                
-              />
-              <IoArchiveOutline
-                size={25}
-                className="inline-block mr-3 hover:cursor-pointer hover:bg-gray-200 hover:rounded-full"
-              />
+
+            <div className="flex items-center">
+              <button className="p-1 mx-1 hover:bg-gray-200 rounded-full">
+                <MdOutlineMarkAsUnread
+                  size={22}
+                  className="text-gray-600"
+                  onClick={() => setUnread(!unread)}
+                />
+              </button>
+              <button className="p-1 mx-1 hover:bg-gray-200 rounded-full">
+                <MdOutlineDelete size={22} className="text-gray-600" />
+              </button>
+              <button className="p-1 mx-1 hover:bg-gray-200 rounded-full">
+                <IoArchiveOutline size={22} className="text-gray-600" />
+              </button>
             </div>
           </div>
         ) : (
           ""
         )}
 
-        {filteredMessagesSearch.map((data) => (
-          <button
-            onClick={() => {
-              handleSelectConversation(data.conversationID, data.type);
-            }}
-            key={data.conversationID}
-            className={`relative flex h-1/5 w-full items-center p-3 border-1 border-[#e8e8e8] hover:cursor-pointer ${
-              SelectedConversationStyle === data.conversationID
-                ? "bg-[#edf3f8] hover:bg-gray-300"
-                : data.type.includes("unread")
-                ? "bg-[#d7e8fa]  hover:bg-[#b1d1fffe]"
-                : " hover:bg-gray-300"
-            }`}
-          >
-            <div className="flex">
-              <div
-                className="relative inset-0 rounded-full w-12 h-12 bg-gray-100"
-                onMouseEnter={() => handleHoverEnter(data.conversationID)}
-                onMouseLeave={() => handleHoverLeave(data.conversationID)}
-              >
-                {hoveredItems.includes(data.conversationID) ||
-                selectedItems.includes(data.conversationID) ? (
-                  <button
-                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2  rounded-md w-6 h-6 border hover:border-2 hover:bg-gray-200 hover:cursor-pointer"
-                    onClick={() =>
-                      toggleSelectedConversation(data.conversationID)
-                    }
-                  >
-                    {selectedItems.includes(data.conversationID) ? (
-                      <FaCheckSquare className="bg-white text-green-800 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2  rounded-md w-6 h-6 border hover:border-2" />
-                    ) : (
-                      ""
+        <div className="divide-y divide-gray-200">
+          {filteredMessagesSearch.map((data) => (
+            <div
+              onMouseEnter={() => dotHoverEnter(data.conversationID)}
+              onMouseLeave={() => dotHoverLeave(data.conversationID)}
+              onClick={() => {
+                handleSelectConversation(
+                  data.conversationID,
+                  data.type,
+                  data.user2_name,
+                  data.status
+                );
+              }}
+              key={data.conversationID}
+              className={`relative flex items-start p-3 hover:cursor-pointer ${
+                SelectedConversationStyle === data.conversationID
+                  ? "bg-[#e6eef4] hover:bg-[#d9e5f0]"
+                  : data.type.includes("unread")
+                  ? "bg-[#eaf4fe] hover:bg-[#d9e5f0]"
+                  : "hover:bg-gray-100"
+              }`}
+            >
+              <div className="flex w-full">
+                <div
+                  id="conversation-section"
+                  className="relative flex-shrink-0 mt-1"
+                  onMouseEnter={() => handleHoverEnter(data.conversationID)}
+                  onMouseLeave={() => handleHoverLeave(data.conversationID)}
+                >
+                  {hoveredItems.includes(data.conversationID) ||
+                  selectedItems.includes(data.conversationID) ? (
+                    <div className="w-12 h-12 flex items-center justify-center">
+                      <button
+                        className={`w-5 h-5 flex items-center justify-center rounded border ${
+                          selectedItems.includes(data.conversationID)
+                            ? "bg-[#01754f] border-[#01754f]"
+                            : "border-gray-400 bg-white"
+                        }`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleSelectedConversation(data.conversationID);
+                        }}
+                      >
+                        {selectedItems.includes(data.conversationID) && (
+                          <span className="text-white text-xs font-extrabold">
+                            ✓
+                          </span>
+                        )}
+                      </button>
+                    </div>
+                  ) : (
+                    <img
+                      id="profile-section"
+                      className="rounded-full w-12 h-12 border border-gray-200"
+                      src={data.profileImg_user2}
+                      alt="profile"
+                    />
+                  )}
+                </div>
+
+                <div className="flex-1 min-w-0 pl-2 pr-2">
+                  <div className="flex justify-between items-center">
+                    <p
+                      className={`text-sm ${
+                        data.type.includes("unread")
+                          ? "font-semibold"
+                          : "font-medium"
+                      }`}
+                    >
+                      {data.user2_name}
+                    </p>
+
+                    {!dotAppearance.includes(data.conversationID) && (
+                      <p className="text-xs text-gray-500">
+                        {data.last_message_time}
+                      </p>
                     )}
-                  </button>
-                ) : (
-                  <img
-                    className="rounded-full w-12 h-12 "
-                    src={data.profileImg}
-                    alt="profile"
-                  />
+                  </div>
+
+                  <p className="text-sm text-gray-600 truncate mt-1 ">
+                    {data.last_message_text}
+                  </p>
+                </div>
+              </div>
+
+              {dotAppearance.includes(data.conversationID) && (
+                <div className="absolute top-3 right-3">
+                  <Popover.Root>
+                    <Popover.Trigger asChild>
+                      <button
+                        id="dots-btn"
+                        className="p-1 hover:bg-gray-200 rounded-full"
+                      >
+                        <HiOutlineDotsHorizontal
+                          size={15}
+                          className="text-gray-500"
+                        />
+                      </button>
+                    </Popover.Trigger>
+                    <Popover.Portal>
+                      <Popover.Content
+                        className="bg-white shadow-lg rounded-lg p-1 w-56 border border-gray-200 z-20"
+                        sideOffset={5}
+                      >
+                        <button
+                          id="move-to-other"
+                          className="block w-full text-left py-2 px-3 text-sm hover:bg-gray-100 rounded"
+                        >
+                          Move to Other
+                        </button>
+                        <button
+                          id="label-as-jobs"
+                          className="block w-full text-left py-2 px-3 text-sm hover:bg-gray-100 rounded"
+                        >
+                          Label as Jobs
+                        </button>
+                        <button
+                          id="unread"
+                          className="block w-full text-left py-2 px-3 text-sm hover:bg-gray-100 rounded"
+                          onClick={() => unreadFiltering(data.conversationID)}
+                        >
+                          {data.type.includes("unread")
+                            ? "Mark as read"
+                            : "Mark as unread"}
+                        </button>
+                        <button
+                          id="starred"
+                          className="block w-full text-left py-2 px-3 text-sm hover:bg-gray-100 rounded"
+                          onClick={() => starredFiltering(data.conversationID)}
+                        >
+                          {data.type.includes("starred")
+                            ? "Remove Star"
+                            : "Star"}
+                        </button>
+                        <button
+                          id="mute"
+                          className="block w-full text-left py-2 px-3 text-sm hover:bg-gray-100 rounded"
+                        >
+                          Mute
+                        </button>
+                        <button
+                          id="archive"
+                          className="block w-full text-left py-2 px-3 text-sm hover:bg-gray-100 rounded"
+                        >
+                          Archive
+                        </button>
+                        <button
+                          id="delete-conversation"
+                          className="block w-full text-left py-2 px-3 text-sm hover:bg-gray-100 rounded"
+                        >
+                          Delete conversation
+                        </button>
+                        <button
+                          id="manage-settings"
+                          className="block w-full text-left py-2 px-3 text-sm hover:bg-gray-100 rounded"
+                        >
+                          Manage settings
+                        </button>
+                      </Popover.Content>
+                    </Popover.Portal>
+                  </Popover.Root>
+                </div>
+              )}
+
+              <div className="absolute bottom-1 right-4 flex space-x-1">
+                {data.type.includes("starred") && (
+                  <FaStar id="star" size={15} className="text-[#c37d16]" />
+                )}
+
+                {data.type.includes("unread") && (
+                  <span className="flex items-center justify-center text-xs rounded-full text-white w-4 h-4 bg-blue-600 font-medium">
+                    1
+                  </span>
                 )}
               </div>
-
-              <div className="flex-1 p-3 text-left pt-0">
-                <p className="font-semibold text-sm">{data.messages.name}</p>
-                <p className="text-xs text-gray-600 truncate">
-                  {data.messages.message}
-                </p>
-              </div>
             </div>
-            <Popover.Root>
-              <Popover.Trigger asChild>
-                <button className="absolute top-2 right-3 text-xs text-gray-600">
-                  <HiOutlineDotsHorizontal
-                    size={15}
-                    className="inline-block ml-3"
-                  />
-                </button>
-              </Popover.Trigger>
-              <Popover.Portal>
-                <Popover.Content
-                  className="bg-white shadow-lg rounded-lg p-2 w-45 border border-gray-200"
-                  sideOffset={5}
-                >
-                  <button className="block w-full text-left p-2 hover:bg-gray-100">
-                    Move to Other
-                  </button>
-                  <button className="block w-full text-left p-2 hover:bg-gray-100">
-                    Label as Jobs
-                  </button>
-                  <button
-                    className="block w-full text-left p-2 hover:bg-gray-100"
-                    onClick={() => unreadFiltering(data.conversationID)}
-                  >
-                    {data.type.includes("unread")
-                      ? "Mark as read"
-                      : "Mark as unread"}
-                  </button>
-                  <button
-                    className="block w-full text-left p-2 hover:bg-gray-100"
-                    onClick={() => starredFiltering(data.conversationID)}
-                  >
-                    {data.type.includes("starred") ? "Remove Star" : "Star"}
-                  </button>
-
-                  <button className="block w-full text-left p-2 hover:bg-gray-100">
-                    Mute
-                  </button>
-                  <button className="block w-full text-left p-2 hover:bg-gray-100">
-                    Archive
-                  </button>
-                  <button className="block w-full text-left p-2 hover:bg-gray-100">
-                    Delete conversation
-                  </button>
-                  <button className="block w-full text-left p-2 hover:bg-gray-100">
-                    Manage settings
-                  </button>
-                </Popover.Content>
-              </Popover.Portal>
-            </Popover.Root>
-            <div className=" flex absolute bottom-2 right-3">
-              {data.type.includes("starred") ? (
-                <FaStar size={15} className=" text-yellow-600 m-1" />
-              ) : (
-                ""
-              )}
-              {data.type.includes("unread") ? (
-                <span className="text-xs rounded-full m-1 text-white w-4 h-4 bg-blue-600 ">
-                  1
-                </span>
-              ) : (
-                ""
-              )}
-            </div>
-          </button>
-        ))}
+          ))}
+        </div>
       </div>
     </>
   );

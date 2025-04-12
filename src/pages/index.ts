@@ -26,6 +26,9 @@ import UserSkillsPage from "./user_profile/user_skills/UserSkillsPage";
 import UserEducationsPage from "./user_profile/user_educations/UserEducationsPage";
 import UserLicensesPage from "./user_profile/user_licenses/UserLicensesPage";
 import UserExperiencesPage from "./user_profile/user_experiences/UserExperiencesPage";
+
+import SignInAndSecurityPage from "./settings/SignInAndSecurityPage";
+import ChangePasswordPage from "./settings/ChangePasswordPage";
 //Export the Imported Pages
 export {
   LandingPage,
@@ -55,4 +58,6 @@ export {
   UserEducationsPage,
   UserLicensesPage,
   UserExperiencesPage,
+  SignInAndSecurityPage,
+  ChangePasswordPage
 };
