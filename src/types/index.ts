@@ -151,12 +151,12 @@ export interface UserStarterInterface {
   city: string;
   isStudent: boolean;
   jobTitle?: string;
-  school?: string;
+  school?: Organization;
   schoolStartYear?: string;
   schoolEndYear?: string;
   is16OrAbove?: boolean;
   employeeType?: string;
-  recentCompany?: string;
+  recentCompany?: Organization;
   birthDate?: Date;
   is_verified: boolean;
 }

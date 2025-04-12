@@ -61,7 +61,7 @@ const OrganizationSearch: React.FC<OrganizationSearchProps> = ({
   };
 
   return (
-    <div className="relative">
+    <div className="relative w-full">
       <FormInput
         label={label}
         value={searchQuery}
