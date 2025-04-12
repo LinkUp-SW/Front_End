@@ -2,46 +2,46 @@ import React, { useEffect, useState } from "react";
 import { Job } from "../../pages/jobs/types";
 
 const JobsDashboard: React.FC = () => {
-  const [savedJobs, setSavedJobs] = useState<Job[]>([]);
+  const [savedPosts, setSavedPosts] = useState<Job[]>([]);
 
   useEffect(() => {
     // Load saved jobs from localStorage
-    const loadSavedJobs = () => {
+    const loadSavedPosts = () => {
       const savedJobsString = localStorage.getItem("savedJobs");
       if (savedJobsString) {
         try {
           const jobs = JSON.parse(savedJobsString);
-          setSavedJobs(jobs);
+          setSavedPosts(jobs);
         } catch (error) {
           console.error("Error parsing saved jobs:", error);
         }
       }
     };
 
-    loadSavedJobs();
+    loadSavedPosts();
 
     // Set up event listener for job updates
-    window.addEventListener("savedJobsUpdated", loadSavedJobs);
+    window.addEventListener("savedPostsUpdated", loadSavedPosts);
 
     return () => {
-      window.removeEventListener("savedJobsUpdated", loadSavedJobs);
+      window.removeEventListener("savedPostsUpdated", loadSavedPosts);
     };
   }, []);
 
-  const removeFromSaved = (jobId: string) => {
-    const updatedJobs = savedJobs.filter((job) => job.id !== jobId);
-    localStorage.setItem("savedJobs", JSON.stringify(updatedJobs));
-    setSavedJobs(updatedJobs);
+  const removeFromSaved = (postID: string) => {
+    const updatedJobs = savedPosts.filter((post) => post.id !== postID);
+
+    setSavedPosts(updatedJobs);
 
     // Dispatch event to notify other components
-    window.dispatchEvent(new Event("savedJobsUpdated"));
+    window.dispatchEvent(new Event("savedPostsUpdated"));
   };
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
       <div className="p-4">
         <h1 className="text-xl font-medium mb-4 text-gray-900 dark:text-white">
-          My Jobs
+          Saved Posts
         </h1>
 
         <div className="flex flex-wrap gap-2 mb-6">
@@ -71,17 +71,17 @@ const JobsDashboard: React.FC = () => {
           </button>
         </div>
 
-        {savedJobs.length > 0 ? (
+        {savedPosts.length > 0 ? (
           <div className="space-y-4">
-            {savedJobs.map((job) => (
-              <div key={job.id} className="border-t pt-4">
+            {savedPosts.map((post) => (
+              <div key={post.id} className="border-t pt-4">
                 <div className="flex justify-between">
                   <div className="flex">
                     <div className="w-12 h-12 bg-black rounded-md flex items-center justify-center overflow-hidden">
-                      {job.logo ? (
+                      {post.logo ? (
                         <img
-                          src={job.logo}
-                          alt={`${job.company} logo`}
+                          src={post.logo}
+                          alt={`${post.company} logo`}
                           className="w-full h-full object-cover"
                         />
                       ) : (
@@ -90,16 +90,16 @@ const JobsDashboard: React.FC = () => {
                     </div>
                     <div className="ml-3">
                       <h3 className="font-medium text-gray-900 dark:text-white">
-                        {job.title}
+                        {post.title}
                       </h3>
                       <p className="text-sm text-gray-800 dark:text-gray-300">
-                        {job.company}
+                        {post.company}
                       </p>
                       <p className="text-sm text-gray-500 dark:text-gray-400">
-                        {job.location}
+                        {post.location}
                       </p>
                       <p className="text-sm text-gray-500 dark:text-gray-400">
-                        Posted {job.postedTime} •{" "}
+                        Posted {post.postedTime} •{" "}
                         <span className="text-blue-600 dark:text-blue-400">
                           Easy Apply
                         </span>
@@ -108,9 +108,9 @@ const JobsDashboard: React.FC = () => {
                   </div>
                   <div className="flex items-start">
                     <button
-                      id={`job-options-${job.id}`}
+                      id={`job-options-${post.id}`}
                       className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-                      onClick={() => removeFromSaved(job.id)}
+                      onClick={() => removeFromSaved(post.id)}
                     >
                       •••
                     </button>

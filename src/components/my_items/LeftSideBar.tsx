@@ -18,7 +18,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
 
       <div className="mt-2">
         <div
-          className={`flex justify-between items-center py-2 border-t pl-4 hover:cursor-pointer hover:underline ${
+          className={`flex justify-between items-center py-2 border-t pl-4 dark:border-t-gray-600 hover:cursor-pointer hover:underline ${
             selectedPage === "saved-jobs"
               ? "border-l-4 border-l-blue-500"
               : "border-l-transparent"
@@ -45,7 +45,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
         </div>
 
         <div
-          className={`flex justify-between items-center py-2 border-t pl-4 hover:cursor-pointer hover:underline  ${
+          className={`flex justify-between items-center py-2 border-t dark:border-t-gray-600 pl-4 hover:cursor-pointer hover:underline  ${
             selectedPage === "saved-posts"
               ? "border-l-4 border-l-blue-500 "
               : "border-l-transparent"
