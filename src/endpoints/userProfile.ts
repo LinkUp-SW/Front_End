@@ -448,3 +448,44 @@ export const getUserSections = async (
   });
   return response.data;
 };
+
+export const updateUserCoverPhoto = async (token: string, coverPhoto: File) => {
+  const formData = new FormData();
+  formData.append("coverPhoto", coverPhoto);
+
+  const response = await axiosInstance.put(
+    "/api/v1/user/profile/cover-photo",
+    formData,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  return response.data;
+};
+
+export const deleteUserCoverPhoto = async (token: string) => {
+  const response = await axiosInstance.delete(
+    `/api/v1/user/profile/cover-photo`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
+
+export const getUserCoverPhoto = async (token: string, userId: string) => {
+  const response = await axiosInstance(
+    `/api/v1/user/profile/cover-photo/${userId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
