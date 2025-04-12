@@ -136,7 +136,7 @@ const UserLicensesPage = () => {
                   )
                 ) : (
                   <div id="license-list-container" className="space-y-4">
-                    {licenses.slice(0, 3).map((lic, idx) => (
+                    {licenses.map((lic, idx) => (
                       <Fragment key={idx}>
                         <LicensesList
                           isMe={isMe}
