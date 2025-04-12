@@ -8,9 +8,9 @@ import {
   FormSelect,
   FormTextarea,
 } from "@/components";
-import SkillsManager from "./components/SkillsManager";
-import MediaManager from "./components/MediaManager";
-import { MediaItem } from "./types";
+import SkillsManager from "../components/SkillsManager";
+import MediaManager from "../components/MediaManager";
+import { MediaItem } from "../components/types";
 import { Experience, JobTypeEnum, Organization } from "@/types";
 import {
   updateWorkExperience,
@@ -20,19 +20,8 @@ import { v4 as uuid } from "uuid";
 import { useFormStatus } from "@/hooks/useFormStatus";
 import { getErrorMessage } from "@/utils/errorHandler";
 import FormSpinner from "@/components/form/form_spinner/FormSpinner";
-/**
- * Helper to extract the numeric month (1-12) and year from a Date
- */
-function extractMonthAndYear(date?: Date): { month: string; year: string } {
-  if (!date) {
-    return { month: "", year: "" };
-  }
-  const d = new Date(date);
-  return {
-    month: String(d.getMonth() + 1), // months are 0-based in JS, so +1
-    year: String(d.getFullYear()),
-  };
-}
+import { extractMonthAndYear } from "@/utils";
+
 
 interface EditExperienceModalProps {
   /** The existing experience to edit. */
@@ -226,6 +215,12 @@ const EditExperienceModal: React.FC<EditExperienceModalProps> = ({
 
     return true;
   };
+
+  useEffect(() => {
+    if (organizationSearch.trim() === "") {
+      setIsOrgsLoading(false);
+    }
+  }, [isOrgsLoading, organizationSearch]);
 
   /**
    * Submits the updated form data to the server
@@ -435,7 +430,7 @@ const EditExperienceModal: React.FC<EditExperienceModalProps> = ({
             id="experience-submit-button"
             className="bg-purple-600 hover:bg-purple-700 w-full disabled:opacity-60 disabled:hover:bg-purple-600 disabled:cursor-not-allowed cursor-pointer text-white py-2 px-4 rounded-full transition-all duration-300"
           >
-            {isSubmitting ? <FormSpinner/>: "Save Changes"}
+            {isSubmitting ? <FormSpinner /> : "Save Changes"}
           </button>
         </div>
       </form>

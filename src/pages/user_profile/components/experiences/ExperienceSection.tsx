@@ -1,6 +1,4 @@
-import React, { useEffect, useState } from "react";
-import { BsPencil } from "react-icons/bs";
-import { GoPlus } from "react-icons/go";
+import React, { Fragment, useEffect, useState } from "react";
 import { IoIosBriefcase } from "react-icons/io";
 import { MdDeleteForever } from "react-icons/md";
 import { Experience } from "@/types";
@@ -13,9 +11,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components";
-import AddExperienceModal from "./modals/experience_modal/AddExperienceModal";
-import EditExperienceModal from "./modals/experience_modal/EditExperienceModal"; // <--- NEW
-import Header from "./modals/components/Header";
+import AddExperienceModal from "../modals/experience_modal/AddExperienceModal";
+import EditExperienceModal from "../modals/experience_modal/EditExperienceModal"; // <--- NEW
+import Header from "../modals/components/Header";
 import useFetchData from "@/hooks/useFetchData";
 import Cookies from "js-cookie";
 import { Link, useParams } from "react-router-dom";
@@ -23,9 +21,11 @@ import {
   getUserExperience,
   removeWorkExperience,
 } from "@/endpoints/userProfile";
-import { formatExperienceDate } from "@/utils";
 import { toast } from "sonner";
 import { getErrorMessage } from "@/utils/errorHandler";
+import ExperiencesList from "./ExperiencesList";
+import ExperienceSkeletonLoader from "./ExperienceSkeletonLoader";
+import ExperienceHeaderSection from "./ExperienceHeaderSection";
 
 interface FetchDataResult {
   work_experience: Experience[];
@@ -85,7 +85,7 @@ const ExperienceSection: React.FC = () => {
         id="experience-section"
         className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow outline-dotted dark:outline-blue-300 outline-blue-500"
       >
-        <SkeletonLoader />
+        <ExperienceSkeletonLoader />
       </section>
     );
   }
@@ -127,7 +127,7 @@ const ExperienceSection: React.FC = () => {
         isEmpty ? "outline-dotted dark:outline-blue-300 outline-blue-500" : ""
       }`}
     >
-      <HeaderSection
+      <ExperienceHeaderSection
         isMe={isMe}
         isEmpty={isEmpty}
         onAddExperience={handleAddExperience}
@@ -140,13 +140,14 @@ const ExperienceSection: React.FC = () => {
           <EmptyExperienceReadOnly />
         )
       ) : (
-        <ExperienceList
+        <ExperienceListContainer
           experiences={experiences}
           isMe={isMe}
           onStartEdit={(exp) => {
             setExperienceToEdit(exp);
             setEditOpen(true);
           }}
+          userId={id as string}
           onDeleteClick={(id) => {
             setSelectedExperienceId(id);
             setDeleteDialogOpen(true);
@@ -192,7 +193,7 @@ const ExperienceSection: React.FC = () => {
         >
           <DialogHeader>
             <DialogTitle className="text-lg flex items-center gap-2">
-              <MdDeleteForever className="text-red-500" />
+              <MdDeleteForever className="text-pink-500" />
               Delete Experience?
             </DialogTitle>
             <DialogDescription className="pt-2 text-gray-600 dark:text-gray-300">
@@ -204,14 +205,14 @@ const ExperienceSection: React.FC = () => {
             <Button
               variant="outline"
               onClick={() => setDeleteDialogOpen(false)}
-              className="border-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+              className="border-gray-300 hover:bg-gray-100 dark:text-black dark:hover:bg-gray-700 dark:hover:text-white dark:border-gray-700 transition-all duration-300 ease-in-out"
             >
               Cancel
             </Button>
             <Button
               variant="destructive"
               onClick={handleConfirmDelete}
-              className="bg-red-500 hover:bg-red-600 focus-visible:ring-red-500"
+              className="destructiveBtn"
             >
               Delete
             </Button>
@@ -223,198 +224,40 @@ const ExperienceSection: React.FC = () => {
 };
 
 /* ------------------------------------------------------------------
-   Header Section
+   ExperienceListContainer
 ------------------------------------------------------------------ */
-interface HeaderSectionProps {
-  isEmpty: boolean;
-  isMe: boolean;
-  onAddExperience: (exp: Experience) => void;
-}
-
-const HeaderSection: React.FC<HeaderSectionProps> = ({
-  isEmpty,
-  isMe,
-  onAddExperience,
-}) => (
-  <header
-    id="experience-section-header"
-    className={`flex justify-between items-center mb-4 ${
-      isEmpty ? "opacity-65" : ""
-    }`}
-  >
-    <div id="experience-section-title-container">
-      <h2
-        id="experience-section-title"
-        className="text-xl text-black dark:text-white font-bold"
-      >
-        Experiences
-      </h2>
-      {isEmpty && isMe && (
-        <p id="experience-section-description" className="text-sm">
-          Showcase your accomplishments and get up to 2X as many profile views
-          and connections
-        </p>
-      )}
-    </div>
-    {/* Only show "+ Add Experience" button if user is the owner and the list is not empty */}
-    {!isEmpty && isMe && <ActionButtons onAddExperience={onAddExperience} />}
-  </header>
-);
-
-/* ------------------------------------------------------------------
-   ActionButtons
------------------------------------------------------------------- */
-interface ActionButtonsProps {
-  onAddExperience: (exp: Experience) => void;
-}
-const ActionButtons: React.FC<ActionButtonsProps> = ({ onAddExperience }) => {
-  const [open, setOpen] = useState(false);
-
-  return (
-    <div
-      id="experience-section-action-buttons"
-      className="flex items-center gap-2"
-    >
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger asChild>
-          <button
-            id="experience-add-button"
-            aria-label="Add Experience"
-            className="hover:bg-gray-300 dark:hover:text-black rounded-full transition-all duration-200 ease-in-out"
-          >
-            <GoPlus size={30} />
-          </button>
-        </DialogTrigger>
-        <DialogContent
-          aria-describedby={undefined}
-          id="experience-add-dialog-content"
-          className="max-h-[45rem] overflow-y-auto dark:bg-gray-900 overflow-x-hidden !max-w-5xl sm:!w-[38.5rem] !w-full"
-        >
-          <DialogTitle className="hidden"></DialogTitle>
-          <DialogHeader id="experience-add-dialog-header">
-            <Header title="Add Experience" />
-            <DialogDescription
-              id="experience-add-dialog-description"
-              className="text-sm text-gray-500 dark:text-gray-300"
-            >
-              *Indicates required
-            </DialogDescription>
-          </DialogHeader>
-          <AddExperienceModal
-            onClose={() => setOpen(false)}
-            onSuccess={(newExp) => {
-              onAddExperience(newExp);
-              setOpen(false);
-            }}
-          />
-        </DialogContent>
-      </Dialog>
-    </div>
-  );
-};
-
-/* ------------------------------------------------------------------
-   ExperienceList
------------------------------------------------------------------- */
-interface ExperienceListProps {
+interface ExperienceListContainerProps {
   experiences: Experience[];
   isMe: boolean;
   onStartEdit: (exp: Experience) => void;
   onDeleteClick: (experienceId: string) => void;
+  userId: string;
 }
 
-const ExperienceList: React.FC<ExperienceListProps> = ({
+const ExperienceListContainer: React.FC<ExperienceListContainerProps> = ({
   experiences,
   isMe,
   onStartEdit,
   onDeleteClick,
+  userId,
 }) => (
   <div id="experience-list-container" className="space-y-4">
     {experiences.slice(0, 3).map((experience, idx) => (
-      <div
-        id={`experience-item-${experience._id}`}
-        key={idx}
-        className="border-l-2 border-blue-600 pl-4 relative"
-      >
-        <h3 id={`experience-title-${experience._id}`} className="font-bold">
-          {experience.title}
-        </h3>
-        <p
-          id={`experience-company-${experience._id}`}
-          className="text-gray-600 dark:text-gray-300"
-        >
-          {experience.organization?.name}
-        </p>
-        <p
-          id={`experience-employee-type-${experience._id}`}
-          className="text-sm text-gray-500 dark:text-gray-200"
-        >
-          {experience.employee_type}
-        </p>
-        <p className="text-xs capitalize inline-flex gap-2 text-gray-500 dark:text-gray-200">
-          <span>{formatExperienceDate(experience.start_date)}</span>
-          <span>-</span>
-          <span>
-            {experience.is_current
-              ? "present"
-              : formatExperienceDate(experience.end_date as Date)}
-          </span>
-        </p>
-
-        {experience.skills.length > 0 && (
-          <div className="text-xs font-semibold flex items-center gap-2">
-            <h2 className="font-bold text-sm">Skills:</h2>
-            {experience.skills.join(", ")}
-          </div>
-        )}
-
-        {experience.media.length > 0 && (
-          <div className="mt-2">
-            {experience.media.map((med, idx) => (
-              <div
-                key={`${med.media}-${idx}`}
-                className="text-xs font-semibold flex items-start gap-2"
-              >
-                <img
-                  src={med.media}
-                  alt="org-logo"
-                  className="h-24 w-24 object-contain rounded-lg"
-                />
-                <div className="flex flex-col mt-2">
-                  <h2 className="text-base font-bold">{med.title}</h2>
-                  <p>{med.description}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {isMe && (
-          <div className="absolute top-0 h-full right-0 flex flex-col justify-between">
-            <button
-              id={`experience-edit-button-${idx}`}
-              aria-label="Edit Experience"
-              className="hover:bg-gray-300 dark:hover:text-black p-2 rounded-full transition-all duration-200 ease-in-out"
-              onClick={() => onStartEdit(experience)}
-            >
-              <BsPencil size={20} />
-            </button>
-            <button
-              id={`experience-delete-button-${idx}`}
-              aria-label="Delete Experience"
-              className="bg-red-100 hover:bg-red-500 hover:text-white p-2 rounded-full transition-all duration-200 ease-in-out"
-              onClick={() => onDeleteClick(experience._id as string)}
-            >
-              <MdDeleteForever size={20} />
-            </button>
-          </div>
-        )}
-      </div>
+      <Fragment key={idx}>
+        <ExperiencesList
+          isMe={isMe}
+          onStartEdit={onStartEdit}
+          onDeleteClick={onDeleteClick}
+          experience={experience}
+          idx={idx}
+        />
+      </Fragment>
     ))}
 
     {experiences.length > 3 && (
       <Link
-        to="#"
+        to={`/user-profile/experiences/${userId}`}
+        id="show-more-experiences-link"
         className="block w-full text-center text-blue-700 hover:underline transition-all duration-300 ease-in-out dark:text-blue-400 font-semibold"
       >
         Show More
@@ -510,18 +353,6 @@ const EmptyExperienceReadOnly: React.FC = () => (
         <p className="text-sm">This user has not added any experience yet.</p>
       </div>
     </div>
-  </div>
-);
-
-/* ------------------------------------------------------------------
-   Skeleton Loader
------------------------------------------------------------------- */
-const SkeletonLoader: React.FC = () => (
-  <div className="animate-pulse space-y-4">
-    <div className="h-6 w-1/2 bg-gray-300 dark:bg-gray-700 rounded" />
-    <div className="h-4 w-full bg-gray-300 dark:bg-gray-700 rounded" />
-    <div className="h-4 w-full bg-gray-300 dark:bg-gray-700 rounded" />
-    <div className="h-24 w-full bg-gray-300 dark:bg-gray-700 rounded" />
   </div>
 );
 

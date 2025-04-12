@@ -99,11 +99,10 @@ export interface CommentType {
 
 export type PostFilter = "all" | "comments" | "reactions" | "reposts";
 
-
-export interface Organization{
-  _id:string;
-  logo:string;
-  name:string;
+export interface Organization {
+  _id: string;
+  logo: string;
+  name: string;
 }
 
 export interface Experience {
@@ -117,16 +116,14 @@ export interface Experience {
   location: string;
   description: string;
   location_type: string;
-  skills: string[]; 
+  skills: string[];
   media: Media[];
 }
 
-
-
 export interface Media {
-  media: string,
-  title: string,
-  description: string
+  media: string;
+  title: string;
+  description: string;
 }
 export enum JobTypeEnum {
   full_time = "Full-time",
@@ -156,12 +153,12 @@ export interface UserStarterInterface {
   city: string;
   isStudent: boolean;
   jobTitle?: string;
-  school?: string;
+  school?: Organization;
   schoolStartYear?: string;
   schoolEndYear?: string;
   is16OrAbove?: boolean;
   employeeType?: string;
-  recentCompany?: string;
+  recentCompany?: Organization;
   birthDate?: Date;
   is_verified: boolean;
 }
@@ -189,7 +186,6 @@ export interface Bio {
   experience: string[];
   education: string[];
   website: string;
-  
 }
 
 export interface UserProfileBio {
@@ -206,8 +202,73 @@ export interface UserProfileBio {
   is_in_sent_connections?: boolean;
   name_of_one_mutual_connection?: string;
   isInConnections?: boolean;
-  isConnectByEmail:boolean
+  isConnectByEmail: boolean;
   isAlreadyFollowing?: boolean;
+  is_default_profile_photo: boolean;
+  education: Organization | null;
+  work_experience: Organization | null;
+  is_defult_cover_photo: boolean;
+}
+
+// Add to types.ts
+export interface Education {
+  _id?: string;
+  school: Organization; // Reusing Organization type assuming it has name/logo
+  degree: string;
+  field_of_study: string;
+  start_date: Date;
+  end_date: Date;
+  grade: string;
+  activities_and_socials: string;
+  skills: string[];
+  description: string;
+  media: Media[];
+}
+
+export interface About {
+  about: string;
+  skills: string[];
+}
+
+export interface License {
+  _id?: string;
+  name: string;
+  issuing_organization: Organization;
+  issue_date: Date;
+  expiration_date: Date;
+  credintial_id: string;
+  credintial_url: string;
+  skills: string[];
+  media: Media[];
+}
+
+export interface SkillForm {
+  name: string;
+  educations: string[];
+  experiences: string[];
+  licenses: string[];
+}
+
+export interface Skill {
+  _id?: string;
+  name: string;
+  endorsments: Endorsement[];
+  educations: Organization[];
+  experiences: Organization[];
+  licenses: Organization[];
+  total_endorsements?:number
+}
+
+export interface Endorsement {
+  user_id: string;
+  profilePicture: string;
+  name: string;
+}
+
+export interface SkillUserSections {
+  educations: Organization[];
+  experiences: Organization[];
+  licenses: Organization[];
 }
 
 export interface MenuAction {

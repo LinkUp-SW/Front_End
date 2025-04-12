@@ -86,16 +86,6 @@ export const FILTERS_LIST = Object.values(FILTER_OPTIONS);
 
 export const CORE_PROFILE_SECTIONS = [
   {
-    id: "add-profile-photo-button",
-    title: "Add profile photo",
-    key: "profile_photo",
-  },
-  {
-    id: "add-about-button",
-    title: "Add about",
-    key: "about",
-  },
-  {
     id: "add-education-button",
     title: "Add education",
     key: "education",
@@ -106,19 +96,23 @@ export const CORE_PROFILE_SECTIONS = [
     key: "experience",
   },
   {
-    id: "add-services-button",
-    title: "Add services",
-    key: "services",
-  },
-  {
-    id: "add-career-break-button",
-    title: "Add career break",
-    key: "career_break",
-  },
-  {
     id: "add-skills-button",
     title: "Add skills",
     key: "skills",
+  },
+];
+
+
+export const RECOMMENDED_PROFILE_SECTIONS = [
+  {
+    id: "add-license-button",
+    title: "Add License",
+    key: "license",
+  },
+  {
+    id: "add-resume-button",
+    title: "Add Resume",
+    key: "resume",
   },
 ];
 
