@@ -3,11 +3,13 @@ import React, { useEffect, useRef, useState } from "react";
 interface TruncatedTextProps {
   content: string;
   lineCount?: number;
+  id:string;
 }
 
 const TruncatedText: React.FC<TruncatedTextProps> = ({
   content,
   lineCount = 3,
+  id
 }) => {
   const textRef = useRef<HTMLParagraphElement>(null);
   const [truncatedText, setTruncatedText] = useState<string>(content);
@@ -61,6 +63,7 @@ const TruncatedText: React.FC<TruncatedTextProps> = ({
       {/* Hidden element for measurement (off-screen) */}
       <p
         ref={textRef}
+        id={id}
         className="text-sm whitespace-pre-wrap break-words invisible absolute -z-10"
       >
         {content}

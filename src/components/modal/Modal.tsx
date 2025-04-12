@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "../../store";
 import { closeModal } from "../../slices/modal/modalSlice";
-import AboutModal from "../../pages/user_profile/components/modals/about_modal/AboutModal";
 import AddProfileSectionModal from "../../pages/user_profile/components/modals/add_profile_section_modal/AddProfileSectionModal";
 import AddExperienceModal from "@/pages/user_profile/components/modals/experience_modal/AddExperienceModal";
 import ReportPostModal from "../../pages/feed/components/modals/ReportPostModal";
@@ -42,8 +41,6 @@ const Modal: React.FC = () => {
   // Render modal content based on modalType
   const renderModalContent = () => {
     switch (modalType) {
-      case "about":
-        return <AboutModal />; // Add more cases for other modals as needed
       case "add_profile_section":
         return <AddProfileSectionModal />;
         case "experience":

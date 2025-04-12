@@ -67,6 +67,10 @@ const UserInfo = () => {
         <ProfileHeader
           userid={id}
           user={data.bio}
+          intros={{
+            work_experience: data.work_experience,
+            education: data.education,
+          }}
           connectionsCount={data.number_of_connections}
         />
 

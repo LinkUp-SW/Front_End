@@ -23,6 +23,10 @@ import {
   ConnectionsPage,
   FollowingFollowersPage,
   SearchPage,
+  UserSkillsPage,
+  UserEducationsPage,
+  UserExperiencesPage,
+  UserLicensesPage,
   SignInAndSecurityPage,
   ChangePasswordPage
 } from "./pages";
@@ -119,6 +123,22 @@ const routes: RouteObject[] = [
   {
     path: "/search/:query",
     element: React.createElement(SearchPage),
+  },
+  {
+    path: "/user-profile/skills/:id",
+    element: React.createElement(UserSkillsPage),
+  },
+  {
+    path: "/user-profile/educations/:id",
+    element: React.createElement(UserEducationsPage),
+  },
+  {
+    path: "/user-profile/experiences/:id",
+    element: React.createElement(UserExperiencesPage),
+  },
+  {
+    path: "/user-profile/licenses/:id",
+    element: React.createElement(UserLicensesPage),
   },
   {
     path: "/settings/security",

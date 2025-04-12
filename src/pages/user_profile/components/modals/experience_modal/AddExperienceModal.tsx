@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Cookies from "js-cookie";
 import { toast } from "sonner";
 import {
@@ -9,9 +9,9 @@ import {
   FormTextarea,
 } from "@/components";
 import { useFormStatus } from "@/hooks/useFormStatus";
-import SkillsManager from "./components/SkillsManager";
-import MediaManager from "./components/MediaManager";
-import { MediaItem } from "./types";
+import SkillsManager from "../components/SkillsManager";
+import MediaManager from "../components/MediaManager";
+import { MediaItem } from "../components/types";
 import { Experience, JobTypeEnum, Organization } from "@/types";
 import { addWorkExperience, getCompaniesList } from "@/endpoints/userProfile";
 import { getErrorMessage } from "@/utils/errorHandler";
@@ -249,6 +249,12 @@ const AddExperienceModal: React.FC<AddExperienceModalProps> = ({
       stopSubmitting();
     }
   };
+
+  useEffect(() => {
+    if (organizationSearch.trim() === "") {
+      setIsOrgsLoading(false);
+    }
+  }, [isOrgsLoading, organizationSearch]);
 
   return (
     <div
