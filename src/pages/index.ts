@@ -22,6 +22,9 @@ import SavedJobsPage from "./jobs/SavedJobsPage";
 import ConnectionsPage from "./mynetwork/ConnectionsPage";
 import FollowingFollowersPage from "./mynetwork/FollowingFollowersPage";
 import SearchPage from "./search/SearchPage";
+
+import SignInAndSecurityPage from "./settings/SignInAndSecurityPage";
+import ChangePasswordPage from "./settings/ChangePasswordPage";
 //Export the Imported Pages
 export {
   LandingPage,
@@ -46,5 +49,7 @@ export {
   SavedJobsPage,
   ConnectionsPage,
   FollowingFollowersPage,
-  SearchPage
+  SearchPage,
+  SignInAndSecurityPage,
+  ChangePasswordPage
 };

@@ -10,6 +10,7 @@ import { LiaEllipsisHSolid as EllipsisIcon } from "react-icons/lia";
 import { IoMdClose as CloseIcon } from "react-icons/io";
 import { Button, Dialog, DialogTrigger, DialogContent } from "@/components";
 import ReportPostModal from "./modals/ReportPostModal";
+import { MenuAction } from "@/types";
 
 interface User {
   name: string;
@@ -38,7 +39,7 @@ interface PostHeaderProps {
   action?: Action;
   postMenuOpen: boolean;
   setPostMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  menuActions: { name: string; icon: React.ReactNode; action: () => void }[];
+  menuActions: MenuAction[]; // You can replace `any` with a more specific type if available
   timeAgo: string;
   post: PostData;
 }
@@ -53,7 +54,7 @@ const PostHeader: React.FC<PostHeaderProps> = ({
   post,
 }) => {
   return (
-    <header className="flex items-center space-x-3 w-full">
+    <header className="flex items-center space-x-3 w-full pl-4">
       <img
         src={user.profileImage}
         alt={user.name}
@@ -84,7 +85,7 @@ const PostHeader: React.FC<PostHeaderProps> = ({
                 </PopoverTrigger>
                 <PopoverContent className="relative right-30 dark:bg-gray-900 bg-white border-neutral-200 dark:border-gray-700 p-0 pt-1">
                   <div className="flex flex-col w-full p-0">
-                    {menuActions.map((item, index) =>
+                    {menuActions.map((item: MenuAction, index: number) =>
                       item.name == "Report Post" ? (
                         <DialogTrigger asChild key={index}>
                           <Button

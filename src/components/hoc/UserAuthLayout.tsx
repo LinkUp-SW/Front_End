@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { AxiosError } from "axios";
 import Cookies from "js-cookie";
 import { validateAuthToken } from "@/endpoints/userAuth";
+import LinkUpLoader from "../linkup_loader/LinkUpLoader";
 
 const UserAuthLayout = <P extends object>(
   WrappedComponent: React.ComponentType<P>
@@ -64,7 +65,7 @@ const UserAuthLayout = <P extends object>(
     }, [navigate, token]);
 
     if (!authCheckCompleted) {
-      return <div>Loading...</div>;
+      return <LinkUpLoader/>;
     }
 
     return (

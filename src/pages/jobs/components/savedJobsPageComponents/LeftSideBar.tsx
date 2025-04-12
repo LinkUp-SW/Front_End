@@ -11,12 +11,12 @@ const LeftSidebar: React.FC = () => {
       
       <div className="mt-2">
         <div className="flex justify-between items-center py-2 border-l-4 border-blue-500 pl-2">
-          <span className="text-blue-600 dark:text-blue-400">My jobs</span>
+          <button id="my-jobs-btn" className="text-blue-600 dark:text-blue-400">My jobs</button>
           <span className="text-blue-600 dark:text-blue-400 text-sm">248</span>
         </div>
         
         <div className="flex justify-between items-center py-2">
-          <span className="text-gray-600 dark:text-gray-400">Saved posts and articles</span>
+          <button id="saved-posts-btn" className="text-gray-600 dark:text-gray-400">Saved posts and articles</button>
           <span className="text-gray-600 dark:text-gray-400 text-sm">10+</span>
         </div>
       </div>

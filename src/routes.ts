@@ -23,6 +23,8 @@ import {
   ConnectionsPage,
   FollowingFollowersPage,
   SearchPage,
+  SignInAndSecurityPage,
+  ChangePasswordPage
 } from "./pages";
 
 import React from "react";
@@ -55,7 +57,7 @@ const routes: RouteObject[] = [
     element: React.createElement(NotificationsPage),
   },
   {
-    path: "/collections",
+    path: "/jobs/see-more",
     element: React.createElement(SeeMorePage),
   },
   {
@@ -68,7 +70,9 @@ const routes: RouteObject[] = [
     element: React.createElement(FollowingFollowersPage),
   },
 
-  { path: "/connections", element: React.createElement(ConnectionsPage) },
+  { path: "/connections/:id", 
+    element: React.createElement(ConnectionsPage) 
+  },
 
   {
     path: "/manage-invitations",
@@ -115,6 +119,14 @@ const routes: RouteObject[] = [
   {
     path: "/search/:query",
     element: React.createElement(SearchPage),
+  },
+  {
+    path: "/settings/security",
+    element: React.createElement(SignInAndSecurityPage),
+  },
+  {
+    path: "/settings/security/changepassword",
+    element: React.createElement(ChangePasswordPage),
   },
 ];
 

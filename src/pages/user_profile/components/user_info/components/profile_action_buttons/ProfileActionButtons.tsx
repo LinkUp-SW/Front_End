@@ -5,6 +5,29 @@ import ResourcesPopover from "./ResourcesPopover";
 import { IoCloseCircle } from "react-icons/io5";
 import { CiCirclePlus, CiClock2 } from "react-icons/ci";
 import { FaUserPlus, FaUserMinus, FaPaperPlane } from "react-icons/fa";
+import {
+  connectWithUser,
+  followUser,
+  removeUserFromConnection,
+  unfollowUser,
+  withdrawInvitation,
+} from "@/endpoints/myNetwork";
+import { useNavigate, useParams } from "react-router-dom";
+import Cookies from "js-cookie";
+import { toast } from "sonner";
+import { getErrorMessage } from "@/utils/errorHandler";
+import {
+  Button,
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  FormInput,
+} from "@/components";
+import { blockUser } from "@/endpoints/userProfile";
 
 export type FollowStatus = {
   isFollowing?: boolean;
@@ -16,14 +39,22 @@ export type FollowStatus = {
 export interface ProfileActionButtonsProps {
   isOwner: boolean;
   followStatus: FollowStatus;
+  isConnectByEmail: boolean;
+  email: string;
 }
 
 const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
   isOwner,
   followStatus,
+  isConnectByEmail,
+  email,
 }) => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const authToken = Cookies.get("linkup_auth_token");
   const [localFollowStatus, setLocalFollowStatus] =
     useState<FollowStatus>(followStatus);
+  const [openEmailDialog, setOpenEmailDialog] = useState(false);
 
   const effectiveStatus = useMemo(
     () => (isOwner ? followStatus : localFollowStatus),
@@ -31,43 +62,228 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
   );
 
   // --- Follow/Connection Handlers ---
-  const handleFollow = useCallback(() => {
+  const handleFollow = useCallback(async () => {
     console.log("Follow clicked");
-    setLocalFollowStatus((prev) => ({
-      ...prev,
-      isFollowing: true,
-      isPending: false,
-      isInConnection: false,
-    }));
+    try {
+      const response = await followUser(authToken as string, id as string);
+      console.log(response);
+      toast.success(response.message);
+      setLocalFollowStatus((prev) => ({
+        ...prev,
+        isFollowing: true,
+      }));
+    } catch (error) {
+      toast.error(getErrorMessage(error));
+      setLocalFollowStatus((prev) => ({
+        ...prev,
+        isFollowing: false,
+      }));
+    }
   }, []);
 
-  const handleUnfollow = useCallback(() => {
+  const handleUnfollow = useCallback(async () => {
     console.log("Unfollow clicked");
-    setLocalFollowStatus((prev) => ({ ...prev, isFollowing: false }));
+    try {
+      const response = await unfollowUser(authToken as string, id as string);
+      console.log(response);
+      toast.success(response.message);
+      setLocalFollowStatus((prev) => ({ ...prev, isFollowing: false }));
+    } catch (error) {
+      toast.error(getErrorMessage(error));
+      setLocalFollowStatus((prev) => ({ ...prev, isFollowing: true }));
+    }
   }, []);
 
-  const handleConnect = useCallback(() => {
+  const handleConnect = useCallback(async (email: string) => {
     console.log("Connect clicked");
-    setLocalFollowStatus((prev) => ({
-      ...prev,
-      isPending: true,
-      isInConnection: false,
-    }));
+    try {
+      const response = await connectWithUser(
+        authToken as string,
+        id as string,
+        email
+      );
+      console.log(response);
+      toast.success(response.message);
+      setLocalFollowStatus((prev) => ({
+        ...prev,
+        isPending: true,
+        isInConnection: false,
+        isFollowing: true,
+      }));
+    } catch (error) {
+      toast.error(getErrorMessage(error));
+      setLocalFollowStatus((prev) => ({
+        ...prev,
+        isPending: false,
+        isInConnection: false,
+      }));
+    }
   }, []);
 
-  const handleCancelRequest = useCallback(() => {
+  const handleCancelRequest = useCallback(async () => {
     console.log("Cancel request clicked");
-    setLocalFollowStatus((prev) => ({ ...prev, isPending: false }));
+    let resolveDelay: (result: string) => void;
+
+    // Create a promise that resolves after 4000ms or when cancel is clicked
+    const delayPromise = new Promise<string>((resolve) => {
+      resolveDelay = resolve;
+      setTimeout(() => {
+        resolve("timeout");
+      }, 4000);
+    });
+
+    const loadingToast = toast.loading("Withdraw connection request", {
+      description: (
+        <p className="text-gray-600">
+          If you withdraw the request, you won’t be able to send another request
+          for <strong>3 weeks</strong>.
+        </p>
+      ),
+      cancel: {
+        label: "Undo",
+        onClick: () => {
+          console.log("Cancel button clicked");
+          resolveDelay("cancel"); // Resolve the delay promise early
+        },
+      },
+      // Custom styling for the cancel button
+      cancelButtonStyle: {
+        backgroundColor: "#f87171", // Tailwind's red-400
+        color: "#fff",
+        fontWeight: "bold",
+        borderRadius: "4px",
+        padding: "8px 12px",
+        marginLeft: "8px",
+        border: "none",
+        cursor: "pointer",
+      },
+    });
+
+    // Wait for either the timeout or cancel click
+    const delayResult = await delayPromise;
+    toast.dismiss(loadingToast);
+    // If cancel was clicked, show a toast after a slight delay and exit early
+    if (delayResult === "cancel") {
+      console.log("Operation canceled by the user.");
+      setTimeout(() => {
+        toast.info(`Withdraw request Canceled`);
+      }, 100);
+      return;
+    }
+
+    // Otherwise, execute the withdraw logic
+    try {
+      const response = await withdrawInvitation(
+        authToken as string,
+        id as string
+      );
+      toast.success(response.message);
+      setLocalFollowStatus((prev) => ({ ...prev, isPending: false }));
+    } catch (error) {
+      setLocalFollowStatus((prev) => ({ ...prev, isPending: false }));
+      toast.error(getErrorMessage(error));
+    }
   }, []);
 
-  const handleRemoveConnection = useCallback(() => {
+  const handleRemoveConnection = useCallback(async () => {
     console.log("Remove Connection clicked");
-    setLocalFollowStatus((prev) => ({ ...prev, isInConnection: false }));
+    let resolveDelay: (result: string) => void;
+    // Create a promise that resolves after 4000ms or when cancel is clicked
+    const delayPromise = new Promise<string>((resolve) => {
+      resolveDelay = resolve;
+      setTimeout(() => {
+        resolve("timeout");
+      }, 4000);
+    });
+    const loadingToast = toast.loading("Unfollow user request", {
+      description: "Are you sure you want to remove this user?",
+      action: {
+        label: "remove",
+        onClick: () => {
+          console.log("Cancel button clicked");
+          resolveDelay("remove"); // Resolve the delay promise early
+        },
+      },
+      actionButtonStyle: {
+        backgroundColor: "#f87171", // Tailwind's red-400
+        color: "#fff",
+        fontWeight: "bold",
+        borderRadius: "4px",
+        padding: "0px 12px",
+        marginLeft: "8px",
+        border: "none",
+        cursor: "pointer",
+      },
+    });
+    // Wait for either the timeout or cancel click
+    const delayResult = await delayPromise;
+    toast.dismiss(loadingToast);
+    if (delayResult === "remove") {
+      try {
+        const response = await removeUserFromConnection(
+          authToken as string,
+          id as string
+        );
+        console.log(response);
+        toast.success(response.message);
+        setLocalFollowStatus((prev) => ({ ...prev, isInConnection: false }));
+      } catch (error) {
+        toast.error(getErrorMessage(error));
+        setLocalFollowStatus((prev) => ({ ...prev, isInConnection: true }));
+      }
+    }
   }, []);
+
+  //-- If isConnectByEmail true open a Dialog
 
   // --- Other Handlers ---
   const handleMessage = useCallback(() => alert("Message clicked"), []);
-  const handleBlock = useCallback(() => alert("Report/Block clicked"), []);
+  const handleBlock = useCallback(async () => {
+    console.log("Remove Connection clicked");
+    let resolveDelay: (result: string) => void;
+    // Create a promise that resolves after 4000ms or when cancel is clicked
+    const delayPromise = new Promise<string>((resolve) => {
+      resolveDelay = resolve;
+      setTimeout(() => {
+        resolve("timeout");
+      }, 4000);
+    });
+    const loadingToast = toast.loading("Block user request", {
+      description: "Are you sure you want to block this user?",
+      action: {
+        label: "block",
+        onClick: () => {
+          console.log("Cancel button clicked");
+          resolveDelay("block"); // Resolve the delay promise early
+        },
+      },
+      actionButtonStyle: {
+        backgroundColor: "#f87171", // Tailwind's red-400
+        color: "#fff",
+        fontWeight: "bold",
+        borderRadius: "4px",
+        padding: "0px 12px",
+        marginLeft: "8px",
+        border: "none",
+        cursor: "pointer",
+      },
+    });
+    // Wait for either the timeout or cancel click
+    const delayResult = await delayPromise;
+    toast.dismiss(loadingToast);
+    if (delayResult === "block") {
+      try {
+        const response = await blockUser(authToken as string, id as string);
+        console.log(response);
+        toast.success(response.message);
+        setTimeout(() => {
+          navigate("/feed", { replace: true });
+        }, 1000);
+      } catch (error) {
+        toast.error(getErrorMessage(error));
+      }
+    }
+  }, []);
   const handleEnhanceProfile = useCallback(
     () => alert("Enhance Profile clicked"),
     []
@@ -107,6 +323,9 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
         <ResourcesPopover
           title="Resources"
           isOwner
+          email={email}
+          setOpenEmailDialog={setOpenEmailDialog}
+          isConnectByEmail={isConnectByEmail}
           onViewActivity={handleViewActivity}
           onViewBlockedUsers={handleViewBlockedUsers}
           onAboutProfile={handleAboutProfile}
@@ -157,7 +376,9 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
                 ? handleCancelRequest
                 : effectiveStatus.isInConnection
                 ? handleRemoveConnection
-                : handleConnect
+                : isConnectByEmail
+                ? () => setOpenEmailDialog(true)
+                : () => handleConnect(email)
             }
           >
             {effectiveStatus.isPending ? (
@@ -197,13 +418,80 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
         onFollow={handleFollow}
         onUnfollow={handleUnfollow}
         onConnect={handleConnect}
+        email={email}
+        isConnectByEmail={isConnectByEmail}
+        setOpenEmailDialog={setOpenEmailDialog}
         onCancelRequest={handleCancelRequest}
         onRemoveConnection={handleRemoveConnection}
         onBlock={handleBlock}
         onAboutProfile={handleAboutProfile}
+      />
+      <EmailConnectionDialog
+        onOpenChange={setOpenEmailDialog}
+        open={openEmailDialog}
+        handleConnect={handleConnect}
       />
     </div>
   );
 };
 
 export default ProfileActionButtons;
+
+const EmailConnectionDialog = ({
+  open,
+  onOpenChange,
+  handleConnect,
+}: {
+  onOpenChange?(open: boolean): void;
+  open: boolean;
+  handleConnect(email?: string): void;
+}) => {
+  const [email, setEmail] = useState("");
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-xl">
+        <DialogHeader>
+          <DialogTitle>Does this user know you?</DialogTitle>
+          <DialogDescription>
+            To verify this member knows you, please enter their email to
+            connect.{" "}
+          </DialogDescription>
+        </DialogHeader>
+        <div className="flex items-center space-x-2">
+          <div className="flex-1">
+            <FormInput
+              label="Email"
+              placeholder="Enter your Email"
+              value={email}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                setEmail(e.target.value.toLowerCase());
+              }}
+              type="text"
+              id="email"
+              name="email"
+              extraClassName="pt-0"
+            />
+          </div>
+        </div>
+        <DialogFooter className="sm:justify-start">
+          <Button
+            onClick={() => {
+              handleConnect(email);
+              onOpenChange?.(false);
+            }}
+            type="submit"
+            size="sm"
+            className="px-3"
+          >
+            send
+          </Button>
+          <DialogClose asChild>
+            <Button type="button" variant="secondary">
+              Close
+            </Button>
+          </DialogClose>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+};

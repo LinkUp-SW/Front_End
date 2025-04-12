@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   fetchRecievedConnections,
   ReceivedConnections,
@@ -8,12 +8,16 @@ import {
 } from "@/endpoints/myNetwork";
 import Cookies from "js-cookie";
 import useFetchData from "@/hooks/useFetchData";
-
+import { useParams } from "react-router-dom";
 const Invitations = () => {
   const [invitations, setInvitations] = useState<ReceivedConnections[]>([]);
   const token = Cookies.get("linkup_auth_token");
+  const { id } = useParams();
   const { data } = useFetchData(
-    () => (token ? fetchRecievedConnections(token) : Promise.resolve(null)),
+    () =>
+      token
+        ? fetchRecievedConnections(token, id as string, 3)
+        : Promise.resolve(null),
     [token]
   );
 
@@ -37,7 +41,7 @@ const Invitations = () => {
       }
 
       try {
-        console.log(token)
+        console.log(token);
         await acceptInvitation(token, userId);
 
         setInvitations((prevInvitations) =>
@@ -77,6 +81,7 @@ const Invitations = () => {
           Invitations ({data?.numberOfReceivedConnections ?? 0})
         </h2>
         <button
+          id="showall-invitations-button"
           className="text-blue-600 hover:underline cursor-pointer"
           onClick={() => navigate("/manage-invitations")}
         >
@@ -89,8 +94,8 @@ const Invitations = () => {
             key={invite.user_id}
             className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg flex-col min-[450px]:flex-row"
           >
-            <a
-              href={invite.name}
+            <Link
+              to={`/user-profile/${invite.user_id}`}
               className="flex items-center space-x-4 flex-1"
             >
               <img
@@ -122,15 +127,17 @@ const Invitations = () => {
                   ) : null}
                 </p>
               </div>
-            </a>
+            </Link>
             <div className="flex space-x-2">
               <button
+                id="ignore-invitation-button"
                 onClick={() => ignoreInvitations(invite.user_id)}
                 className="px-3 py-1 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white cursor-pointer"
               >
                 Ignore
               </button>
               <button
+                id="accept-invitation-button"
                 onClick={() => acceptInvitations(invite.user_id)}
                 className="px-4 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 cursor-pointer"
               >
