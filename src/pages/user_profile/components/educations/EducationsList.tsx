@@ -40,9 +40,9 @@ const EducationsList: React.FC<EducationListProps> = ({
         {education.field_of_study}
       </p>
       <p className="text-xs capitalize inline-flex gap-2 text-gray-500 dark:text-gray-200">
-        <span>{formatExperienceDate(education.start_date)}</span>
+        <span>{education.start_date&&formatExperienceDate(education.start_date)}</span>
         <span>-</span>
-        <span>{formatExperienceDate(education.end_date)}</span>
+        <span>{education.end_date&&formatExperienceDate(education.end_date)}</span>
       </p>
       {education.skills.length > 0 && (
         <div className="text-xs font-semibold flex items-center gap-2">
