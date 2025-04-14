@@ -224,6 +224,7 @@ const CoverPictureModal: React.FC<CoverPictureModalProps> = ({
               className="affimativeBtn flex disabled:cursor-not-allowed gap-2"
               onClick={handleSave}
               disabled={isSubmitting}
+              id="save-cover-photo-button"
             >
               <LiaSaveSolid className="w-5 h-5" />
               Save
