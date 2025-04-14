@@ -27,6 +27,7 @@ export const CoverPhoto = ({ src, isOwner, children }: CoverPhotoProps) => {
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
           <DialogTrigger asChild>
             <button
+              id="edit-cover-photo"
               className="absolute hover:opacity-85 transition-all duration-300 cursor-pointer bg-gray-300 dark:bg-gray-800 p-2 rounded-full top-3 right-3"
               aria-label="Edit cover photo"
             >
