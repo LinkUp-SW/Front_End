@@ -25,7 +25,7 @@ pipeline {
         stage('Set up environment') { 
             steps {
                  echo 'setting up environment variables...'   
-                 writeFile file: 'testfile', text: ${env.VAULT_SECRET}
+                 writeFile file: 'testfile', text: "${env.VAULT_SECRET}"
                  
             }
         }
