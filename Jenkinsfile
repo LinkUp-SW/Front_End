@@ -62,13 +62,13 @@ pipeline {
             steps {
                  echo 'deploying...'  
                 sh '''
-                     rm -rf ~/mywork
-                    mv mywork ~/
+                    sudo rm -rf /home/azureuser/mywork
+                    sudo  mv mywork /home/azureuser/
                     timestamp=$(date +%Y%m%d%H%M%S)
-                     mkdir -p ~/Front_deploy_backup_$timestamp
-                      rsync -a --remove-source-files ~/Front_deploy/ ~/Front_deploy_backup/
-                      rm -rf ~/Front_deploy/*
-                      rsync -a ~/mywork/dist/ ~/Front_deploy/
+                     sudo mkdir -p /home/azureuser/Front_deploy_backup_$timestamp
+                      sudo rsync -a --remove-source-files /home/azureuser/Front_deploy/ /home/azureuser/Front_deploy_backup/
+                      sudo rm -rf /home/azureuser/Front_deploy/*
+                      sudo rsync -a /home/azureuser/mywork/dist/ /home/azureuser/Front_deploy/
                  '''
             }
         }
