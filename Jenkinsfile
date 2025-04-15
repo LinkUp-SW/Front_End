@@ -59,6 +59,9 @@ pipeline {
             }
         }
         stage('Deploy') { 
+            when {
+                branch 'main'
+            }
             steps {
                  echo 'deploying...'  
                 sh '''
