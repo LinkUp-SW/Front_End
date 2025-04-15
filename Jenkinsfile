@@ -25,10 +25,7 @@ pipeline {
         stage('Set up environment') { 
             steps {
                  echo 'setting up environment variables...'   
-                 sh '''
-                    echo "this is a test secret wow: ${env.VAULT_SECRET}"
-                    
-                 '''
+                 echo "this is a test secret wow: ${env.VAULT_SECRET}"
             }
         }
         stage('Lint Code') { 
