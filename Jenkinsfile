@@ -2,7 +2,7 @@ pipeline {
     agent any
     environment {
         CI = "true"  
-        VAULT_SECRET = vault path: 'secret/jenkins/testkey', engineVersion: '2', key: 'testkey'
+        VAULT_SECRET = vault path: 'secret/jenkins', engineVersion: "2", key: 'testkey'
     }
     stages {
         stage('Checkout') {
