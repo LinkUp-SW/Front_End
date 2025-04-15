@@ -25,10 +25,8 @@ pipeline {
         stage('Set up environment') { 
             steps {
                  echo 'setting up environment variables...'   
+                 writeFile file: 'testfile', text: ${env.VAULT_SECRET}
                  
-                 sh '''
-                    writeFile file: 'testfile', text: ${env.VAULT_SECRET}
-                 '''
             }
         }
         stage('Lint Code') { 
