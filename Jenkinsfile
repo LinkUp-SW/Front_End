@@ -17,7 +17,7 @@ pipeline {
                 echo 'installing dependencies...' 
                 sh '''
                     cd mywork
-                    #npm install
+                    npm install
                 '''
                  
             }
@@ -52,9 +52,24 @@ pipeline {
                  echo 'building...'  
                 sh '''
                     cd mywork
-                    #npm run build
+                    npm run build
                     cd ..
                     #rm -rf mywork
+                 '''
+            }
+        }
+        stage('Deploy') { 
+            steps {
+                 echo 'deploying...'  
+                sh '''
+                    sudo rm -rf ~/mywork
+                    sudo mv mywork ~/
+                    timestamp=$(date +%Y%m%d%H%M%S)
+                    sudo mkdir -p ~/Front_deploy_backup_$timestamp
+                    sudo rsync -a --remove-source-files ~/Front_deploy/ ~/Front_deploy_backup/
+                    sudo rm -rf ~/Front_deploy/*
+                    sudo rsync -a ~/mywork/dist/ ~/Front_deploy/
+                    sudo systemctl restart nginx
                  '''
             }
         }
