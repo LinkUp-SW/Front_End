@@ -7,9 +7,9 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                #sh ' rm -rf mywork' // Ensure it's clean
-                #checkout scm       // Clone the repo in the root directory
-                #sh 'mkdir mywork && mv * mywork/ 2>/dev/null || true' // Move everything to mywork
+                sh ' rm -rf mywork' // Ensure it's clean
+                checkout scm       // Clone the repo in the root directory
+                sh 'mkdir mywork && mv * mywork/ 2>/dev/null || true' // Move everything to mywork
                 }
         }
        stage('Install Dependencies') { 
