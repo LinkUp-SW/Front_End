@@ -62,14 +62,14 @@ pipeline {
             steps {
                  echo 'deploying...'  
                 sh '''
-                    sudo rm -rf ~/mywork
-                    sudo mv mywork ~/
+                     rm -rf ~/mywork
+                     mv mywork ~/
                     timestamp=$(date +%Y%m%d%H%M%S)
-                    sudo mkdir -p ~/Front_deploy_backup_$timestamp
-                    sudo rsync -a --remove-source-files ~/Front_deploy/ ~/Front_deploy_backup/
-                    sudo rm -rf ~/Front_deploy/*
-                    sudo rsync -a ~/mywork/dist/ ~/Front_deploy/
-                    sudo systemctl restart nginx
+                     mkdir -p ~/Front_deploy_backup_$timestamp
+                     rsync -a --remove-source-files ~/Front_deploy/ ~/Front_deploy_backup/
+                     rm -rf ~/Front_deploy/*
+                     rsync -a ~/mywork/dist/ ~/Front_deploy/
+                     systemctl restart nginx
                  '''
             }
         }
