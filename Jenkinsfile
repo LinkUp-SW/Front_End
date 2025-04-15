@@ -34,7 +34,7 @@ pipeline {
                  echo 'Linting...'   
                  sh '''
                     cd mywork
-                    #npm run lint
+                    npm run lint
                  '''
             }
         }
@@ -43,7 +43,7 @@ pipeline {
                  echo 'test...'  
                  sh '''
                     cd mywork
-                    #npx vitest
+                    npx vitest
                  '''
             }
         }
