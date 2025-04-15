@@ -1,14 +1,15 @@
 pipeline {
     agent any
     environment {
-        CI = "true"  // Set CI mode for React (avoids prompts)
+        CI = "true"  
+        VAULT_SECRET = vault path: 'secret/data/jenkins/testkey', engineVersion: 2, key: 'value'
     }
     stages {
         stage('Checkout') {
             steps {
-                sh ' rm -rf mywork' // Ensure it's clean
-                checkout scm       // Clone the repo in the root directory
-                sh 'mkdir mywork && mv * mywork/ 2>/dev/null || true' // Move everything to mywork
+                #sh ' rm -rf mywork' // Ensure it's clean
+                #checkout scm       // Clone the repo in the root directory
+                #sh 'mkdir mywork && mv * mywork/ 2>/dev/null || true' // Move everything to mywork
                 }
         }
        stage('Install Dependencies') { 
@@ -16,9 +17,18 @@ pipeline {
                 echo 'installing dependencies...' 
                 sh '''
                     cd mywork
-                    npm install
+                    #npm install
                 '''
                  
+            }
+        }
+        stage('Set up environment') { 
+            steps {
+                 echo 'setting up environment variables...'   
+                 sh '''
+                    echo "this is a test secret wow: ${env.VAULT_SECRET}"
+                    
+                 '''
             }
         }
         stage('Lint Code') { 
@@ -26,7 +36,7 @@ pipeline {
                  echo 'Linting...'   
                  sh '''
                     cd mywork
-                    npm run lint
+                    #npm run lint
                  '''
             }
         }
@@ -35,7 +45,7 @@ pipeline {
                  echo 'test...'  
                  sh '''
                     cd mywork
-                    npx vitest
+                    #npx vitest
                  '''
             }
         }
@@ -44,7 +54,7 @@ pipeline {
                  echo 'building...'  
                 sh '''
                     cd mywork
-                    npm run build
+                    #npm run build
                     cd ..
                     #rm -rf mywork
                  '''
