@@ -60,7 +60,7 @@ pipeline {
         }
         stage('Deploy') { 
             when {
-                branch 'phase3-bug-fixes-afify'
+                branch 'main'
             }
             steps {
                  echo 'deploying...'  
