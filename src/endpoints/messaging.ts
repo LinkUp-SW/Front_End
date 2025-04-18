@@ -83,9 +83,11 @@ export const deleteConversation= async(
 
 export const deleteMessages= async(
   token:string,
+  conversationId:string,
   messageId:string
+
 )=>{
-  const response =await axiosInstance.delete(`/api/v1/messages/${messageId}`,{
+  const response =await axiosInstance.delete(`/api/v1/messages/${conversationId}/${messageId}`,{
     headers: {
       Authorization: `Bearer ${token}`,
     },
