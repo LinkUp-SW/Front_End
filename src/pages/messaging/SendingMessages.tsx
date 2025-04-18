@@ -76,7 +76,7 @@ const SendingMessages = () => {
     <>
       {/* File attachments UI */}
       {files.length > 0 && (
-        <div className="px-4 space-y-2 mb-2">
+        <div className="px-4 space-y-2 mb-2 flex-shrink-0">
           {files.map((file, index) => (
             <div
               key={index}
@@ -108,20 +108,20 @@ const SendingMessages = () => {
         </div>
       )}
 
-      <div className="border-t border-gray-200 flex flex-col">
+      <div className="border-t border-gray-200 flex flex-col flex-shrink-0">
         {/* Message input area */}
-        <div className="px-4 pt-4 pb-2">
+        <div className="px-4 pt-2 pb-1">
           <textarea
             id="text-message"
             value={text}
             onChange={(e) => setText(e.target.value)}
             placeholder="Write a message..."
-            className="w-full min-h-24 bg-gray-50 text-gray-700 p-4 rounded-md resize-none outline-none border-none"
+            className="w-full min-h-16 max-h-24 bg-gray-50 text-gray-700 p-3 rounded-md resize-none outline-none border-none"
           />
         </div>
 
         {/* Bottom action bar with icons and send button */}
-        <div className="flex items-start justify-between px-4 pt-3 pb-15 border-t border-gray-200">
+        <div className="flex items-center justify-between px-4 py-2 border-t border-gray-200">
           <div className="flex space-x-4">
             <button
               id="send-message-image"
