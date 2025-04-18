@@ -186,7 +186,8 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
       }, 4000);
     });
     const loadingToast = toast.loading("Remove Connection request", {
-      description: "Are you sure you want to remove this user from your connections?",
+      description:
+        "Are you sure you want to remove this user from your connections?",
       action: {
         label: "remove",
         onClick: () => {
