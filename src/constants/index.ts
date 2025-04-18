@@ -49,7 +49,7 @@ export const SMALL_SCREEN_NAV_ITEMS = [
     title: "My Network",
   },
   {
-    path: "#",
+    path: `/user-profile`,
     icon: FaUserAlt,
     title: "Profile",
   },

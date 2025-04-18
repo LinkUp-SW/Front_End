@@ -6,9 +6,11 @@ import {
 import { Link } from "react-router-dom";
 import { RootState } from "../../store";
 import ThemeToggle from "../theme_toggle/ThemeToggle";
+import Cookies from "js-cookie";
 
 const NavItems = () => {
   const screenWidth = useSelector((state: RootState) => state.screen.width);
+  const userId = Cookies.get("linkup_user_id");
   return (
     <div className="flex justify-between lg:border-0 border-t lg:py-0 py-2 border-t-gray-400 dark:border-gray-700 bg-white dark:bg-gray-900 w-full items-center px-2">
       {screenWidth >= 1024
@@ -25,7 +27,9 @@ const NavItems = () => {
         : SMALL_SCREEN_NAV_ITEMS.map((item, i) => (
             <Link
               key={i}
-              to={item.path}
+              to={
+                item.title === "Profile" ? `${item.path}/${userId}` : item.path
+              }
               className="flex text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white hover:underline underline-offset-2 transition-all duration-300 ease-in-out flex-col items-center"
             >
               <item.icon size={25} />
