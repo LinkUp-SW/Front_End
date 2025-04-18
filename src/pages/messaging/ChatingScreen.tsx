@@ -90,14 +90,21 @@ const ChatingScreen = () => {
     }
   };
 
-  const handlingDeleteMsg = async (msgId: string) => {
+  const handlingDeleteMsg = async (convId: string, msgId: string) => {
     try {
-      await deleteMessages(token!, msgId);
-      setMsgDeleted(true);
+      await deleteMessages(token!, convId, msgId);
+  
+      // Remove the deleted message from local state
+      setChatData((prev) => ({
+        ...prev!,
+        messages: prev!.messages.filter((msg) => msg.messageId !== msgId),
+      }));
+      setMsgDeleted(true)
     } catch (err) {
       console.log("Error deleting:", err);
     }
   };
+  
 
   return (
     <>
@@ -208,7 +215,7 @@ const ChatingScreen = () => {
                                     id="delete"
                                     className="block w-full text-left py-2 px-3 text-sm hover:bg-gray-100 rounded"
                                     onClick={() => {
-                                      handlingDeleteMsg(msg.messageId);
+                                      handlingDeleteMsg(selectedConvID, msg.messageId);
                                     }}
                                   >
                                     Delete
