@@ -228,7 +228,7 @@ const CoverPictureModal: React.FC<CoverPictureModalProps> = ({
               Upload New
             </Button>
             <Button
-              className="affimativeBtn flex disabled:cursor-not-allowed gap-2"
+              className="affirmativeBtn flex disabled:cursor-not-allowed gap-2"
               onClick={handleSave}
               disabled={isSubmitting}
               id="save-cover-photo-button"

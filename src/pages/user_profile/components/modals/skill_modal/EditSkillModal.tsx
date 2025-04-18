@@ -208,7 +208,7 @@ const EditSkillModal: React.FC<EditSkillModalProps> = ({
         </Button>
         <Button
           onClick={handleSubmit}
-          className="affimativeBtn"
+          className="affirmativeBtn"
           disabled={isSubmitting}
         >
           {isSubmitting ? "Saving..." : "Save Changes"}
