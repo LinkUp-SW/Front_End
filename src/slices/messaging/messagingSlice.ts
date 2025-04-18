@@ -44,7 +44,7 @@ interface MessageState {
   search: string;
   starredConversations: string[],/*initial state should be starred from database*/
   user2Name:string;
-  userStatus:string;
+  userStatus:boolean;
 }
 
 const initialState: MessageState = {
@@ -54,7 +54,7 @@ const initialState: MessageState = {
   search:"",
   starredConversations: [],
   user2Name:"",
-  userStatus:""
+  userStatus:false
 };
 
 const MessagingSlice = createSlice({
@@ -109,7 +109,7 @@ const MessagingSlice = createSlice({
       state.user2Name = action.payload; 
     },
 
-    selectUserStatus: (state, action: PayloadAction<string>) => {
+    selectUserStatus: (state, action: PayloadAction<boolean>) => {
       state.userStatus = action.payload; 
     },
 
