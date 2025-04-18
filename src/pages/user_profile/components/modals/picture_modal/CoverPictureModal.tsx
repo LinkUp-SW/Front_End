@@ -17,6 +17,7 @@ import { LiaSaveSolid } from "react-icons/lia";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { editUserBio } from "@/slices/user_profile/userBioSlice";
+import { defaultProfileImage } from "@/constants";
 
 type CoverPictureModalProps = {
   src: string; // initial cover photo URL
@@ -178,9 +179,15 @@ const CoverPictureModal: React.FC<CoverPictureModalProps> = ({
       {!isEditing ? (
         // Preview Mode: show the full-width image only if previewImage exists.
         <div className="w-full">
-          {previewImage && (
+          {previewImage ? (
             <img
               src={previewImage}
+              alt="Cover Preview"
+              className="w-full aspect-[4/1] object-cover"
+            />
+          ) : (
+            <img
+              src={defaultProfileImage}
               alt="Cover Preview"
               className="w-full aspect-[4/1] object-cover"
             />
@@ -244,7 +251,7 @@ const CoverPictureModal: React.FC<CoverPictureModalProps> = ({
             <Button
               variant="ghost"
               onClick={() => setIsEditing(true)}
-              disabled={isSubmitting || userBio?.is_defult_cover_photo}
+              disabled={isSubmitting || userBio?.is_defult_cover_photo || !src}
               id="edit-cover-photo-btn"
               className="flex disabled:cursor-not-allowed disabled:opacity-65 cursor-not-allowed items-center gap-2 text-gray-600 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-500 transition-colors duration-200"
             >
@@ -266,7 +273,7 @@ const CoverPictureModal: React.FC<CoverPictureModalProps> = ({
               variant="destructive"
               onClick={handleDelete}
               id="delete-cover-photo-btn"
-              disabled={isSubmitting || userBio?.is_defult_cover_photo}
+              disabled={isSubmitting || userBio?.is_defult_cover_photo || !src}
               className="destructiveBtn disabled:cursor-not-allowed flex gap-2"
             >
               <FiTrash className="w-5 h-5" />
