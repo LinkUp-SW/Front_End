@@ -14,10 +14,9 @@ import { useState } from "react";
 type ProfileAvatarProps = {
   src: string;
   isOwner: boolean;
-  onEdit: () => void;
 };
 
-export const ProfileAvatar = ({ src, isOwner, onEdit }: ProfileAvatarProps) => {
+export const ProfileAvatar = ({ src, isOwner }: ProfileAvatarProps) => {
   const [pic, setPic] = useState(src);
   const [isOpen, setIsOpen] = useState(false);
   return (
@@ -32,7 +31,6 @@ export const ProfileAvatar = ({ src, isOwner, onEdit }: ProfileAvatarProps) => {
           <DialogTrigger asChild>
             <button
               className="absolute hover:opacity-85 transition-all duration-300 cursor-pointer bg-gray-300 dark:bg-gray-800 p-2 rounded-full -bottom-2 right-0"
-              onClick={onEdit}
               aria-label="Edit profile"
               id="edit-profile-button"
             >

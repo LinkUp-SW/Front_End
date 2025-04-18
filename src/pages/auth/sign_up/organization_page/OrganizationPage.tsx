@@ -138,7 +138,6 @@ const OrganizationPage = () => {
 
       // Await the result of the toast promise.
       const data = await toastResult.unwrap();
-      console.log("Submitted", data);
       if (data) {
         // Mimic API request delay.
         localStorage.removeItem("user-signup-credentials");

@@ -49,7 +49,6 @@ const EducationSection: React.FC = () => {
   }, [authToken, id]);
 
   useEffect(() => {
-    console.log(data?.education);
     if (data?.education) {
       setEducations(data.education);
     }

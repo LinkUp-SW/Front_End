@@ -52,13 +52,10 @@ const AddSkillModal: React.FC<AddSkillModalProps> = ({
   const handleSubmit = async () => {
     if (!validateForm()) return;
     startSubmitting();
-    console.log(formData);
     try {
       const response = await addUserSkills(authToken as string, {
         ...formData,
       });
-      console.log(response.skill);
-      console.log(formData);
       // Update the parent state with the newly created experience
       onSuccess?.({
         ...formData,

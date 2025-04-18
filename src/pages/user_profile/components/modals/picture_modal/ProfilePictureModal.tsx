@@ -38,7 +38,6 @@ const ProfilePictureModal = ({
     if (userBio?.is_default_profile_photo) {
       setEditedImage(null);
     } else {
-      console.log(src);
       getDataBlob(src)
         .then((data) => {
           setEditedImage(data);
@@ -165,7 +164,6 @@ const ProfilePictureModal = ({
           <ImageEditor
             sourceImage={uploadedImage as string}
             onSave={(dataUrl) => {
-              console.log(dataUrl);
               setEditedImage(dataUrl);
               setProfilePic(dataUrl);
             }}

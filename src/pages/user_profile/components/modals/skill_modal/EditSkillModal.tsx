@@ -47,9 +47,7 @@ const EditSkillModal: React.FC<EditSkillModalProps> = ({
     });
   }, [skill]);
 
-  useEffect(() => {
-    console.log(data);
-  }, [data]);
+
 
   // Toggle checkbox selection
   const handleCheckboxChange =
@@ -68,8 +66,6 @@ const EditSkillModal: React.FC<EditSkillModalProps> = ({
       toast.error("Unauthorized");
       return;
     }
-    console.log(skill);
-    console.log(formData);
     if (!skill._id) {
       toast.error("Invalid skill id");
       return;
@@ -77,14 +73,11 @@ const EditSkillModal: React.FC<EditSkillModalProps> = ({
     setIsSubmitting(true);
     try {
       // Only updating the arrays; the name remains unchanged
-      console.log(skill._id);
       const updatedSkill = await updateUserSkill(
         authToken,
         skill._id,
         formData
       );
-      console.log(skill);
-      // console.log(formData)
       // Call onSuccess with complete updated skill data
       onSuccess?.({
         ...skill,

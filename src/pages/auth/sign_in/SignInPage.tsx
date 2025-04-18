@@ -79,7 +79,6 @@ const SignInPage: React.FC = () => {
 
       // Await the result of the toast promise
       const data = await toastResult.unwrap();
-      console.log("Submitted", data);
       if (!data.user.isVerified) {
         localStorage.setItem("user-email", data.user.email);
         return window.location.replace("/email-verification");
