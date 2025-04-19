@@ -122,7 +122,7 @@ const JobsDashboard: React.FC = () => {
               alt="No saved jobs" 
               className="w-48 h-48 mb-4"
             />
-            <p className="text-gray-500 dark:text-gray-400">No saved jobs yet.</p>
+            <p className="text-gray-500 dark:text-gray-400 text-2xl">No recent job activity.</p>
             <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
               Browse jobs and click "Save" to add them here.
             </p>
