@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MdArrowDropDown, MdMenu, MdClose } from 'react-icons/md';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
@@ -35,6 +35,21 @@ const JobFilterBar: React.FC<JobFilterBarProps> = ({ onFiltersChange }) => {
   const company = ['Fortune 500', 'Orascom', 'Health Insights', 'Vodafone', 'Microsoft'];
   const remoteOptions = ['On-site', 'Remote', 'Hybrid'];
   const salaryRanges = ['1000-5000', '5000-10000', '10000+'];
+
+  // Close menu when screen size changes
+  useEffect(() => {
+    const handleResize = () => {
+      // Close the mobile menu when resizing
+      setIsMenuOpen(false);
+      // Close any open popovers/dropdowns
+      setActivePopover(null);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
 
   // Update filters based on search inputs
   const updateSearchFilters = (type: 'locations' | 'company', searchTerm: string) => {
@@ -89,8 +104,9 @@ const JobFilterBar: React.FC<JobFilterBarProps> = ({ onFiltersChange }) => {
                 onClick={() => {
                   setSearchLocation(loc);
                   updateSearchFilters('locations', loc);
+                  setActivePopover(null); // Close the popover after selection
                 }}
-                className={`w-full justify-start dark:text-gray-200 dark:hover:bg-gray-700`}
+                className="w-full justify-start dark:text-gray-200 dark:hover:bg-gray-700"
               >
                 {loc}
               </Button>
@@ -126,8 +142,9 @@ const JobFilterBar: React.FC<JobFilterBarProps> = ({ onFiltersChange }) => {
                 onClick={() => {
                   setSearchCompany(comp);
                   updateSearchFilters('company', comp);
+                  setActivePopover(null); // Close the popover after selection
                 }}
-                className={`w-full justify-start dark:text-gray-300 dark:hover:bg-gray-700`}
+                className="w-full justify-start dark:text-gray-300 dark:hover:bg-gray-700"
               >
                 {comp}
               </Button>
@@ -224,8 +241,8 @@ const JobFilterBar: React.FC<JobFilterBarProps> = ({ onFiltersChange }) => {
     <header className="w-full border-y bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 flex items-center justify-center px-4 py-3 fixed top-14 left-0 z-13">
       <nav className="w-full max-w-7xl px-4 sm:px-6 lg:px-18">
         <div className="flex items-center justify-between">
-          {/* Mobile Menu Toggle */}
-          <div className="lg:hidden">
+          {/* Mobile Menu Toggle - Shows hamburger or X based on menu state */}
+          <div className="lg:hidden z-30">
             <button 
               id="mobile-menu-toggle"
               onClick={toggleMenu} 
@@ -239,6 +256,11 @@ const JobFilterBar: React.FC<JobFilterBarProps> = ({ onFiltersChange }) => {
               )}
             </button>
           </div>
+
+          {/* Main Filter Content - Backdrop for mobile view */}
+          {isMenuOpen && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 z-10 lg:hidden" />
+          )}
 
           {/* Main Filter Content */}
           <div className={`
