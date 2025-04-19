@@ -129,7 +129,7 @@ const SendingMessages = () => {
         </div>
       )}
 
-      <div className="border-t border-gray-200 flex flex-col flex-shrink-0 bg-black">
+      <div className="border-t border-gray-200 flex flex-col flex-shrink-0">
         {/* Message input area */}
         {editingMessageId ? (
           <div>
