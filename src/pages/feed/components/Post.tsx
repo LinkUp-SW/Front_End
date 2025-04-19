@@ -1,7 +1,5 @@
 import React, { JSX, useEffect, useState } from "react";
-import moment from "moment";
 import { Button } from "../../../components/ui/button";
-
 import { Card, CardContent, CardFooter } from "../../../components/ui/card";
 import CelebrateIcon from "@/assets/Celebrate.svg";
 import LikeIcon from "@/assets/Like.svg";
@@ -35,7 +33,6 @@ const Post: React.FC<PostProps> = ({ postData, comments, viewMore }) => {
 
   const [liked, setLiked] = useState(false);
   const [isLandscape, setIsLandscape] = useState<boolean>(false);
-
   const [postMenuOpen, setPostMenuOpen] = useState(false);
   const [sortingMenu, setSortingMenu] = useState(false);
   const [sortingState, setSortingState] = useState("Most relevant");
@@ -148,13 +145,20 @@ const Post: React.FC<PostProps> = ({ postData, comments, viewMore }) => {
           </div>
         )}
         {post.pdf && (
-          <div className="h-[50rem] w-[27.5rem] relative left-4.5 pt-4">
-            {/* <EmbedPDF
-              mode="inline"
-              className="w-full h-full"
-              companyIdentifier="react-viewer"
-              documentURL={post.pdf}
-            /> */}
+          <div className="h-[37rem] w-[27.5rem] relative left-4.5 pt-4">
+            <object
+              data={post.pdf}
+              type="application/pdf"
+              width="100%"
+              height="100%"
+            >
+              <p>
+                Alternative text - include a link{" "}
+                <a href="http://africau.edu/images/default/sample.pdf">
+                  to the PDF!
+                </a>
+              </p>
+            </object>
           </div>
         )}
 
