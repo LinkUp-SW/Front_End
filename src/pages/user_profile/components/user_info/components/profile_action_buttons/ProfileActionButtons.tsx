@@ -63,10 +63,8 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
 
   // --- Follow/Connection Handlers ---
   const handleFollow = useCallback(async () => {
-    console.log("Follow clicked");
     try {
       const response = await followUser(authToken as string, id as string);
-      console.log(response);
       toast.success(response.message);
       setLocalFollowStatus((prev) => ({
         ...prev,
@@ -82,10 +80,8 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
   }, []);
 
   const handleUnfollow = useCallback(async () => {
-    console.log("Unfollow clicked");
     try {
       const response = await unfollowUser(authToken as string, id as string);
-      console.log(response);
       toast.success(response.message);
       setLocalFollowStatus((prev) => ({ ...prev, isFollowing: false }));
     } catch (error) {
@@ -95,14 +91,12 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
   }, []);
 
   const handleConnect = useCallback(async (email: string) => {
-    console.log("Connect clicked");
     try {
       const response = await connectWithUser(
         authToken as string,
         id as string,
         email
       );
-      console.log(response);
       toast.success(response.message);
       setLocalFollowStatus((prev) => ({
         ...prev,
@@ -121,7 +115,6 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
   }, []);
 
   const handleCancelRequest = useCallback(async () => {
-    console.log("Cancel request clicked");
     let resolveDelay: (result: string) => void;
 
     // Create a promise that resolves after 4000ms or when cancel is clicked
@@ -142,7 +135,6 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
       cancel: {
         label: "Undo",
         onClick: () => {
-          console.log("Cancel button clicked");
           resolveDelay("cancel"); // Resolve the delay promise early
         },
       },
@@ -164,7 +156,6 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
     toast.dismiss(loadingToast);
     // If cancel was clicked, show a toast after a slight delay and exit early
     if (delayResult === "cancel") {
-      console.log("Operation canceled by the user.");
       setTimeout(() => {
         toast.info(`Withdraw request Canceled`);
       }, 100);
@@ -186,7 +177,6 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
   }, []);
 
   const handleRemoveConnection = useCallback(async () => {
-    console.log("Remove Connection clicked");
     let resolveDelay: (result: string) => void;
     // Create a promise that resolves after 4000ms or when cancel is clicked
     const delayPromise = new Promise<string>((resolve) => {
@@ -195,12 +185,12 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
         resolve("timeout");
       }, 4000);
     });
-    const loadingToast = toast.loading("Unfollow user request", {
-      description: "Are you sure you want to remove this user?",
+    const loadingToast = toast.loading("Remove Connection request", {
+      description:
+        "Are you sure you want to remove this user from your connections?",
       action: {
         label: "remove",
         onClick: () => {
-          console.log("Cancel button clicked");
           resolveDelay("remove"); // Resolve the delay promise early
         },
       },
@@ -224,7 +214,6 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
           authToken as string,
           id as string
         );
-        console.log(response);
         toast.success(response.message);
         setLocalFollowStatus((prev) => ({ ...prev, isInConnection: false }));
       } catch (error) {
@@ -239,7 +228,6 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
   // --- Other Handlers ---
   const handleMessage = useCallback(() => alert("Message clicked"), []);
   const handleBlock = useCallback(async () => {
-    console.log("Remove Connection clicked");
     let resolveDelay: (result: string) => void;
     // Create a promise that resolves after 4000ms or when cancel is clicked
     const delayPromise = new Promise<string>((resolve) => {
@@ -253,7 +241,6 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
       action: {
         label: "block",
         onClick: () => {
-          console.log("Cancel button clicked");
           resolveDelay("block"); // Resolve the delay promise early
         },
       },
@@ -274,7 +261,6 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
     if (delayResult === "block") {
       try {
         const response = await blockUser(authToken as string, id as string);
-        console.log(response);
         toast.success(response.message);
         setTimeout(() => {
           navigate("/feed", { replace: true });

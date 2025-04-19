@@ -59,6 +59,10 @@ const OrganizationPage = () => {
         toast.error("Please complete all required fields in the student form.");
         return;
       }
+      if (!partialUserStarterData.school._id) {
+        toast.error("Please select a valid school");
+        return;
+      }
 
       if (
         Number(partialUserStarterData.schoolStartYear) >
@@ -81,6 +85,10 @@ const OrganizationPage = () => {
         !partialUserStarterData.recentCompany
       ) {
         toast.error("Please complete all required fields in the job form.");
+        return;
+      }
+      if (!partialUserStarterData.recentCompany._id) {
+        toast.error("Please select a valid company");
         return;
       }
     }
@@ -138,7 +146,6 @@ const OrganizationPage = () => {
 
       // Await the result of the toast promise.
       const data = await toastResult.unwrap();
-      console.log("Submitted", data);
       if (data) {
         // Mimic API request delay.
         localStorage.removeItem("user-signup-credentials");

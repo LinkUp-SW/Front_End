@@ -1,5 +1,4 @@
 // UserInfo.tsx
-import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import Cookies from "js-cookie";
 import useFetchData from "@/hooks/useFetchData";
@@ -40,9 +39,6 @@ const UserInfo = () => {
   // If we're not fetching (i.e. the profile is the logged-in user's), use the global state.
   // Otherwise, use the data from the custom hook.
   const { data, loading, error } = shouldFetch ? fetchData : userBioState;
-  useEffect(() => {
-    if (data) console.log(data); // Remove in production
-  }, [data]);
 
   if (!id || getErrorMessage(error).toLocaleLowerCase() === "user not found") {
     window.location.replace("/user-not-found");
@@ -56,11 +52,7 @@ const UserInfo = () => {
   return (
     <section className="bg-white dark:bg-gray-900 rounded-lg shadow-md overflow-hidden">
       <CoverPhoto src={data.cover_photo} isOwner={data.is_me}>
-        <ProfileAvatar
-          src={data.profile_photo}
-          isOwner={data.is_me}
-          onEdit={() => console.log("Edit profile")}
-        />
+        <ProfileAvatar src={data.profile_photo} isOwner={data.is_me} />
       </CoverPhoto>
 
       <div className="pt-20 px-6 pb-6">
@@ -91,7 +83,6 @@ const UserInfo = () => {
 };
 
 const ErrorFallback = ({ error }: { error: unknown }) => {
-  console.log(error);
   if (error instanceof AxiosError) {
     if (error.response?.status === 403) {
       window.location.replace("/user-not-found");
