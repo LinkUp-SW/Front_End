@@ -193,7 +193,7 @@ const AddSkillModal: React.FC<AddSkillModalProps> = ({
         </Button>
         <Button
           disabled={isSubmitting}
-          className="affimativeBtn"
+          className="affirmativeBtn"
           onClick={handleSubmit}
         >
           Add Skill

@@ -10,6 +10,7 @@ import { FcAddImage } from "react-icons/fc";
 import Header from "../../modals/components/Header";
 import ProfilePictureModal from "../../modals/picture_modal/ProfilePictureModal";
 import { useState } from "react";
+import { defaultProfileImage } from "@/constants";
 
 type ProfileAvatarProps = {
   src: string;
@@ -22,7 +23,7 @@ export const ProfileAvatar = ({ src, isOwner }: ProfileAvatarProps) => {
   return (
     <div className="absolute -bottom-16 left-4">
       <img
-        src={pic}
+        src={pic || defaultProfileImage}
         alt="Avatar"
         className="w-32 h-32 rounded-full border-4 border-white"
       />
