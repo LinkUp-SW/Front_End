@@ -9,8 +9,11 @@ import {
 import Cookies from "js-cookie";
 import useFetchData from "@/hooks/useFetchData";
 import { useParams } from "react-router-dom";
+import { useConnectionContext } from "./ConnectionContext";
 const Invitations = () => {
   const [invitations, setInvitations] = useState<ReceivedConnections[]>([]);
+  const [numberOfReceived, setNumberOfReceived] = useState(0);
+  const { connectionCount, setConnectionCount } = useConnectionContext();
   const token = Cookies.get("linkup_auth_token");
   const { id } = useParams();
   const { data } = useFetchData(
@@ -24,6 +27,7 @@ const Invitations = () => {
   useEffect(() => {
     if (data && data.receivedConnections) {
       setInvitations(data.receivedConnections.slice(0, 3)); // Update invitations state when data is available
+      setNumberOfReceived(data.numberOfReceivedConnections || 0);
     }
   }, [data]);
 
@@ -47,11 +51,13 @@ const Invitations = () => {
         setInvitations((prevInvitations) =>
           prevInvitations.filter((c) => c.user_id !== userId)
         );
+        setNumberOfReceived((prev) => Math.max(prev - 1, 0));
+          setConnectionCount(connectionCount + 1);
       } catch (error) {
         console.error("can't", error);
       }
     },
-    [token]
+    [token, connectionCount, setConnectionCount]
   );
 
   const ignoreInvitations = useCallback(
@@ -67,6 +73,7 @@ const Invitations = () => {
         setInvitations((prevInvitations) =>
           prevInvitations.filter((c) => c.user_id !== userId)
         );
+        setNumberOfReceived((prev) => Math.max(prev - 1, 0));
       } catch (error) {
         console.error("Error", error);
       }
@@ -77,15 +84,17 @@ const Invitations = () => {
   return (
     <div className="bg-white dark:bg-gray-900 shadow-lg rounded-lg p-4">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-          Invitations ({data?.numberOfReceivedConnections ?? 0})
-        </h2>
+        {numberOfReceived > 0 && (
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+            Invitations ({numberOfReceived})
+          </h2>
+        )}
         <button
           id="showall-invitations-button"
           className="text-blue-600 hover:underline cursor-pointer"
           onClick={() => navigate("/manage-invitations")}
         >
-          Show all
+          Manage
         </button>
       </div>
       <ul className="space-y-4">
