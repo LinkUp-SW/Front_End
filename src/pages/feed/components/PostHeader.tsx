@@ -11,6 +11,7 @@ import { IoMdClose as CloseIcon } from "react-icons/io";
 import { Button, Dialog, DialogTrigger, DialogContent } from "@/components";
 import ReportPostModal from "./modals/ReportPostModal";
 import { MenuAction } from "@/types";
+import moment from "moment";
 
 interface User {
   name: string;
@@ -40,8 +41,8 @@ interface PostHeaderProps {
   postMenuOpen: boolean;
   setPostMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
   menuActions: MenuAction[]; // You can replace `any` with a more specific type if available
-  timeAgo: string;
   post: PostData;
+  savedPostView?: boolean;
 }
 
 const PostHeader: React.FC<PostHeaderProps> = ({
@@ -50,9 +51,10 @@ const PostHeader: React.FC<PostHeaderProps> = ({
   postMenuOpen,
   setPostMenuOpen,
   menuActions,
-  timeAgo,
   post,
+  savedPostView = false,
 }) => {
+  const timeAgo = moment(post.date).fromNow();
   return (
     <header className="flex items-center space-x-3 w-full pl-4">
       <img
@@ -120,13 +122,15 @@ const PostHeader: React.FC<PostHeaderProps> = ({
                 <ReportPostModal />
               </DialogContent>
             </Dialog>
-            <Button
-              className="rounded-full dark:hover:bg-zinc-700 hover:cursor-pointer dark:hover:text-neutral-200"
-              variant="ghost"
-              size="sm"
-            >
-              <CloseIcon />
-            </Button>
+            {!savedPostView && (
+              <Button
+                className="rounded-full dark:hover:bg-zinc-700 hover:cursor-pointer dark:hover:text-neutral-200"
+                variant="ghost"
+                size="sm"
+              >
+                <CloseIcon />
+              </Button>
+            )}
           </nav>
         </div>
         {action && (

@@ -16,7 +16,12 @@ import { POST_ACTIONS } from "@/constants";
 import PostHeader from "./PostHeader";
 import PostFooter from "./PostFooter";
 import { getEngagementButtons, getMenuActions } from "../components/Menus";
-import { Dialog, DialogContent, DialogTrigger, TruncatedText } from "@/components";
+import {
+  Dialog,
+  DialogContent,
+  DialogTrigger,
+  TruncatedText,
+} from "@/components";
 import ReactionsModal from "./modals/ReactionsModal";
 import PostImages from "./PostImages";
 
@@ -52,8 +57,6 @@ const Post: React.FC<PostProps> = ({ postData, comments }) => {
   const menuActions = getMenuActions();
 
   const engagementButtons = getEngagementButtons(liked, () => setLiked(!liked));
-
-  const timeAgo = moment(post.date).fromNow();
 
   const statsArray = [
     { name: "celebrate", count: stats.celebrate, icon: <CelebrateIcon /> },
@@ -108,7 +111,6 @@ const Post: React.FC<PostProps> = ({ postData, comments }) => {
           postMenuOpen={postMenuOpen}
           setPostMenuOpen={setPostMenuOpen}
           menuActions={menuActions}
-          timeAgo={timeAgo}
           post={post}
         />
         <TruncatedText id="post-content" content={post.content} lineCount={3} />
