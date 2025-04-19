@@ -129,6 +129,31 @@ const CreatePost: React.FC = () => {
           fileReaders.push(imagePromise);
         });
       }
+      const pdfs = selectedMedia.filter(
+        (file) => file.type === "application/pdf"
+      );
+
+      if (pdfs.length > 0) {
+        media_type = "pdf";
+        pdfs.forEach((pdf) => {
+          const reader = new FileReader();
+
+          const pdfPromise = new Promise<void>((resolve, reject) => {
+            reader.onload = () => {
+              const result = reader.result as string; // Convert to Base64 string
+              media.push(result);
+              resolve();
+            };
+            reader.onerror = (error) => {
+              console.error(`Error reading file ${pdf.name}:`, error);
+              reject(error);
+            };
+          });
+
+          reader.readAsDataURL(pdf);
+          fileReaders.push(pdfPromise);
+        });
+      }
 
       // Wait for all FileReader operations to complete
       await Promise.all(fileReaders);
@@ -240,7 +265,11 @@ const CreatePost: React.FC = () => {
                     setSelectedMedia={setSelectedMedia}
                   />
                 ) : activeModal == "add-document" ? (
-                  <AddDocumentModal setActiveModal={setActiveModal} />
+                  <AddDocumentModal
+                    setActiveModal={setActiveModal}
+                    selectedMedia={selectedMedia}
+                    setSelectedMedia={setSelectedMedia}
+                  />
                 ) : activeModal == "comment-control" ? (
                   <CommentControlModal
                     commentSetting={commentSetting}

@@ -20,10 +20,13 @@ import { useSelector } from "react-redux";
 import { GoFileMedia as MediaIcon } from "react-icons/go";
 import BlueButton from "../buttons/BlueButton";
 import IconButton from "../buttons/IconButton";
-import { IoDocument as DocumentIcon } from "react-icons/io5";
+import { IoDocumentOutline as DocumentIcon } from "react-icons/io5";
 import PostImages from "../PostImages";
 import { MdModeEdit as EditIcon } from "react-icons/md";
 import { IoClose as CloseIcon } from "react-icons/io5";
+import { Viewer } from "@react-pdf-viewer/core";
+import "@react-pdf-viewer/core/lib/styles/index.css";
+import DocumentPreview from "./DocumentPreview";
 
 interface CreatePostModalProps {
   profileImageUrl: string;
@@ -103,7 +106,9 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
             <div className="flex justify-end gap-2">
               <IconButton
                 onClick={() => {
-                  setActiveModal("add-media");
+                  selectedMedia[0].type === "application/pdf"
+                    ? setActiveModal("add-document")
+                    : setActiveModal("add-media");
                 }}
                 size={"icon"}
                 className="text-white bg-gray-700 dark:hover:bg-neutral-400 hover:bg-gray-800 dark:text-neutral-700 dark:bg-neutral-200"
@@ -117,7 +122,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
                   setSelectedMedia([]);
                   console.log(selectedMedia);
                 }}
-                className=" rounded-full h-10 w-10 dark:bg-gray-200 dark:hover:bg-neutral-400  text-white bg-gray-700 hover:bg-gray-800 dark:text-gray-900"
+                className=" rounded-full dark:bg-gray-200 dark:hover:bg-neutral-400  text-white bg-gray-700 hover:bg-gray-800 dark:text-gray-900"
                 id="remove-media-button"
               >
                 <CloseIcon />
@@ -130,7 +135,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
                 images={selectedMedia.map((file) => URL.createObjectURL(file))}
                 isLandscape={false}
               ></PostImages>
-            ) : (
+            ) : selectedMedia[0].type.startsWith("video/") ? (
               <div className="flex justify-center items-center">
                 <video
                   src={URL.createObjectURL(selectedMedia[0])}
@@ -138,6 +143,8 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
                   controls
                 />
               </div>
+            ) : (
+              <DocumentPreview currentSelectedMedia={selectedMedia} />
             )}
           </div>
         )}
@@ -199,7 +206,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
                     onClick={() => setActiveModal("add-document")}
                     asChild
                   >
-                    <IconButton id="add-document-button">
+                    <IconButton className="text-black" id="add-document-button">
                       <DocumentIcon></DocumentIcon>
                     </IconButton>
                   </TooltipTrigger>
