@@ -74,14 +74,24 @@ export const getPostReactions = async (): Promise<any> => {
 };
 
 export const createPost = async (postPayload: PostDBObject, token: string) => {
-  const response = await axiosInstance.post(
-    "api/v1/post/create-post",
-    postPayload,
-    {
+  const response = await axiosInstance.post("api/v1/post/posts", postPayload, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data;
+};
+
+export const fetchSinglePost = async (postId: string, token: string) => {
+  try {
+    const response = await axiosInstance.get(`api/v1/post/posts/${postId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
-    }
-  );
-  return response.data;
+    });
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
 };
