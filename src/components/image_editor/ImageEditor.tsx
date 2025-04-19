@@ -545,7 +545,7 @@ export default function ImageEditor({
           <Button
             id="editor-save-button"
             onClick={handleSave}
-            className="flex items-center gap-2 affimativeBtn"
+            className="flex items-center gap-2 affirmativeBtn"
           >
             <Download className="h-4 w-4" />
             Save Changes
