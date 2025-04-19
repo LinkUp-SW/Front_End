@@ -312,6 +312,8 @@ const commentsHandlers = [
 // Posts
 const postsHandlers = [
   createGetHandler<PostType[]>("/api/posts", () => MOCK_POSTS),
+  createGetHandler<CommentType[]>("/api/postComments/:id", () => MOCK_COMMENTS),
+  createGetHandler<PostType>("/api/posts/:id", () => MOCK_POSTS[0]),
 ];
 
 // feed

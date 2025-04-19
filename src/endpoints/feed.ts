@@ -28,6 +28,37 @@ export const getPostComments = async (): Promise<CommentType[]> => {
     throw error;
   }
 };
+
+export const getSinglePost = async (postId: string): Promise<PostType> => {
+  try {
+    const response = await axios.get(
+      import.meta.env.VITE_NODE_ENV === "DEV"
+        ? `/api/posts/${postId}`
+        : `actual api endpoint/${postId}`
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
+export const getSingleComments = async (
+  postId: string
+): Promise<CommentType[]> => {
+  try {
+    const response = await axios.get(
+      import.meta.env.VITE_NODE_ENV === "DEV"
+        ? `/api/postComments/${postId}`
+        : `actual api endpoint/${postId}`
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
 export const createPost = async (postPayload: PostDBObject, token: string) => {
   const response = await axiosInstance.post(
     "api/v1/post/create-post",
