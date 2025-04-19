@@ -25,9 +25,8 @@ export interface Notification {
   actionLink?: string;
   location?: string;
   count?: number;
-  isNew: boolean;  // Make isNew non-optional to avoid undefined checks
+  isNew: boolean; // Make isNew non-optional to avoid undefined checks
 }
-
 
 export interface PostType {
   user: {
@@ -61,6 +60,20 @@ export interface PostType {
     profileImage?: string;
     action?: "like" | "comment" | "repost" | "love";
   };
+}
+
+export interface ReactionType {
+  id: number;
+  name: string;
+  title: string;
+  profileImage: string;
+  reactionType:
+    | "like"
+    | "love"
+    | "celebrate"
+    | "insightful"
+    | "support"
+    | "funny";
 }
 
 export interface ProfileCardType {
@@ -256,7 +269,7 @@ export interface Skill {
   educations: Organization[];
   experiences: Organization[];
   licenses: Organization[];
-  total_endorsements?:number
+  total_endorsements?: number;
 }
 
 export interface Endorsement {
