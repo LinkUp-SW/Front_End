@@ -18,6 +18,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { CommentType, PostType, ReactionType } from "@/types";
 import {
+  fetchSinglePost,
   getFeedPosts,
   getPostComments,
   getPostReactions,
@@ -25,6 +26,7 @@ import {
   getSinglePost,
 } from "@/endpoints/feed";
 import { useParams } from "react-router-dom";
+import Cookies from "js-cookie";
 
 interface FeedPageProps {
   single?: boolean;
@@ -40,6 +42,8 @@ const FeedPage: React.FC<FeedPageProps> = ({ single = false }) => {
   const [reactions, setReactions] = useState<ReactionType[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
+  const user_token = Cookies.get("linkup_auth_token");
+
   useEffect(() => {
     setIsLoading(true);
     const fetchData = async () => {
@@ -51,6 +55,15 @@ const FeedPage: React.FC<FeedPageProps> = ({ single = false }) => {
 
         // Call both endpoints concurrently
         const [fetchedPosts, fetchedComments, fetchedReactions] =
+          // await Promise.all([
+          //   !single || !id
+          //     ? getFeedPosts()
+          //     : user_token && fetchSinglePost(id, user_token),
+
+          //   !single || !id ? getPostComments() : getSingleComments(id),
+
+          //   getPostReactions(),
+          // ]);
           await Promise.all([
             !single || !id ? getFeedPosts() : getSinglePost(id),
 
