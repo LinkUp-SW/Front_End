@@ -1,41 +1,35 @@
 import React, { useEffect, useState } from "react";
-import { Job } from "../../pages/jobs/types";
+import PostHeader from "@/pages/feed/components/PostHeader";
+import { PostType } from "@/types";
+import { getFeedPosts } from "@/endpoints/feed";
+import TruncatedText from "../truncate_text/TruncatedText";
+import { getMenuActions } from "@/pages/feed/components/Menus";
 
 const JobsDashboard: React.FC = () => {
-  const [savedPosts, setSavedPosts] = useState<Job[]>([]);
+  const [savedPosts, setSavedPosts] = useState<PostType[]>([]);
+  const [postMenu, setPostMenu] = useState(false);
 
   useEffect(() => {
-    // Load saved jobs from localStorage
-    const loadSavedPosts = () => {
-      const savedJobsString = localStorage.getItem("savedJobs");
-      if (savedJobsString) {
-        try {
-          const jobs = JSON.parse(savedJobsString);
-          setSavedPosts(jobs);
-        } catch (error) {
-          console.error("Error parsing saved jobs:", error);
-        }
+    const fetchData = async () => {
+      try {
+        // Call both endpoints concurrently
+        const [fetchedPosts] = await Promise.all([getFeedPosts()]);
+        if (fetchedPosts)
+          setSavedPosts(
+            Array.isArray(fetchedPosts) ? fetchedPosts : [fetchedPosts]
+          );
+        else setSavedPosts([]);
+
+        return fetchedPosts;
+      } catch (error) {
+        console.error("Error fetching feed data", error);
       }
     };
 
-    loadSavedPosts();
-
-    // Set up event listener for job updates
-    window.addEventListener("savedPostsUpdated", loadSavedPosts);
-
-    return () => {
-      window.removeEventListener("savedPostsUpdated", loadSavedPosts);
-    };
+    fetchData();
   }, []);
 
-  const removeFromSaved = (postID: string) => {
-    const updatedJobs = savedPosts.filter((post) => post.id !== postID);
-
-    setSavedPosts(updatedJobs);
-
-    // Dispatch event to notify other components
-    window.dispatchEvent(new Event("savedPostsUpdated"));
-  };
+  const menuActions = getMenuActions();
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
@@ -47,74 +41,80 @@ const JobsDashboard: React.FC = () => {
         <div className="flex flex-wrap gap-2 mb-6">
           <button
             id="saved-jobs-tab"
-            className="bg-green-700 text-white px-4 py-1 rounded-full"
+            className="bg-green-600 font-medium hover:bg-green-500 text-neutral-200 dark:text-black px-4 py-1 rounded-full"
           >
-            Saved
-          </button>
-          <button
-            id="in-progress-tab"
-            className="bg-white dark:bg-gray-700 border dark:border-gray-600 px-4 py-1 rounded-full text-gray-800 dark:text-gray-200"
-          >
-            In Progress
-          </button>
-          <button
-            id="applied-tab"
-            className="bg-white dark:bg-gray-700 border dark:border-gray-600 px-4 py-1 rounded-full text-gray-800 dark:text-gray-200"
-          >
-            Applied
-          </button>
-          <button
-            id="archived-tab"
-            className="bg-white dark:bg-gray-700 border dark:border-gray-600 px-4 py-1 rounded-full text-gray-800 dark:text-gray-200"
-          >
-            Archived
+            All
           </button>
         </div>
 
         {savedPosts.length > 0 ? (
           <div className="space-y-4">
-            {savedPosts.map((post) => (
-              <div key={post.id} className="border-t pt-4">
-                <div className="flex justify-between">
+            {savedPosts.map((post, index) => (
+              <div key={index} className="border-t dark:border-t-gray-600 p-4">
+                <div className="flex flex-col gap-3">
+                  <div className="relative -left-7">
+                    <PostHeader
+                      user={post.user}
+                      postMenuOpen={postMenu}
+                      setPostMenuOpen={setPostMenu}
+                      menuActions={menuActions}
+                      post={post.post}
+                      savedPostView
+                    />
+                  </div>
                   <div className="flex">
-                    <div className="w-12 h-12 bg-black rounded-md flex items-center justify-center overflow-hidden">
-                      {post.logo ? (
+                    {post.post.images || post.post.video ? (
+                      post.post.images ? (
                         <img
-                          src={post.logo}
-                          alt={`${post.company} logo`}
-                          className="w-full h-full object-cover"
+                          src={post.post.images[0]}
+                          className="object-cover w-20 h-20 overflow-hidden shrink-0"
+                          alt="Post thumbnail"
                         />
                       ) : (
-                        <div className="w-6 h-6 bg-orange-500 rounded-full transform translate-y-1/4"></div>
-                      )}
-                    </div>
-                    <div className="ml-3">
-                      <h3 className="font-medium text-gray-900 dark:text-white">
-                        {post.title}
-                      </h3>
-                      <p className="text-sm text-gray-800 dark:text-gray-300">
-                        {post.company}
-                      </p>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
-                        {post.location}
-                      </p>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
-                        Posted {post.postedTime} •{" "}
-                        <span className="text-blue-600 dark:text-blue-400">
-                          Easy Apply
-                        </span>
-                      </p>
-                    </div>
+                        <div className="relative w-20 h-20 shrink-0">
+                          <video
+                            src={post.post.video}
+                            className=" object-cover "
+                            poster={post.post.video} // Use the first frame as the poster
+                            controls={false} // Disable controls for the thumbnail
+                          />
+                          <div
+                            className="absolute inset-0 flex items-center justify-center bg-black/50 hover:bg-black/30 transition-opacity cursor-pointer"
+                            onClick={() => {
+                              // Handle play action (e.g., open a modal or play the video)
+                            }}
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="white"
+                              viewBox="0 0 24 24"
+                              strokeWidth={2}
+                              stroke="currentColor"
+                              className="w-12 h-12"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M5 3l14 9-14 9V3z"
+                              />
+                            </svg>
+                          </div>
+                        </div>
+                      )
+                    ) : (
+                      <></>
+                    )}
+                    <TruncatedText
+                      id="post-content"
+                      content={post.post.content}
+                      lineCount={3}
+                    />
                   </div>
-                  <div className="flex items-start">
-                    <button
-                      id={`job-options-${post.id}`}
-                      className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-                      onClick={() => removeFromSaved(post.id)}
-                    >
-                      •••
-                    </button>
-                  </div>
+                  {post.post.pdf ? (
+                    <div className="h-20 w-full bg-white"></div>
+                  ) : (
+                    <></>
+                  )}
                 </div>
               </div>
             ))}
