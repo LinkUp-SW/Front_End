@@ -2,6 +2,7 @@ import BlueButton from "../buttons/BlueButton";
 import TransparentButton from "../buttons/TransparentButton";
 import { useRef, useState, useEffect } from "react";
 import DocumentPreview from "./DocumentPreview";
+import { toast } from "sonner";
 
 interface AddDocumentModalProps {
   setActiveModal: (value: string) => void;
@@ -22,6 +23,16 @@ const AddDocumentModal: React.FC<AddDocumentModalProps> = ({
 
   const handleAdd = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
+    if (!files) return;
+    const maxFileSizeInMB = 10;
+    const maxFileSize = maxFileSizeInMB * 1048576; // 10 MB
+
+    if (files[0].size > maxFileSize) {
+      toast.error(
+        `File "${files[0].name}" exceeds the maximum size of ${maxFileSizeInMB} MB.`
+      );
+      return false;
+    }
     setCurrentSelectedMedia(files ? Array.from(files) : []);
     console.log(files);
   };
