@@ -1,7 +1,7 @@
 // API endpoints for password change functionality
 import axios from 'axios';
 
-const API_BASE_URL = '/api';
+const API_BASE_URL = '//// el api';
 
 
 export interface ChangePasswordRequest {
