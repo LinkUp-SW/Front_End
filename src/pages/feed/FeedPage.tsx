@@ -36,8 +36,10 @@ const FeedPage: React.FC<FeedPageProps> = ({ single = false }) => {
 
   const [posts, setPosts] = useState<PostType[]>([]);
   const [comments, setComments] = useState<CommentType[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
+    setIsLoading(true);
     const fetchData = async () => {
       try {
         if (single && !id) {
@@ -63,6 +65,7 @@ const FeedPage: React.FC<FeedPageProps> = ({ single = false }) => {
     };
 
     fetchData();
+    setIsLoading(false);
   }, []);
 
   useEffect(() => {
@@ -72,6 +75,10 @@ const FeedPage: React.FC<FeedPageProps> = ({ single = false }) => {
       setViewMore(true);
     }
   }, [screenWidth]);
+
+  if (isLoading) {
+    return <>Loading...</>;
+  }
 
   return (
     <>
