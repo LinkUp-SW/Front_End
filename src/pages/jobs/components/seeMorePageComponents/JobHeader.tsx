@@ -133,7 +133,7 @@ const JobHeader: React.FC<JobHeaderProps> = ({ job }) => {
             id="btn-easy-apply"
             className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 md:px-6 rounded-full flex items-center text-sm font-medium transition-colors"
           >
-            <span className="bg-white text-blue-600 rounded px-1 mr-2 text-xs">in</span>
+            <span className="bg-white text-blue-600 rounded px-1 mr-2 text-xs">Up</span>
             <span>Easy Apply</span>
           </button>
         )}
