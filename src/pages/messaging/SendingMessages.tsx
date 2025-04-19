@@ -1,5 +1,5 @@
 import { useDispatch } from "react-redux";
-import { sendMessage } from "../../slices/messaging/messagingSlice";
+import { sendMessage,setEditingMessageId } from "../../slices/messaging/messagingSlice";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { useState } from "react";
@@ -10,11 +10,22 @@ import { BsEmojiSmile } from "react-icons/bs";
 import { BsThreeDots } from "react-icons/bs";
 import { IoIosClose } from "react-icons/io";
 import { FaFileAlt } from "react-icons/fa";
+import {editMessage} from "@/endpoints/messaging";
+import Cookies from "js-cookie";
+import {setEditText,clearEditingState} from "../../slices/messaging/messagingSlice";
+
 
 const SendingMessages = () => {
+  const token = Cookies.get("linkup_auth_token");
   const selectedConvID = useSelector(
     (state: RootState) => state.messaging.selectedMessages
   );
+  const editingMessageId = useSelector(
+    (state: RootState) => state.messaging.editingMessageId
+  );
+
+  const editText = useSelector((state: RootState) => state.messaging.editText);
+
   const dispatch = useDispatch();
   /* const [selectedImage, setSelectedMessages] = useState("");*/
   const [selectedEmoji, setSelectedEmoji] = useState(false);
@@ -72,6 +83,16 @@ const SendingMessages = () => {
 
     setText("");
   };
+
+  const handleEditingMsgSave = async () => {
+    if (!editText.trim()) return;
+    try {
+      await editMessage(token!, selectedConvID, editingMessageId, editText); // All synced from Redux
+      dispatch(clearEditingState());
+    } catch (error) {
+      console.error("Error editing message:", error);
+    }
+  };
   return (
     <>
       {/* File attachments UI */}
@@ -108,87 +129,139 @@ const SendingMessages = () => {
         </div>
       )}
 
-      <div className="border-t border-gray-200 flex flex-col flex-shrink-0">
+      <div className="border-t border-gray-200 flex flex-col flex-shrink-0 bg-black">
         {/* Message input area */}
-        <div className="px-4 pt-2 pb-1">
-          <textarea
-            id="text-message"
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            placeholder="Write a message..."
-            className="w-full min-h-16 max-h-24 bg-gray-50 text-gray-700 p-3 rounded-md resize-none outline-none border-none"
-          />
-        </div>
-
-        {/* Bottom action bar with icons and send button */}
-        <div className="flex items-center justify-between px-4 py-2 border-t border-gray-200">
-          <div className="flex space-x-4">
-            <button
-              id="send-message-image"
-              className="text-gray-500 hover:text-gray-700"
-            >
-              <BsImage size={20} />
-            </button>
-
-            <label htmlFor="upload-folder" className="cursor-pointer">
-              <BsPaperclip
-                size={20}
-                className="text-gray-500 hover:text-gray-700"
-                onClick={() => setSelectedFile(!selectedFile)}
-              />
-              <input
-                id="upload-folder"
-                type="file"
-                multiple
-                onChange={handleFileRequest}
-                className="hidden"
-              />
-            </label>
-
-            <button
-              id="gif-btn"
-              className="text-gray-500 hover:text-gray-700 font-medium"
-            >
-              GIF
-            </button>
-
-            <button
-              id="emoji-btn"
-              onClick={() => setSelectedEmoji(!selectedEmoji)}
-              className="text-gray-500 hover:text-gray-700 relative"
-            >
-              <BsEmojiSmile size={20} />
-            </button>
-
-            {selectedEmoji && (
-              <div className="absolute bottom-14 left-4 z-10 shadow-lg rounded-lg">
-                <EmojiPicker onEmojiClick={handleEmojiRequest} />
+        {editingMessageId ? (
+          <div>
+            <p>Edit Message</p>
+            <textarea
+              id="edit-text-message"
+              value={editText}
+              onChange={(e) => dispatch(setEditText(e.target.value))}
+              placeholder="Write a message..."
+              className="w-full min-h-16 max-h-24 bg-gray-50 text-gray-700 p-3 rounded-md resize-none outline-none border-none"
+            />
+            <div className="flex justify-between">
+              <div>
+                <button
+                  id="emoji-btn"
+                  onClick={() => setSelectedEmoji(!selectedEmoji)}
+                  className="text-gray-500 hover:text-gray-700 relative"
+                >
+                  <BsEmojiSmile size={20} />
+                </button>
               </div>
-            )}
-          </div>
 
-          <div className="flex items-start space-x-2">
-            <button
-              id="send-message"
-              onClick={handleSendMessage}
-              disabled={!text.trim()}
-              className={`px-4 py-1 rounded-full text-sm ${
-                text.trim()
-                  ? "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                  : "bg-gray-100 text-gray-400 cursor-not-allowed"
-              }`}
-            >
-              Send
-            </button>
+              <div>
+                <button
+                  id="cancel-edit-message"
+                  onClick={()=>{
+                    dispatch(setEditingMessageId(""))
+                    setEditText("")
+                  }}
+                  disabled={!editText.trim()}
+                  className="px-4 py-1 rounded-full text-sm bg-gray-200 text-gray-700 hover:bg-gray-300" 
+                >
+                  Cancel
+                </button>
 
-            <button
-              id="sending-msg-dots"
-              className="text-gray-500 hover:text-gray-700 p-1"
-            >
-              <BsThreeDots size={20} />
-            </button>
+                <button
+                  id="save-edit-message"
+                  onClick={handleEditingMsgSave}
+                  disabled={!editText.trim()}
+                  className={`px-4 py-1 rounded-full text-sm ${
+                    text.trim()
+                      ? "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                      : "bg-gray-100 text-gray-400 cursor-not-allowed"
+                  }`}
+                >
+                  Save
+                </button>
+              </div>
+            </div>
           </div>
-        </div>
+        ) : (
+          <div>
+            <div className="px-4 pt-2 pb-1">
+              <textarea
+                id="text-message"
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+                placeholder="Write a message..."
+                className="w-full min-h-16 max-h-24 bg-gray-50 text-gray-700 p-3 rounded-md resize-none outline-none border-none"
+              />
+            </div>
+
+            <div className="flex items-center justify-between px-4 py-2 border-t border-gray-200">
+              <div className="flex space-x-4">
+                <button
+                  id="send-message-image"
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  <BsImage size={20} />
+                </button>
+
+                <label htmlFor="upload-folder" className="cursor-pointer">
+                  <BsPaperclip
+                    size={20}
+                    className="text-gray-500 hover:text-gray-700"
+                    onClick={() => setSelectedFile(!selectedFile)}
+                  />
+                  <input
+                    id="upload-folder"
+                    type="file"
+                    multiple
+                    onChange={handleFileRequest}
+                    className="hidden"
+                  />
+                </label>
+
+                <button
+                  id="gif-btn"
+                  className="text-gray-500 hover:text-gray-700 font-medium"
+                >
+                  GIF
+                </button>
+
+                <button
+                  id="emoji-btn"
+                  onClick={() => setSelectedEmoji(!selectedEmoji)}
+                  className="text-gray-500 hover:text-gray-700 relative"
+                >
+                  <BsEmojiSmile size={20} />
+                </button>
+
+                {selectedEmoji && (
+                  <div className="absolute bottom-14 left-4 z-10 shadow-lg rounded-lg">
+                    <EmojiPicker onEmojiClick={handleEmojiRequest} />
+                  </div>
+                )}
+              </div>
+
+              <div className="flex items-start space-x-2">
+                <button
+                  id="send-message"
+                  onClick={handleSendMessage}
+                  disabled={!text.trim()}
+                  className={`px-4 py-1 rounded-full text-sm ${
+                    text.trim()
+                      ? "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                      : "bg-gray-100 text-gray-400 cursor-not-allowed"
+                  }`}
+                >
+                  Send
+                </button>
+
+                <button
+                  id="sending-msg-dots"
+                  className="text-gray-500 hover:text-gray-700 p-1"
+                >
+                  <BsThreeDots size={20} />
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </>
   );
