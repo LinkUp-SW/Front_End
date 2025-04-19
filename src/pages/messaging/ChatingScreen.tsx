@@ -1,4 +1,4 @@
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { HiOutlineDotsHorizontal } from "react-icons/hi";
 import * as Popover from "@radix-ui/react-popover";
@@ -10,9 +10,12 @@ import {
   getConversation,
   chattingMessages,
   deleteMessages,
+  
 } from "@/endpoints/messaging";
+import {setEditingMessageId,setEditText} from "../../slices/messaging/messagingSlice";
 
 const ChatingScreen = () => {
+  const dispatch = useDispatch();
   const token = Cookies.get("linkup_auth_token");
   const selectedConvID = useSelector(
     (state: RootState) => state.messaging.selectedMessages
@@ -38,6 +41,7 @@ const ChatingScreen = () => {
   const starredConversations = useSelector(
     (state: RootState) => state.messaging.starredConversations
   );
+
   const isCurrentConversationStarred =
     starredConversations.includes(selectedConvID);
 
@@ -45,6 +49,8 @@ const ChatingScreen = () => {
   const [dataChat, setChatData] = useState<chattingMessages>();
   const [loading, setLoading] = useState<boolean>(true);
   const [msgDeleted, setMsgDeleted] = useState<boolean>(false);
+  
+
   useEffect(() => {
     const fetchChatting = async () => {
       try {
@@ -93,18 +99,17 @@ const ChatingScreen = () => {
   const handlingDeleteMsg = async (convId: string, msgId: string) => {
     try {
       await deleteMessages(token!, convId, msgId);
-  
-      // Remove the deleted message from local state
       setChatData((prev) => ({
         ...prev!,
         messages: prev!.messages.filter((msg) => msg.messageId !== msgId),
       }));
-      setMsgDeleted(true)
+      setMsgDeleted(true);
     } catch (err) {
       console.log("Error deleting:", err);
     }
   };
-  
+
+ 
 
   return (
     <>
@@ -215,7 +220,10 @@ const ChatingScreen = () => {
                                     id="delete"
                                     className="block w-full text-left py-2 px-3 text-sm hover:bg-gray-100 rounded"
                                     onClick={() => {
-                                      handlingDeleteMsg(selectedConvID, msg.messageId);
+                                      handlingDeleteMsg(
+                                        selectedConvID,
+                                        msg.messageId
+                                      );
                                     }}
                                   >
                                     Delete
@@ -223,6 +231,11 @@ const ChatingScreen = () => {
                                   <button
                                     id="edit"
                                     className="block w-full text-left py-2 px-3 text-sm hover:bg-gray-100 rounded"
+                                    onClick={() => {
+                                      dispatch(setEditingMessageId(msg.messageId));
+                                      dispatch(setEditText(msg.message));  
+
+                                    }}
                                   >
                                     Edit
                                   </button>
@@ -238,7 +251,7 @@ const ChatingScreen = () => {
                   <div className="w-full hover:bg-gray-200 pl-14 hover:cursor-pointer ">
                     {msg.message}
                   </div>
-                )}
+                ) }
               </div>
             ))
           )}
