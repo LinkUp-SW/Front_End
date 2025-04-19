@@ -179,11 +179,11 @@ const FollowingFollowers: React.FC = () => {
   }
 
   return (
-    <div className="flex-1 bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 transition-all flex flex-col max-h-fit">
+    <div className="flex-1 bg-white dark:bg-gray-800 rounded-lg shadow-md p-2 sm:p-4 transition-all flex flex-col h-full overflow-hidden">
       <div className="flex border-b">
         <button
           id="following-tab-button"
-          className={`px-4 py-2 text-lg font-semibold transition-colors ${
+          className={`px-3 py-2 sm:px-4 text-sm sm:text-lg font-semibold transition-colors ${
             activeTab === "following"
               ? "border-b-2 border-blue-500 text-blue-500"
               : "text-gray-500 dark:text-gray-400"
@@ -197,7 +197,7 @@ const FollowingFollowers: React.FC = () => {
         </button>
         <button
           id="followers-tab-button"
-          className={`px-4 py-2 text-lg font-semibold transition-colors ${
+          className={`px-3 py-2 sm:px-4 text-sm sm:text-lg font-semibold transition-colors ${
             activeTab === "followers"
               ? "border-b-2 border-blue-500 text-blue-500"
               : "text-gray-500 dark:text-gray-400"
@@ -211,27 +211,27 @@ const FollowingFollowers: React.FC = () => {
         </button>
       </div>
 
-      <div className="space-y-4 p-4 flex-grow min-h-0">
+      <div className="space-y-3 p-2 sm:p-4 flex-grow overflow-y-auto">
         {(activeTab === "followers" ? followers : following).map((user) => (
           <div
             key={user.user_id}
-            className="flex items-center p-3 bg-gray-100 dark:bg-gray-700 rounded-lg shadow-sm hover:shadow-md transition-shadow"
+            className="flex items-center p-2 sm:p-3 bg-gray-100 dark:bg-gray-700 rounded-lg shadow-sm hover:shadow-md transition-shadow"
           >
             <img
               src={user.profilePicture}
               alt={user.name}
-              className="w-12 h-12 rounded-full border border-gray-300"
+              className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border border-gray-300 cursor-pointer"
               onClick={() => navigateToUser(user.user_id)}
             />
-            <div className="ml-4 flex-1">
+            <div className="ml-3 flex-1 min-w-0">
               <p
-                className="text-lg font-medium text-gray-900 dark:text-white cursor-pointer"
+                className="text-sm sm:text-lg font-medium text-gray-900 dark:text-white cursor-pointer truncate"
                 onClick={() => navigateToUser(user.user_id)}
                 id="user-name-link"
               >
                 {user.name}
               </p>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 truncate">
                 {user.headline}
               </p>
             </div>
@@ -240,14 +240,14 @@ const FollowingFollowers: React.FC = () => {
                 <DialogTrigger asChild>
                   <button
                     id="unfollow-button-1"
-                    className="px-4 py-2 bg-red-500 text-white rounded-lg flex items-center hover:bg-red-600 transition-colors"
+                    className="px-2 py-1 sm:px-4 sm:py-2 bg-red-500 text-white rounded-lg flex items-center hover:bg-red-600 transition-colors text-xs sm:text-base whitespace-nowrap"
                   >
                     Unfollow
                   </button>
                 </DialogTrigger>
                 <DialogContent
                   id="unfollow-dialog1-content"
-                  className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg shadow-lg p-6"
+                  className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg shadow-lg p-4 sm:p-6"
                 >
                   <UnfollowUserModal
                     userData={{ userName: user.name, userId: user.user_id }}
@@ -264,14 +264,14 @@ const FollowingFollowers: React.FC = () => {
                 <DialogTrigger asChild>
                   <button
                     id="unfollow-button-2"
-                    className="px-4 py-2 bg-red-500 text-white rounded-lg flex items-center hover:bg-red-600 transition-colors"
+                    className="px-2 py-1 sm:px-4 sm:py-2 bg-red-500 text-white rounded-lg flex items-center hover:bg-red-600 transition-colors text-xs sm:text-base whitespace-nowrap"
                   >
                     Unfollow
                   </button>
                 </DialogTrigger>
                 <DialogContent
                   id="unfollow-dialog2-content"
-                  className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg shadow-lg p-6"
+                  className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg shadow-lg p-4 sm:p-6"
                 >
                   <UnfollowUserModal
                     userData={{ userName: user.name, userId: user.user_id }}
@@ -286,7 +286,7 @@ const FollowingFollowers: React.FC = () => {
             ) : (
               <button
                 id="follow-button-3"
-                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                className="px-2 py-1 sm:px-4 sm:py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-xs sm:text-base whitespace-nowrap"
                 onClick={() => handleFollowUser(user.user_id)}
               >
                 Follow
