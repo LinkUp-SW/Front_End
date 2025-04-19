@@ -55,7 +55,7 @@ const CreatePost: React.FC = () => {
   const { dismiss } = useDismissModal();
 
   const navigate = useNavigate();
-  const userID = Cookies.get("linkup_auth_token");
+  const user_token = Cookies.get("linkup_auth_token");
 
   const clearFields = () => {
     setPrivacySetting("Anyone");
@@ -165,7 +165,7 @@ const CreatePost: React.FC = () => {
       toast.error("The post must have either content or media.");
       return;
     }
-    if (!userID) {
+    if (!user_token) {
       toast.error("Please sign in again.");
       setTimeout(() => {
         navigate("/login");
@@ -187,7 +187,7 @@ const CreatePost: React.FC = () => {
       dismiss();
       clearFields();
       const toastId = toast.loading("Submitting your post...");
-      await createPost(postObject, userID);
+      await createPost(postObject, user_token);
       toast.success("Post created successfully!", { id: toastId });
     } catch {
       toast.error("Error creating post. Please try again.");
