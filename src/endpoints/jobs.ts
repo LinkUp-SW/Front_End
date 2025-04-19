@@ -35,6 +35,7 @@ export interface JobData {
   responsibilities: string[];
   isPromoted: boolean;
   hasEasyApply: boolean;
+  isSaved?: boolean;
 }
 
 export interface SavedJobsResponse {
@@ -42,45 +43,31 @@ export interface SavedJobsResponse {
   data: JobData[];
 }
 
+// Helper function to add auth header
+const getAuthHeader = (token: string) => ({
+  headers: { Authorization: `Bearer ${token}` }
+});
+
+// API call functions
 export const fetchJobs = async (token: string, limit: number = 10, cursor?: string): Promise<JobResponse> => {
-  const url = cursor
-    ? `/api/v1/jobs/get-jobs?cursor=${cursor}&limit=${limit}`
-    : `/api/v1/jobs/get-jobs?limit=${limit}`;
- 
-  const response = await axiosInstance.get(url, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
- 
+  const url = `/api/v1/jobs/get-jobs?limit=${limit}${cursor ? `&cursor=${cursor}` : ''}`;
+  const response = await axiosInstance.get(url, getAuthHeader(token));
   return response.data;
 };
 
 export const fetchTopJobs = async (token: string, limit: number = 3): Promise<JobResponse> => {
   const url = `/api/v1/jobs/get-top-jobs?limit=${limit}`;
- 
-  const response = await axiosInstance.get(url, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
- 
+  const response = await axiosInstance.get(url, getAuthHeader(token));
   return response.data;
 };  
 
 export const fetchSingleJob = async (token: string, jobId: string): Promise<{ data: JobData }> => {
   const url = `/api/v1/jobs/get-job/${jobId}`;
- 
-  const response = await axiosInstance.get(url, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  const response = await axiosInstance.get(url, getAuthHeader(token));
 
   try {
     const savedJobs = await fetchSavedJobs();
-    const isJobSaved = savedJobs.some(savedJob => savedJob._id === jobId);
-    response.data.data.isSaved = isJobSaved;
+    response.data.data.isSaved = savedJobs.some(savedJob => savedJob._id === jobId);
   } catch (error) {
     console.error('Error checking saved status:', error);
   }
@@ -88,56 +75,34 @@ export const fetchSingleJob = async (token: string, jobId: string): Promise<{ da
   return response.data;
 };
 
-// New functions for saved jobs
-
-export const fetchSavedJobs = async (): Promise<JobData[]> => {
+// Token helper function
+const getAuthToken = () => {
   const token = Cookies.get('linkup_auth_token');
-  
   if (!token) {
     throw new Error('Authentication required');
   }
-  
+  return token;
+};
+
+// Saved jobs functions
+export const fetchSavedJobs = async (): Promise<JobData[]> => {
+  const token = getAuthToken();
   const url = '/api/v1/jobs/get-saved-jobs';
-  const response = await axiosInstance.get(url, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-  
+  const response = await axiosInstance.get(url, getAuthHeader(token));
   return response.data.data || [];
 };
 
 export const saveJob = async (jobId: string): Promise<{ message: string }> => {
-  const token = Cookies.get('linkup_auth_token');
-  
-  if (!token) {
-    throw new Error('Authentication required');
-  }
-  
+  const token = getAuthToken();
   const url = `/api/v1/jobs/save-jobs/${jobId}`;
-  const response = await axiosInstance.post(url, {}, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-  
+  const response = await axiosInstance.post(url, {}, getAuthHeader(token));
   return response.data;
 };
 
 export const removeFromSaved = async (jobId: string): Promise<{ message: string }> => {
-  const token = Cookies.get('linkup_auth_token');
-  
-  if (!token) {
-    throw new Error('Authentication required');
-  }
-  
+  const token = getAuthToken();
   const url = `/api/v1/jobs/unsave-jobs/${jobId}`;
-  const response = await axiosInstance.delete(url, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-  
+  const response = await axiosInstance.delete(url, getAuthHeader(token));
   return response.data;
 };
 
@@ -150,10 +115,10 @@ export const convertJobDataToJob = (jobData: JobData): Job => {
     location: jobData.location,
     experience_level: jobData.experience_level,
     isRemote: jobData.workplace_type === 'Remote',
-    isSaved: true, 
+    isSaved: jobData.isSaved || false, 
     logo: jobData.organization?.logo || '',
     isPromoted: jobData.isPromoted,
-    hasEasyApply: jobData.hasEasyApply,
+    hasEasyApply: true,
     postedTime: jobData.timeAgo || jobData.posted_time,
     workMode: jobData.workplace_type,
     description: jobData.description,
@@ -172,4 +137,3 @@ export const convertJobDataToJob = (jobData: JobData): Job => {
     } : undefined
   };
 };
-
