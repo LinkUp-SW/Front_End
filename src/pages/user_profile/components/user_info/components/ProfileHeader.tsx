@@ -36,7 +36,7 @@ export const ProfileHeader = ({
     >
       {connectionsCount} connections
     </Link>
-    <div className="grid gap-2 absolute right-0">
+    <div className="sm:grid gap-2 absolute right-0 hidden">
       {intros.work_experience && (
         <Link
           to={"#"}
