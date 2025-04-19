@@ -2,14 +2,13 @@ import React, { JSX, useEffect, useState } from "react";
 import moment from "moment";
 import { Button } from "../../../components/ui/button";
 
-import { AiOutlineLike as LikeIcon } from "react-icons/ai";
-
 import { Card, CardContent, CardFooter } from "../../../components/ui/card";
-import { PiHandsClapping as CelebrateIcon } from "react-icons/pi";
-import { FcLike as LoveIcon } from "react-icons/fc";
-import { FaRegFaceLaughSquint as LaughIcon } from "react-icons/fa6";
-import { HiOutlineLightBulb as InsightfulIcon } from "react-icons/hi";
-import { PiHandPalmBold as SupportIcon } from "react-icons/pi";
+import CelebrateIcon from "@/assets/Celebrate.svg";
+import LikeIcon from "@/assets/Like.svg";
+import LoveIcon from "@/assets/Love.svg";
+import LaughIcon from "@/assets/Funny.svg";
+import InsightfulIcon from "@/assets/Insightful.svg";
+import SupportIcon from "@/assets/Support.svg";
 import { Link } from "react-router-dom";
 import { CommentType, PostType } from "@/types";
 import { POST_ACTIONS } from "@/constants";
@@ -59,12 +58,36 @@ const Post: React.FC<PostProps> = ({ postData, comments }) => {
   const engagementButtons = getEngagementButtons(liked, () => setLiked(!liked));
 
   const statsArray = [
-    { name: "celebrate", count: stats.celebrate, icon: <CelebrateIcon /> },
-    { name: "love", count: stats.love, icon: <LoveIcon /> },
-    { name: "insightful", count: stats.insightful, icon: <InsightfulIcon /> },
-    { name: "support", count: stats.support, icon: <SupportIcon /> },
-    { name: "funny", count: stats.funny, icon: <LaughIcon /> },
-    { name: "like", count: stats.likes, icon: <LikeIcon /> },
+    {
+      name: "celebrate",
+      count: stats.celebrate,
+      icon: <img src={CelebrateIcon} alt="Celebrate" className="w-4 h-4" />,
+    },
+    {
+      name: "love",
+      count: stats.love,
+      icon: <img src={LoveIcon} alt="Love" className="w-4 h-4" />,
+    },
+    {
+      name: "insightful",
+      count: stats.insightful,
+      icon: <img src={InsightfulIcon} alt="Insightful" className="w-4 h-4" />,
+    },
+    {
+      name: "support",
+      count: stats.support,
+      icon: <img src={SupportIcon} alt="Support" className="w-4 h-4" />,
+    },
+    {
+      name: "funny",
+      count: stats.funny,
+      icon: <img src={LaughIcon} alt="Funny" className="w-4 h-4" />,
+    },
+    {
+      name: "like",
+      count: stats.likes,
+      icon: <img src={LikeIcon} alt="Like" className="w-4 h-4" />,
+    },
   ];
 
   const topStats = statsArray
