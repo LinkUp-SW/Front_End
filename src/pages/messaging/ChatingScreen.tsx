@@ -21,9 +21,9 @@ const ChatingScreen = () => {
     (state: RootState) => state.messaging.selectedMessages
   );
 
-  const user2Name = "testUser"; /*to be removed */
+  const user2Name = "testUser"; 
   const user2Img =
-    "https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg"; /*to be removed */
+    "https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg"; 
   /* const user2Name = useSelector(
     (state: RootState) => state.messaging.user2Name
   );
