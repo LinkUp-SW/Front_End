@@ -27,9 +27,10 @@ import PostImages from "./PostImages";
 interface PostProps {
   postData: PostType;
   comments: CommentType[];
+  viewMore: boolean;
 }
 
-const Post: React.FC<PostProps> = ({ postData, comments }) => {
+const Post: React.FC<PostProps> = ({ postData, comments, viewMore }) => {
   const { user, post, stats, action } = postData;
 
   const [liked, setLiked] = useState(false);
@@ -203,7 +204,7 @@ const Post: React.FC<PostProps> = ({ postData, comments }) => {
                 } items-center gap-2 hover:cursor-pointer  transition-all`}
               >
                 {button.icon}
-                {button.name}
+                {viewMore && button.name}
               </Button>
             )
           )}

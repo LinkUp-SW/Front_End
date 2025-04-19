@@ -56,16 +56,16 @@ const PostHeader: React.FC<PostHeaderProps> = ({
 }) => {
   const timeAgo = moment(post.date).fromNow();
   return (
-    <header className="flex items-center space-x-3 w-full pl-4">
+    <header className="flex items-center space-x-3 w-full pl-2">
       <img
         src={user.profileImage}
         alt={user.name}
-        className="w-12 h-12 rounded-full"
+        className="w-8 h-8 md:w-12 md:h-12 rounded-full"
       />
       <div className="flex flex-col gap-0 w-full relative">
         <div className="flex justify-between">
           <Link to="#" className="flex gap-1 items-center">
-            <h2 className="text-sm font-semibold sm:text-base hover:cursor-pointer hover:underline hover:text-blue-600 dark:hover:text-blue-400">
+            <h2 className="text-xs md:text-sm font-semibold sm:text-base hover:cursor-pointer hover:underline hover:text-blue-600 dark:hover:text-blue-400">
               {user.name}
             </h2>
             <p className="text-lg text-gray-500 dark:text-neutral-400 font-bold">
@@ -136,7 +136,7 @@ const PostHeader: React.FC<PostHeaderProps> = ({
         {action && (
           <Button
             variant="ghost"
-            className="absolute -right-3 top-1 hover:cursor-pointer hover:bg-blue-50 dark:hover:bg-slate-800"
+            className="absolute -right-3 top-1 pl-2 hover:cursor-pointer hover:bg-blue-50 dark:hover:bg-slate-800"
           >
             <div className="flex items-center gap-2 text-blue-700 dark:text-blue-400 text-[1rem]">
               <p>+</p>
