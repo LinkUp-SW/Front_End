@@ -1,4 +1,6 @@
 import axiosInstance from "@/services/axiosInstance";
+import Cookies from 'js-cookie';
+import { Job } from "../pages/jobs/types";
 
 export interface JobResponse {
   message: string;
@@ -25,53 +27,149 @@ export interface JobData {
   workplace_type: "On-site" | "Remote" | "Hybrid";
   experience_level: 'Internship' | 'Entry level' | 'Associate' | 'Mid-Senior level' | 'Director' | 'Executive';
   salary: string;
-  posted_time:string;
-  timeAgo:string;
-  description:string;
-  benefits:string[];
-  qualifications:string[];
-  responsibilities:string[];
-  isPromoted:boolean;
-  hasEasyApply:boolean;
+  posted_time: string;
+  timeAgo: string;
+  description: string;
+  benefits: string[];
+  qualifications: string[];
+  responsibilities: string[];
+  isPromoted: boolean;
+  hasEasyApply: boolean;
+}
+
+export interface SavedJobsResponse {
+  message: string;
+  data: JobData[];
 }
 
 export const fetchJobs = async (token: string, limit: number = 10, cursor?: string): Promise<JobResponse> => {
-    const url = cursor 
-      ? `/api/v1/jobs/get-jobs?cursor=${cursor}&limit=${limit}` 
-      : `/api/v1/jobs/get-jobs?limit=${limit}`;
-    
-    const response = await axiosInstance.get(url, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    
-    console.log("Jobs response:", response.data);
-    return response.data;
-  };
+  const url = cursor
+    ? `/api/v1/jobs/get-jobs?cursor=${cursor}&limit=${limit}`
+    : `/api/v1/jobs/get-jobs?limit=${limit}`;
+ 
+  const response = await axiosInstance.get(url, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+ 
+  return response.data;
+};
 
 export const fetchTopJobs = async (token: string, limit: number = 3): Promise<JobResponse> => {
-    const url = `/api/v1/jobs/get-top-jobs?limit=${limit}`;
-    
-    const response = await axiosInstance.get(url, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    
-    console.log("Top Jobs response:", response.data);
-    return response.data;
-  };  
+  const url = `/api/v1/jobs/get-top-jobs?limit=${limit}`;
+ 
+  const response = await axiosInstance.get(url, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+ 
+  return response.data;
+};  
 
 export const fetchSingleJob = async (token: string, jobId: string): Promise<{ data: JobData }> => {
-    const url = `/api/v1/jobs/get-job/${jobId}`;
-    
-    const response = await axiosInstance.get(url, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    
-    console.log("Single Job response:", response.data);
-    return response.data;
+  const url = `/api/v1/jobs/get-job/${jobId}`;
+ 
+  const response = await axiosInstance.get(url, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  try {
+    const savedJobs = await fetchSavedJobs();
+    const isJobSaved = savedJobs.some(savedJob => savedJob._id === jobId);
+    response.data.data.isSaved = isJobSaved;
+  } catch (error) {
+    console.error('Error checking saved status:', error);
+  }
+ 
+  return response.data;
+};
+
+// New functions for saved jobs
+
+export const fetchSavedJobs = async (): Promise<JobData[]> => {
+  const token = Cookies.get('linkup_auth_token');
+  
+  if (!token) {
+    throw new Error('Authentication required');
+  }
+  
+  const url = '/api/v1/jobs/get-saved-jobs';
+  const response = await axiosInstance.get(url, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  
+  return response.data.data || [];
+};
+
+export const saveJob = async (jobId: string): Promise<{ message: string }> => {
+  const token = Cookies.get('linkup_auth_token');
+  
+  if (!token) {
+    throw new Error('Authentication required');
+  }
+  
+  const url = `/api/v1/jobs/save-jobs/${jobId}`;
+  const response = await axiosInstance.post(url, {}, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  
+  return response.data;
+};
+
+export const removeFromSaved = async (jobId: string): Promise<{ message: string }> => {
+  const token = Cookies.get('linkup_auth_token');
+  
+  if (!token) {
+    throw new Error('Authentication required');
+  }
+  
+  const url = `/api/v1/jobs/unsave-jobs/${jobId}`;
+  const response = await axiosInstance.delete(url, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  
+  return response.data;
+};
+
+// Helper to convert JobData to Job interface
+export const convertJobDataToJob = (jobData: JobData): Job => {
+  return {
+    id: jobData._id,
+    title: jobData.job_title,
+    company: jobData.organization?.name || '',
+    location: jobData.location,
+    experience_level: jobData.experience_level,
+    isRemote: jobData.workplace_type === 'Remote',
+    isSaved: true, 
+    logo: jobData.organization?.logo || '',
+    isPromoted: jobData.isPromoted,
+    hasEasyApply: jobData.hasEasyApply,
+    postedTime: jobData.timeAgo || jobData.posted_time,
+    workMode: jobData.workplace_type,
+    description: jobData.description,
+    qualifications: jobData.qualifications,
+    responsibilities: jobData.responsibilities,
+    benefits: jobData.benefits,
+    salary: jobData.salary,
+    companyInfo: jobData.organization ? {
+      name: jobData.organization.name,
+      logo: jobData.organization.logo,
+      followers: jobData.organization.followers,
+      industryType: jobData.organization.industry,
+      employeeCount: jobData.organization.size,
+      linkupPresence: jobData.organization.linkup_presence,
+      description: jobData.organization.description
+    } : undefined
   };
+};
+

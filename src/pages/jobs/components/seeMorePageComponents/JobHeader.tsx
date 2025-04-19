@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Job } from "../../types";
 import Cookies from 'js-cookie';
+import { saveJob, removeFromSaved, fetchSavedJobs } from "../../../../endpoints/jobs";
 
 interface JobHeaderProps {
   job: Job;
@@ -9,70 +10,88 @@ interface JobHeaderProps {
 const JobHeader: React.FC<JobHeaderProps> = ({ job }) => {
   const [isSaved, setIsSaved] = useState<boolean>(job.isSaved || false);
   const [saveInProgress, setSaveInProgress] = useState<boolean>(false);
+  const [isChecking, setIsChecking] = useState<boolean>(true); // New state for tracking initial check
   
+  // Check if the job is in the saved jobs list on component mount and prop change
   useEffect(() => {
-    // Check if this job is already saved in localStorage
-    const savedJobsString = localStorage.getItem('savedJobs');
-    if (savedJobsString) {
+    const checkSavedStatus = async () => {
+      setIsChecking(true); // Start checking
       try {
-        const savedJobs = JSON.parse(savedJobsString);
-        const alreadySaved = savedJobs.some((savedJob: Job) => savedJob.id === job.id);
-        setIsSaved(alreadySaved);
+        const savedJobs = await fetchSavedJobs();
+        const isJobSaved = savedJobs.some(savedJob => savedJob._id === job.id);
+        setIsSaved(isJobSaved);
       } catch (error) {
-        console.error('Error parsing saved jobs:', error);
+        console.error('Error checking saved status:', error);
+        // Fall back to the prop value if we can't check
+        setIsSaved(job.isSaved || false);
+      } finally {
+        setIsChecking(false); // End checking regardless of result
       }
+    };
+    
+    // If job.isSaved is already true, set it immediately to avoid flicker
+    if (job.isSaved) {
+      setIsSaved(true);
+      setIsChecking(false);
+    } else {
+      checkSavedStatus();
     }
+  }, [job.id, job.isSaved]);
+
+  // Also listen for the savedJobsUpdated event
+  useEffect(() => {
+    const handleSavedJobsUpdated = async () => {
+      try {
+        const savedJobs = await fetchSavedJobs();
+        const isJobSaved = savedJobs.some(savedJob => savedJob._id === job.id);
+        setIsSaved(isJobSaved);
+      } catch (error) {
+        console.error('Error handling saved jobs update:', error);
+      }
+    };
+    
+    window.addEventListener('savedJobsUpdated', handleSavedJobsUpdated);
+    return () => {
+      window.removeEventListener('savedJobsUpdated', handleSavedJobsUpdated);
+    };
   }, [job.id]);
 
   const handleSaveJob = async () => {
     setSaveInProgress(true);
     
-    // Get existing saved jobs from localStorage
-    const savedJobsString = localStorage.getItem('savedJobs');
-    let savedJobs: Job[] = [];
-    
-    if (savedJobsString) {
-      try {
-        savedJobs = JSON.parse(savedJobsString);
-      } catch (error) {
-        console.error('Error parsing saved jobs:', error);
+    try {
+      const token = Cookies.get('linkup_auth_token');
+      
+      if (!token) {
+        // Handle the case where the user is not authenticated
+        alert("Please log in to save jobs");
+        setSaveInProgress(false);
+        return;
       }
-    }
-    
-    // Try to update on backend if user has authentication
-    const token = Cookies.get('linkup_auth_token');
-    if (token) {
-      try {
-        // Example API call to save/unsave job
-        // const response = await (isSaved ? unsaveJob(token, job.id) : saveJob(token, job.id));
-        // If backend call succeeds, update local state
-      } catch (error) {
-        console.error('Error updating saved job status:', error);
-        // Continue with local storage update even if backend fails
+      
+      if (isSaved) {
+        // Remove job from saved jobs
+        await removeFromSaved(job.id);
+        setIsSaved(false);
+      } else {
+        // Add job to saved jobs
+        await saveJob(job.id);
+        setIsSaved(true);
       }
+      
+      // Dispatch event to notify other components
+      window.dispatchEvent(new Event('savedJobsUpdated'));
+      
+    } catch (error) {
+      console.error('Error updating saved job status:', error);
+      alert("Failed to update saved job status. Please try again.");
+    } finally {
+      setSaveInProgress(false);
     }
-    
-    // Update localStorage regardless of backend result
-    if (isSaved) {
-      // Remove job from saved jobs
-      savedJobs = savedJobs.filter(savedJob => savedJob.id !== job.id);
-      setIsSaved(false);
-    } else {
-      // Add job to saved jobs if it's not already there
-      const isAlreadySaved = savedJobs.some(savedJob => savedJob.id === job.id);
-      if (!isAlreadySaved) {
-        savedJobs.push(job);
-      }
-      setIsSaved(true);
-    }
-    
-    // Save updated list back to localStorage
-    localStorage.setItem('savedJobs', JSON.stringify(savedJobs));
-    
-    // Dispatch event to notify other components
-    window.dispatchEvent(new Event('savedJobsUpdated'));
-    setSaveInProgress(false);
   };
+
+  // Determine button state
+  const buttonIsLoading = saveInProgress || isChecking;
 
   return (
     <>
@@ -139,23 +158,23 @@ const JobHeader: React.FC<JobHeaderProps> = ({ job }) => {
         )}
         <button
           id="btn-save-job"
-          disabled={saveInProgress}
+          disabled={buttonIsLoading}
           className={`
             py-2 px-4 md:px-6 rounded-full text-sm font-medium transition-colors flex items-center
-            ${saveInProgress ? "opacity-70 cursor-not-allowed" : ""}
-            ${isSaved 
+            ${buttonIsLoading ? "opacity-70 cursor-not-allowed" : ""}
+            ${isSaved && !isChecking
               ? "bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 border border-blue-300 dark:border-blue-700" 
               : "border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"}
           `}
           onClick={handleSaveJob}
         >
-          {saveInProgress ? (
+          {buttonIsLoading ? (
             <>
               <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-current" xmlns="https://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
-              <span>Processing...</span>
+              <span>{isChecking ? "Checking..." : "Processing..."}</span>
             </>
           ) : (
             <>

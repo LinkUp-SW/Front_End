@@ -1,134 +1,185 @@
-import React, { useEffect, useState } from "react";
-import { Job } from "../../pages/jobs/types";
+import React, { useEffect, useState } from 'react';
+import { Job } from '../../pages/jobs/types';
+import { fetchSavedJobs, removeFromSaved, convertJobDataToJob } from '../../endpoints/jobs';
+import Cookies from 'js-cookie';
+
+enum TabState {
+  SAVED = 'saved',
+  IN_PROGRESS = 'in-progress',
+  APPLIED = 'applied',
+  ARCHIVED = 'archived'
+}
 
 const JobsDashboard: React.FC = () => {
   const [savedJobs, setSavedJobs] = useState<Job[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<TabState>(TabState.SAVED);
+
+  const loadSavedJobs = async () => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const token = Cookies.get('linkup_auth_token');
+      
+      if (!token) {
+        setError('Authentication required');
+        setLoading(false);
+        return;
+      }
+      
+      const jobsData = await fetchSavedJobs();
+      const jobs = jobsData.map(jobData => convertJobDataToJob(jobData));
+      setSavedJobs(jobs);
+    } catch (error) {
+      console.error('Error loading saved jobs:', error);
+      setError('Failed to load saved jobs');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    // Load saved jobs from localStorage
-    const loadSavedJobs = () => {
-      const savedJobsString = localStorage.getItem("savedJobs");
-      if (savedJobsString) {
-        try {
-          const jobs = JSON.parse(savedJobsString);
-          setSavedJobs(jobs);
-        } catch (error) {
-          console.error("Error parsing saved jobs:", error);
-        }
-      }
-    };
-
     loadSavedJobs();
-
+    
     // Set up event listener for job updates
-    window.addEventListener("savedJobsUpdated", loadSavedJobs);
-
+    const handleJobsUpdated = () => {
+      loadSavedJobs();
+    };
+    
+    window.addEventListener('savedJobsUpdated', handleJobsUpdated);
+    
     return () => {
-      window.removeEventListener("savedJobsUpdated", loadSavedJobs);
+      window.removeEventListener('savedJobsUpdated', handleJobsUpdated);
     };
   }, []);
 
-  const removeFromSaved = (jobId: string) => {
-    const updatedJobs = savedJobs.filter((job) => job.id !== jobId);
-    localStorage.setItem("savedJobs", JSON.stringify(updatedJobs));
-    setSavedJobs(updatedJobs);
+  const handleRemoveFromSaved = async (jobId: string) => {
+    try {
+      await removeFromSaved(jobId);
+      
+      // Update local state
+      setSavedJobs(prevJobs => prevJobs.filter(job => job.id !== jobId));
+      
+      // Dispatch event to notify other components
+      window.dispatchEvent(new Event('savedJobsUpdated'));
+    } catch (error) {
+      console.error('Error removing saved job:', error);
+      alert('Failed to remove job from saved jobs');
+    }
+  };
 
-    // Dispatch event to notify other components
-    window.dispatchEvent(new Event("savedJobsUpdated"));
+  const handleTabChange = (tab: TabState) => {
+    setActiveTab(tab);
+    // Here you would fetch the appropriate jobs for the selected tab
+    // For now we only have implementation for saved jobs
+  };
+
+  const renderContent = () => {
+    if (loading) {
+      return (
+        <div className="border-t pt-6 pb-4 text-center">
+          <p className="text-gray-500 dark:text-gray-400">Loading...</p>
+        </div>
+      );
+    }
+
+    if (error) {
+      return (
+        <div className="border-t pt-6 pb-4 text-center">
+          <p className="text-red-500">{error}</p>
+          {error === 'Authentication required' && (
+            <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
+              Please log in to view your saved jobs.
+            </p>
+          )}
+        </div>
+      );
+    }
+
+    if (activeTab === TabState.SAVED && savedJobs.length === 0) {
+      return (
+        <div className="border-t pt-6 pb-4 text-center">
+          <p className="text-gray-500 dark:text-gray-400">No saved jobs yet.</p>
+          <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
+            Browse jobs and click "Save" to add them here.
+          </p>
+        </div>
+      );
+    }
+
+    return (
+      <div className="space-y-4">
+        {savedJobs.map((job) => (
+          <div key={job.id} className="border-t pt-4">
+            <div className="flex justify-between">
+              <div className="flex">
+                <div className="w-12 h-12 bg-black rounded-md flex items-center justify-center overflow-hidden">
+                  {job.logo ? (
+                    <img src={job.logo} alt={`${job.company} logo`} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-6 h-6 bg-orange-500 rounded-full transform translate-y-1/4"></div>
+                  )}
+                </div>
+                <div className="ml-3">
+                  <h3 className="font-medium text-gray-900 dark:text-white">{job.title}</h3>
+                  <p className="text-sm text-gray-800 dark:text-gray-300">{job.company}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">{job.location}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    Posted {job.postedTime} • {job.hasEasyApply && <span className="text-blue-600 dark:text-blue-400">Easy Apply</span>}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start">
+                <button 
+                  className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                  onClick={() => handleRemoveFromSaved(job.id)}
+                  title="Remove from saved"
+                >
+                  •••
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
   };
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
       <div className="p-4">
-        <h1 className="text-xl font-medium mb-4 text-gray-900 dark:text-white">
-          My Jobs
-        </h1>
-
+        <h1 className="text-xl font-medium mb-4 text-gray-900 dark:text-white">My Jobs</h1>
+        
         <div className="flex flex-wrap gap-2 mb-6">
-          <button
-            id="saved-jobs-tab"
-            className="bg-green-700 text-white px-4 py-1 rounded-full"
+          <button 
+            className={`px-4 py-1 rounded-full ${activeTab === TabState.SAVED ? 'bg-green-700 text-white' : 'bg-white dark:bg-gray-700 border dark:border-gray-600 text-gray-800 dark:text-gray-200'}`}
+            onClick={() => handleTabChange(TabState.SAVED)}
           >
             Saved
           </button>
-          <button
-            id="in-progress-tab"
-            className="bg-white dark:bg-gray-700 border dark:border-gray-600 px-4 py-1 rounded-full text-gray-800 dark:text-gray-200"
+          <button 
+            className={`px-4 py-1 rounded-full ${activeTab === TabState.IN_PROGRESS ? 'bg-green-700 text-white' : 'bg-white dark:bg-gray-700 border dark:border-gray-600 text-gray-800 dark:text-gray-200'}`}
+            onClick={() => handleTabChange(TabState.IN_PROGRESS)}
           >
             In Progress
           </button>
-          <button
-            id="applied-tab"
-            className="bg-white dark:bg-gray-700 border dark:border-gray-600 px-4 py-1 rounded-full text-gray-800 dark:text-gray-200"
+          <button 
+            className={`px-4 py-1 rounded-full ${activeTab === TabState.APPLIED ? 'bg-green-700 text-white' : 'bg-white dark:bg-gray-700 border dark:border-gray-600 text-gray-800 dark:text-gray-200'}`}
+            onClick={() => handleTabChange(TabState.APPLIED)}
           >
             Applied
           </button>
-          <button
-            id="archived-tab"
-            className="bg-white dark:bg-gray-700 border dark:border-gray-600 px-4 py-1 rounded-full text-gray-800 dark:text-gray-200"
+          <button 
+            className={`px-4 py-1 rounded-full ${activeTab === TabState.ARCHIVED ? 'bg-green-700 text-white' : 'bg-white dark:bg-gray-700 border dark:border-gray-600 text-gray-800 dark:text-gray-200'}`}
+            onClick={() => handleTabChange(TabState.ARCHIVED)}
           >
             Archived
           </button>
         </div>
-
-        {savedJobs.length > 0 ? (
-          <div className="space-y-4">
-            {savedJobs.map((job) => (
-              <div key={job.id} className="border-t pt-4">
-                <div className="flex justify-between">
-                  <div className="flex">
-                    <div className="w-12 h-12 bg-black rounded-md flex items-center justify-center overflow-hidden">
-                      {job.logo ? (
-                        <img
-                          src={job.logo}
-                          alt={`${job.company} logo`}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-6 h-6 bg-orange-500 rounded-full transform translate-y-1/4"></div>
-                      )}
-                    </div>
-                    <div className="ml-3">
-                      <h3 className="font-medium text-gray-900 dark:text-white">
-                        {job.title}
-                      </h3>
-                      <p className="text-sm text-gray-800 dark:text-gray-300">
-                        {job.company}
-                      </p>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
-                        {job.location}
-                      </p>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
-                        Posted {job.postedTime} •{" "}
-                        <span className="text-blue-600 dark:text-blue-400">
-                          Easy Apply
-                        </span>
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-start">
-                    <button
-                      id={`job-options-${job.id}`}
-                      className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-                      onClick={() => removeFromSaved(job.id)}
-                    >
-                      •••
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="border-t pt-6 pb-4 text-center">
-            <p className="text-gray-500 dark:text-gray-400">
-              No saved jobs yet.
-            </p>
-            <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
-              Browse jobs and click "Save" to add them here.
-            </p>
-          </div>
-        )}
+        
+        {renderContent()}
       </div>
     </div>
   );
