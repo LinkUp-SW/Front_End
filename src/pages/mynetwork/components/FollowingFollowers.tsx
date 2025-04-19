@@ -35,6 +35,7 @@ const FollowingFollowers: React.FC = () => {
   );
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
+  const [openDialogUserId, setOpenDialogUserId] = useState<string | null>(null);
   const observerRef = useRef<HTMLDivElement | null>(null);
   const navigate = useNavigate();
 
@@ -236,11 +237,17 @@ const FollowingFollowers: React.FC = () => {
               </p>
             </div>
             {activeTab === "following" ? (
-              <Dialog>
+              <Dialog
+                open={openDialogUserId === user.user_id}
+                onOpenChange={(open) => {
+                  if (!open) setOpenDialogUserId(null);
+                }}
+              >
                 <DialogTrigger asChild>
                   <button
                     id="unfollow-button-1"
                     className="px-2 py-1 sm:px-4 sm:py-2 bg-red-500 text-white rounded-lg flex items-center hover:bg-red-600 transition-colors text-xs sm:text-base whitespace-nowrap"
+                    onClick={() => setOpenDialogUserId(user.user_id)}
                   >
                     Unfollow
                   </button>
@@ -251,7 +258,11 @@ const FollowingFollowers: React.FC = () => {
                 >
                   <UnfollowUserModal
                     userData={{ userName: user.name, userId: user.user_id }}
-                    onConfirm={() => handleUnfollowUser(user.user_id)}
+                    onConfirm={() => {
+                      handleUnfollowUser(user.user_id);
+                      setOpenDialogUserId(null);
+                    }}
+                    onCancel={() => setOpenDialogUserId(null)}
                   />
                   <DialogHeader>
                     <DialogTitle></DialogTitle>
@@ -260,11 +271,17 @@ const FollowingFollowers: React.FC = () => {
                 </DialogContent>
               </Dialog>
             ) : (user as Followers).following ? (
-              <Dialog>
+              <Dialog
+                open={openDialogUserId === user.user_id}
+                onOpenChange={(open) => {
+                  if (!open) setOpenDialogUserId(null);
+                }}
+              >
                 <DialogTrigger asChild>
                   <button
                     id="unfollow-button-2"
                     className="px-2 py-1 sm:px-4 sm:py-2 bg-red-500 text-white rounded-lg flex items-center hover:bg-red-600 transition-colors text-xs sm:text-base whitespace-nowrap"
+                    onClick={() => setOpenDialogUserId(user.user_id)}
                   >
                     Unfollow
                   </button>
@@ -275,7 +292,11 @@ const FollowingFollowers: React.FC = () => {
                 >
                   <UnfollowUserModal
                     userData={{ userName: user.name, userId: user.user_id }}
-                    onConfirm={() => handleUnfollowUser(user.user_id)}
+                    onConfirm={() => {
+                      handleUnfollowUser(user.user_id);
+                      setOpenDialogUserId(null);
+                    }}
+                    onCancel={() => setOpenDialogUserId(null)}
                   />
                   <DialogHeader>
                     <DialogTitle></DialogTitle>
