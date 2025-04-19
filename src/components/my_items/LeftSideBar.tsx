@@ -58,7 +58,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
               selectedPage === "saved-posts"
                 ? "text-blue-600 dark:text-blue-400 font-medium"
                 : "text-gray-600 dark:text-gray-400"
-            }`}
+            } text-left line-clamp-1 text-ellipsis`}
           >
             Saved posts and articles
           </button>
