@@ -16,10 +16,11 @@ import {
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
-import { CommentType, PostType } from "@/types";
+import { CommentType, PostType, ReactionType } from "@/types";
 import {
   getFeedPosts,
   getPostComments,
+  getPostReactions,
   getSingleComments,
   getSinglePost,
 } from "@/endpoints/feed";
@@ -36,6 +37,7 @@ const FeedPage: React.FC<FeedPageProps> = ({ single = false }) => {
 
   const [posts, setPosts] = useState<PostType[]>([]);
   const [comments, setComments] = useState<CommentType[]>([]);
+  const [reactions, setReactions] = useState<ReactionType[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -48,17 +50,21 @@ const FeedPage: React.FC<FeedPageProps> = ({ single = false }) => {
         }
 
         // Call both endpoints concurrently
-        const [fetchedPosts, fetchedComments] = await Promise.all([
-          !single || !id ? getFeedPosts() : getSinglePost(id),
+        const [fetchedPosts, fetchedComments, fetchedReactions] =
+          await Promise.all([
+            !single || !id ? getFeedPosts() : getSinglePost(id),
 
-          !single || !id ? getPostComments() : getSingleComments(id),
-        ]);
+            !single || !id ? getPostComments() : getSingleComments(id),
+
+            getPostReactions(),
+          ]);
         if (fetchedPosts)
           setPosts(Array.isArray(fetchedPosts) ? fetchedPosts : [fetchedPosts]);
         else setPosts([]);
         if (fetchedComments) setComments(fetchedComments);
         else setComments([]);
-        return fetchedPosts;
+        if (fetchedReactions) setReactions(fetchedReactions);
+        else setReactions([]);
       } catch (error) {
         console.error("Error fetching feed data", error);
       }
@@ -123,6 +129,7 @@ const FeedPage: React.FC<FeedPageProps> = ({ single = false }) => {
                 viewMore={viewMore}
                 postData={post}
                 comments={comments}
+                reactions={reactions}
               />
             ))}
           </main>

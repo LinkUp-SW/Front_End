@@ -8,7 +8,7 @@ import LaughIcon from "@/assets/Funny.svg";
 import InsightfulIcon from "@/assets/Insightful.svg";
 import SupportIcon from "@/assets/Support.svg";
 import { Link } from "react-router-dom";
-import { CommentType, PostType } from "@/types";
+import { CommentType, PostType, ReactionType } from "@/types";
 import { POST_ACTIONS } from "@/constants";
 import PostHeader from "./PostHeader";
 import PostFooter from "./PostFooter";
@@ -16,6 +16,8 @@ import { getEngagementButtons, getMenuActions } from "../components/Menus";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
+  DialogTitle,
   DialogTrigger,
   TruncatedText,
 } from "@/components";
@@ -26,9 +28,15 @@ interface PostProps {
   postData: PostType;
   comments: CommentType[];
   viewMore: boolean;
+  reactions: ReactionType[];
 }
 
-const Post: React.FC<PostProps> = ({ postData, comments, viewMore }) => {
+const Post: React.FC<PostProps> = ({
+  postData,
+  comments,
+  viewMore,
+  reactions,
+}) => {
   const { user, post, stats, action } = postData;
 
   const [liked, setLiked] = useState(false);
@@ -171,8 +179,14 @@ const Post: React.FC<PostProps> = ({ postData, comments, viewMore }) => {
                   : totalStats}
               </button>
             </DialogTrigger>
-            <DialogContent>
-              <ReactionsModal />
+            <DialogContent className="dark:bg-gray-900 min-w-[20rem] sm:min-w-[35rem] w-auto dark:border-gray-700">
+              <DialogTitle>
+                <h1 className=" px-2 text-xl font-medium">Reactions</h1>
+              </DialogTitle>
+              <DialogDescription />
+              {reactions && reactions.length && (
+                <ReactionsModal reactions={reactions} />
+              )}
             </DialogContent>
           </Dialog>
           <div className="flex text-gray-500 dark:text-neutral-400 gap-2 text-sm items-center ">
