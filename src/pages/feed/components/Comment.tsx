@@ -3,7 +3,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { LiaEllipsisHSolid as EllipsisIcon } from "react-icons/lia";
 import { Button } from "@/components/ui/button";
@@ -14,10 +14,17 @@ import LoveIcon from "@/assets/Love.svg";
 import LaughIcon from "@/assets/Funny.svg";
 import InsightfulIcon from "@/assets/Insightful.svg";
 import SupportIcon from "@/assets/Support.svg";
-import { Dialog, DialogContent } from "@/components";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+} from "@/components";
 import { DialogTrigger } from "@radix-ui/react-dialog";
 import ReportCommentModal from "./modals/ReportCommentModal";
 import ReactionsModal from "./modals/ReactionsModal";
+import { getPostReactions } from "@/endpoints/feed";
+import { ReactionType } from "@/types";
 
 export interface CommentProps {
   user: {
@@ -46,8 +53,29 @@ export interface CommentProps {
 
 const Comment: React.FC<CommentProps> = ({ user, comment, stats }) => {
   const { profileImage, name, degree } = user;
+
   const { text, edited } = comment;
   const [commentMenuOpen, setCommentMenuOpen] = useState(false);
+  const [reactions, setReactions] = useState<ReactionType[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    setIsLoading(true);
+    const fetchData = async () => {
+      try {
+        // Call both endpoints concurrently
+        const [fetchedReactions] = await Promise.all([getPostReactions()]);
+
+        if (fetchedReactions) setReactions(fetchedReactions);
+        else setReactions([]);
+      } catch (error) {
+        console.error("Error fetching feed data", error);
+      }
+    };
+
+    fetchData();
+    setIsLoading(false);
+  }, []);
 
   const statsArray = [
     {
@@ -237,8 +265,12 @@ const Comment: React.FC<CommentProps> = ({ user, comment, stats }) => {
               {totalStats}
             </button>
           </DialogTrigger>
-          <DialogContent>
-            <ReactionsModal />
+          <DialogContent className="dark:bg-gray-900 min-w-[20rem] sm:min-w-[35rem] w-auto dark:border-gray-700">
+            <DialogTitle>
+              <h1 className=" px-2 text-xl font-medium">Reactions</h1>
+            </DialogTitle>
+            <DialogDescription />
+            <ReactionsModal reactions={reactions} />
           </DialogContent>
         </Dialog>
 
