@@ -24,7 +24,6 @@ import { IoDocumentOutline as DocumentIcon } from "react-icons/io5";
 import PostImages from "../PostImages";
 import { MdModeEdit as EditIcon } from "react-icons/md";
 import { IoClose as CloseIcon } from "react-icons/io5";
-import { Viewer } from "@react-pdf-viewer/core";
 import "@react-pdf-viewer/core/lib/styles/index.css";
 import DocumentPreview from "./DocumentPreview";
 

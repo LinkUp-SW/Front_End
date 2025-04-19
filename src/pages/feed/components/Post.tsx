@@ -1,4 +1,4 @@
-import React, { JSX, useEffect, useState } from "react";
+import React, { JSX, useEffect, useRef, useState } from "react";
 import { Button } from "../../../components/ui/button";
 import { Card, CardContent, CardFooter } from "../../../components/ui/card";
 import CelebrateIcon from "@/assets/Celebrate.svg";
@@ -106,7 +106,7 @@ const Post: React.FC<PostProps> = ({ postData, comments, viewMore }) => {
 
   return (
     <Card className="p-2 bg-white border-0 mb-4 pl-0 dark:bg-gray-900 dark:text-neutral-200">
-      <CardContent className="flex flex-col items-center pl-0 w-full">
+      <CardContent className="flex flex-col items-start pl-0 w-full">
         {action && (
           <header className="flex pl-4 justify-start items-center w-full border-b gap-2 pb-2 dark:border-neutral-700">
             <img
@@ -137,28 +137,20 @@ const Post: React.FC<PostProps> = ({ postData, comments, viewMore }) => {
         <TruncatedText id="post-content" content={post.content} lineCount={3} />
 
         {/* Post Image(s) */}
-        <PostImages images={post.images || []} isLandscape={isLandscape} />
+        {post && post.images && post.images.length != 0 && (
+          <PostImages images={post.images || []} isLandscape={isLandscape} />
+        )}
 
         {post.video && (
-          <div className="flex w-[108%] relative left-4 justify-end">
+          <div className="flex w-[100%] relative left-4 self-center justify-end">
             <video className="w-full pt-4" controls src={post.video}></video>
           </div>
         )}
         {post.pdf && (
-          <div className="h-[37rem] w-[27.5rem] relative left-4.5 pt-4">
-            <object
-              data={post.pdf}
-              type="application/pdf"
-              width="100%"
-              height="100%"
-            >
-              <p>
-                Alternative text - include a link{" "}
-                <a href="http://africau.edu/images/default/sample.pdf">
-                  to the PDF!
-                </a>
-              </p>
-            </object>
+          <div className="h-[37rem] self-center w-full max-w-[34rem] relative left-4.5 pt-4">
+            <div className="App">
+              <div className="header">React sample</div>
+            </div>
           </div>
         )}
 
