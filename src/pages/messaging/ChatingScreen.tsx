@@ -45,7 +45,7 @@ const ChatingScreen = () => {
   const isCurrentConversationStarred =
     starredConversations.includes(selectedConvID);
 
-  const messages = conversation ? conversation.user1_sent_messages : [];
+  /*const messages = conversation ? conversation.user1_sent_messages : [];*/
   const [dataChat, setChatData] = useState<chattingMessages>();
   const [loading, setLoading] = useState<boolean>(true);
   const [msgDeleted, setMsgDeleted] = useState<boolean>(false);

@@ -29,7 +29,6 @@ import Cookies from "js-cookie";
 import { Conversation } from "@/endpoints/messaging";
 
 const SideBar = () => {
-  const userId = Cookies.get("linkup_user_id");
   const token = Cookies.get("linkup_auth_token");
 
   const dispatch = useDispatch();
