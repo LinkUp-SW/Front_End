@@ -24,9 +24,9 @@ const JobFilterBar: React.FC<JobFilterBarProps> = ({ onFiltersChange }) => {
 
   const experienceLevels = [
     'Internship',
-    'Entry level',
+    'Entry Level',
     'Associate',
-    'Mid-Senior level',
+    'Mid-Senior',
     'Director',
     'Executive'
   ];
@@ -180,7 +180,7 @@ const JobFilterBar: React.FC<JobFilterBarProps> = ({ onFiltersChange }) => {
       ),
     },
     {
-      label: 'Remote',
+      label: 'Work Mode',
       component: (
         <div className="w-64 bg-white dark:bg-gray-800">
           {remoteOptions.map((option) => (
