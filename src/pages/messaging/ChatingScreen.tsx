@@ -32,11 +32,11 @@ const ChatingScreen = () => {
     (state: RootState) => state.messaging.userStatus
   );*/
   // Find conversation based on selected ID
-  const conversation = useSelector((state: RootState) =>
+  /*const conversation = useSelector((state: RootState) =>
     state.messaging.conversations.find(
       (conv) => conv.conversationID === selectedConvID
     )
-  );
+  );*/
 
   const starredConversations = useSelector(
     (state: RootState) => state.messaging.starredConversations
