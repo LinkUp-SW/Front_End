@@ -3,6 +3,8 @@ pipeline {
     environment {
         CI = "true"  
         VAULT_SECRET = vault path: 'secret/jenkins/front_env', engineVersion: "2", key: 'value'
+        DOCKERHUB_CREDENTIALS = credentials('docker-token')
+        IMAGE_NAME = credentials('DockerHub-repo')
     }
     stages {
         stage('Checkout') {
@@ -47,6 +49,18 @@ pipeline {
                  '''
             }
         }
+
+         stage('Docker Build & Push') {
+            steps {
+                script {
+                    docker.build("${IMAGE_NAME}:${BUILD_NUMBER}")
+                    docker.withRegistry('https://index.docker.io/v1/', 'docker-token') {
+                        docker.image("${IMAGE_NAME}:${BUILD_NUMBER}").push('latest')
+                    }
+                }
+            }
+        }
+        /*
         stage('Build') { 
             steps {
                  echo 'building...'  
@@ -75,6 +89,8 @@ pipeline {
                  '''
             }
         }
+
+        */
     }
     post {
         success {
