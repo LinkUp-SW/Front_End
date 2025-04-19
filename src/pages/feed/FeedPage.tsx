@@ -17,9 +17,20 @@ import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { CommentType, PostType } from "@/types";
-import { getFeedPosts, getPostComments } from "@/endpoints/feed";
+import {
+  getFeedPosts,
+  getPostComments,
+  getSingleComments,
+  getSinglePost,
+} from "@/endpoints/feed";
+import { useParams } from "react-router-dom";
 
-const FeedPage = () => {
+interface FeedPageProps {
+  single?: boolean;
+}
+
+const FeedPage: React.FC<FeedPageProps> = ({ single = false }) => {
+  const { id } = useParams<{ id: string }>(); // Extract the 'id' parameter from the URL
   const [viewMore, setViewMore] = useState(true);
   const screenWidth = useSelector((state: RootState) => state.screen.width);
 
@@ -29,15 +40,23 @@ const FeedPage = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        if (single && !id) {
+          console.error("ID is required for single post view");
+          return;
+        }
+
         // Call both endpoints concurrently
         const [fetchedPosts, fetchedComments] = await Promise.all([
-          getFeedPosts(),
-          getPostComments(),
+          !single || !id ? getFeedPosts() : getSinglePost(id),
+
+          !single || !id ? getPostComments() : getSingleComments(id),
         ]);
-        if (fetchedPosts) setPosts(fetchedPosts);
+        if (fetchedPosts)
+          setPosts(Array.isArray(fetchedPosts) ? fetchedPosts : [fetchedPosts]);
         else setPosts([]);
         if (fetchedComments) setComments(fetchedComments);
         else setComments([]);
+        return fetchedPosts;
       } catch (error) {
         console.error("Error fetching feed data", error);
       }
@@ -90,7 +109,7 @@ const FeedPage = () => {
           </aside>
           {/* Main Content */}
           <main className="flex flex-col w-full max-w-auto md:max-w-[27.8rem] lg:max-w-[35rem]">
-            <CreatePost />
+            {!single && <CreatePost />}
             {posts.map((post, index) => (
               <Post key={index} postData={post} comments={comments} />
             ))}
