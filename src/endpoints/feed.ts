@@ -59,6 +59,20 @@ export const getSingleComments = async (
   }
 };
 
+export const getPostReactions = async (): Promise<any> => {
+  try {
+    const response = await axios.get(
+      import.meta.env.VITE_NODE_ENV === "DEV"
+        ? "/api/postReactions"
+        : "actual api endpoint"
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
 export const createPost = async (postPayload: PostDBObject, token: string) => {
   const response = await axiosInstance.post(
     "api/v1/post/create-post",

@@ -1,4 +1,4 @@
-import { CommentType, PostType } from "@/types";
+import { CommentType, PostType, ReactionType } from "@/types";
 import { createGetHandler } from "../handler_wrapper/getHandler";
 const MOCK_POSTS: PostType[] = [
   {
@@ -304,6 +304,177 @@ const MOCK_COMMENTS: CommentType[] = [
   },
 ];
 
+const MOCK_REACTIONS: ReactionType[] = [
+  {
+    id: 1,
+    name: "Abdelrahman Essa",
+    title: "ARM Instructor at SemiColon",
+    profileImage:
+      "https://res.cloudinary.com/dyhnxqs6f/image/upload/v1719229880/meme_k18ky2_c_crop_w_674_h_734_x_0_y_0_u0o1yz.png",
+    reactionType: "like",
+  },
+  {
+    id: 2,
+    name: "Louai Eleslambolyps",
+    title: "Biomedical Engineering Student",
+    profileImage:
+      "https://res.cloudinary.com/dyhnxqs6f/image/upload/v1719229880/meme_k18ky2_c_crop_w_674_h_734_x_0_y_0_u0o1yz.png",
+    reactionType: "insightful",
+  },
+  {
+    id: 3,
+    name: "Farouq Diaa Eldin",
+    title: "Software Engineer",
+    profileImage:
+      "https://res.cloudinary.com/dyhnxqs6f/image/upload/v1719229880/meme_k18ky2_c_crop_w_674_h_734_x_0_y_0_u0o1yz.png",
+    reactionType: "funny",
+  },
+  {
+    id: 4,
+    name: "Abdelrahman Essa",
+    title: "ARM Instructor at SemiColon",
+    profileImage:
+      "https://res.cloudinary.com/dyhnxqs6f/image/upload/v1719229880/meme_k18ky2_c_crop_w_674_h_734_x_0_y_0_u0o1yz.png",
+    reactionType: "like",
+  },
+  {
+    id: 5,
+    name: "Louai Eleslambolyps",
+    title: "Biomedical Engineering Student",
+    profileImage:
+      "https://res.cloudinary.com/dyhnxqs6f/image/upload/v1719229880/meme_k18ky2_c_crop_w_674_h_734_x_0_y_0_u0o1yz.png",
+    reactionType: "insightful",
+  },
+  {
+    id: 6,
+    name: "Farouq Diaa Eldin",
+    title: "Software Engineer",
+    profileImage:
+      "https://res.cloudinary.com/dyhnxqs6f/image/upload/v1719229880/meme_k18ky2_c_crop_w_674_h_734_x_0_y_0_u0o1yz.png",
+    reactionType: "funny",
+  },
+  {
+    id: 7,
+    name: "Abdelrahman Essa",
+    title: "ARM Instructor at SemiColon",
+    profileImage:
+      "https://res.cloudinary.com/dyhnxqs6f/image/upload/v1719229880/meme_k18ky2_c_crop_w_674_h_734_x_0_y_0_u0o1yz.png",
+    reactionType: "like",
+  },
+  {
+    id: 8,
+    name: "Louai Eleslambolyps",
+    title: "Biomedical Engineering Student",
+    profileImage:
+      "https://res.cloudinary.com/dyhnxqs6f/image/upload/v1719229880/meme_k18ky2_c_crop_w_674_h_734_x_0_y_0_u0o1yz.png",
+    reactionType: "insightful",
+  },
+  {
+    id: 9,
+    name: "Farouq Diaa Eldin",
+    title: "Software Engineer",
+    profileImage:
+      "https://res.cloudinary.com/dyhnxqs6f/image/upload/v1719229880/meme_k18ky2_c_crop_w_674_h_734_x_0_y_0_u0o1yz.png",
+    reactionType: "funny",
+  },
+  {
+    id: 10,
+    name: "Abdelrahman Essa",
+    title: "ARM Instructor at SemiColon",
+    profileImage:
+      "https://res.cloudinary.com/dyhnxqs6f/image/upload/v1719229880/meme_k18ky2_c_crop_w_674_h_734_x_0_y_0_u0o1yz.png",
+    reactionType: "like",
+  },
+  {
+    id: 11,
+    name: "Louai Eleslambolyps",
+    title: "Biomedical Engineering Student",
+    profileImage:
+      "https://res.cloudinary.com/dyhnxqs6f/image/upload/v1719229880/meme_k18ky2_c_crop_w_674_h_734_x_0_y_0_u0o1yz.png",
+    reactionType: "insightful",
+  },
+  {
+    id: 12,
+    name: "Farouq Diaa Eldin",
+    title: "Software Engineer",
+    profileImage:
+      "https://res.cloudinary.com/dyhnxqs6f/image/upload/v1719229880/meme_k18ky2_c_crop_w_674_h_734_x_0_y_0_u0o1yz.png",
+    reactionType: "funny",
+  },
+  {
+    id: 13,
+    name: "Abdelrahman Essa",
+    title: "ARM Instructor at SemiColon",
+    profileImage:
+      "https://res.cloudinary.com/dyhnxqs6f/image/upload/v1719229880/meme_k18ky2_c_crop_w_674_h_734_x_0_y_0_u0o1yz.png",
+    reactionType: "like",
+  },
+  {
+    id: 14,
+    name: "Louai Eleslambolyps",
+    title: "Biomedical Engineering Student",
+    profileImage:
+      "https://res.cloudinary.com/dyhnxqs6f/image/upload/v1719229880/meme_k18ky2_c_crop_w_674_h_734_x_0_y_0_u0o1yz.png",
+    reactionType: "insightful",
+  },
+  {
+    id: 15,
+    name: "Farouq Diaa Eldin",
+    title: "Software Engineer",
+    profileImage:
+      "https://res.cloudinary.com/dyhnxqs6f/image/upload/v1719229880/meme_k18ky2_c_crop_w_674_h_734_x_0_y_0_u0o1yz.png",
+    reactionType: "funny",
+  },
+  {
+    id: 16,
+    name: "Abdelrahman Essa",
+    title: "ARM Instructor at SemiColon",
+    profileImage:
+      "https://res.cloudinary.com/dyhnxqs6f/image/upload/v1719229880/meme_k18ky2_c_crop_w_674_h_734_x_0_y_0_u0o1yz.png",
+    reactionType: "like",
+  },
+  {
+    id: 17,
+    name: "Louai Eleslambolyps",
+    title: "Biomedical Engineering Student",
+    profileImage:
+      "https://res.cloudinary.com/dyhnxqs6f/image/upload/v1719229880/meme_k18ky2_c_crop_w_674_h_734_x_0_y_0_u0o1yz.png",
+    reactionType: "insightful",
+  },
+  {
+    id: 18,
+    name: "Farouq Diaa Eldin",
+    title: "Software Engineer",
+    profileImage:
+      "https://res.cloudinary.com/dyhnxqs6f/image/upload/v1719229880/meme_k18ky2_c_crop_w_674_h_734_x_0_y_0_u0o1yz.png",
+    reactionType: "funny",
+  },
+  {
+    id: 19,
+    name: "Abdelrahman Essa",
+    title: "ARM Instructor at SemiColon",
+    profileImage:
+      "https://res.cloudinary.com/dyhnxqs6f/image/upload/v1719229880/meme_k18ky2_c_crop_w_674_h_734_x_0_y_0_u0o1yz.png",
+    reactionType: "like",
+  },
+  {
+    id: 20,
+    name: "Louai Eleslambolyps",
+    title: "Biomedical Engineering Student",
+    profileImage:
+      "https://res.cloudinary.com/dyhnxqs6f/image/upload/v1719229880/meme_k18ky2_c_crop_w_674_h_734_x_0_y_0_u0o1yz.png",
+    reactionType: "insightful",
+  },
+  {
+    id: 21,
+    name: "Farouq Diaa Eldin",
+    title: "Software Engineer",
+    profileImage:
+      "https://res.cloudinary.com/dyhnxqs6f/image/upload/v1719229880/meme_k18ky2_c_crop_w_674_h_734_x_0_y_0_u0o1yz.png",
+    reactionType: "funny",
+  },
+];
+
 // Post Comments
 const commentsHandlers = [
   createGetHandler<CommentType[]>("/api/postComments", () => MOCK_COMMENTS),
@@ -316,5 +487,13 @@ const postsHandlers = [
   createGetHandler<PostType>("/api/posts/:id", () => MOCK_POSTS[0]),
 ];
 
+const reactionsHandlers = [
+  createGetHandler<ReactionType[]>("/api/postReactions", () => MOCK_REACTIONS),
+];
+
 // feed
-export const feedHandlers = [...postsHandlers, ...commentsHandlers];
+export const feedHandlers = [
+  ...postsHandlers,
+  ...commentsHandlers,
+  ...reactionsHandlers,
+];
