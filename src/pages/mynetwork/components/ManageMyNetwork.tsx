@@ -2,31 +2,35 @@ import { FaUsers, FaUserPlus } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { fetchConnectionsNumber } from "@/endpoints/myNetwork";
 import Cookies from "js-cookie";
-import useFetchData from "@/hooks/useFetchData";
 import { useEffect } from "react";
-
+import { useConnectionContext } from "./ConnectionContext";
 const ManageMyNetwork = () => {
   const navigate = useNavigate();
 
   const token = Cookies.get("linkup_auth_token");
   const userId = Cookies.get("linkup_user_id");
+  const {connectionCount, setConnectionCount} =  useConnectionContext();
 
-  const { data } = useFetchData(
-    () => (token ? fetchConnectionsNumber(token) : Promise.resolve(null)),
-    [token]
-  );
+  // const { data } = useFetchData(
+  //   () => (token ? fetchConnectionsNumber(token) : Promise.resolve(null)),
+  //   [token]
+  // );
 
   useEffect(() => {
-    console.log(data);
-  }, [data]);
+    const fetchCount = async () => {
+      if (!token) return;
+      const data = await fetchConnectionsNumber(token);
+      setConnectionCount(data?.number_of_connections || 0);
+    };
+    fetchCount();
+  }, [token, setConnectionCount]);
 
   const networkOptions = [
     {
-      label: `Connections ${
-        data?.number_of_connections !== null
-          ? `(${data?.number_of_connections})`
-          : ""
-      }`,
+      label:
+        connectionCount && connectionCount > 0
+          ? `Connections (${connectionCount})`
+          : "",
       icon: <FaUsers />,
       route: `/connections/${userId}`,
     },
@@ -43,7 +47,9 @@ const ManageMyNetwork = () => {
       </h2>
 
       <ul>
-        {networkOptions.map((option, index) => (
+        {networkOptions.map(
+          (option, index) =>
+            option.label &&(
           <li
             key={index}
             onClick={() => navigate(option.route)}
@@ -54,7 +60,9 @@ const ManageMyNetwork = () => {
               {option.label}
             </span>
           </li>
-        ))}
+        )
+        
+        )}
       </ul>
 
       {/* Promotional Banner */}

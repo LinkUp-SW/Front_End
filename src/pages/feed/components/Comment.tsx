@@ -50,12 +50,20 @@ const Comment: React.FC<CommentProps> = ({ user, comment, stats }) => {
   const [commentMenuOpen, setCommentMenuOpen] = useState(false);
 
   const statsArray = [
-    { name: "celebrate", count: stats.celebrate, icon: <CelebrateIcon /> },
-    { name: "love", count: stats.love, icon: <LoveIcon /> },
-    { name: "insightful", count: stats.insightful, icon: <InsightfulIcon /> },
-    { name: "support", count: stats.support, icon: <SupportIcon /> },
-    { name: "funny", count: stats.funny, icon: <LaughIcon /> },
-    { name: "like", count: stats.likes, icon: <LikeIcon /> },
+    {
+      name: "celebrate",
+      count: stats.celebrate,
+      icon: <CelebrateIcon size={15} />,
+    },
+    { name: "love", count: stats.love, icon: <LoveIcon size={15} /> },
+    {
+      name: "insightful",
+      count: stats.insightful,
+      icon: <InsightfulIcon size={15} />,
+    },
+    { name: "support", count: stats.support, icon: <SupportIcon size={15} /> },
+    { name: "funny", count: stats.funny, icon: <LaughIcon size={15} /> },
+    { name: "like", count: stats.likes, icon: <LikeIcon size={15} /> },
   ];
 
   const topStats = statsArray
@@ -182,8 +190,8 @@ const Comment: React.FC<CommentProps> = ({ user, comment, stats }) => {
           </div>
         </div>
       </header>
-      <p className="p-1 pl-11 text-sm">{text}</p>
-      <footer className="flex pl-10 justify-start items-center gap-2 ">
+      <p className="p-1 pl-11 text-xs md:text-sm">{text}</p>
+      <footer className="flex pl-10 justify-start items-center gap-0.5 ">
         {/* <div className="flex justify-start w-full items-center pt-4 gap-0"> */}
         <Button
           variant="ghost"
@@ -227,7 +235,7 @@ const Comment: React.FC<CommentProps> = ({ user, comment, stats }) => {
           {" "}
           ·
         </p>
-        <p className="hover:underlinetext-xs text-xs text-gray-500 dark:text-neutral-400 hover:text-blue-600 hover:underline dark:hover:text-blue-400 hover:cursor-pointer">
+        <p className="hover:underlinetext-xs text-xs text-gray-500 line-clamp-1 text-ellipsis dark:text-neutral-400 hover:text-blue-600 hover:underline dark:hover:text-blue-400 hover:cursor-pointer">
           {stats.replies && stats.replies == 1
             ? "1 Reply"
             : `${stats.replies} Replies`}

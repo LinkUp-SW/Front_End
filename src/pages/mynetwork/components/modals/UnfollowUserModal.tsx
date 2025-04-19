@@ -6,11 +6,13 @@ import { UnfollowUserType } from "@/types";
 interface UnfollowUserModalProps {
   userData: UnfollowUserType;
   onConfirm: () => void;
+  onCancel: () => void;
 }
 
 const UnfollowUserModal: React.FC<UnfollowUserModalProps> = ({
   userData,
   onConfirm,
+  onCancel,
 }) => {
   const dispatch = useDispatch();
 
@@ -36,7 +38,7 @@ const UnfollowUserModal: React.FC<UnfollowUserModalProps> = ({
           </button>
           <button
             id="cancel-unfollow-button"
-            onClick={() => dispatch(closeModal())}
+            onClick={onCancel} 
             className="px-4 py-2 bg-gray-300 text-gray-900 rounded cursor-pointer hover:bg-gray-400 
             dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
           >
