@@ -8,12 +8,12 @@ import { Link } from "react-router-dom";
 import { LiaEllipsisHSolid as EllipsisIcon } from "react-icons/lia";
 import { Button } from "@/components/ui/button";
 import { FaEyeSlash, FaFlag, FaLink } from "react-icons/fa";
-import { PiHandsClapping as CelebrateIcon } from "react-icons/pi";
-import { FcLike as LoveIcon } from "react-icons/fc";
-import { FaRegFaceLaughSquint as LaughIcon } from "react-icons/fa6";
-import { HiOutlineLightBulb as InsightfulIcon } from "react-icons/hi";
-import { PiHandPalmBold as SupportIcon } from "react-icons/pi";
-import { AiOutlineLike as LikeIcon } from "react-icons/ai";
+import CelebrateIcon from "@/assets/Celebrate.svg";
+import LikeIcon from "@/assets/Like.svg";
+import LoveIcon from "@/assets/Love.svg";
+import LaughIcon from "@/assets/Funny.svg";
+import InsightfulIcon from "@/assets/Insightful.svg";
+import SupportIcon from "@/assets/Support.svg";
 import { Dialog, DialogContent } from "@/components";
 import { DialogTrigger } from "@radix-ui/react-dialog";
 import ReportCommentModal from "./modals/ReportCommentModal";
@@ -53,17 +53,35 @@ const Comment: React.FC<CommentProps> = ({ user, comment, stats }) => {
     {
       name: "celebrate",
       count: stats.celebrate,
-      icon: <CelebrateIcon size={15} />,
+      icon: <img src={CelebrateIcon} alt="Celebrate" width={15} height={15} />,
     },
-    { name: "love", count: stats.love, icon: <LoveIcon size={15} /> },
+    {
+      name: "love",
+      count: stats.love,
+      icon: <img src={LoveIcon} alt="Love" width={15} height={15} />,
+    },
     {
       name: "insightful",
       count: stats.insightful,
-      icon: <InsightfulIcon size={15} />,
+      icon: (
+        <img src={InsightfulIcon} alt="Insightful" width={15} height={15} />
+      ),
     },
-    { name: "support", count: stats.support, icon: <SupportIcon size={15} /> },
-    { name: "funny", count: stats.funny, icon: <LaughIcon size={15} /> },
-    { name: "like", count: stats.likes, icon: <LikeIcon size={15} /> },
+    {
+      name: "support",
+      count: stats.support,
+      icon: <img src={SupportIcon} alt="Support" width={15} height={15} />,
+    },
+    {
+      name: "funny",
+      count: stats.funny,
+      icon: <img src={LaughIcon} alt="Funny" width={15} height={15} />,
+    },
+    {
+      name: "like",
+      count: stats.likes,
+      icon: <img src={LikeIcon} alt="Like" width={15} height={15} />,
+    },
   ];
 
   const topStats = statsArray
