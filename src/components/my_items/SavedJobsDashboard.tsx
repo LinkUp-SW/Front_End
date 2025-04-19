@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Job } from '../../pages/jobs/types';
 import { fetchSavedJobs, removeFromSaved, convertJobDataToJob } from '../../endpoints/jobs';
 import Cookies from 'js-cookie';
+import { MdClose } from 'react-icons/md';
 
 enum TabState {
   SAVED = 'saved',
@@ -15,6 +16,20 @@ const JobsDashboard: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<TabState>(TabState.SAVED);
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(
+    window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+  );
+
+  useEffect(() => {
+    const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleDarkModeChange = (e: MediaQueryListEvent) => setIsDarkMode(e.matches);
+    
+    darkModeMediaQuery.addEventListener('change', handleDarkModeChange);
+    
+    return () => {
+      darkModeMediaQuery.removeEventListener('change', handleDarkModeChange);
+    };
+  }, []);
 
   const loadSavedJobs = async () => {
     setLoading(true);
@@ -101,10 +116,17 @@ const JobsDashboard: React.FC = () => {
     if (activeTab === TabState.SAVED && savedJobs.length === 0) {
       return (
         <div className="border-t pt-6 pb-4 text-center">
-          <p className="text-gray-500 dark:text-gray-400">No saved jobs yet.</p>
-          <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
-            Browse jobs and click "Save" to add them here.
-          </p>
+          <div className="flex flex-col items-center justify-center py-8">
+            <img 
+              src={isDarkMode ? '/src/assets/no-saved-jobs-dark.svg' : '/src/assets/no-saved-jobs-light.svg'} 
+              alt="No saved jobs" 
+              className="w-48 h-48 mb-4"
+            />
+            <p className="text-gray-500 dark:text-gray-400">No saved jobs yet.</p>
+            <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
+              Browse jobs and click "Save" to add them here.
+            </p>
+          </div>
         </div>
       );
     }
@@ -133,11 +155,11 @@ const JobsDashboard: React.FC = () => {
               </div>
               <div className="flex items-start">
                 <button 
-                  className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                  className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
                   onClick={() => handleRemoveFromSaved(job.id)}
                   title="Remove from saved"
                 >
-                  •••
+                  <MdClose size={20} />
                 </button>
               </div>
             </div>
