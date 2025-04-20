@@ -72,6 +72,20 @@ const Post: React.FC<PostProps> = ({
 
   let timeoutId: NodeJS.Timeout;
 
+  const handleToggleComments = () => {
+    if (!commentsOpen) {
+      setCommentsOpen(true);
+    } else {
+      const commentInput = document.getElementById(
+        "comment-input"
+      ) as HTMLInputElement;
+      console.log(commentInput);
+      if (commentInput) {
+        commentInput.focus();
+      }
+    }
+  };
+
   const handleMouseEnter = () => {
     clearTimeout(timeoutId);
     setReactionsOpen(true);
@@ -105,7 +119,7 @@ const Post: React.FC<PostProps> = ({
       setLiked(!liked);
       setSelectedReaction("Like");
     },
-    (value) => setCommentsOpen(value)
+    () => handleToggleComments()
   );
 
   const { topStats, totalStats } = calculateTopStats(stats);
@@ -190,7 +204,9 @@ const Post: React.FC<PostProps> = ({
           <div className="flex text-gray-500 dark:text-neutral-400 gap-2 text-sm items-center ">
             {stats.comments != 0 && (
               <p
-                onClick={() => setCommentsOpen(true)}
+                onClick={() => {
+                  handleToggleComments();
+                }}
                 className="hover:underline hover:text-blue-600 dark:hover:text-blue-400 hover:cursor-pointer"
               >
                 {stats.comments} comments

@@ -93,16 +93,6 @@ const PostFooter: React.FC<PostFooterProps> = ({
     setCommentInput((prevMessage) => prevMessage + emoji.emoji);
   };
 
-  // Scroll right by 100 pixels (adjust as needed)
-  const scrollRight = () => {
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollBy({
-        left: 100,
-        behavior: "smooth",
-      });
-    }
-  };
-
   return (
     <section className="flex flex-col w-full gap-4">
       {/* Container for text buttons with relative so our scroll button can be absolute */}
@@ -153,8 +143,16 @@ const PostFooter: React.FC<PostFooterProps> = ({
           <div className="flex relative w-full items-center">
             <input
               ref={inputRef}
+              id="comment-input"
               placeholder="Add a comment..."
               value={commentInput}
+              autoFocus
+              onFocus={() => {
+                inputRef.current?.scrollIntoView({
+                  behavior: "smooth",
+                  block: "center",
+                });
+              }}
               onChange={(e) => setCommentInput(e.target.value)}
               className=" w-full h-11 dark:focus:ring-0 dark:focus:border-0 border p-4 focus:ring-1 transition-colors dark:hover:bg-gray-800 hover:text-gray-950 dark:hover:text-neutral-300 rounded-full border-gray-400 font-normal text-sm text-black  text-left dark:text-neutral-300"
             />
