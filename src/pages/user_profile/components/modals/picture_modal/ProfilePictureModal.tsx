@@ -15,6 +15,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store"; // Adjust the import path to your store type
 import { editUserBio } from "@/slices/user_profile/userBioSlice";
 import { useFormStatus } from "@/hooks/useFormStatus";
+import { defaultProfileImage } from "@/constants";
 
 const ProfilePictureModal = ({
   src,
@@ -35,10 +36,9 @@ const ProfilePictureModal = ({
   const { isSubmitting, startSubmitting, stopSubmitting } = useFormStatus();
 
   useEffect(() => {
-    if (userBio?.is_default_profile_photo) {
+    if (userBio?.is_default_profile_photo || src === null) {
       setEditedImage(null);
     } else {
-      console.log(src);
       getDataBlob(src)
         .then((data) => {
           setEditedImage(data);
@@ -165,7 +165,6 @@ const ProfilePictureModal = ({
           <ImageEditor
             sourceImage={uploadedImage as string}
             onSave={(dataUrl) => {
-              console.log(dataUrl);
               setEditedImage(dataUrl);
               setProfilePic(dataUrl);
             }}
@@ -184,7 +183,7 @@ const ProfilePictureModal = ({
           <div id="profile-image-container" className="relative group">
             <img
               id="profile-image"
-              src={editedImage || profilePic}
+              src={editedImage || profilePic || defaultProfileImage}
               alt="Profile"
               className="w-40 h-40 md:w-56 md:h-56 rounded-full ring-4 ring-gray-200 dark:ring-gray-600 transition-all duration-300"
             />
@@ -196,7 +195,8 @@ const ProfilePictureModal = ({
             <button
               id="edit-button"
               disabled={
-                (userBio?.is_default_profile_photo && editedImage === null) ||
+                ((userBio?.is_default_profile_photo || src === null) &&
+                  editedImage === null) ||
                 isSubmitting
               }
               onClick={onEdit}
@@ -217,7 +217,9 @@ const ProfilePictureModal = ({
 
             <button
               id="delete-button"
-              disabled={userBio?.is_default_profile_photo || isSubmitting}
+              disabled={
+                userBio?.is_default_profile_photo || isSubmitting || !src
+              }
               onClick={onDelete}
               className="flex flex-grow disabled:opacity-65 cursor-not-allowed items-center gap-2 text-gray-600 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-400 transition-colors duration-200"
             >
@@ -230,7 +232,8 @@ const ProfilePictureModal = ({
               onClick={onSave}
               disabled={
                 isSubmitting ||
-                (!editedImage && userBio?.is_default_profile_photo)
+                (!editedImage && userBio?.is_default_profile_photo) ||
+                (!editedImage && !src)
               }
               className="flex flex-grow disabled:opacity-65 cursor-not-allowed items-center gap-2 text-gray-600 dark:text-gray-300 hover:text-purple-500 dark:hover:text-purple-400 transition-colors duration-200"
             >

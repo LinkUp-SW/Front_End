@@ -24,11 +24,15 @@ const OrganizationSearch: React.FC<OrganizationSearchProps> = ({
   const [searchQuery, setSearchQuery] = useState("");
   const [organizations, setOrganizations] = useState<Organization[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const isUserInput = useRef(false);
 
+  // Sync input with externally selected org
   useEffect(() => {
     setSearchQuery(selectedOrganization?.name || "");
+    setHasSearched(false); // reset feedback when externally changed
+    setOrganizations([]);
   }, [selectedOrganization]);
 
   useEffect(() => {
@@ -36,29 +40,43 @@ const OrganizationSearch: React.FC<OrganizationSearchProps> = ({
 
     if (timerRef.current) clearTimeout(timerRef.current);
 
+    // if user cleared the input, hide everything
     if (!searchQuery.trim()) {
       setOrganizations([]);
-      isUserInput.current = false;
+      setHasSearched(false);
       setIsLoading(false);
+      isUserInput.current = false;
       return;
     }
 
     setIsLoading(true);
+    // mark that we’re about to run a lookup
+    setHasSearched(true);
+
     timerRef.current = setTimeout(() => {
       fetchOrganizations(searchQuery)
-        .then((data) => {
-          setOrganizations(data);
-          setIsLoading(false);
+        .then((data) => setOrganizations(data))
+        .catch(() => {
+          setOrganizations([]); // on error, clear
         })
-        .catch(() => setIsLoading(false))
-        .finally(() => (isUserInput.current = false));
+        .finally(() => {
+          setIsLoading(false);
+          isUserInput.current = false;
+        });
     }, 500);
   }, [searchQuery, fetchOrganizations]);
 
   const handleSelect = (organization: Organization) => {
     onSelect(organization);
     setOrganizations([]);
+    setHasSearched(false);
   };
+
+  // Should we render the dropdown?
+  const showDropdown =
+    isLoading ||
+    organizations.length > 0 ||
+    (hasSearched && !isLoading && organizations.length === 0);
 
   return (
     <div className="relative w-full">
@@ -74,27 +92,32 @@ const OrganizationSearch: React.FC<OrganizationSearchProps> = ({
         name={name}
       />
 
-      {(isLoading || organizations.length > 0) && (
-        <div className="w-full max-h-fit p-2 bg-white dark:border-gray-400 border dark:bg-gray-800 rounded-lg absolute top-22">
+      {showDropdown && (
+        <div className="w-full max-h-fit p-2 bg-white dark:border-gray-400 border dark:bg-gray-800 rounded-lg absolute top-22 z-50">
           {isLoading ? (
             <OrganizationSearchSkeleton />
-          ) : (
+          ) : organizations.length > 0 ? (
             <ul className="space-y-2">
-              {organizations.map((organization) => (
+              {organizations.map((org) => (
                 <li
-                  key={organization._id}
+                  key={org._id}
                   className="flex items-center gap-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 rounded p-1"
-                  onClick={() => handleSelect(organization)}
+                  onClick={() => handleSelect(org)}
                 >
                   <img
-                    src={organization.logo}
-                    alt="organization-logo"
+                    src={org.logo}
+                    alt={`${org.name} logo`}
                     className="h-10 w-10 object-contain rounded-lg"
                   />
-                  <p>{organization.name}</p>
+                  <p>{org.name}</p>
                 </li>
               ))}
             </ul>
+          ) : (
+            // Friendly “no results” message
+            <div className="py-2 text-gray-500 dark:text-gray-400 z-50">
+              No results found for “{searchQuery.trim()}”.
+            </div>
           )}
         </div>
       )}
@@ -105,7 +128,7 @@ const OrganizationSearch: React.FC<OrganizationSearchProps> = ({
 const OrganizationSearchSkeleton = () => (
   <div className="space-y-2 animate-pulse">
     {[...Array(3)].map((_, index) => (
-      <div key={index} className="flex items-center gap-2">
+      <div key={index} className="flex items-center gap-2 z-50">
         <div className="h-10 w-10 bg-gray-300 dark:bg-gray-700 rounded-lg" />
         <div className="h-4 w-32 bg-gray-300 dark:bg-gray-700 rounded" />
       </div>

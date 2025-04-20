@@ -48,8 +48,6 @@ const LicenseSection: React.FC = () => {
   }, [authToken, id]);
 
   useEffect(() => {
-    console.log("License", data);
-    // console.log(data?.education);
     if (data?.licenses) {
       setLicenses(data.licenses);
     }

@@ -102,7 +102,7 @@ Grab the job you want. Get specific. Get found.
 What's your current headline? Let's optimize it!`,
       date: 0,
       video:
-        "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+        "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
       public: true,
       edited: true,
     },

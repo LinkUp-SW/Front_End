@@ -3,8 +3,8 @@ import { WithNavBar } from '../../components';
 import { useLocation, useNavigate } from 'react-router-dom';
 import JobFilterBar from "../../components/jobs_filter_bar/JobFilterBar";
 import JobListings from "./components/seeMorePageComponents/JobListings";
-import { JobFilters, Job, CompanyInfo } from './types';
-import { fetchSingleJob, JobData } from '../../endpoints/jobs';
+import { JobFilters, Job } from './types';
+import { fetchSingleJob, convertJobDataToJob } from '../../endpoints/jobs';
 import Cookies from 'js-cookie';
 
 const SeeMorePage: React.FC = () => {
@@ -38,7 +38,7 @@ const SeeMorePage: React.FC = () => {
       setLoading(true);
       try {
         const response = await fetchSingleJob(token, selectedJobId);
-        const jobData = convertApiDataToJob(response.data);
+        const jobData = convertJobDataToJob(response.data);
         setSelectedJob(jobData);
       } catch (error) {
         console.error('Error fetching job details:', error);
@@ -49,40 +49,6 @@ const SeeMorePage: React.FC = () => {
     
     fetchSelectedJobData();
   }, [selectedJobId]);
-
-  const convertApiDataToJob = (jobData: JobData): Job => {
-    const companyInfo: CompanyInfo = {
-      name: jobData.organization?.name || "",
-      logo: jobData.organization?.logo || "",
-      followers: jobData.organization?.followers || "",
-      industryType: jobData.organization?.industry || "",
-      employeeCount: jobData.organization?.size || "",
-      linkupPresence: jobData.organization?.linkup_presence || "",
-      description: jobData.organization?.description || ""
-    };
-
-    // Map API data to Job type according to your type definition
-    return {
-      id: jobData._id,
-      title: jobData.job_title || "Unknown Title",
-      company: jobData.organization?.name || "Unknown Company",
-      location: jobData.location || "Unknown Location",
-      experience_level: jobData.experience_level,
-      isRemote: jobData.workplace_type === 'Remote',
-      isSaved: false,
-      logo: jobData.organization?.logo || "",
-      isPromoted: Boolean(jobData.isPromoted),
-      hasEasyApply: Boolean(jobData.hasEasyApply || true),
-      workMode: jobData.workplace_type || "On-site",
-      postedTime: jobData.timeAgo || "",
-      salary: jobData.salary || "",
-      description: jobData.description || "",
-      responsibilities: jobData.responsibilities || [],
-      qualifications: jobData.qualifications || [],
-      benefits: jobData.benefits || [],
-      companyInfo: companyInfo
-    };
-  };
 
   const handleFiltersChange = (newFilters: JobFilters) => {
     setFilters(newFilters);

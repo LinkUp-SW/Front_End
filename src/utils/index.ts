@@ -109,7 +109,8 @@ export function formatIsoDateToHumanReadable(isoDate: string): string {
   return formattedDate;
 }
 
-export const formatExperienceDate = (date: Date): string => {
+export const formatExperienceDate = (date: Date): string | null => {
+  if (!date) return null;
   if (typeof date === "string") {
     date = new Date(date);
   }

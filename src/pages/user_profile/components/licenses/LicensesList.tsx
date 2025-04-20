@@ -3,6 +3,7 @@ import { formatExperienceDate } from "@/utils";
 import React from "react";
 import { BsPencil } from "react-icons/bs";
 import { MdDeleteForever } from "react-icons/md";
+import { Link } from "react-router-dom";
 
 interface LicensesListProps {
   isMe: boolean;
@@ -32,12 +33,6 @@ const LicensesList: React.FC<LicensesListProps> = ({
       >
         {license.issuing_organization?.name}
       </p>
-      <p
-        id={`license-credential-url-${license._id}`}
-        className="text-sm text-gray-500 dark:text-gray-200"
-      >
-        {license.credintial_url}
-      </p>
       <p className="text-xs capitalize inline-flex gap-2 text-gray-500 dark:text-gray-200">
         <span>{formatExperienceDate(license.issue_date)}</span>
         <span>-</span>
@@ -48,6 +43,22 @@ const LicensesList: React.FC<LicensesListProps> = ({
           <h2 className="font-bold text-sm">Skills:</h2>
           {license.skills.join(", ")}
         </div>
+      )}
+      {!!license.credintial_id && (
+        <p className="text-sm">
+          <span className="font-semibold">Credential ID: </span>
+          <span className="text-gray-700 text-xs dark:text-gray-200">
+            {license.credintial_id}
+          </span>
+        </p>
+      )}
+
+      {!!license.credintial_url && (
+        <Link to={license.credintial_url} className="text-sm">
+          <span className="text-gray-700 dark:text-gray-200">
+            {license.credintial_url}
+          </span>
+        </Link>
       )}
       {license.media.length > 0 && (
         <div className="mt-2">
@@ -70,7 +81,7 @@ const LicensesList: React.FC<LicensesListProps> = ({
         </div>
       )}
       {isMe && (
-        <div className="absolute top-[-1rem] h-full right-0 flex gap-2 flex-col justify-between">
+        <div className="absolute top-[-1rem] h-full right-0 flex gap-2 flex-col">
           <button
             id={`license-edit-button-${idx}`}
             aria-label="Edit License"

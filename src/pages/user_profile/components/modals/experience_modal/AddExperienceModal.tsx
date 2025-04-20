@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 import Cookies from "js-cookie";
 import { toast } from "sonner";
 import {
@@ -7,6 +7,7 @@ import {
   FormInput,
   FormSelect,
   FormTextarea,
+  OrganizationSearch,
 } from "@/components";
 import { useFormStatus } from "@/hooks/useFormStatus";
 import SkillsManager from "../components/SkillsManager";
@@ -59,12 +60,6 @@ const AddExperienceModal: React.FC<AddExperienceModalProps> = ({
   const authToken = Cookies.get("linkup_auth_token");
   const { isSubmitting, startSubmitting, stopSubmitting } = useFormStatus();
 
-  // Organization search states
-  const [organizations, setOrganizations] = useState<Organization[]>([]);
-  const [organizationSearch, setOrganizationSearch] = useState("");
-  const [isOrgsLoading, setIsOrgsLoading] = useState(false);
-  const organizationTimer = useRef<NodeJS.Timeout | null>(null);
-
   // Core form data
   const [formData, setFormData] = useState<ExperienceFormData>({
     title: "",
@@ -86,37 +81,7 @@ const AddExperienceModal: React.FC<AddExperienceModalProps> = ({
    * General change handler for form fields
    */
   const handleChange = (field: keyof ExperienceFormData, value: unknown) => {
-    // Special case for organization searching
-    if (field === "organization") {
-      const searchValue = value as string;
-      setOrganizationSearch(searchValue);
-
-      if (organizationTimer.current) {
-        clearTimeout(organizationTimer.current);
-      }
-
-      if (searchValue === "") {
-        setOrganizations([]);
-        return;
-      }
-
-      setIsOrgsLoading(true);
-      organizationTimer.current = setTimeout(() => {
-        getCompaniesList(searchValue)
-          .then((data) => {
-            setOrganizations(data.data);
-          })
-          .catch((error) => {
-            console.error("Error fetching companies:", error);
-            toast.error("Failed to fetch companies.");
-          })
-          .finally(() => {
-            setIsOrgsLoading(false);
-          });
-      }, 500);
-    } else {
-      setFormData((prev) => ({ ...prev, [field]: value }));
-    }
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   /**
@@ -124,8 +89,6 @@ const AddExperienceModal: React.FC<AddExperienceModalProps> = ({
    */
   const handleSelectOrganization = (org: Organization) => {
     setFormData((prev) => ({ ...prev, organization: org }));
-    setOrganizationSearch(org.name);
-    setOrganizations([]);
   };
 
   /**
@@ -250,12 +213,6 @@ const AddExperienceModal: React.FC<AddExperienceModalProps> = ({
     }
   };
 
-  useEffect(() => {
-    if (organizationSearch.trim() === "") {
-      setIsOrgsLoading(false);
-    }
-  }, [isOrgsLoading, organizationSearch]);
-
   return (
     <div
       id="add-experience-modal-container"
@@ -290,41 +247,17 @@ const AddExperienceModal: React.FC<AddExperienceModalProps> = ({
           name="employmentType"
         />
 
-        {/* Organization */}
-        <div className="w-full relative">
-          <FormInput
-            label="Company or Organization*"
-            placeholder="Ex: Microsoft"
-            value={organizationSearch}
-            onChange={(e) => handleChange("organization", e.target.value)}
-            id="organization-name"
-            name="organization"
-          />
-          {(isOrgsLoading || organizations.length !== 0) && (
-            <div className="w-full max-h-fit p-2 bg-white dark:border-gray-400 border dark:bg-gray-800 rounded-lg z-50 absolute top-22">
-              {isOrgsLoading ? (
-                <OrganizationSkeleton />
-              ) : (
-                <ul className="space-y-2">
-                  {organizations.map((org) => (
-                    <li
-                      key={org._id}
-                      className="w-full flex items-center gap-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 rounded p-1"
-                      onClick={() => handleSelectOrganization(org)}
-                    >
-                      <img
-                        src={org.logo}
-                        alt="org-logo"
-                        className="h-10 w-10 object-contain rounded-lg"
-                      />
-                      <p>{org.name}</p>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          )}
-        </div>
+        <OrganizationSearch
+          label="Company or Organization*"
+          selectedOrganization={formData.organization}
+          onSelect={(org) => handleSelectOrganization(org)}
+          fetchOrganizations={(query) =>
+            getCompaniesList(query).then((res) => res.data)
+          }
+          placeholder="Ex: Microsoft"
+          id="organization-name"
+          name="organization"
+        />
 
         <FormCheckbox
           label="I am currently working in this role"
@@ -410,19 +343,5 @@ const AddExperienceModal: React.FC<AddExperienceModalProps> = ({
     </div>
   );
 };
-
-/**
- * Simple skeleton for organization search
- */
-const OrganizationSkeleton: React.FC = () => (
-  <div className="space-y-2 animate-pulse">
-    {[...Array(3)].map((_, index) => (
-      <div className="flex items-center gap-2" key={index}>
-        <div className="h-10 w-10 bg-gray-300 dark:bg-gray-700 rounded-lg" />
-        <div className="h-4 w-32 bg-gray-300 dark:bg-gray-700 rounded" />
-      </div>
-    ))}
-  </div>
-);
 
 export default AddExperienceModal;

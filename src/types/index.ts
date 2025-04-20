@@ -310,3 +310,20 @@ export interface PostDBObject {
   publicPost: boolean; // Whether the post is public or not
   taggedUsers: string[]; // Array of user IDs tagged in the post
 }
+
+export interface BioFormData {
+  first_name: string;
+  last_name: string;
+  headline: string;
+  location: {
+    country_region: string;
+    city: string;
+  };
+  contact_info: {
+    phone_number: number;
+    address: string;
+    birthday: string;
+    website: string;
+    country_code:string
+  };
+}
