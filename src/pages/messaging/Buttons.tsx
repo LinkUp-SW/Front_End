@@ -32,10 +32,10 @@ const Buttons = () => {
 
   return (
     <>
-      <div className="border-1 border-[#e8e8e8] flex items-center  space-x-4 px-4">
+      <div className="border-1 border-[#e8e8e8] flex items-center space-x-2 px-4 py-2 overflow-x-auto">
         <select
           onChange={() => handleMainButton()}
-          className="selectMainButton"
+          className="selectMainButton flex-shrink-0"
         >
           <option id="focused" value="Focused">
             Focused
@@ -51,22 +51,23 @@ const Buttons = () => {
           </option>
         </select>
 
-        <div className="border-1 border-gray-300 h-7"></div>
-
-        {buttonNameList.map((buttonName) => (
-          <button
-            id="button-name"
-            className={`${
-              activeFilter === buttonName && AllowOtherButtons === "true"
-                ? "text-center  hover:cursor-pointer font-semibold bg-[#01754f] rounded-2xl text-white  pr-2 pl-2 pt-1 pb-1 mr-3"
-                : "buttonStyle"
-            } `}
-            onClick={() => handleFilterButtonClick(buttonName)}
-            key={buttonName}
-          >
-            {buttonName}
-          </button>
-        ))}
+        <div className="border-1 border-gray-300 h-7 flex-shrink-0"></div>
+        <div className="flex items-center space-x-2 overflow-x-auto flex-nowrap">
+          {buttonNameList.map((buttonName) => (
+            <button
+              id="button-name"
+              className={`${
+                activeFilter === buttonName && AllowOtherButtons === "true"
+                  ? "text-center  hover:cursor-pointer font-semibold bg-[#01754f] rounded-2xl text-white  pr-2 pl-2 pt-1 pb-1 mr-3"
+                  : "buttonStyle"
+              } `}
+              onClick={() => handleFilterButtonClick(buttonName)}
+              key={buttonName}
+            >
+              {buttonName}
+            </button>
+          ))}
+        </div>
       </div>
     </>
   );

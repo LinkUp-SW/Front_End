@@ -7,7 +7,7 @@ import RecentSearches from './components/jobsPageComponents/RecentSearches';
 import MoreJobs from './components/jobsPageComponents/MoreJobs';
 import { RECENT_SEARCHES } from '../../constants/index';
 import { Job } from './types';
-import { fetchJobs, JobData, fetchTopJobs } from '../../endpoints/jobs';
+import { fetchJobs, fetchTopJobs, convertJobDataToJob } from '../../endpoints/jobs';
 import Cookies from 'js-cookie';
 
 const JobsPage: React.FC = () => {
@@ -29,17 +29,15 @@ const JobsPage: React.FC = () => {
   // Job limit per page
   const JOBS_PER_PAGE = 5;
 
-  // Handle job dismissal
+  // Event handlers
   const dismissTopJob = (jobId: string) => {
     setTopJobs(topJobs.filter(job => job.id !== jobId));
   };
 
-  // Handle more job dismissal
   const dismissMoreJob = (jobId: string) => {
     setMoreJobs(moreJobs.filter(job => job.id !== jobId));
   };
 
-  // Clear recent searches
   const clearRecentSearches = () => {
     setRecentSearches([]);
   };
@@ -48,25 +46,7 @@ const JobsPage: React.FC = () => {
     navigate(`/jobs/see-more?selected=${jobId}`);
   };
 
-  const convertApiDataToJobs = (jobData: JobData[]): Job[] => {
-    return jobData.map(job => ({
-      id: job._id,
-      title: job.job_title,
-      company: job.organization.name,
-      location: job.location,
-      experience_level: job.experience_level,
-      isRemote: job.workplace_type === 'Remote',
-      isSaved: false,
-      logo: job.organization.logo,
-      isPromoted: false,
-      hasEasyApply: true,
-      workMode: job.workplace_type,
-      postedTime: job.timeAgo,
-      salary: job.salary,
-    }));
-  };
-
-
+  // Load more jobs for infinite scrolling
   const loadMoreJobs = useCallback(async () => {
     if (!hasMore || loading) return;
     
@@ -79,7 +59,7 @@ const JobsPage: React.FC = () => {
     setLoading(true);
     try {
       const response = await fetchJobs(token, JOBS_PER_PAGE, nextCursor || undefined);
-      const newJobs = convertApiDataToJobs(response.data);
+      const newJobs = response.data.map(convertJobDataToJob);
       
       setMoreJobs(prev => [...prev, ...newJobs]);
       setNextCursor(response.nextCursor);
@@ -103,11 +83,10 @@ const JobsPage: React.FC = () => {
       setTopJobsLoading(true);
       try {
         const response = await fetchTopJobs(token, 3); 
-        const newJobs = convertApiDataToJobs(response.data);
+        const newJobs = response.data.map(convertJobDataToJob);
         setTopJobs(newJobs);
       } catch (error) {
         console.error('Error fetching top jobs:', error);
-  
       } finally {
         setTopJobsLoading(false);
       }
@@ -128,7 +107,7 @@ const JobsPage: React.FC = () => {
       setLoading(true);
       try {
         const response = await fetchJobs(token, JOBS_PER_PAGE);
-        const newJobs = convertApiDataToJobs(response.data);
+        const newJobs = response.data.map(convertJobDataToJob);
         
         setMoreJobs(newJobs);
         setNextCursor(response.nextCursor);
@@ -145,29 +124,24 @@ const JobsPage: React.FC = () => {
 
   // Setup intersection observer for infinite scrolling
   useEffect(() => {
-    // Disconnect previous observer if it exists
     if (observer.current) {
       observer.current.disconnect();
     }
 
-    // Create a new observer
     observer.current = new IntersectionObserver(entries => {
-      // If the loading element is visible and we're not already loading
       if (entries[0].isIntersecting && hasMore && !loading) {
         loadMoreJobs();
       }
     }, {
       root: null,
-      rootMargin: '100px', // Start loading when 100px from the viewport
+      rootMargin: '100px',
       threshold: 0.1
     });
 
-    // Observe the loading element if it exists
     if (loadingRef.current) {
       observer.current.observe(loadingRef.current);
     }
 
-    // Cleanup
     return () => {
       if (observer.current) {
         observer.current.disconnect();
@@ -182,7 +156,6 @@ const JobsPage: React.FC = () => {
         <Sidebar />
         
         <div className="w-full md:w-3/4">
-          {/* Top job picks section */}
           <TopJobPicks 
             jobs={topJobs} 
             onDismissJob={dismissTopJob}
@@ -190,13 +163,11 @@ const JobsPage: React.FC = () => {
             loading={topJobsLoading}
           />
 
-          {/* Recent job searches section */}
           <RecentSearches 
             searches={recentSearches}
             onClear={clearRecentSearches}
           />
           
-          {/* More jobs for you section */}
           <MoreJobs 
             jobs={moreJobs} 
             onDismissJob={dismissMoreJob}
@@ -206,7 +177,6 @@ const JobsPage: React.FC = () => {
             onLoadMore={loadMoreJobs}
           />
           
-          {/* Invisible loading element for intersection observer */}
           {hasMore && (
             <div 
               ref={loadingRef} 

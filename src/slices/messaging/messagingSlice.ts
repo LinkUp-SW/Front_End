@@ -44,7 +44,9 @@ interface MessageState {
   search: string;
   starredConversations: string[],/*initial state should be starred from database*/
   user2Name:string;
-  userStatus:string;
+  userStatus:boolean;
+  editingMessageId:string;
+  editText: string
 }
 
 const initialState: MessageState = {
@@ -54,7 +56,9 @@ const initialState: MessageState = {
   search:"",
   starredConversations: [],
   user2Name:"",
-  userStatus:""
+  userStatus:false,
+  editingMessageId: "",
+  editText: ""
 };
 
 const MessagingSlice = createSlice({
@@ -109,7 +113,7 @@ const MessagingSlice = createSlice({
       state.user2Name = action.payload; 
     },
 
-    selectUserStatus: (state, action: PayloadAction<string>) => {
+    selectUserStatus: (state, action: PayloadAction<boolean>) => {
       state.userStatus = action.payload; 
     },
 
@@ -122,8 +126,23 @@ const MessagingSlice = createSlice({
       state.activeFilter = action.payload; 
     },
 
+
+  
+    setEditingMessageId:(state, action: PayloadAction<string>) => {
+      state.editingMessageId = action.payload; 
+    },
+    setEditText: (state, action: PayloadAction<string>) => {
+      state.editText = action.payload;
+    },
+    clearEditingState: (state) => {
+      state.editingMessageId = "";
+      state.editText = "";
+    }
+    
+    
+
   },
 });
 
-export const {toggleStarred, activeButton, searchFiltering, selectMessage,selectUserName,selectUserStatus, sendMessage} = MessagingSlice.actions;
+export const {toggleStarred, activeButton, searchFiltering, selectMessage,selectUserName,selectUserStatus, sendMessage,setEditingMessageId,setEditText,clearEditingState} = MessagingSlice.actions;
 export default MessagingSlice.reducer;

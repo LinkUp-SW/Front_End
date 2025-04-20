@@ -2,31 +2,37 @@ import { FaUsers, FaUserPlus } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { fetchConnectionsNumber } from "@/endpoints/myNetwork";
 import Cookies from "js-cookie";
-import useFetchData from "@/hooks/useFetchData";
 import { useEffect } from "react";
+import { useConnectionContext } from "./ConnectionContext";
+import whoIsHiringImage from "@/assets/whoIsHiring.jpg";
 
 const ManageMyNetwork = () => {
   const navigate = useNavigate();
 
   const token = Cookies.get("linkup_auth_token");
   const userId = Cookies.get("linkup_user_id");
+  const { connectionCount, setConnectionCount } = useConnectionContext();
 
-  const { data } = useFetchData(
-    () => (token ? fetchConnectionsNumber(token) : Promise.resolve(null)),
-    [token]
-  );
+  // const { data } = useFetchData(
+  //   () => (token ? fetchConnectionsNumber(token) : Promise.resolve(null)),
+  //   [token]
+  // );
 
   useEffect(() => {
-    console.log(data);
-  }, [data]);
+    const fetchCount = async () => {
+      if (!token) return;
+      const data = await fetchConnectionsNumber(token);
+      setConnectionCount(data?.number_of_connections || 0);
+    };
+    fetchCount();
+  }, [token, setConnectionCount]);
 
   const networkOptions = [
     {
-      label: `Connections ${
-        data?.number_of_connections !== null
-          ? `(${data?.number_of_connections})`
-          : ""
-      }`,
+      label:
+        connectionCount && connectionCount > 0
+          ? `Connections (${connectionCount})`
+          : "",
       icon: <FaUsers />,
       route: `/connections/${userId}`,
     },
@@ -43,24 +49,27 @@ const ManageMyNetwork = () => {
       </h2>
 
       <ul>
-        {networkOptions.map((option, index) => (
-          <li
-            key={index}
-            onClick={() => navigate(option.route)}
-            className="flex items-center p-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md transition"
-          >
-            <span className="mr-2 text-lg">{option.icon}</span>
-            <span className="text-gray-900 dark:text-white">
-              {option.label}
-            </span>
-          </li>
-        ))}
+        {networkOptions.map(
+          (option, index) =>
+            option.label && (
+              <li
+                key={index}
+                onClick={() => navigate(option.route)}
+                className="flex items-center p-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md transition"
+              >
+                <span className="mr-2 text-lg">{option.icon}</span>
+                <span className="text-gray-900 dark:text-white">
+                  {option.label}
+                </span>
+              </li>
+            )
+        )}
       </ul>
 
       {/* Promotional Banner */}
       <div className="mt-4 cursor-pointer hidden lg:block">
         <img
-          src="./src/assets/see_who's_hiring.jpg"
+          src={whoIsHiringImage}
           alt="Promotional Banner"
           className="rounded-lg shadow-lg w-full object-cover"
         />

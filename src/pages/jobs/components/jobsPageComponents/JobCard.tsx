@@ -102,7 +102,7 @@ const JobCard: React.FC<JobCardProps> = ({ job, onDismiss, onSelect }) => {
           
           {job.hasEasyApply && !job.applied && (
             <div className="flex items-center gap-1 ml-2">
-              <span className="text-blue-600 dark:text-blue-400 font-bold text-sm">In</span>
+              <span className="text-blue-600 dark:text-blue-400 font-bold text-sm">Up</span>
               <span className="text-sm text-blue-600 dark:text-blue-400">Easy Apply</span>
             </div>
           )}

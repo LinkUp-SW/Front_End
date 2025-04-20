@@ -5,7 +5,6 @@ export function createPostHandler<T extends JsonBodyType, B extends JsonBodyType
   resolver: (req: { params: Record<string, unknown>; body: B }) => T | HttpResponse
 ) {
   return http.post(path, async ({ request, params }) => {
-    console.log(`[MSW] Intercepted POST ${request.url}`);
     
     // Parse the request body
     let body = {} as B;

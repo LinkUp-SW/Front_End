@@ -52,8 +52,6 @@ const UserLicensesPage = () => {
   const isEmpty = licenses.length === 0;
 
   useEffect(() => {
-    console.log("License", data);
-    // console.log(data?.education);
     if (data?.licenses) {
       setLicenses(data.licenses);
     }
