@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { FaUserPlus } from "react-icons/fa";
 import {
   Dialog,
@@ -6,6 +6,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { getPeopleYouMayKnow, PeopleYouMayKnow } from "@/endpoints/myNetwork";
 import Cookies from "js-cookie";
@@ -21,30 +22,79 @@ const PeopleSection = ({ token, context, title }: PeopleSectionProps) => {
   const [mainViewSuggestions, setMainViewSuggestions] = useState<PeopleYouMayKnow[]>([]);
   const [allSuggestions, setAllSuggestions] = useState<PeopleYouMayKnow[]>([]);
   const [loading, setLoading] = useState(false);
+  const [dialogLoading, setDialogLoading] = useState(false);
+  const [cursor, setCursor] = useState<string | null>(null);
+  const [hasMore, setHasMore] = useState(true);
   const navigate = useNavigate();
+  const observer = useRef<IntersectionObserver | null>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
 
-  const loadPeople = async () => {
+  const loadInitialPeople = async () => {
     if (!token) return;
 
     setLoading(true);
     try {
-      // Load initial 6 for main view
-      const mainViewData = await getPeopleYouMayKnow(token, context, null, 6);
-      setMainViewSuggestions(mainViewData.people);
-
-      // Load all for dialog (adjust limit as needed)
-      const allData = await getPeopleYouMayKnow(token, context, null, 50);
-      setAllSuggestions(allData.people);
+      const data = await getPeopleYouMayKnow(token, context, null, 6);
+      setMainViewSuggestions(data.people);
     } catch (error) {
-      console.error(`Error fetching people you may know (${context}):`, error);
+      console.error(`Error fetching initial people (${context}):`, error);
     } finally {
       setLoading(false);
     }
   };
 
+  const loadMorePeople = useCallback(async () => {
+    if (!token || !hasMore || dialogLoading) return;
+
+    setDialogLoading(true);
+    try {
+      const data = await getPeopleYouMayKnow(token, context, cursor, 3);
+      
+      setAllSuggestions(prev => {
+        const existingIds = new Set(prev.map(p => p._id));
+        const newPeople = data.people.filter(p => !existingIds.has(p._id));
+        return [...prev, ...newPeople];
+      });
+      
+      setCursor(data.nextCursor);
+      setHasMore(!!data.nextCursor);
+    } catch (error) {
+      console.error(`Error fetching more people (${context}):`, error);
+    } finally {
+      setDialogLoading(false);
+    }
+    console.log("All suggestions:", allSuggestions);
+  }, [token, cursor, hasMore, dialogLoading, context]);
+
   useEffect(() => {
-    loadPeople();
+    loadInitialPeople();
   }, [token]);
+
+  const handleDialogOpen = async () => {
+    setAllSuggestions([]);
+    setCursor(null);
+    setHasMore(true);
+    await loadMorePeople();
+  };
+
+  const lastPersonRef = useCallback(
+    (node: HTMLDivElement) => {
+      if (dialogLoading || !hasMore) return;
+      if (observer.current) observer.current.disconnect();
+      
+      observer.current = new IntersectionObserver(
+        (entries) => {
+          if (entries[0].isIntersecting) {
+            loadMorePeople();
+          }
+        },
+        { root: dialogRef.current, threshold: 0.1 }
+      );
+      
+      if (node) observer.current.observe(node);
+    },
+    [dialogLoading, hasMore, loadMorePeople]
+  );
 
   const removePerson = (id: string) => {
     setMainViewSuggestions((prev) => prev.filter((p) => p._id !== id));
@@ -58,11 +108,16 @@ const PeopleSection = ({ token, context, title }: PeopleSectionProps) => {
   const PersonCard = ({
     person,
     onRemove,
+    isLast = false,
   }: {
     person: PeopleYouMayKnow;
     onRemove: (id: string) => void;
+    isLast?: boolean;
   }) => (
-    <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 flex flex-col items-center justify-between w-full max-w-[280px] min-h-[320px] mx-auto">
+    <div 
+      ref={isLast ? lastPersonRef : null}
+      className="relative bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 flex flex-col items-center justify-between w-full max-w-[280px] min-h-[320px] mx-auto"
+    >
       <div 
         className="h-20 w-full overflow-hidden rounded-t-lg cursor-pointer"
         onClick={() => navigateToUser(person.user_id)}
@@ -133,28 +188,45 @@ const PeopleSection = ({ token, context, title }: PeopleSectionProps) => {
           {title}
         </h2>
 
-        <Dialog>
+        <Dialog onOpenChange={(open) => open && handleDialogOpen()}>
           <DialogTrigger asChild>
             <button className="text-blue-600 dark:text-blue-400 hover:underline text-sm font-medium">
               Show all
             </button>
           </DialogTrigger>
-          <DialogContent className="max-w-6xl w-full max-h-[90vh] overflow-y-auto dark:bg-gray-900 bg-white p-6 rounded-lg">
+          <DialogContent 
+            className="max-w-6xl w-full max-h-[90vh] overflow-y-auto dark:bg-gray-900 bg-white p-6 rounded-lg"
+            ref={dialogRef}
+          >
             <DialogHeader>
               <DialogTitle className="text-xl text-gray-900 dark:text-white">
                 {title}
               </DialogTitle>
+              <DialogDescription className="sr-only">
+                List of people you may know based on {context}
+              </DialogDescription>
             </DialogHeader>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
-              {allSuggestions.map((person) => (
+              {allSuggestions.map((person, index) => (
                 <PersonCard
                   key={person._id}
                   person={person}
                   onRemove={removePerson}
+                  isLast={index === allSuggestions.length - 1}
                 />
               ))}
             </div>
+            {dialogLoading && (
+              <div className="flex justify-center py-4">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+              </div>
+            )}
+            {!hasMore && allSuggestions.length > 0 && (
+              <p className="text-center text-gray-500 dark:text-gray-400 py-4">
+                No more people to show
+              </p>
+            )}
           </DialogContent>
         </Dialog>
       </div>
