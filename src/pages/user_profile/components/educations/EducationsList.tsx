@@ -39,11 +39,43 @@ const EducationsList: React.FC<EducationListProps> = ({
       >
         {education.field_of_study}
       </p>
+      {!!education.grade && (
+        <p className="text-sm">
+          {" "}
+          <span className="font-semibold">Grade: </span>
+          <span className="text-gray-700 dark:text-gray-200">
+            {education.grade}
+          </span>
+        </p>
+      )}
+      {!!education.activities_and_socials && (
+        <p className="text-sm">
+          {" "}
+          <span className="font-semibold">Activities & Socials: </span>
+          <span className="text-gray-700 dark:text-gray-200">
+            {education.activities_and_socials}
+          </span>
+        </p>
+      )}
       <p className="text-xs capitalize inline-flex gap-2 text-gray-500 dark:text-gray-200">
-        <span>{education.start_date&&formatExperienceDate(education.start_date)}</span>
+        <span>
+          {education.start_date && formatExperienceDate(education.start_date)}
+        </span>
         <span>-</span>
-        <span>{education.end_date&&formatExperienceDate(education.end_date)}</span>
+        <span>
+          {education.end_date && formatExperienceDate(education.end_date)}
+        </span>
       </p>
+      {!!education.description && (
+        <p className="text-sm">
+          {" "}
+          <span className="font-semibold">Description: </span>
+          <span className="text-gray-700 dark:text-gray-200">
+            {education.description}
+          </span>
+        </p>
+      )}
+
       {education.skills.length > 0 && (
         <div className="text-xs font-semibold flex items-center gap-2">
           <h2 className="font-bold text-sm">Skills:</h2>
@@ -71,7 +103,7 @@ const EducationsList: React.FC<EducationListProps> = ({
         </div>
       )}
       {isMe && (
-        <div className="absolute top-[-1rem] h-full right-0 flex gap-2 flex-col justify-between">
+        <div className="absolute top-[-1rem] h-full right-0 flex gap-2 flex-col">
           <button
             id={`education-edit-button-${idx}`}
             aria-label="Edit Education"
