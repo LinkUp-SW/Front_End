@@ -54,6 +54,7 @@ export interface PostType {
     support?: number;
     funny?: number;
     person?: string;
+    reposts?: number;
   };
   action?: {
     name?: string;
