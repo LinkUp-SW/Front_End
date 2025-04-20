@@ -51,7 +51,6 @@ const UserEducationsPage = () => {
   }, [authToken, id]);
 
   useEffect(() => {
-    console.log(data?.education);
     if (data?.education) {
       setEducations(data.education);
     }

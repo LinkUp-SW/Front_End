@@ -60,8 +60,6 @@ const Modal: React.FC = () => {
         };
 
         const handleConfirm = () => {
-          console.log("Removing connection for:", modalData);
-
           onRemove(userInfo.userId);
           dispatch(closeModal());
         };

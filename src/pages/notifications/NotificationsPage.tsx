@@ -65,6 +65,9 @@ const NotificationsPage: React.FC = () => {
 
   // State for tracking clicked notifications
   const [clickedNotifications, setClickedNotifications] = useState<Set<string>>(new Set());
+  
+  // New state for notification options dropdown
+  const [activeOptionsDropdown, setActiveOptionsDropdown] = useState<string | null>(null);
 
   // State for mobile responsiveness
   const [isMobile, setIsMobile] = useState<boolean>(window.innerWidth <= 768);
@@ -107,36 +110,29 @@ const NotificationsPage: React.FC = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Add click outside listener to close dropdown
+  // Add click outside listener to close dropdowns
   useEffect(() => {
-    const cleanup = setupClickOutsideListener(
-      `.${styles.postsTabContainer}`,
-      `.${styles.dropdownArrow}`,
-      setShowPostDropdown
-    );
-    
-    return cleanup;
-  }, []);
-
-  // Setup click outside listener for dropdowns
-  const setupClickOutsideListener = (
-    containerSelector: string,
-    arrowSelector: string,
-    setShowDropdown: (show: boolean) => void
-  ): () => void => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
-      if (!target.closest(containerSelector) && 
-          !target.closest(arrowSelector)) {
-        setShowDropdown(false);
+      
+      // Close post dropdown if clicked outside
+      if (!target.closest(`.${styles.postsTabContainer}`) && 
+          !target.closest(`.${styles.dropdownArrow}`)) {
+        setShowPostDropdown(false);
+      }
+      
+      // Close options dropdown if clicked outside
+      if (!target.closest(`.${styles.notificationOptions}`)) {
+        setActiveOptionsDropdown(null);
       }
     };
-  
+    
     document.addEventListener('click', handleClickOutside);
+    
     return () => {
       document.removeEventListener('click', handleClickOutside);
     };
-  };
+  }, []);
 
   // Handle tab click
   const handleTabChange = (tab: Tab): void => {
@@ -156,6 +152,12 @@ const NotificationsPage: React.FC = () => {
   const togglePostDropdown = (e: React.MouseEvent): void => {
     e.stopPropagation();
     setShowPostDropdown(!showPostDropdown);
+  };
+  
+  // Toggle notification options dropdown
+  const toggleOptionsDropdown = (e: React.MouseEvent, notificationId: string): void => {
+    e.stopPropagation();
+    setActiveOptionsDropdown(prevId => prevId === notificationId ? null : notificationId);
   };
 
   // Function to handle notification click and mark as read
@@ -192,6 +194,41 @@ const NotificationsPage: React.FC = () => {
         newSet.delete(notification.id);
         return newSet;
       });
+    }
+  };
+  
+  // Function to manually mark notification as read from dropdown
+  const handleMarkAsRead = async (e: React.MouseEvent, notification: Notification) => {
+    e.stopPropagation();
+    
+    // Close the dropdown
+    setActiveOptionsDropdown(null);
+    
+    // If already read, do nothing
+    if (!notification.isNew) return;
+    
+    try {
+      // Call the endpoint to mark notification as read
+      await markNotificationAsRead('hfhfhfh', notification.id);
+      
+      // Update local state
+      setNotifications(prevNotifications => 
+        prevNotifications.map(item => 
+          item.id === notification.id 
+            ? { ...item, isNew: false } 
+            : item
+        )
+      );
+      
+      // Add to clicked notifications set
+      setClickedNotifications(prev => {
+        const newSet = new Set(prev);
+        newSet.add(notification.id);
+        return newSet;
+      });
+      
+    } catch (error) {
+      console.error('Error marking notification as read:', error);
     }
   };
 
@@ -241,9 +278,6 @@ const NotificationsPage: React.FC = () => {
           <div className={styles.notificationSettings}>
             <h3>Manage your notifications</h3>
             <a href="#" className={styles.settingsLink}>View settings</a>
-            <div className={styles.unreadCounter}>
-              {unreadCount} unread {unreadCount === 1 ? 'notification' : 'notifications'}
-            </div>
           </div>
         </div>
 
@@ -348,10 +382,22 @@ const NotificationsPage: React.FC = () => {
                       <button 
                         type="button" 
                         aria-label="More options"
-                        onClick={(e) => e.stopPropagation()} // Prevent triggering parent onClick
+                        onClick={(e) => toggleOptionsDropdown(e, notification.id)}
                       >
                         ...
                       </button>
+                      
+                      {/* Options dropdown */}
+                      {activeOptionsDropdown === notification.id && (
+                        <div className={styles.optionsDropdown}>
+                          <div 
+                            className={styles.optionItem}
+                            onClick={(e) => handleMarkAsRead(e, notification)}
+                          >
+                            Mark this notification as read
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))

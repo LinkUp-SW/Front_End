@@ -2,6 +2,16 @@
 import { Bio, Organization } from "@/types";
 import { ContactInfoModal } from "./ContactInfoModal";
 import { Link } from "react-router-dom";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components";
+import { FaPencilAlt } from "react-icons/fa";
+import EditUserBioModal from "../../modals/edit_user_bio_modal/EditUserBioModal";
 
 type ProfileHeaderProps = {
   userid: string;
@@ -11,6 +21,7 @@ type ProfileHeaderProps = {
     work_experience: Organization | null;
     education: Organization | null;
   };
+  isOwner: boolean;
 };
 
 export const ProfileHeader = ({
@@ -18,6 +29,7 @@ export const ProfileHeader = ({
   userid,
   connectionsCount,
   intros,
+  isOwner,
 }: ProfileHeaderProps) => (
   <div className="mb-4 grid gap-1 relative">
     <h1 className="text-2xl font-bold text-gray-800 dark:text-white">
@@ -36,7 +48,8 @@ export const ProfileHeader = ({
     >
       {connectionsCount} connections
     </Link>
-    <div className="grid gap-2 absolute right-0">
+    {isOwner && <EditUserBio user={user} userid={userid} intros={intros} />}
+    <div className="sm:grid gap-2 absolute right-0 hidden">
       {intros.work_experience && (
         <Link
           to={"#"}
@@ -63,3 +76,46 @@ export const ProfileHeader = ({
     </div>
   </div>
 );
+
+const EditUserBio: React.FC<Partial<ProfileHeaderProps>> = ({
+  user,
+  userid,
+  intros,
+}) => {
+  return (
+    <div className="absolute right-[-1rem] top-[-5rem]">
+      <Dialog>
+        <DialogTrigger asChild>
+          <button
+            id="edit-user-bio"
+            className="absolute hover:opacity-85 transition-all duration-300 cursor-pointer bg-gray-300 dark:bg-gray-800 p-2 rounded-full top-3 right-3"
+            aria-label="Edit User Bio"
+          >
+            <FaPencilAlt size={20} />
+          </button>
+        </DialogTrigger>
+        <DialogContent
+          aria-describedby={undefined}
+          className="!max-w-5xl md:!w-[40rem] dark:bg-gray-900 dark:border-gray-600 !w-full border-2"
+        >
+          <DialogHeader>
+            <DialogTitle>Edit User Bio</DialogTitle>
+            <DialogDescription className="text-sm text-gray-500 dark:text-gray-300">
+              *Indicates required
+            </DialogDescription>
+          </DialogHeader>
+          <EditUserBioModal
+            userData={user as Bio}
+            userId={userid as string}
+            intros={
+              intros as {
+                work_experience: Organization | null;
+                education: Organization | null;
+              }
+            }
+          />
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+};

@@ -5,7 +5,6 @@ export function createGetHandler<T extends JsonBodyType>(
   resolver: (req: { params: Record<string, unknown> }) => T | HttpResponse
 ) {
   return http.get(path, async (req) => {
-    console.log(`[MSW] Intercepted GET ${req}`);
     const result = resolver({ params: req.params });
     return result instanceof HttpResponse
       ? result

@@ -22,7 +22,6 @@ const ForgetPasswordPage = () => {
 
       // Await the result of the toast promise
       const data = await toastResult.unwrap();
-      console.log(data);
       toast.success(`${data.message}`);
     } catch (error) {
       const err = getErrorMessage(error);
