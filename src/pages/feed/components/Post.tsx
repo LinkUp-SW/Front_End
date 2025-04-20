@@ -4,7 +4,7 @@ import { Card, CardContent, CardFooter } from "../../../components/ui/card";
 import CelebrateIcon from "@/assets/Celebrate.svg";
 import LikeIcon from "@/assets/Like.svg";
 import LoveIcon from "@/assets/Love.svg";
-import LaughIcon from "@/assets/Funny.svg";
+import FunnyIcon from "@/assets/Funny.svg";
 import InsightfulIcon from "@/assets/Insightful.svg";
 import SupportIcon from "@/assets/Support.svg";
 import { Link } from "react-router-dom";
@@ -19,10 +19,18 @@ import {
   DialogDescription,
   DialogTitle,
   DialogTrigger,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
   TruncatedText,
 } from "@/components";
 import ReactionsModal from "./modals/ReactionsModal";
 import PostImages from "./PostImages";
+import IconButton from "./buttons/IconButton";
 
 interface PostProps {
   postData: PostType;
@@ -38,12 +46,38 @@ const Post: React.FC<PostProps> = ({
   reactions,
 }) => {
   const { user, post, stats, action } = postData;
-
   const [liked, setLiked] = useState(false);
   const [isLandscape, setIsLandscape] = useState<boolean>(false);
   const [postMenuOpen, setPostMenuOpen] = useState(false);
   const [sortingMenu, setSortingMenu] = useState(false);
   const [sortingState, setSortingState] = useState("Most relevant");
+  const [commentsOpen, setCommentsOpen] = useState(false);
+  const [reactionsOpen, setReactionsOpen] = useState(false);
+  const [selectedReaction, setSelectedReaction] = useState<string | null>(
+    "Like"
+  );
+
+  const reactionIcons = [
+    { name: "Celebrate", icon: CelebrateIcon },
+    { name: "Like", icon: LikeIcon },
+    { name: "Love", icon: LoveIcon },
+    { name: "Funny", icon: FunnyIcon },
+    { name: "Insightful", icon: InsightfulIcon },
+    { name: "Support", icon: SupportIcon },
+  ];
+
+  let timeoutId: NodeJS.Timeout;
+
+  const handleMouseEnter = () => {
+    clearTimeout(timeoutId);
+    setReactionsOpen(true);
+  };
+
+  const handleMouseLeave = () => {
+    timeoutId = setTimeout(() => {
+      setReactionsOpen(false);
+    }, 300);
+  };
 
   const handleSortingState = (selectedState: string) => {
     setSortingState(selectedState);
@@ -61,7 +95,14 @@ const Post: React.FC<PostProps> = ({
 
   const menuActions = getMenuActions();
 
-  const engagementButtons = getEngagementButtons(liked, () => setLiked(!liked));
+  const engagementButtons = getEngagementButtons(
+    liked,
+    () => {
+      setLiked(!liked);
+      setSelectedReaction("Like");
+    },
+    (value) => setCommentsOpen(value)
+  );
 
   const { topStats, totalStats } = calculateTopStats(stats);
 
@@ -143,45 +184,195 @@ const Post: React.FC<PostProps> = ({
             </DialogContent>
           </Dialog>
           <div className="flex text-gray-500 dark:text-neutral-400 gap-2 text-sm items-center ">
-            <p className="hover:underline hover:text-blue-600 dark:hover:text-blue-400 hover:cursor-pointer">
-              {stats.comments} comments
-            </p>
+            {stats.comments != 0 && (
+              <p
+                onClick={() => setCommentsOpen(true)}
+                className="hover:underline hover:text-blue-600 dark:hover:text-blue-400 hover:cursor-pointer"
+              >
+                {stats.comments} comments
+              </p>
+            )}
+            {stats.reposts && (
+              <>
+                <p className="text-xs text-gray-500 dark:text-neutral-400 font-bold">
+                  {" "}
+                  ·
+                </p>
+
+                <p className="hover:underline hover:text-blue-600 dark:hover:text-blue-400 hover:cursor-pointer">
+                  {stats.reposts} reposts
+                </p>
+              </>
+            )}
           </div>
         </footer>
         {/* Engagement Buttons */}
         <footer className="mt-3 flex justify-around text-gray-600 dark:text-neutral-400 text-sm w-full">
-          {engagementButtons.map(
-            (
-              button: { name: string; icon: JSX.Element; callback: () => void },
-              index: number
-            ) => (
-              <Button
-                key={index}
-                variant="ghost"
-                size="lg"
-                onClick={button.callback}
-                className={`flex dark:hover:bg-zinc-800 dark:hover:text-neutral-200 ${
-                  button.name == "Like" &&
-                  liked &&
-                  "text-blue-400 hover:text-blue-400 dark:hover:text-blue-400"
-                } items-center gap-2 hover:cursor-pointer  transition-all`}
+          <Popover open={reactionsOpen} onOpenChange={setReactionsOpen}>
+            {engagementButtons.map(
+              (
+                button: {
+                  name: string;
+                  icon: JSX.Element;
+                  callback: () => void;
+                },
+                index: number
+              ) =>
+                button.name === "Like" ? (
+                  <PopoverTrigger
+                    key={index}
+                    onMouseEnter={handleMouseEnter}
+                    onMouseLeave={handleMouseLeave}
+                  >
+                    <Button
+                      variant="ghost"
+                      size="lg"
+                      onClick={button.callback}
+                      className={`flex dark:hover:bg-zinc-800 dark:hover:text-neutral-200 ${
+                        liked && selectedReaction === "Like"
+                          ? "text-blue-700 dark:text-blue-500 hover:text-blue-700 dark:hover:text-blue-400"
+                          : selectedReaction === "Insightful"
+                          ? "text-yellow-700 dark:text-yellow-500 hover:text-yellow-700 dark:hover:text-yellow-400"
+                          : selectedReaction === "Love"
+                          ? "text-red-700 dark:text-red-500 hover:text-red-700 dark:hover:text-red-400"
+                          : selectedReaction === "Funny"
+                          ? "text-cyan-700 dark:text-cyan-500 hover:text-cyan-700 dark:hover:text-cyan-400"
+                          : selectedReaction === "Celebrate"
+                          ? "text-green-700 dark:text-green-500 hover:text-green-700 dark:hover:text-green-400"
+                          : selectedReaction === "Support"
+                          ? "text-purple-700 dark:text-purple-500 hover:text-purple-700 dark:hover:text-purple-400"
+                          : ""
+                      } items-center hover:cursor-pointer transition-all`}
+                    >
+                      {selectedReaction && liked ? (
+                        <img
+                          src={
+                            reactionIcons.find(
+                              (reaction) => reaction.name === selectedReaction
+                            )?.icon
+                          }
+                          alt={selectedReaction}
+                          className="w-4 h-4"
+                        />
+                      ) : (
+                        button.icon
+                      )}
+                      {viewMore && selectedReaction}
+                    </Button>
+                  </PopoverTrigger>
+                ) : (
+                  <Button
+                    key={index}
+                    variant="ghost"
+                    size="lg"
+                    onClick={button.callback}
+                    className={`flex dark:hover:bg-zinc-800 dark:hover:text-neutral-200 items-center gap-2 hover:cursor-pointer transition-all`}
+                  >
+                    {button.icon}
+                    {viewMore && button.name}
+                  </Button>
+                )
+            )}
+            <TooltipProvider>
+              <PopoverContent
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
+                align="start"
+                className="absolute w-fit bottom-15 dark:bg-gray-900 rounded-full border-gray-700 shadow-2xl transition-transform duration-300 ease-in-out transform"
               >
-                {button.icon}
-                {viewMore && button.name}
-              </Button>
-            )
-          )}
+                <div className="flex">
+                  {[
+                    { icon: LikeIcon, alt: "Like" },
+                    { icon: CelebrateIcon, alt: "Celebrate" },
+                    { icon: SupportIcon, alt: "Support" },
+                    { icon: LoveIcon, alt: "Love" },
+                    { icon: InsightfulIcon, alt: "Insightful" },
+                    { icon: FunnyIcon, alt: "Funny" },
+                  ].map((reaction, index) => (
+                    <Tooltip key={reaction.alt}>
+                      <IconButton
+                        className={`hover:scale-200 hover:bg-gray-200 w-12 h-12 dark:hover:bg-zinc-800 duration-300 ease-in-out transform transition-all mx-0 hover:mx-7 hover:-translate-y-5`}
+                        style={{
+                          animation: `bounceIn 0.5s ease-in-out ${
+                            index * 0.045
+                          }s forwards`,
+                          opacity: 0,
+                        }}
+                        onClick={() => {
+                          setSelectedReaction(reaction.alt);
+                          setLiked(true);
+                          setReactionsOpen(false);
+                        }}
+                      >
+                        <TooltipTrigger asChild>
+                          <img
+                            src={reaction.icon}
+                            alt={reaction.alt}
+                            className="w-full h-full"
+                          />
+                        </TooltipTrigger>
+                      </IconButton>
+
+                      <TooltipContent>
+                        <p>{reaction.alt}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  ))}
+                  <style>
+                    {`
+                    @keyframes bounceIn {
+                    0% {
+                    transform: scale(0.5) translateY(50px);
+                    opacity: 0;
+                    }
+                    50% {
+                    transform: scale(1.2) translateY(-10px);
+                    opacity: 1;
+                    }
+                    100% {
+                    transform: scale(1) translateY(0);
+                    opacity: 1;
+                    }
+                    }
+                  `}
+                  </style>
+                  <style>
+                    {`
+                    @keyframes popUp {
+                    0% {
+                    transform: scale(0.5);
+                    opacity: 0;
+                    }
+                    100% {
+                    transform: scale(1);
+                    opacity: 1;
+                    }
+                    }
+                  `}
+                  </style>
+                </div>
+              </PopoverContent>
+            </TooltipProvider>
+          </Popover>
         </footer>
       </CardContent>
       <CardFooter>
-        <PostFooter
-          user={user}
-          sortingMenu={sortingMenu}
-          setSortingMenu={setSortingMenu}
-          sortingState={sortingState}
-          handleSortingState={handleSortingState}
-          comments={comments}
-        />
+        {commentsOpen && (
+          <div
+            className={`transition-all duration-300 ease-in-out ${
+              commentsOpen ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"
+            } overflow-hidden`}
+          >
+            <PostFooter
+              user={user}
+              sortingMenu={sortingMenu}
+              setSortingMenu={setSortingMenu}
+              sortingState={sortingState}
+              handleSortingState={handleSortingState}
+              comments={comments}
+            />
+          </div>
+        )}
       </CardFooter>
     </Card>
   );
@@ -223,7 +414,7 @@ function calculateTopStats(stats: {
     {
       name: "funny",
       count: stats.funny,
-      icon: <img src={LaughIcon} alt="Funny" className="w-4 h-4" />,
+      icon: <img src={FunnyIcon} alt="Funny" className="w-4 h-4" />,
     },
     {
       name: "like",
