@@ -15,6 +15,13 @@ import { MdOutlineEmojiEmotions } from "react-icons/md";
 import EmojiPicker, { Theme, EmojiClickData } from "emoji-picker-react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 
 interface SortingMenuItem {
   name: string;
@@ -99,45 +106,41 @@ const PostFooter: React.FC<PostFooterProps> = ({
   return (
     <section className="flex flex-col w-full gap-4">
       {/* Container for text buttons with relative so our scroll button can be absolute */}
-      <div className="relative">
-        <div
-          ref={scrollContainerRef}
-          className="flex gap-1 z-10 overflow-x-clip"
-        >
+      <Carousel className="w-full">
+        <CarouselContent className="px-2 ">
           {[
             "I appreciate this!",
             "Congratulations!",
             "Useful takeaway",
+            "Great insight!",
             "I appreciate this!",
             "Congratulations!",
             "Useful takeaway",
-            "I appreciate this!",
-            "Congratulations!",
-            "Useful takeaway",
+            "Great insight!",
           ].map((text, index) => (
-            <Button
+            <CarouselItem
               key={index}
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                setCommentInput(text);
-                inputRef.current?.focus();
-              }}
-              className="bg-transparent light:border-gray-600 light:hover:border-2 dark:hover:text-neutral-200 dark:hover:bg-transparent hover:cursor-pointer dark:text-blue-300 dark:border-blue-300 rounded-full"
+              className=" basis-1/2 sm:basis-1/3 lg:basis-1/4 px-6"
             >
-              {text}
-            </Button>
+              <div className="">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setCommentInput(text);
+                    inputRef.current?.focus();
+                  }}
+                  className="bg-transparent text-xs sm:text-sm w-fit px-1.5 light:border-gray-600 light:hover:border-2 dark:hover:text-neutral-200 dark:hover:bg-transparent hover:cursor-pointer dark:text-blue-300 dark:border-blue-300 rounded-full"
+                >
+                  {text}
+                </Button>
+              </div>
+            </CarouselItem>
           ))}
-        </div>
-        {/* Overlay button to scroll to the right */}
-        <Button
-          onClick={scrollRight}
-          variant="ghost"
-          className="absolute right-0 top-0 h-full bg-black bg-opacity-100 hover:bg-opacity-100 transition-colors"
-        >
-          &gt;
-        </Button>
-      </div>
+        </CarouselContent>
+        <CarouselPrevious className="dark:bg-gray-900 dark:text-neutral-400 absolute -left-5" />
+        <CarouselNext className="dark:bg-gray-900 dark:text-neutral-400 absolute -right-8" />
+      </Carousel>
 
       <div className="flex w-full items-center justify-between">
         <div className="flex space-x-3 justify-start items-center w-full">
