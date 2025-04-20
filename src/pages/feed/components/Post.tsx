@@ -205,7 +205,7 @@ const Post: React.FC<PostProps> = ({
             {stats.comments != 0 && (
               <p
                 onClick={() => {
-                  handleToggleComments();
+                  setCommentsOpen(true);
                 }}
                 className="hover:underline hover:text-blue-600 dark:hover:text-blue-400 hover:cursor-pointer"
               >
