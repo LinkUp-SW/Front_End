@@ -9,6 +9,7 @@ import {
 import { useState } from "react";
 import { FaPencilAlt } from "react-icons/fa";
 import CoverPictureModal from "../../modals/picture_modal/CoverPictureModal";
+import { defaultProfileImage } from "@/constants";
 
 type CoverPhotoProps = {
   src: string;
@@ -22,7 +23,11 @@ export const CoverPhoto = ({ src, isOwner, children }: CoverPhotoProps) => {
 
   return (
     <div className="relative h-48 bg-gray-200">
-      <img src={cover} alt="Cover" className="w-full h-full object-cover" />
+      <img
+        src={cover || defaultProfileImage}
+        alt="Cover"
+        className="w-full h-full object-cover"
+      />
       {isOwner && (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
           <DialogTrigger asChild>

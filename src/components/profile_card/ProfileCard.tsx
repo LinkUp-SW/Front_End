@@ -9,6 +9,7 @@ import { refetchUserBio } from "@/slices/user_profile/userBioSlice";
 import { RootState, AppDispatch } from "@/store"; // Ensure AppDispatch is exported from your store
 import { getErrorMessage } from "@/utils/errorHandler";
 import { BiSolidBriefcase } from "react-icons/bi";
+import { defaultProfileImage } from "@/constants";
 
 const ProfileCard: React.FC = () => {
   // Use the correctly typed dispatch
@@ -134,7 +135,7 @@ const ProfileCard: React.FC = () => {
           >
             <img
               id="profile-card-cover-photo"
-              src={data?.cover_photo}
+              src={data?.cover_photo || defaultProfileImage}
               alt="Cover"
               className="w-full h-full min-h-20 rounded-t-md"
             />
@@ -143,7 +144,7 @@ const ProfileCard: React.FC = () => {
             <Avatar id="profile-card-avatar" className="h-19 w-19">
               <AvatarImage
                 id="profile-card-avatar-image"
-                src={data?.profile_photo}
+                src={data?.profile_photo || defaultProfileImage}
                 alt="user-profile"
               />
               <AvatarFallback id="profile-card-avatar-fallback">

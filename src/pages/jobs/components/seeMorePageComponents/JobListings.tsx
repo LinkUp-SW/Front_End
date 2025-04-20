@@ -5,16 +5,16 @@ import Pagination from "./Pagination";
 import { Job, JobFilters } from "../../types";
 import { FOOTER_LINKS } from '../../../../constants/index';
 import { FaSortDown } from "react-icons/fa6";
-import { fetchSingleJob, fetchJobs, JobData } from '../../../../endpoints/jobs';
+import { fetchSingleJob, fetchJobs, convertJobDataToJob } from '../../../../endpoints/jobs';
 import Cookies from 'js-cookie';
 
 interface JobListingsProps {
   filters: JobFilters;
-  jobs?: Job[]; // Optional prop to accept jobs from parent component
-  selectedJobId?: string; // Optional selected job ID
-  selectedJob?: Job | null; // Optional selected job object
-  loading?: boolean; // Optional loading state
-  onJobSelect?: (job: Job) => void; // New callback for job selection
+  jobs?: Job[];
+  selectedJobId?: string;
+  selectedJob?: Job | null;
+  loading?: boolean;
+  onJobSelect?: (job: Job) => void;
 }
 
 const JobListings: React.FC<JobListingsProps> = ({ 
@@ -32,25 +32,20 @@ const JobListings: React.FC<JobListingsProps> = ({
   const [selectedJob, setSelectedJob] = useState<Job | null>(propSelectedJob || null);
   const [jobDetailLoading, setJobDetailLoading] = useState(false);
   const [fetchedOnce, setFetchedOnce] = useState(false);
-  const JOBS_PER_PAGE = 10; // Define how many jobs to show per page
+  const JOBS_PER_PAGE = 10;
   
   // Check if any filters are active
   const isFilterActive = useMemo(() => {
     return Object.values(filters).some(filterArr => filterArr.length > 0);
   }, [filters]);
   
-  // Apply filters to jobs only if filters are active
+  // Apply filters to jobs
   const filteredJobs = useMemo(() => {
-    // If no filters are active, return all jobs
-    if (!isFilterActive) {
-      return jobs;
-    }
+    if (!isFilterActive) return jobs;
     
-    // Start with all jobs
     let result = [...jobs];
     
-    // Filter by location
-    if (filters.locations && filters.locations.length > 0) {
+    if (filters.locations.length > 0) {
       result = result.filter(job => 
         filters.locations.some(location => 
           job.location.toLowerCase().includes(location.toLowerCase())
@@ -58,8 +53,7 @@ const JobListings: React.FC<JobListingsProps> = ({
       );
     }
     
-    // Filter by company
-    if (filters.company && filters.company.length > 0) {
+    if (filters.company.length > 0) {
       result = result.filter(job => 
         filters.company.some(company => 
           job.company.toLowerCase().includes(company.toLowerCase())
@@ -67,26 +61,23 @@ const JobListings: React.FC<JobListingsProps> = ({
       );
     }
     
-    // Filter by experience level
-    if (filters.experienceLevels && filters.experienceLevels.length > 0) {
+    if (filters.experienceLevels.length > 0) {
       result = result.filter(job => 
         filters.experienceLevels.includes(job.experience_level)
       );
     }
     
-    // Filter by work mode
-    if (filters.workModes && filters.workModes.length > 0) {
+    if (filters.workModes.length > 0) {
       result = result.filter(job => 
         filters.workModes.includes(job.workMode)
       );
     }
     
-    // Filter by salary range - implement if salary has a consistent format
-    if (filters.salaryRanges && filters.salaryRanges.length > 0) {
+    if (filters.salaryRanges.length > 0) {
       result = result.filter(job => {
         if (!job.salary) return false;
         
-        const salaryStr = String(job.salary); // Ensure it's a string
+        const salaryStr = String(job.salary);
         const salaryValue = parseInt(salaryStr.replace(/[^0-9]/g, ''));
         
         return filters.salaryRanges.some(range => {
@@ -101,48 +92,18 @@ const JobListings: React.FC<JobListingsProps> = ({
     return result;
   }, [jobs, filters, isFilterActive]);
 
-  // Calculate total pages based on filtered jobs
+  // Calculate pagination
   const totalPages = Math.ceil(filteredJobs.length / JOBS_PER_PAGE);
   
-  // Get current page's jobs
   const currentJobs = useMemo(() => {
     const startIndex = (currentPage - 1) * JOBS_PER_PAGE;
     return filteredJobs.slice(startIndex, startIndex + JOBS_PER_PAGE);
-  }, [filteredJobs, currentPage, JOBS_PER_PAGE]);
-  
-  const convertApiDataToJob = (jobData: JobData): Job => {
-    return {
-      id: jobData._id,
-      title: jobData.job_title,
-      company: jobData.organization ? jobData.organization.name : 'Unknown Company',
-      location: jobData.location || 'Unknown Location',
-      experience_level: jobData.experience_level || 'Entry level',
-      isRemote: jobData.workplace_type === 'Remote',
-      isSaved: false,
-      logo: jobData.organization ? jobData.organization.logo : '',
-      isPromoted: false,
-      hasEasyApply: true,
-      workMode: jobData.workplace_type || 'On-site',
-      postedTime: jobData.timeAgo || 'Recently',
-      salary: jobData.salary || '',
-      description: jobData.description || '',
-      responsibilities: jobData.responsibilities || [],
-      qualifications: jobData.qualifications || [],
-      benefits: jobData.benefits || [],
-    };
-  };
+  }, [filteredJobs, currentPage]);
 
-  // Fetch jobs if no props were provided
+  // Fetch jobs when needed
   useEffect(() => {
     const fetchAllJobs = async () => {
-      // If we already have jobs from props, don't fetch
-      if (propJobs && propJobs.length > 0) {
-        setJobs(propJobs);
-        return;
-      }
-      
-      // Don't fetch twice
-      if (fetchedOnce) return;
+      if ((propJobs && propJobs.length > 0) || fetchedOnce) return;
       
       const token = Cookies.get('linkup_auth_token');
       if (!token) {
@@ -152,12 +113,10 @@ const JobListings: React.FC<JobListingsProps> = ({
       
       setLoading(true);
       try {
-        // Set limit to a high number to get all jobs at once
-        const response = await fetchJobs(token, 100); 
-        const jobsData = response.data.map(job => convertApiDataToJob(job));
+        const response = await fetchJobs(token, 100);
+        const jobsData = response.data.map(job => convertJobDataToJob(job));
         setJobs(jobsData);
         setFetchedOnce(true);
-        console.log(`Fetched ${jobsData.length} jobs`);
       } catch (error) {
         console.error('Error fetching jobs:', error);
       } finally {
@@ -187,21 +146,19 @@ const JobListings: React.FC<JobListingsProps> = ({
     const getJobFromId = async () => {
       if (!propSelectedJobId) return;
       
-      // Check if the job is already in our list
       const jobInList = jobs.find(job => job.id === propSelectedJobId);
       if (jobInList) {
         setSelectedJob(jobInList);
         return;
       }
 
-      // If job is not in list, fetch just that one job
       await fetchSelectedJob(propSelectedJobId);
     };
 
     getJobFromId();
   }, [propSelectedJobId, jobs]);
 
-  // Fetch a single job when selected
+  // Fetch a single job
   const fetchSelectedJob = async (jobId: string) => {
     setJobDetailLoading(true);
     
@@ -214,10 +171,9 @@ const JobListings: React.FC<JobListingsProps> = ({
 
     try {
       const response = await fetchSingleJob(token, jobId);
-      const jobData = convertApiDataToJob(response.data);
+      const jobData = convertJobDataToJob(response.data);
       setSelectedJob(jobData);
       
-      // If parent provided a callback, use it
       if (onJobSelect) {
         onJobSelect(jobData);
       }
@@ -230,47 +186,38 @@ const JobListings: React.FC<JobListingsProps> = ({
 
   // Handle job selection from list
   const handleSelectJob = (job: Job) => {
-    // If parent component provided onJobSelect, call it
+    const hasCompleteData = job.description && 
+                           Array.isArray(job.responsibilities) && 
+                           Array.isArray(job.qualifications) && 
+                           Array.isArray(job.benefits);
+    
     if (onJobSelect) {
-      // Check if the job has complete data before passing it up
-      if (job.description && 
-          Array.isArray(job.responsibilities) && 
-          Array.isArray(job.qualifications) && 
-          Array.isArray(job.benefits)) {
+      if (hasCompleteData) {
         onJobSelect(job);
       } else {
-        // If job doesn't have complete data, fetch it first
         setJobDetailLoading(true);
         fetchSelectedJob(job.id);
       }
       return;
     }
     
-    // Otherwise handle selection internally
-    if (job.description && 
-        Array.isArray(job.responsibilities) && 
-        Array.isArray(job.qualifications) && 
-        Array.isArray(job.benefits)) {
+    if (hasCompleteData) {
       setSelectedJob(job);
     } else {
-      // Otherwise fetch the full details
       fetchSelectedJob(job.id);
     }
   };
 
-  // Effect to select first job when currentJobs change and no job is selected
+  // Auto-select first job when needed
   useEffect(() => {
     if (!selectedJob && currentJobs.length > 0 && !propSelectedJobId) {
-      // If no job is selected and we have jobs, select the first one
-      const firstJob = currentJobs[0];
-      handleSelectJob(firstJob);
+      handleSelectJob(currentJobs[0]);
     }
   }, [currentJobs, selectedJob, propSelectedJobId]);
 
   // Handle page change
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
-    // Scroll to top of job list when page changes
     const jobListElement = document.querySelector('.job-list-container');
     if (jobListElement) {
       jobListElement.scrollTop = 0;

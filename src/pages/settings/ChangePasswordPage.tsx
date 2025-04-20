@@ -4,6 +4,7 @@ import { FaInfoCircle } from 'react-icons/fa';
 import SettingsLayoutPage from '../../components/hoc/SettingsLayoutPage';
 import styles from './changePasswordPage.module.css';
 import { validatePassword } from '../../utils';
+import { changePassword } from '@/endpoints/changePassword';
 
 const ChangePasswordPage: React.FC = () => {
   const navigate = useNavigate();
@@ -14,6 +15,8 @@ const ChangePasswordPage: React.FC = () => {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showRetypePassword, setShowRetypePassword] = useState(false);
   const [showPasswordInfo, setShowPasswordInfo] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [statusMessage, setStatusMessage] = useState('');
   
   const [isFormValid, setIsFormValid] = useState(false);
   const [errors, setErrors] = useState({
@@ -50,14 +53,33 @@ const ChangePasswordPage: React.FC = () => {
     navigate('/settings/sign-in-security');
   };
 
-  const handleSavePassword = () => {
-    // Here you would implement password validation and update logic
-    console.log('Password changed');
-    navigate('/settings/sign-in-security');
+  const handleSavePassword = async () => {
+    if (!isFormValid) return;
+    
+    setIsLoading(true);
+    setStatusMessage('');
+    
+    try {
+      const response = await changePassword(currentPassword, newPassword);
+      
+      if (response.success) {
+        setStatusMessage('Password changed successfully');
+        setTimeout(() => {
+          navigate('/settings/sign-in-security');
+        }, 1500);
+      } else {
+        setStatusMessage(response.message || 'Failed to change password');
+      }
+    } catch (error) {
+      setStatusMessage('An error occurred. Please try again later.');
+      console.error('Password change error:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleForgotPassword = () => {
-    // Implement forgot password flow
+    // This will use the existing forgot password implementation
     console.log('Forgot password clicked');
   };
 
@@ -208,14 +230,19 @@ const ChangePasswordPage: React.FC = () => {
             </div>
           </div>
           
+          {statusMessage && (
+            <div className={`${styles.statusMessage} ${statusMessage.includes('success') ? styles.successMessage : styles.errorMessage}`}>
+              {statusMessage}
+            </div>
+          )}
           
           <div className={styles.actionButtons}>
             <button 
               className={`${styles.saveButton} ${isFormValid ? styles.saveButtonActive : ''}`} 
               onClick={handleSavePassword}
-              disabled={!isFormValid}
+              disabled={!isFormValid || isLoading}
             >
-              Save Password
+              {isLoading ? 'Processing...' : 'Save Password'}
             </button>
             
             <button 

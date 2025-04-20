@@ -258,7 +258,6 @@ const EditExperienceModal: React.FC<EditExperienceModalProps> = ({
         media: formData.media,
       };
 
-      console.log(updatedExperience);
 
       // Make a request to your "updateWorkExperience" endpoint
       // This is an example; adjust to match your actual API method

@@ -1,7 +1,8 @@
 pipeline {
     agent any
     environment {
-        CI = "true"  // Set CI mode for React (avoids prompts)
+        CI = "true"  
+        VAULT_SECRET = vault path: 'secret/jenkins/front_env', engineVersion: "2", key: 'value'
     }
     stages {
         stage('Checkout') {
@@ -21,9 +22,16 @@ pipeline {
                  
             }
         }
+        stage('Set up environment') { 
+            steps {
+                 echo 'setting up environment variables...'   
+                 writeFile file: 'mywork/.env', text: "${env.VAULT_SECRET}"
+                 
+            }
+        }
         stage('Lint Code') { 
             steps {
-                 echo 'Linting...'  
+                 echo 'Linting...'   
                  sh '''
                     cd mywork
                     npm run lint
@@ -41,11 +49,29 @@ pipeline {
         }
         stage('Build') { 
             steps {
-                 echo 'building...' 
+                 echo 'building...'  
                 sh '''
                     cd mywork
                     npm run build
-                    rm -rf mywork
+                    cd ..
+                    #rm -rf mywork
+                 '''
+            }
+        }
+        stage('Deploy') { 
+            when {
+                branch 'main'
+            }
+            steps {
+                 echo 'deploying...'  
+                sh '''
+                    sudo rm -rf /home/azureuser/mywork
+                    sudo  mv mywork /home/azureuser/
+                    timestamp=$(date +%Y%m%d%H%M%S)
+                     sudo mkdir -p /home/azureuser/Front_deploy_backup_$timestamp
+                      sudo rsync -a --remove-source-files /home/azureuser/Front_deploy/ /home/azureuser/Front_deploy_backup/
+                      sudo rm -rf /home/azureuser/Front_deploy/*
+                      sudo rsync -a /home/azureuser/mywork/dist/ /home/azureuser/Front_deploy/
                  '''
             }
         }
