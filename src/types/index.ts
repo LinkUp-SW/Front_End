@@ -25,9 +25,8 @@ export interface Notification {
   actionLink?: string;
   location?: string;
   count?: number;
-  isNew: boolean;  // Make isNew non-optional to avoid undefined checks
+  isNew: boolean; // Make isNew non-optional to avoid undefined checks
 }
-
 
 export interface PostType {
   user: {
@@ -256,7 +255,7 @@ export interface Skill {
   educations: Organization[];
   experiences: Organization[];
   licenses: Organization[];
-  total_endorsements?:number
+  total_endorsements?: number;
 }
 
 export interface Endorsement {
@@ -295,4 +294,21 @@ export interface PostDBObject {
   commentsDisabled: string; // Indicates if comments are disabled (e.g., "true" or "false")
   publicPost: boolean; // Whether the post is public or not
   taggedUsers: string[]; // Array of user IDs tagged in the post
+}
+
+export interface BioFormData {
+  first_name: string;
+  last_name: string;
+  headline: string;
+  location: {
+    country_region: string;
+    city: string;
+  };
+  contact_info: {
+    phone_number: number;
+    address: string;
+    birthday: string;
+    website: string;
+    country_code:string
+  };
 }

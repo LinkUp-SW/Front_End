@@ -1,4 +1,8 @@
 import {
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
   FormInput,
   FormTextarea,
   Select,
@@ -8,8 +12,10 @@ import {
   SelectValue,
 } from "@/components";
 import { COUNTRY_CITY_MAP } from "@/constants";
-import { Bio, Organization } from "@/types";
-import { useState } from "react";
+import { Bio, BioFormData, Organization } from "@/types";
+import { Dialog } from "@radix-ui/react-dialog";
+import { useState, ChangeEvent } from "react";
+import EditContactInfoModal from "./EditContactInfoModal";
 
 type EditUserBioModalProps = {
   userId: string;
@@ -20,56 +26,103 @@ type EditUserBioModalProps = {
   };
 };
 
-const EditUserBioModal: React.FC<EditUserBioModalProps> = () => {
-  const [selectedCountry, setSelectedCountry] = useState<string>("");
-  const [selectedCity, setSelectedCity] = useState<string>("");
+const EditUserBioModal: React.FC<EditUserBioModalProps> = ({ userData }) => {
+  const [formData, setFormData] = useState<BioFormData>({
+    first_name: userData.first_name,
+    last_name: userData.last_name,
+    headline: userData.headline ?? "",
+    location: {
+      country_region: userData.location.country_region,
+      city: userData.location.city,
+    },
+    contact_info: {
+      phone_number: userData.contact_info.phone_number ?? 0,
+      address: userData.contact_info.address ?? "",
+      birthday: userData.contact_info.birthday ?? "",
+      website: userData.contact_info.website ?? "",
+      country_code:userData.contact_info.country_code??''
+    },
+  });
+  const [openContactInfoModal, setOpenContactInfoModal] = useState(false);
+
+  // Generic input/textarea change
+  const handleInputChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData(
+      (prev) =>
+        ({
+          ...prev,
+          [name]: value,
+        } as Pick<BioFormData, keyof BioFormData>)
+    );
+  };
+
+  // Country select change resets city
+  const handleCountryChange = (country: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      location: { country_region: country, city: "" },
+    }));
+  };
+
+  // City select change
+  const handleCityChange = (city: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      location: { ...prev.location, city },
+    }));
+  };
+
+  // Contact info fields change
+  const handleContactInfoChange = (
+    field: keyof BioFormData["contact_info"],
+    value: string | number
+  ) => {
+    setFormData((prev) => ({
+      ...prev,
+      contact_info: { ...prev.contact_info, [field]: value },
+    }));
+  };
+
   return (
     <div>
       <FormInput
         label="First Name*"
         placeholder="John"
         id="first-name"
-        name="firstName"
-        onChange={(e) => {
-          console.log(e);
-        }}
-        value=""
+        name="first_name"
+        value={formData.first_name}
+        onChange={handleInputChange}
       />
       <FormInput
         label="Last Name*"
         placeholder="Doe"
         id="last-name"
-        name="lastName"
-        value=""
-        onChange={(e) => {
-          console.log(e);
-        }}
+        name="last_name"
+        value={formData.last_name}
+        onChange={handleInputChange}
       />
       <FormTextarea
-        label="Headline* "
+        label="Headline*"
         placeholder="Write a brief and compelling summary about yourself"
         maxLength={200}
-        value=""
         id="profile-headline"
         name="headline"
-        onChange={(e) => {
-          console.log(e);
-        }}
+        value={formData.headline}
+        onChange={handleInputChange}
       />
 
       <h2 className="text-xl font-bold">Location</h2>
       <section className="flex py-5 sm:flex-row flex-col gap-2">
-        {/* Country Select */}
         <Select
-          onValueChange={(value: string) => {
-            setSelectedCountry(value);
-            // Reset city when country changes
-            setSelectedCity("");
-          }}
+          value={formData.location.country_region}
+          onValueChange={handleCountryChange}
         >
           <SelectTrigger
             id="country"
-            name="country"
+            name="country_region"
             className="flex-grow w-full border-gray-600 outline-gray-600"
           >
             <SelectValue placeholder="Country" />
@@ -83,11 +136,10 @@ const EditUserBioModal: React.FC<EditUserBioModalProps> = () => {
           </SelectContent>
         </Select>
 
-        {/* City Select */}
         <Select
-          value={selectedCity} // Make this a controlled component
-          onValueChange={(value: string) => setSelectedCity(value)}
-          disabled={!selectedCountry}
+          value={formData.location.city}
+          onValueChange={handleCityChange}
+          disabled={!formData.location.country_region}
         >
           <SelectTrigger
             id="city"
@@ -97,8 +149,8 @@ const EditUserBioModal: React.FC<EditUserBioModalProps> = () => {
             <SelectValue placeholder="City" />
           </SelectTrigger>
           <SelectContent className="dark:bg-gray-900 dark:border-gray-600 dark:text-white">
-            {selectedCountry &&
-              COUNTRY_CITY_MAP[selectedCountry].map((city) => (
+            {formData.location.country_region &&
+              COUNTRY_CITY_MAP[formData.location.country_region].map((city) => (
                 <SelectItem key={city} value={city}>
                   {city}
                 </SelectItem>
@@ -106,14 +158,77 @@ const EditUserBioModal: React.FC<EditUserBioModalProps> = () => {
           </SelectContent>
         </Select>
       </section>
+
       <div>
-        <h2 className="text-xl font-bold">Location</h2>
+        <h2 className="text-xl font-bold">Contact Info</h2>
         <p className="text-xs font-semibold">
-          Add or Edit your email, phone number, and more.
+          Add or edit your email, phone number, and more.
         </p>
+        <EditContactInfo
+          contactInfoData={formData.contact_info}
+          handleUserBioChange={handleContactInfoChange}
+          openContactInfoModal={openContactInfoModal}
+          setOpenContactInfoModal={setOpenContactInfoModal}
+        />
+      </div>
+
+      <div>
+        <h2 className="text-xl font-bold">Website</h2>
+        <p className="text-xs font-semibold mb-[-1rem]">
+          Add a link that will appear at the top of your profile
+        </p>
+        <FormInput
+          placeholder="Ex: portfolio"
+          label=""
+          id="website"
+          name="website"
+          value={formData.contact_info.website}
+          onChange={(e) => handleContactInfoChange("website", e.target.value)}
+        />
       </div>
     </div>
   );
 };
+
+interface EditContactInfoProps {
+  contactInfoData: BioFormData["contact_info"];
+  handleUserBioChange: (
+    field: keyof BioFormData["contact_info"],
+    value: string | number
+  ) => void;
+  openContactInfoModal: boolean;
+  setOpenContactInfoModal: (open: boolean) => void;
+}
+
+const EditContactInfo: React.FC<EditContactInfoProps> = ({
+  contactInfoData,
+  handleUserBioChange,
+  openContactInfoModal,
+  setOpenContactInfoModal,
+}) => (
+  <Dialog open={openContactInfoModal} onOpenChange={setOpenContactInfoModal}>
+    <DialogTrigger asChild>
+      <button
+        id="edit-contact-info-btn"
+        className="w-fit py-1.5 my-4 px-4 border-2 rounded-full dark:border-blue-400 font-semibold text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-600 dark:hover:bg-blue-400 hover:text-white transition-all duration-300 ease-in-out border-blue-600 cursor-pointer"
+      >
+        Edit Contact Info
+      </button>
+    </DialogTrigger>
+    <DialogContent
+      aria-describedby={undefined}
+      className="!max-w-5xl md:!w-[40rem] dark:bg-gray-900 dark:border-gray-600 !w-full border-2"
+    >
+      <DialogHeader>
+        <DialogTitle>Edit Contact Info</DialogTitle>
+      </DialogHeader>
+      <EditContactInfoModal
+        contactInfoData={contactInfoData}
+        handleUserBioChange={handleUserBioChange}
+        setOpenContactInfoModal={setOpenContactInfoModal}
+      />
+    </DialogContent>
+  </Dialog>
+);
 
 export default EditUserBioModal;
