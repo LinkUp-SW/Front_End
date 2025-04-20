@@ -31,9 +31,7 @@ const Invitations = () => {
     }
   }, [data]);
 
-  useEffect(() => {
-    console.log(data);
-  }, [data]);
+
 
   const navigate = useNavigate();
 
@@ -45,7 +43,6 @@ const Invitations = () => {
       }
 
       try {
-        console.log(token);
         await acceptInvitation(token, userId);
 
         setInvitations((prevInvitations) =>
