@@ -62,7 +62,7 @@ const JobListItem: React.FC<JobListItemProps> = ({ job, isSelected, onClick }) =
             )}
             {job.hasEasyApply && (
               <span className="text-xs flex items-center">
-                <span className="bg-blue-600 dark:bg-blue-700 text-white rounded px-1 mr-1 text-xs">in</span> 
+                <span className="bg-blue-600 dark:bg-blue-700 text-white rounded px-1 mr-1 text-xs">Up</span> 
                 <span className="text-blue-600 dark:text-blue-400">Easy Apply</span>
               </span>
             )}
