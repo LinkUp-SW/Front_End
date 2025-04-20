@@ -9,6 +9,9 @@ import { toast } from "sonner";
 import { initiateGoogleAuth, signin } from "@/endpoints/userAuth";
 import { validateEmail } from "@/utils";
 import { getErrorMessage } from "@/utils/errorHandler";
+import {socketService} from "@/services/socket"
+import Cookies from "js-cookie";
+
 
 const SignInPage: React.FC = () => {
   const [identifier, setIdentifier] = useState<string>("");
@@ -83,6 +86,17 @@ const SignInPage: React.FC = () => {
         localStorage.setItem("user-email", data.user.email);
         return window.location.replace("/email-verification");
       }
+
+      
+      try {
+        const token = Cookies.get("linkup_auth_token") as string;
+        console.log('trying to connect');
+        await socketService.connect(token); 
+        console.log('Socket connected successfully after login');
+      } catch (socketError) {
+        console.error('Socket connection failed:', socketError);
+      }
+
       toast.success("Signed in successfully!");
       setTimeout(() => {
         window.location.replace("/feed");
