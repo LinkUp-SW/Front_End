@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { getPeopleYouMayKnow, PeopleYouMayKnow } from "@/endpoints/myNetwork";
 import Cookies from "js-cookie";
+import { useNavigate } from "react-router-dom";
 
 interface PeopleSectionProps {
   token: string;
@@ -20,6 +21,7 @@ const PeopleSection = ({ token, context, title }: PeopleSectionProps) => {
   const [mainViewSuggestions, setMainViewSuggestions] = useState<PeopleYouMayKnow[]>([]);
   const [allSuggestions, setAllSuggestions] = useState<PeopleYouMayKnow[]>([]);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const loadPeople = async () => {
     if (!token) return;
@@ -49,6 +51,10 @@ const PeopleSection = ({ token, context, title }: PeopleSectionProps) => {
     setAllSuggestions((prev) => prev.filter((p) => p._id !== id));
   };
 
+  const navigateToUser = (user_id: string) => {
+    navigate(`/user-profile/${user_id}`);
+  };
+
   const PersonCard = ({
     person,
     onRemove,
@@ -57,7 +63,10 @@ const PeopleSection = ({ token, context, title }: PeopleSectionProps) => {
     onRemove: (id: string) => void;
   }) => (
     <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 flex flex-col items-center justify-between w-full max-w-[280px] min-h-[320px] mx-auto">
-      <div className="h-20 w-full overflow-hidden rounded-t-lg">
+      <div 
+        className="h-20 w-full overflow-hidden rounded-t-lg cursor-pointer"
+        onClick={() => navigateToUser(person.user_id)}
+      >
         {person.cover_photo ? (
           <img
             src={person.cover_photo}
@@ -68,7 +77,10 @@ const PeopleSection = ({ token, context, title }: PeopleSectionProps) => {
           <div className="w-full h-full bg-gray-200 dark:bg-gray-700" />
         )}
       </div>
-      <div className="flex justify-center -mt-10">
+      <div 
+        className="flex justify-center -mt-10 cursor-pointer"
+        onClick={() => navigateToUser(person.user_id)}
+      >
         {person.profile_photo ? (
           <img
             src={person.profile_photo}
@@ -81,15 +93,18 @@ const PeopleSection = ({ token, context, title }: PeopleSectionProps) => {
           </div>
         )}
       </div>
-      <div className="text-center mt-2 space-y-0.5">
-        <a href={`/profile/${person.user_id}`} className="space-y-0.5">
+      <div 
+        className="text-center mt-2 space-y-0.5 cursor-pointer"
+        onClick={() => navigateToUser(person.user_id)}
+      >
+        <div className="space-y-0.5">
           <p className="text-sm font-semibold text-gray-900 dark:text-white">
             {person.bio.first_name} {person.bio.last_name}
           </p>
           <p className="text-sm text-gray-600 dark:text-gray-300">
             {person.bio.headline}
           </p>
-        </a>
+        </div>
       </div>
       <div className="mt-4 w-full">
         <button
