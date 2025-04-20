@@ -18,6 +18,9 @@ import {
 import RemoveConnectionModal from "./modals/remove_connection_modal/RemoveConnectionModal";
 import Cookies from "js-cookie";
 import { useNavigate, useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "@/store";
+import { editUserBio } from "@/slices/user_profile/userBioSlice";
 
 const Connections: React.FC = () => {
   const navigate = useNavigate();
@@ -29,6 +32,8 @@ const Connections: React.FC = () => {
   const [hasMore, setHasMore] = useState(true);
   const token = Cookies.get("linkup_auth_token");
   const { id } = useParams();
+  const userBioState = useSelector((state: RootState) => state.userBio);
+  const dispatch = useDispatch();
 
   const observer = useRef<IntersectionObserver | null>(null);
   const hasFetchedInitial = useRef(false); // Prevents double fetching on mount
@@ -83,6 +88,15 @@ const Connections: React.FC = () => {
       loadConnections();
     }
   }, [loadConnections]);
+
+  useEffect(() => {
+    dispatch(
+      editUserBio({
+        ...userBioState,
+        number_of_connections: connections.length,
+      })
+    );
+  }, [connections]);
 
   const lastConnectionRef = useCallback(
     (node: HTMLDivElement) => {
