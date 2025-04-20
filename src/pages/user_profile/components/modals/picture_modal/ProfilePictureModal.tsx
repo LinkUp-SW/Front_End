@@ -36,7 +36,6 @@ const ProfilePictureModal = ({
   const { isSubmitting, startSubmitting, stopSubmitting } = useFormStatus();
 
   useEffect(() => {
-    console.log(userBio?.is_default_profile_photo || src === null);
     if (userBio?.is_default_profile_photo || src === null) {
       setEditedImage(null);
     } else {

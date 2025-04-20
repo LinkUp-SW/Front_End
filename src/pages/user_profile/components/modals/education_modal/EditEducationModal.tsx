@@ -1,7 +1,12 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import { toast } from "sonner";
-import { DatePicker, FormInput, FormTextarea } from "@/components";
+import {
+  DatePicker,
+  FormInput,
+  FormTextarea,
+  OrganizationSearch,
+} from "@/components";
 
 import { Education, Organization } from "@/types";
 import { getSchoolsList, updateEducation } from "@/endpoints/userProfile";
@@ -13,7 +18,6 @@ import MediaManager from "../components/MediaManager";
 import { MediaItem } from "../components/types";
 import { v4 as uuid } from "uuid";
 import { extractMonthAndYear } from "@/utils";
-
 
 interface EditEducationModalProps {
   education: Education;
@@ -49,11 +53,9 @@ const EditEducationModal: React.FC<EditEducationModalProps> = ({
   );
 
   const authToken = Cookies.get("linkup_auth_token");
-  const [schools, setSchools] = useState<Organization[]>([]);
   const [schoolSearch, setSchoolSearch] = useState("");
   const [isSchoolsLoading, setIsSchoolsLoading] = useState(false);
   const { isSubmitting, startSubmitting, stopSubmitting } = useFormStatus();
-  const schoolTimer = useRef<NodeJS.Timeout | null>(null);
 
   const [formData, setFormData] = useState<EducationFormData>({
     school: education.school || { _id: "", name: "", logo: "" },
@@ -75,33 +77,11 @@ const EditEducationModal: React.FC<EditEducationModalProps> = ({
   }, [formData.school]);
 
   const handleChange = (field: keyof EducationFormData, value: unknown) => {
-    if (field === "school") {
-      const searchValue = value as string;
-      setSchoolSearch(searchValue);
-      if (schoolTimer.current) clearTimeout(schoolTimer.current);
-      if (searchValue === "") {
-        setSchools([]);
-        return;
-      }
-      setIsSchoolsLoading(true);
-      schoolTimer.current = setTimeout(() => {
-        getSchoolsList(searchValue)
-          .then((data) => setSchools(data.data))
-          .catch((err) => {
-            console.error("Failed to fetch schools:", err);
-            toast.error("Failed to fetch schools.");
-          })
-          .finally(() => setIsSchoolsLoading(false));
-      }, 500);
-    } else {
-      setFormData((prev) => ({ ...prev, [field]: value }));
-    }
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleSelectSchool = (school: Organization) => {
     setFormData((prev) => ({ ...prev, school }));
-    setSchoolSearch(school.name);
-    setSchools([]);
   };
 
   const validateForm = (): boolean => {
@@ -199,40 +179,17 @@ const EditEducationModal: React.FC<EditEducationModalProps> = ({
           if (e.key === "Enter") e.preventDefault();
         }}
       >
-        <div className="w-full relative">
-          <FormInput
-            label="School*"
-            placeholder="Ex: Harvard University"
-            value={schoolSearch}
-            onChange={(e) => handleChange("school", e.target.value)}
-            id="edit-education-school"
-            name="editEducationSchool"
-          />
-          {(isSchoolsLoading || schools.length !== 0) && (
-            <div className="w-full max-h-fit p-2 bg-white dark:border-gray-400 border dark:bg-gray-800 rounded-lg absolute top-22">
-              {isSchoolsLoading ? (
-                <SchoolSkeleton />
-              ) : (
-                <ul className="space-y-2">
-                  {schools.map((s) => (
-                    <li
-                      key={s._id}
-                      className="flex items-center gap-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 rounded p-1"
-                      onClick={() => handleSelectSchool(s)}
-                    >
-                      <img
-                        src={s.logo}
-                        alt="school-logo"
-                        className="h-10 w-10 object-contain rounded-lg"
-                      />
-                      <p>{s.name}</p>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          )}
-        </div>
+        <OrganizationSearch
+          label="School*"
+          selectedOrganization={formData.school}
+          onSelect={(org) => handleSelectSchool(org)}
+          fetchOrganizations={(query) =>
+            getSchoolsList(query).then((res) => res.data)
+          }
+          placeholder="Enter your school"
+          id="school"
+          name="school"
+        />
         <FormInput
           label="Degree*"
           placeholder="Ex: Bachelor of Science"
@@ -316,16 +273,5 @@ const EditEducationModal: React.FC<EditEducationModalProps> = ({
     </div>
   );
 };
-
-const SchoolSkeleton = () => (
-  <div className="space-y-2 animate-pulse">
-    {[...Array(3)].map((_, index) => (
-      <div key={index} className="flex items-center gap-2">
-        <div className="h-10 w-10 bg-gray-300 dark:bg-gray-700 rounded-lg" />
-        <div className="h-4 w-32 bg-gray-300 dark:bg-gray-700 rounded" />
-      </div>
-    ))}
-  </div>
-);
 
 export default EditEducationModal;
