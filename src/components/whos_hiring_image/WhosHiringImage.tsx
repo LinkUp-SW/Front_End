@@ -1,4 +1,4 @@
-import whoIsHiringImage from '@/assets/whoIsHiring.jpg'
+import whoIsHiringImage from "@/assets/whoIsHiring.jpg";
 const WhosHiringImage = () => {
   return (
     <div className="mt-4 cursor-pointer h-fit">
