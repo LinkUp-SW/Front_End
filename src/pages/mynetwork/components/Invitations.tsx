@@ -10,10 +10,16 @@ import Cookies from "js-cookie";
 import useFetchData from "@/hooks/useFetchData";
 import { useParams } from "react-router-dom";
 import { useConnectionContext } from "./ConnectionContext";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "@/store";
+import { editUserBio } from "@/slices/user_profile/userBioSlice";
 const Invitations = () => {
   const [invitations, setInvitations] = useState<ReceivedConnections[]>([]);
   const [numberOfReceived, setNumberOfReceived] = useState(0);
   const { connectionCount, setConnectionCount } = useConnectionContext();
+  const userBioState = useSelector((state: RootState) => state.userBio);
+  const dispatch = useDispatch();
+
   const token = Cookies.get("linkup_auth_token");
   const { id } = useParams();
   const { data } = useFetchData(
@@ -31,8 +37,6 @@ const Invitations = () => {
     }
   }, [data]);
 
-
-
   const navigate = useNavigate();
 
   const acceptInvitations = useCallback(
@@ -49,7 +53,13 @@ const Invitations = () => {
           prevInvitations.filter((c) => c.user_id !== userId)
         );
         setNumberOfReceived((prev) => Math.max(prev - 1, 0));
-          setConnectionCount(connectionCount + 1);
+        setConnectionCount(connectionCount + 1);
+        dispatch(
+          editUserBio({
+            ...userBioState,
+            number_of_connections: connectionCount + 1,
+          })
+        );
       } catch (error) {
         console.error("can't", error);
       }
