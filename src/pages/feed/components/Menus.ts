@@ -62,7 +62,8 @@ export const COMMENT_SORTING_MENU: MenuAction[] = [
 
 export const getEngagementButtons = (
   liked: boolean,
-  toggleLiked: () => void
+  toggleLiked: () => void,
+  toggleComments: (value: boolean) => void
 ) => [
   {
     name: "Like",
@@ -75,7 +76,7 @@ export const getEngagementButtons = (
     name: "Comment",
     icon: React.createElement(CommentIcon),
     callback: () => {
-      // Add your comment callback here if needed
+      toggleComments(true);
     },
   },
   {
