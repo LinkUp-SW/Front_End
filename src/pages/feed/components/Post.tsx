@@ -12,7 +12,11 @@ import { CommentType, PostType, ReactionType } from "@/types";
 import { POST_ACTIONS } from "@/constants";
 import PostHeader from "./PostHeader";
 import PostFooter from "./PostFooter";
-import { getEngagementButtons, getMenuActions } from "../components/Menus";
+import {
+  getEngagementButtons,
+  getMenuActions,
+  REPOST_MENU,
+} from "../components/Menus";
 import {
   Dialog,
   DialogContent,
@@ -260,6 +264,44 @@ const Post: React.FC<PostProps> = ({
                       {viewMore && selectedReaction}
                     </Button>
                   </PopoverTrigger>
+                ) : button.name === "Repost" ? (
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        key={index}
+                        variant="ghost"
+                        size="lg"
+                        onClick={button.callback}
+                        className={`flex dark:hover:bg-zinc-800 dark:hover:text-neutral-200 items-center gap-2 hover:cursor-pointer transition-all`}
+                      >
+                        {button.icon}
+                        {viewMore && button.name}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="relative  dark:bg-gray-900 bg-white border-neutral-200 dark:border-gray-700 p-0 pt-1">
+                      <div className="flex flex-col w-full p-2 gap-4">
+                        {REPOST_MENU.map((item, index) => (
+                          <Button
+                            key={index}
+                            variant="ghost"
+                            size="lg"
+                            onClick={button.callback}
+                            className={`flex w-fit h-fit dark:hover:bg-zinc-800 dark:hover:text-neutral-200 items-center gap-2 hover:cursor-pointer transition-all`}
+                          >
+                            <div className="flex justify-start w-full  text-gray-600 dark:text-neutral-200">
+                              <div className="p-4 pl-0 ">{item.icon}</div>
+                              <div className="flex flex-col items-start justify-center">
+                                <span className="font-medium">{item.name}</span>
+                                <span className="text-xs text-wrap text-left font-normal">
+                                  {item.subtext}
+                                </span>
+                              </div>
+                            </div>
+                          </Button>
+                        ))}
+                      </div>
+                    </PopoverContent>
+                  </Popover>
                 ) : (
                   <Button
                     key={index}
@@ -358,20 +400,14 @@ const Post: React.FC<PostProps> = ({
       </CardContent>
       <CardFooter>
         {commentsOpen && (
-          <div
-            className={`transition-all duration-300 ease-in-out ${
-              commentsOpen ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"
-            } overflow-hidden`}
-          >
-            <PostFooter
-              user={user}
-              sortingMenu={sortingMenu}
-              setSortingMenu={setSortingMenu}
-              sortingState={sortingState}
-              handleSortingState={handleSortingState}
-              comments={comments}
-            />
-          </div>
+          <PostFooter
+            user={user}
+            sortingMenu={sortingMenu}
+            setSortingMenu={setSortingMenu}
+            sortingState={sortingState}
+            handleSortingState={handleSortingState}
+            comments={comments}
+          />
         )}
       </CardFooter>
     </Card>

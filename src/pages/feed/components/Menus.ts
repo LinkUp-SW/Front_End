@@ -16,6 +16,7 @@ import {
 import { BsFillSendFill as SendIcon } from "react-icons/bs";
 import { MenuAction } from "@/types";
 import React from "react";
+import { EditIcon } from "lucide-react";
 
 export const getMenuActions: () => MenuAction[] = () => [
   {
@@ -42,6 +43,21 @@ export const getMenuActions: () => MenuAction[] = () => [
     name: "Unfollow",
     action: () => console.log("Unfollow clicked"),
     icon: React.createElement(FaUserSlash, { className: "mr-2" }),
+  },
+];
+
+export const REPOST_MENU = [
+  {
+    name: "Repost with your thoughts",
+    subtext: "Create a new post with this post attached",
+    action: () => console.log("Repost 1"),
+    icon: React.createElement(EditIcon, { className: "mr-2" }),
+  },
+  {
+    name: "Repost",
+    subtext: "Instantly bring this post to others' feeds",
+    action: () => console.log("Repost 2"),
+    icon: React.createElement(RepostIcon, { className: "mr-2" }),
   },
 ];
 
