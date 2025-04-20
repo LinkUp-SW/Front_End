@@ -33,7 +33,7 @@ const MessagingPage = () => {
         </div>
 
         <div className="w-80 pl-4 hidden lg:block">
-          <div className="h-full flex flex-col justify-between">
+          <div className="h-full justify-between ">
             <div className="rounded-lg border border-gray-200">
               <WhosHiringImage />
             </div>
