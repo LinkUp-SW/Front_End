@@ -1,177 +1,262 @@
 import { useState } from "react";
-// import { People } from "./Invitations";
 import { FaUserPlus } from "react-icons/fa";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+
+interface Person {
+  id: number;
+  name: string;
+  title: string;
+  mutualConnections: string;
+  image: string;
+  coverImage: string;
+  profileUrl: string;
+}
 
 const ConnectWithPeople = () => {
-  const [people, setPeople] = useState(
-    /*<People[]>*/ [
-      {
-        id: 1,
-        name: "Sama Mohamed",
-        title: "Software Engineer at Microsoft",
-        mutualConnections: "Ahmed Khaled and 12 other mutual connections",
-        image:
-          "https://www.svgrepo.com/show/382097/female-avatar-girl-face-woman-user-9.svg",
-        coverImage:
-          "https://thingscareerrelated.com/wp-content/uploads/2021/10/default-background-image.png?w=862",
-        profileUrl: "/profile/Sama-Mohamed",
-      },
-      {
-        id: 2,
-        name: "Youssef Afify",
-        title: "Machine Learning Researcher",
-        mutualConnections: "Mariam Samir is a mutual connection",
-        image:
-          "https://www.svgrepo.com/show/382107/male-avatar-boy-face-man-user-6.svg",
-        coverImage:
-          "https://thingscareerrelated.com/wp-content/uploads/2021/10/default-background-image.png?w=862",
-        profileUrl: "/profile/Youssef-Afify",
-      },
-      {
-        id: 3,
-        name: "Amr Doma",
-        title: "Cybersecurity Analyst at IBM",
-        mutualConnections: "Haneen Mohamed and 8 other mutual connections",
-        image:
-          "https://www.svgrepo.com/show/382107/male-avatar-boy-face-man-user-6.svg",
-        coverImage:
-          "https://thingscareerrelated.com/wp-content/uploads/2021/10/default-background-image.png?w=862",
-        profileUrl: "/profile/Amr-Doma",
-      },
-      {
-        id: 4,
-        name: "Habiba Walid",
-        title: "Biomedical Data Engineer",
-        mutualConnections: "Noor Emad and 5 other mutual connections",
-        image:
-          "https://www.svgrepo.com/show/382097/female-avatar-girl-face-woman-user-9.svg",
-        coverImage:
-          "https://thingscareerrelated.com/wp-content/uploads/2021/10/default-background-image.png?w=862",
-        profileUrl: "/profile/Habiba-Walid",
-      },
+  const initialPeople: Person[] = [
+    {
+      id: 1,
+      name: "Emily Johnson",
+      title: "Software Engineer at Microsoft",
+      mutualConnections: "John Smith and 12 other mutual connections",
+      image:
+        "https://www.svgrepo.com/show/382097/female-avatar-girl-face-woman-user-9.svg",
+      coverImage:
+        "https://thingscareerrelated.com/wp-content/uploads/2021/10/default-background-image.png?w=862",
+      profileUrl: "/profile/Emily-Johnson",
+    },
+    {
+      id: 2,
+      name: "Michael Brown",
+      title: "Machine Learning Researcher",
+      mutualConnections: "Sarah Williams is a mutual connection",
+      image:
+        "https://www.svgrepo.com/show/382107/male-avatar-boy-face-man-user-6.svg",
+      coverImage:
+        "https://thingscareerrelated.com/wp-content/uploads/2021/10/default-background-image.png?w=862",
+      profileUrl: "/profile/Michael-Brown",
+    },
+    {
+      id: 3,
+      name: "David Wilson",
+      title: "Cybersecurity Analyst at IBM",
+      mutualConnections: "Jennifer Davis and 8 other mutual connections",
+      image:
+        "https://www.svgrepo.com/show/382107/male-avatar-boy-face-man-user-6.svg",
+      coverImage:
+        "https://thingscareerrelated.com/wp-content/uploads/2021/10/default-background-image.png?w=862",
+      profileUrl: "/profile/David-Wilson",
+    },
+    {
+      id: 4,
+      name: "Jessica Taylor",
+      title: "Biomedical Data Engineer",
+      mutualConnections: "Robert Anderson and 5 other mutual connections",
+      image:
+        "https://www.svgrepo.com/show/382097/female-avatar-girl-face-woman-user-9.svg",
+      coverImage:
+        "https://thingscareerrelated.com/wp-content/uploads/2021/10/default-background-image.png?w=862",
+      profileUrl: "/profile/Jessica-Taylor",
+    },
+    {
+      id: 5,
+      name: "Daniel Martinez",
+      title: "Full Stack Developer",
+      mutualConnections: "Lisa Thompson and 10 other mutual connections",
+      image:
+        "https://www.svgrepo.com/show/382107/male-avatar-boy-face-man-user-6.svg",
+      coverImage:
+        "https://thingscareerrelated.com/wp-content/uploads/2021/10/default-background-image.png?w=862",
+      profileUrl: "/profile/Daniel-Martinez",
+    },
+    {
+      id: 6,
+      name: "Sophia Anderson",
+      title: "UX/UI Designer",
+      mutualConnections: "Christopher Lee and 6 other mutual connections",
+      image:
+        "https://www.svgrepo.com/show/382097/female-avatar-girl-face-woman-user-9.svg",
+      coverImage:
+        "https://thingscareerrelated.com/wp-content/uploads/2021/10/default-background-image.png?w=862",
+      profileUrl: "/profile/Sophia-Anderson",
+    },
+    {
+      id: 7,
+      name: "Matthew Thomas",
+      title: "Electrical Engineer",
+      mutualConnections: "Amanda White and 9 other mutual connections",
+      image:
+        "https://www.svgrepo.com/show/382107/male-avatar-boy-face-man-user-6.svg",
+      coverImage:
+        "https://thingscareerrelated.com/wp-content/uploads/2021/10/default-background-image.png?w=862",
+      profileUrl: "/profile/Matthew-Thomas",
+    },
+    {
+      id: 8,
+      name: "Olivia Garcia",
+      title: "Cloud Architect at AWS",
+      mutualConnections: "James Rodriguez is a mutual connection",
+      image:
+        "https://www.svgrepo.com/show/382097/female-avatar-girl-face-woman-user-9.svg",
+      coverImage:
+        "https://thingscareerrelated.com/wp-content/uploads/2021/10/default-background-image.png?w=862",
+      profileUrl: "/profile/Olivia-Garcia",
+    },
+    {
+      id: 9,
+      name: "William Hernandez",
+      title: "Data Scientist",
+      mutualConnections: "Elizabeth Lopez and 7 other mutual connections",
+      image:
+        "https://www.svgrepo.com/show/382107/male-avatar-boy-face-man-user-6.svg",
+      coverImage:
+        "https://thingscareerrelated.com/wp-content/uploads/2021/10/default-background-image.png?w=862",
+      profileUrl: "/profile/William-Hernandez",
+    },
+    {
+      id: 10,
+      name: "Ava Martinez",
+      title: "Product Manager",
+      mutualConnections: "Ryan Gonzalez and 4 other mutual connections",
+      image:
+        "https://www.svgrepo.com/show/382097/female-avatar-girl-face-woman-user-9.svg",
+      coverImage:
+        "https://thingscareerrelated.com/wp-content/uploads/2021/10/default-background-image.png?w=862",
+      profileUrl: "/profile/Ava-Martinez",
+    },
+    {
+      id: 11,
+      name: "Ethan Robinson",
+      title: "DevOps Engineer",
+      mutualConnections: "Mia Perez and 11 other mutual connections",
+      image:
+        "https://www.svgrepo.com/show/382107/male-avatar-boy-face-man-user-6.svg",
+      coverImage:
+        "https://thingscareerrelated.com/wp-content/uploads/2021/10/default-background-image.png?w=862",
+      profileUrl: "/profile/Ethan-Robinson",
+    },
+    {
+      id: 12,
+      name: "Isabella Clark",
+      title: "Frontend Developer",
+      mutualConnections: "Alexander Lewis and 3 other mutual connections",
+      image:
+        "https://www.svgrepo.com/show/382097/female-avatar-girl-face-woman-user-9.svg",
+      coverImage:
+        "https://thingscareerrelated.com/wp-content/uploads/2021/10/default-background-image.png?w=862",
+      profileUrl: "/profile/Isabella-Clark",
+    },
+  ];
 
-      {
-        id: 5,
-        name: "Mohanad Tarek",
-        title: "Full Stack Developer",
-        mutualConnections: "Noha Adel and 10 other mutual connections",
-        image:
-          "https://www.svgrepo.com/show/382107/male-avatar-boy-face-man-user-6.svg",
-        coverImage:
-          "https://thingscareerrelated.com/wp-content/uploads/2021/10/default-background-image.png?w=862",
-        profileUrl: "/profile/Mohanad-Tarek",
-      },
-      {
-        id: 6,
-        name: "Salsabil Mostafa",
-        title: "UX/UI Designer",
-        mutualConnections: "Karim Nabil and 6 other mutual connections",
-        image:
-          "https://www.svgrepo.com/show/382097/female-avatar-girl-face-woman-user-9.svg",
-        coverImage:
-          "https://thingscareerrelated.com/wp-content/uploads/2021/10/default-background-image.png?w=862",
-        profileUrl: "/profile/Salsabil-Mostafa",
-      },
-      {
-        id: 7,
-        name: "Mehrati Sameh",
-        title: "Electrical Engineer",
-        mutualConnections: "Nada Omar and 9 other mutual connections",
-        image:
-          "https://www.svgrepo.com/show/382097/female-avatar-girl-face-woman-user-9.svg",
-        coverImage:
-          "https://thingscareerrelated.com/wp-content/uploads/2021/10/default-background-image.png?w=862",
-        profileUrl: "/profile/Mehrati-Sameh",
-      },
-      {
-        id: 8,
-        name: "Mayar Ahmed",
-        title: "Cloud Architect at AWS",
-        mutualConnections: "Aya Ibrahim is a mutual connection",
-        image:
-          "https://www.svgrepo.com/show/382097/female-avatar-girl-face-woman-user-9.svg",
-        coverImage:
-          "https://thingscareerrelated.com/wp-content/uploads/2021/10/default-background-image.png?w=862",
-        profileUrl: "/profile/Mayar-Ahmed",
-      },
-    ]
-  );
+  const [allSuggestions, setAllSuggestions] = useState<Person[]>(initialPeople);
 
   const removePerson = (id: number) => {
-    setPeople((prev) => prev.filter((person) => person.id !== id));
+    setAllSuggestions((prev) => prev.filter((p) => p.id !== id));
   };
 
-  if (people.length === 0) {
-    return null;
-  }
+  const mainViewSuggestions = allSuggestions.slice(0, 6);
+
+  const PersonCard = ({
+    person,
+    onRemove,
+  }: {
+    person: Person;
+    onRemove: (id: number) => void;
+  }) => (
+    <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 flex flex-col items-center justify-between w-full max-w-[280px] min-h-[320px] mx-auto">
+      <div className="h-20 w-full overflow-hidden rounded-t-lg">
+        <img
+          src={person.coverImage}
+          alt="Cover"
+          className="w-full h-full object-cover"
+        />
+      </div>
+      <div className="flex justify-center -mt-10">
+        <img
+          src={person.image}
+          alt={person.name}
+          className="w-20 h-20 rounded-full border-4 border-white dark:border-gray-800"
+        />
+      </div>
+      <div className="text-center mt-2 space-y-0.5">
+        <a href={person.profileUrl} className="space-y-0.5">
+          <p className="text-sm font-semibold text-gray-900 dark:text-white">
+            {person.name}
+          </p>
+          <p className="text-sm text-gray-600 dark:text-gray-300">
+            {person.title}
+          </p>
+          <p className="text-xs text-gray-500 dark:text-gray-400">
+            {person.mutualConnections}
+          </p>
+        </a>
+      </div>
+      <div className="mt-4 w-full">
+        <button
+          onClick={() => onRemove(person.id)}
+          className="w-full border border-blue-600 text-blue-600 font-medium py-1 rounded-full flex items-center justify-center gap-2 hover:bg-blue-100 dark:hover:bg-blue-900 transition"
+        >
+          <FaUserPlus />
+          Connect
+        </button>
+      </div>
+      <button
+        onClick={() => onRemove(person.id)}
+        className="absolute top-2 right-2 text-gray-500 hover:text-gray-800 dark:hover:text-white"
+      >
+        ✕
+      </button>
+    </div>
+  );
+
+  if (mainViewSuggestions.length === 0) return null;
 
   return (
-    <div className="bg-white dark:bg-gray-900 shadow-lg rounded-lg p-4 mt-5">
-      <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 ml-2">
-        People you may know
-      </h2>
+    <div className="bg-white dark:bg-gray-900 shadow-lg rounded-lg p-5 mt-5">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+          People you may know based on education
+        </h2>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-        {people.map((person) => (
-          <div
-            key={person.id}
-            className="relative bg-white dark:bg-gray-800 rounded-lg shadow-md h-full flex flex-col overflow-hidden"
-          >
-            {/* Cover Image */}
-            <div className="relative w-full h-16">
-              <img
-                src={person.coverImage}
-                alt="Cover"
-                className="w-full h-full object-cover"
-              />
-            </div>
-
-            {/* Profile Picture - Positioned over Cover */}
-            <div className="absolute top-6 left-1/2 transform -translate-x-1/2">
-              <img
-                src={person.image}
-                alt={person.name}
-                className="w-20 h-20  border-white dark:border-gray-800"
-              />
-            </div>
-
-            {/* Card Content */}
-            <div className="mt-12 text-center px-4 pb-4 flex justify-between flex-col flex-grow">
-              <a
-                href={person.profileUrl}
-                className="flex flex-col items-center"
-              >
-                <p className="text-gray-900 dark:text-white font-semibold">
-                  {person.name}
-                </p>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  {person.title}
-                </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  {person.mutualConnections}
-                </p>
-              </a>
-
-              {/* Connect Button */}
-              <button
-                onClick={() => removePerson(person.id)}
-                id="connect-button "
-                className="mt-3 w-full border border-blue-600 text-blue-600 font-semibold py-1 rounded-full flex items-center justify-center gap-2 hover:bg-blue-100 transition cursor-pointer"
-              >
-                <FaUserPlus />
-                Connect
-              </button>
-            </div>
-
-            {/* Remove Button (X) */}
-            <button
-              onClick={() => removePerson(person.id)}
-              id="remove-suggestion-button"
-              className="absolute top-2 right-2 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-white rounded-full w-6 h-6 flex items-center justify-center cursor-pointer"
-            >
-              ✕
+        <Dialog>
+          <DialogTrigger asChild>
+            <button className="text-blue-600 dark:text-blue-400 hover:underline text-sm font-medium">
+              Show all
             </button>
-          </div>
+          </DialogTrigger>
+          <DialogContent className="max-w-6xl w-full max-h-[90vh] overflow-y-auto dark:bg-gray-900 bg-white p-6 rounded-lg">
+            <DialogHeader>
+              <DialogTitle className="text-xl text-gray-900 dark:text-white">
+                People you may know based on education
+              </DialogTitle>
+            </DialogHeader>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+              {allSuggestions.map((person) => (
+                <PersonCard
+                  key={person.id}
+                  person={person}
+                  onRemove={removePerson}
+                />
+              ))}
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {mainViewSuggestions.map((person) => (
+          <PersonCard
+            key={person.id}
+            person={person}
+            onRemove={removePerson}
+          />
         ))}
       </div>
     </div>
