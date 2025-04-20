@@ -6,14 +6,18 @@ import { HiOutlineDotsHorizontal } from "react-icons/hi";
 
 const Header = () => {
   const dispatch = useDispatch();
+  // Only showing the container modifications
   return (
     <>
-      <header className="flex items-center justify-between p-4 border-1 border-[#e8e8e8] ">
-        <div className=" flex items-center space-x-4">
-          <label htmlFor="searchMessages" className="font-semibold">
+      <header className="flex items-center justify-between p-3 border-1 border-[#e8e8e8]">
+        <div className="flex items-center space-x-2 sm:space-x-4">
+          <label
+            htmlFor="searchMessages"
+            className="font-semibold whitespace-nowrap"
+          >
             Messaging
           </label>
-          <div id="search" className="relative w-60">
+          <div id="search" className="relative w-full sm:w-60">
             <IoSearchSharp className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#3b3d3e]" />
             <input
               type="text"
@@ -26,18 +30,18 @@ const Header = () => {
           </div>
         </div>
 
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-2 sm:space-x-4 flex-shrink-0">
           <button
             id="header-dots"
             className="hover:rounded-full hover:bg-gray-200 hover:cursor-pointer"
           >
-            <HiOutlineDotsHorizontal size={30} />
+            <HiOutlineDotsHorizontal size={24} />
           </button>
           <button
             id="pencil-icon"
             className="hover:rounded-full hover:bg-gray-200 hover:cursor-pointer"
           >
-            <HiOutlinePencilAlt size={30} />{" "}
+            <HiOutlinePencilAlt size={24} />
           </button>
         </div>
       </header>
