@@ -75,6 +75,10 @@ const routes: RouteObject[] = [
   },
 
   { path: "/connections/:id", element: React.createElement(ConnectionsPage) },
+  {
+    path: "/feed/posts/:id",
+    element: React.createElement(FeedPage, { single: true }),
+  },
 
   {
     path: "/manage-invitations",
