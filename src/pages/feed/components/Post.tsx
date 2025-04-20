@@ -63,54 +63,7 @@ const Post: React.FC<PostProps> = ({
 
   const engagementButtons = getEngagementButtons(liked, () => setLiked(!liked));
 
-  const statsArray = [
-    {
-      name: "celebrate",
-      count: stats.celebrate,
-      icon: <img src={CelebrateIcon} alt="Celebrate" className="w-4 h-4" />,
-    },
-    {
-      name: "love",
-      count: stats.love,
-      icon: <img src={LoveIcon} alt="Love" className="w-4 h-4" />,
-    },
-    {
-      name: "insightful",
-      count: stats.insightful,
-      icon: <img src={InsightfulIcon} alt="Insightful" className="w-4 h-4" />,
-    },
-    {
-      name: "support",
-      count: stats.support,
-      icon: <img src={SupportIcon} alt="Support" className="w-4 h-4" />,
-    },
-    {
-      name: "funny",
-      count: stats.funny,
-      icon: <img src={LaughIcon} alt="Funny" className="w-4 h-4" />,
-    },
-    {
-      name: "like",
-      count: stats.likes,
-      icon: <img src={LikeIcon} alt="Like" className="w-4 h-4" />,
-    },
-  ];
-
-  const topStats = statsArray
-    .filter((stat) => stat.count)
-    .sort((a, b) => (b.count || 0) - (a.count || 0))
-    .slice(0, 3);
-  if (!topStats.length) {
-    topStats.push(statsArray[5]);
-  }
-
-  const totalStats =
-    (stats.likes || 0) +
-    (stats.celebrate || 0) +
-    (stats.love || 0) +
-    (stats.insightful || 0) +
-    (stats.support || 0) +
-    (stats.funny || 0);
+  const { topStats, totalStats } = calculateTopStats(stats);
 
   return (
     <Card className="p-2 bg-white border-0 mb-4 pl-0 dark:bg-gray-900 dark:text-neutral-200">
@@ -235,3 +188,64 @@ const Post: React.FC<PostProps> = ({
 };
 
 export default Post;
+
+function calculateTopStats(stats: {
+  likes?: number;
+  comments?: number;
+  celebrate?: number;
+  love?: number;
+  insightful?: number;
+  support?: number;
+  funny?: number;
+  person?: string;
+}) {
+  const statsArray = [
+    {
+      name: "celebrate",
+      count: stats.celebrate,
+      icon: <img src={CelebrateIcon} alt="Celebrate" className="w-4 h-4" />,
+    },
+    {
+      name: "love",
+      count: stats.love,
+      icon: <img src={LoveIcon} alt="Love" className="w-4 h-4" />,
+    },
+    {
+      name: "insightful",
+      count: stats.insightful,
+      icon: <img src={InsightfulIcon} alt="Insightful" className="w-4 h-4" />,
+    },
+    {
+      name: "support",
+      count: stats.support,
+      icon: <img src={SupportIcon} alt="Support" className="w-4 h-4" />,
+    },
+    {
+      name: "funny",
+      count: stats.funny,
+      icon: <img src={LaughIcon} alt="Funny" className="w-4 h-4" />,
+    },
+    {
+      name: "like",
+      count: stats.likes,
+      icon: <img src={LikeIcon} alt="Like" className="w-4 h-4" />,
+    },
+  ];
+
+  const topStats = statsArray
+    .filter((stat) => stat.count)
+    .sort((a, b) => (b.count || 0) - (a.count || 0))
+    .slice(0, 3);
+  if (!topStats.length) {
+    topStats.push(statsArray[5]);
+  }
+
+  const totalStats =
+    (stats.likes || 0) +
+    (stats.celebrate || 0) +
+    (stats.love || 0) +
+    (stats.insightful || 0) +
+    (stats.support || 0) +
+    (stats.funny || 0);
+  return { topStats, totalStats };
+}
