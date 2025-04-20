@@ -49,7 +49,7 @@ const UserProfilePopover: React.FC<UserProfilePopoverProps> = ({
         <h2 className="pt-1 font-semibold">Account</h2>
         <Link
           to={"/settings/account"}
-          className="text-sm text-gray-500 dark:text-gray-400 p-2 hover:underline"
+          className="text-sm capitalize text-gray-500 dark:text-gray-400 p-2 hover:underline"
         >
           settings & privacy
         </Link>
