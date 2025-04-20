@@ -33,11 +33,22 @@ const ExperiencesList: React.FC<ExperiencesListProps> = ({
       >
         {experience.organization?.name}
       </p>
+      {!!experience.location && (
+        <p className="text-sm">
+          <span className="font-semibold">Location: </span>
+          <span className="text-gray-700 text-xs dark:text-gray-200">
+            {experience.location}
+          </span>
+        </p>
+      )}
       <p
         id={`experience-employee-type-${experience._id}`}
         className="text-sm text-gray-500 dark:text-gray-200"
       >
         {experience.employee_type}
+        {!!experience.location_type && (
+          <span>, {experience.location_type}</span>
+        )}
       </p>
       <p className="text-xs capitalize inline-flex gap-2 text-gray-500 dark:text-gray-200">
         <span>{formatExperienceDate(experience.start_date)}</span>
@@ -48,6 +59,15 @@ const ExperiencesList: React.FC<ExperiencesListProps> = ({
             : formatExperienceDate(experience.end_date as Date)}
         </span>
       </p>
+
+      {!!experience.description && (
+        <p className="text-sm">
+          <span className="font-semibold">Description: </span>
+          <span className="text-gray-700 dark:text-gray-200">
+            {experience.description}
+          </span>
+        </p>
+      )}
 
       {experience.skills.length > 0 && (
         <div className="text-xs font-semibold flex items-center gap-2">
@@ -78,7 +98,7 @@ const ExperiencesList: React.FC<ExperiencesListProps> = ({
       )}
 
       {isMe && (
-        <div className="absolute top-[-1rem] h-full right-0 flex gap-2 flex-col justify-between">
+        <div className="absolute top-[-1rem] h-full right-0 flex gap-2 flex-col">
           <button
             id={`experience-edit-button-${idx}`}
             aria-label="Edit Experience"

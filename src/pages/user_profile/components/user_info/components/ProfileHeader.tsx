@@ -21,6 +21,7 @@ type ProfileHeaderProps = {
     work_experience: Organization | null;
     education: Organization | null;
   };
+  isOwner: boolean;
 };
 
 export const ProfileHeader = ({
@@ -28,6 +29,7 @@ export const ProfileHeader = ({
   userid,
   connectionsCount,
   intros,
+  isOwner,
 }: ProfileHeaderProps) => (
   <div className="mb-4 grid gap-1 relative">
     <h1 className="text-2xl font-bold text-gray-800 dark:text-white">
@@ -46,7 +48,7 @@ export const ProfileHeader = ({
     >
       {connectionsCount} connections
     </Link>
-    <EditUserBio />
+    {isOwner && <EditUserBio user={user} userid={userid} intros={intros} />}
     <div className="sm:grid gap-2 absolute right-0 hidden">
       {intros.work_experience && (
         <Link

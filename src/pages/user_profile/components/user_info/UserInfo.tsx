@@ -64,6 +64,7 @@ const UserInfo = () => {
             education: data.education,
           }}
           connectionsCount={data.number_of_connections}
+          isOwner={data.is_me}
         />
 
         <ProfileActionButtons

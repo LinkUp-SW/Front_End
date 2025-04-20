@@ -310,5 +310,27 @@ export const COUNTRY_CITY_MAP: { [key: string]: string[] } = {
   ],
 };
 
+
+// Map of Egypt and Middle Eastern countries to their international dialing codes
+export const COUNTRY_PHONE_CODE_MAP: { [key: string]: string } = {
+  Egypt: "+20",
+  "Saudi Arabia": "+966",
+  "United Arab Emirates": "+971",
+  Qatar: "+974",
+  Kuwait: "+965",
+  Oman: "+968",
+  Bahrain: "+973",
+  Jordan: "+962",
+  Lebanon: "+961",
+  Iraq: "+964",
+  Syria: "+963",
+  Iran: "+98",
+  Yemen: "+967",
+  Turkey: "+90",
+};
+
+
+
+
 export const defaultProfileImage =
   "https://res.cloudinary.com/dyhnxqs6f/image/upload/v1719229880/meme_k18ky2_c_crop_w_674_h_734_x_0_y_0_u0o1yz.png";
