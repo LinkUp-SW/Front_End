@@ -44,18 +44,22 @@ const LicensesList: React.FC<LicensesListProps> = ({
           {license.skills.join(", ")}
         </div>
       )}
-      {(!!license.credintial_id)&&<p className="text-sm">
+      {!!license.credintial_id && (
+        <p className="text-sm">
           <span className="font-semibold">Credential ID: </span>
           <span className="text-gray-700 text-xs dark:text-gray-200">
             {license.credintial_id}
           </span>
-        </p>}
+        </p>
+      )}
 
-        {(!!license.credintial_url)&&<Link to={license.credintial_url} className="text-sm">
+      {!!license.credintial_url && (
+        <Link to={license.credintial_url} className="text-sm">
           <span className="text-gray-700 dark:text-gray-200">
             {license.credintial_url}
           </span>
-        </Link>}
+        </Link>
+      )}
       {license.media.length > 0 && (
         <div className="mt-2">
           {license.media.map((med, idx) => (
