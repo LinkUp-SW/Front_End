@@ -24,7 +24,6 @@ import { editUserBio } from "@/slices/user_profile/userBioSlice";
 
 const Connections: React.FC = () => {
   const navigate = useNavigate();
-
   const [search, setSearch] = useState("");
   const [connections, setConnections] = useState<Connection[]>([]);
   const [loading, setLoading] = useState(false);
