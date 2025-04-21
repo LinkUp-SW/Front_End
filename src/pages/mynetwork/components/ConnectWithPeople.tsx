@@ -9,8 +9,11 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { getPeopleYouMayKnow, PeopleYouMayKnow } from "@/endpoints/myNetwork";
+import { connectWithUser } from "@/endpoints/myNetwork";
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import axios from "axios";
 
 interface PeopleSectionProps {
   token: string;
@@ -25,6 +28,7 @@ const PeopleSection = ({ token, context, title }: PeopleSectionProps) => {
   const [dialogLoading, setDialogLoading] = useState(false);
   const [cursor, setCursor] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(true);
+  const [connectingIds, setConnectingIds] = useState<string[]>([]);
   const navigate = useNavigate();
   const observer = useRef<IntersectionObserver | null>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
@@ -38,6 +42,7 @@ const PeopleSection = ({ token, context, title }: PeopleSectionProps) => {
       setMainViewSuggestions(data.people);
     } catch (error) {
       console.error(`Error fetching initial people (${context}):`, error);
+      toast.error("Failed to load suggestions");
     } finally {
       setLoading(false);
     }
@@ -60,6 +65,7 @@ const PeopleSection = ({ token, context, title }: PeopleSectionProps) => {
       setHasMore(!!data.nextCursor);
     } catch (error) {
       console.error(`Error fetching more people (${context}):`, error);
+      toast.error("Failed to load more suggestions");
     } finally {
       setDialogLoading(false);
     }
@@ -96,9 +102,47 @@ const PeopleSection = ({ token, context, title }: PeopleSectionProps) => {
     [dialogLoading, hasMore, loadMorePeople]
   );
 
+  const handleConnect = async (userId: string, email?: string) => {
+    try {
+      setConnectingIds(prev => [...prev, userId]);
+      
+      await connectWithUser(token, userId, email || "");
+      
+      // Remove from both main view and all suggestions
+      setMainViewSuggestions(prev => prev.filter(p => p.user_id !== userId));
+      setAllSuggestions(prev => prev.filter(p => p.user_id !== userId));
+      
+      toast.success("Connection request sent successfully");
+    } catch (error:unknown) {
+      
+      if (axios.isAxiosError(error)) {
+        switch (error.response?.status) {
+          case 400:
+            toast.error("Invalid connection request");
+            break;
+          case 401:
+            toast.error("Please log in to connect");
+            break;
+          case 404:
+            toast.error("User not found");
+            break;
+          case 409:
+            toast.error("Connection already exists");
+            break;
+          default:
+            toast.error("Failed to send connection request");
+        }
+      } else {
+        toast.error("An unexpected error occurred");
+      }
+    } finally {
+      setConnectingIds(prev => prev.filter(id => id !== userId));
+    }
+  };
+
   const removePerson = (id: string) => {
-    setMainViewSuggestions((prev) => prev.filter((p) => p._id !== id));
-    setAllSuggestions((prev) => prev.filter((p) => p._id !== id));
+    setMainViewSuggestions(prev => prev.filter(p => p._id !== id));
+    setAllSuggestions(prev => prev.filter(p => p._id !== id));
   };
 
   const navigateToUser = (user_id: string) => {
@@ -113,71 +157,92 @@ const PeopleSection = ({ token, context, title }: PeopleSectionProps) => {
     person: PeopleYouMayKnow;
     onRemove: (id: string) => void;
     isLast?: boolean;
-  }) => (
-    <div 
-      ref={isLast ? lastPersonRef : null}
-      className="relative bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 flex flex-col items-center justify-between w-full max-w-[280px] min-h-[320px] mx-auto"
-    >
+  }) => {
+    const isConnecting = connectingIds.includes(person.user_id);
+    
+    return (
       <div 
-        className="h-20 w-full overflow-hidden rounded-t-lg cursor-pointer"
-        onClick={() => navigateToUser(person.user_id)}
+        ref={isLast ? lastPersonRef : null}
+        className="relative bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 flex flex-col items-center justify-between w-full max-w-[280px] min-h-[320px] mx-auto"
       >
-        {person.cover_photo ? (
-          <img
-            src={person.cover_photo}
-            alt="Cover"
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <div className="w-full h-full bg-gray-200 dark:bg-gray-700" />
-        )}
-      </div>
-      <div 
-        className="flex justify-center -mt-10 cursor-pointer"
-        onClick={() => navigateToUser(person.user_id)}
-      >
-        {person.profile_photo ? (
-          <img
-            src={person.profile_photo}
-            alt={`${person.bio.first_name} ${person.bio.last_name}`}
-            className="w-20 h-20 rounded-full border-4 border-white dark:border-gray-800"
-          />
-        ) : (
-          <div className="w-20 h-20 rounded-full border-4 border-white dark:border-gray-800 bg-gray-300 dark:bg-gray-600 flex items-center justify-center text-2xl font-semibold text-gray-600 dark:text-gray-300">
-            {person.bio.first_name.charAt(0)}{person.bio.last_name.charAt(0)}
-          </div>
-        )}
-      </div>
-      <div 
-        className="text-center mt-2 space-y-0.5 cursor-pointer"
-        onClick={() => navigateToUser(person.user_id)}
-      >
-        <div className="space-y-0.5">
-          <p className="text-sm font-semibold text-gray-900 dark:text-white">
-            {person.bio.first_name} {person.bio.last_name}
-          </p>
-          <p className="text-sm text-gray-600 dark:text-gray-300">
-            {person.bio.headline}
-          </p>
+        <div 
+          className="h-20 w-full overflow-hidden rounded-t-lg cursor-pointer"
+          onClick={() => navigateToUser(person.user_id)}
+        >
+          {person.cover_photo ? (
+            <img
+              src={person.cover_photo}
+              alt="Cover"
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full bg-gray-200 dark:bg-gray-700" />
+          )}
         </div>
-      </div>
-      <div className="mt-4 w-full">
+        <div 
+          className="flex justify-center -mt-10 cursor-pointer"
+          onClick={() => navigateToUser(person.user_id)}
+        >
+          {person.profile_photo ? (
+            <img
+              src={person.profile_photo}
+              alt={`${person.bio.first_name} ${person.bio.last_name}`}
+              className="w-20 h-20 rounded-full border-4 border-white dark:border-gray-800"
+            />
+          ) : (
+            <div className="w-20 h-20 rounded-full border-4 border-white dark:border-gray-800 bg-gray-300 dark:bg-gray-600 flex items-center justify-center text-2xl font-semibold text-gray-600 dark:text-gray-300">
+              {person.bio.first_name.charAt(0)}{person.bio.last_name.charAt(0)}
+            </div>
+          )}
+        </div>
+        <div 
+          className="text-center mt-2 space-y-0.5 cursor-pointer"
+          onClick={() => navigateToUser(person.user_id)}
+        >
+          <div className="space-y-0.5">
+            <p className="text-sm font-semibold text-gray-900 dark:text-white">
+              {person.bio.first_name} {person.bio.last_name}
+            </p>
+            <p className="text-sm text-gray-600 dark:text-gray-300">
+              {person.bio.headline}
+            </p>
+          </div>
+        </div>
+        <div className="mt-4 w-full">
+          <button
+            onClick={() => handleConnect(person.user_id)}
+            disabled={isConnecting}
+            className={`w-full border border-blue-600 font-medium py-1 rounded-full flex items-center justify-center gap-2 transition ${
+              isConnecting
+                ? "bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300"
+                : "text-blue-600 hover:bg-blue-100 dark:hover:bg-blue-900"
+            }`}
+          >
+            {isConnecting ? (
+              <>
+                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Connecting...
+              </>
+            ) : (
+              <>
+                <FaUserPlus />
+                Connect
+              </>
+            )}
+          </button>
+        </div>
         <button
           onClick={() => onRemove(person._id)}
-          className="w-full border border-blue-600 text-blue-600 font-medium py-1 rounded-full flex items-center justify-center gap-2 hover:bg-blue-100 dark:hover:bg-blue-900 transition"
+          className="absolute top-2 right-2 text-gray-500 hover:text-gray-800 dark:hover:text-white"
         >
-          <FaUserPlus />
-          Connect
+          ✕
         </button>
       </div>
-      <button
-        onClick={() => onRemove(person._id)}
-        className="absolute top-2 right-2 text-gray-500 hover:text-gray-800 dark:hover:text-white"
-      >
-        ✕
-      </button>
-    </div>
-  );
+    );
+  };
 
   if (mainViewSuggestions.length === 0 && !loading) return null;
 
@@ -222,11 +287,7 @@ const PeopleSection = ({ token, context, title }: PeopleSectionProps) => {
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
               </div>
             )}
-            {!hasMore && allSuggestions.length > 0 && (
-              <p className="text-center text-gray-500 dark:text-gray-400 py-4">
-                No more people to show
-              </p>
-            )}
+            
           </DialogContent>
         </Dialog>
       </div>
