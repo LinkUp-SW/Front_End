@@ -17,16 +17,10 @@ import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { CommentType, PostType, ReactionType } from "@/types";
-import {
-  fetchSinglePost,
-  getFeedPosts,
-  getPostComments,
-  getPostReactions,
-  getSingleComments,
-  getSinglePost,
-} from "@/endpoints/feed";
+import { fetchSinglePost, getPostReactions } from "@/endpoints/feed";
 import { useParams } from "react-router-dom";
 import Cookies from "js-cookie";
+import SortDown from "./components/SortDown";
 
 interface FeedPageProps {
   single?: boolean;
@@ -37,10 +31,16 @@ const FeedPage: React.FC<FeedPageProps> = ({ single = false }) => {
   const [viewMore, setViewMore] = useState(true);
   const screenWidth = useSelector((state: RootState) => state.screen.width);
 
-  const [posts, setPosts] = useState<any[]>([]);
-  const [comments, setComments] = useState<any>([]);
+  const [posts, setPosts] = useState<PostType[]>([]);
+  const [comments, setComments] = useState<CommentType[]>([]);
   const [reactions, setReactions] = useState<ReactionType[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+
+  const temporary_feed = [
+    "6806a2058db9403282340f23",
+    "6806a76c8db9403282340f47",
+    "6806b5a2bfb3de42b857be4c",
+  ];
 
   const user_token = Cookies.get("linkup_auth_token");
 
@@ -54,38 +54,33 @@ const FeedPage: React.FC<FeedPageProps> = ({ single = false }) => {
         }
 
         // Call both endpoints concurrently
-        const [fetchedPosts, fetchedComments, fetchedReactions] =
-          await Promise.all([
-            !single || !id
-              ? getFeedPosts()
-              : user_token && fetchSinglePost(id, user_token),
+        const [fetchedData, fetchedReactions] = await Promise.all([
+          Promise.all(
+            (!single || !id
+              ? temporary_feed.map((postId) =>
+                  fetchSinglePost(postId, user_token ?? "", 0, 10)
+                )
+              : [fetchSinglePost(id, user_token ?? "", 0, 10)]
+            ).filter(Boolean)
+          ),
+          getPostReactions(),
+        ]);
+        console.log("Fetched data", fetchedData);
 
-            !single || !id ? getPostComments() : getSingleComments(id),
+        const posts = fetchedData.map((data) => data.post);
+        const comments = fetchedData.map((data) => data.comments);
+        console.log("Posts:", posts);
+        console.log("Comments:", comments);
 
-            getPostReactions(),
-          ]);
-        // await Promise.all([
-        //   !single || !id ? getFeedPosts() : getSinglePost(id),
-
-        //   !single || !id ? getPostComments() : getSingleComments(id),
-
-        //   getPostReactions(),
-        // ]);
-        if (fetchedPosts)
-          setPosts(
-            Array.isArray(fetchedPosts) ? fetchedPosts : [fetchedPosts.post]
-          );
+        if (posts.length > 0) setPosts(posts);
         else setPosts([]);
-        if (fetchedComments)
-          setComments(Object.values(fetchedPosts.comments.comments));
-        else setComments([]);
+        if (comments.length > 0) {
+          setComments(comments);
+        } else {
+          setComments([]);
+        }
         if (fetchedReactions) setReactions(fetchedReactions);
         else setReactions([]);
-        console.log([fetchedPosts.post]);
-        console.log(
-          "Tito's Comments",
-          Object.values(fetchedPosts.comments.comments)
-        );
         console.log(fetchedReactions);
       } catch (error) {
         console.error("Error fetching feed data", error);
@@ -144,18 +139,24 @@ const FeedPage: React.FC<FeedPageProps> = ({ single = false }) => {
           </aside>
           {/* Main Content */}
           <main className="flex flex-col w-full max-w-auto md:max-w-[27.8rem] lg:max-w-[35rem]">
-            {!single && <CreatePost />}
-            {posts.map((post, index) => (
-              <Post
-                key={index}
-                postUser={post.author}
-                viewMore={viewMore}
-                postData={post}
-                comments={comments}
-                reactions={reactions}
-                action={post.action}
-              />
-            ))}
+            {!single && <CreatePost posts={posts} setPosts={setPosts} />}
+            <SortDown />
+            {posts.length != 0 ? (
+              posts.map((post, index) => (
+                <Post
+                  key={index}
+                  viewMore={viewMore}
+                  postData={post}
+                  comments={[comments[index]]}
+                  reactions={reactions}
+                  action={post.action}
+                />
+              ))
+            ) : (
+              <p className="text-center text-2xl bg-white border rounded-lg p-4">
+                No posts to display. Start connecting to people!
+              </p>
+            )}
           </main>
           {/* Right Sidebar */}
           {screenWidth > 1158 && (
