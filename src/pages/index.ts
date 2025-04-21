@@ -28,6 +28,7 @@ import UserExperiencesPage from "./user_profile/user_experiences/UserExperiences
 import SignInAndSecurityPage from "./settings/SignInAndSecurityPage";
 import ChangePasswordPage from "./settings/ChangePasswordPage";
 import MyItemsPage from "./my_items/MyItemsPage";
+import CompanyCreationPage from "./company/CompanyCreationPage";
 
 //Export the Imported Pages
 export {
@@ -60,4 +61,6 @@ export {
   SignInAndSecurityPage,
   ChangePasswordPage,
   MyItemsPage,
+  CompanyCreationPage,
+  
 };

@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import linkUpLogo from "/link_up_logo.png";
 import { BsChatDotsFill, BsFillGrid3X3GapFill } from "react-icons/bs";
+import { FaPlus } from "react-icons/fa";
 import NavItems from "./NavItems";
 import { FaPlusSquare } from "react-icons/fa";
 import { MdArrowDropDown } from "react-icons/md";
+import { HiOutlineBuildingOffice2 } from "react-icons/hi2";
 import ThemeToggle from "../theme_toggle/ThemeToggle";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { getErrorMessage } from "@/utils/errorHandler";
@@ -13,6 +15,7 @@ import Cookies from "js-cookie";
 import { AppDispatch, RootState } from "@/store";
 import { fetchUserBio } from "@/slices/user_profile/userBioSlice";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 import SearchInput from "./SearchInput";
 import UserProfilePopover from "./UserProfilePopover";
@@ -21,10 +24,13 @@ import { defaultProfileImage } from "@/constants";
 const NavBar = () => {
   // Use the correctly typed dispatch
   const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
 
   const token = Cookies.get("linkup_auth_token");
   const userId = Cookies.get("linkup_user_id");
   const [userPopOverOpen, setUserPopOverOpen] = useState(false);
+  const [businessPopOverOpen, setBusinessPopOverOpen] = useState(false);
+  
   // Make sure to use the correct state property names (loading instead of loading)
   const { data, loading, error } = useSelector(
     (state: RootState) => state.userBio
@@ -49,6 +55,7 @@ const NavBar = () => {
   useEffect(() => {
     if (screenWidth <= 1024) {
       setUserPopOverOpen(false);
+      setBusinessPopOverOpen(false);
     }
   }, [screenWidth]);
 
@@ -63,6 +70,12 @@ const NavBar = () => {
       toast.error(err);
     }
   };
+
+  const handleCreateCompany = () => {
+    setBusinessPopOverOpen(false);
+    navigate("/company-creation");
+  };
+
   // Use the profile picture if available; otherwise, fall back to a default image.
   const profilePictureUrl = data?.profile_photo || defaultProfileImage;
   return (
@@ -103,15 +116,42 @@ const NavBar = () => {
             </Popover>
           )}
 
-          <button className="inline-flex cursor-pointer border-l pl-2 flex-col text-gray-600 dark:text-gray-300 items-center">
-            <BsFillGrid3X3GapFill size={30} />
-            <span className="text-xs font-semibold inline-flex items-center">
-              Business{" "}
-              <i>
-                <MdArrowDropDown size={20} />
-              </i>
-            </span>
-          </button>
+          <Popover open={businessPopOverOpen} onOpenChange={setBusinessPopOverOpen}>
+            <PopoverTrigger asChild>
+              <button className="inline-flex cursor-pointer border-l pl-2 flex-col text-gray-600 dark:text-gray-300 items-center">
+                <BsFillGrid3X3GapFill size={30} />
+                <span className="text-xs font-semibold inline-flex items-center">
+                  Business{" "}
+                  <i>
+                    <MdArrowDropDown size={20} />
+                  </i>
+                </span>
+              </button>
+            </PopoverTrigger>
+            <PopoverContent className="w-64 p-4 mt-2 rounded-md shadow-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+              <div className="space-y-2">
+                <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 pb-2 border-b border-gray-200 dark:border-gray-700">
+                  Business Option
+                </h3>
+                <button 
+                  onClick={handleCreateCompany}
+                  className="w-full text-left px-3 py-3 hover:bg-blue-50 dark:hover:bg-gray-700 rounded-md transition-colors duration-200 flex items-center gap-3 group"
+                >
+                  <div className="bg-blue-100 dark:bg-gray-700 p-2 rounded-md group-hover:bg-blue-200 dark:group-hover:bg-gray-600 transition-colors duration-200">
+                    <HiOutlineBuildingOffice2 className="text-blue-600 dark:text-blue-400" size={18} />
+                  </div>
+                  <div>
+                    <span className="font-medium text-gray-800 dark:text-gray-200 flex items-center">
+                      Create a company page <FaPlus className="ml-2 text-blue-500" size={12} />
+                    </span>
+                    <span className="text-xs text-gray-500 dark:text-gray-400 block mt-1">
+                      Build your professional business presence
+                    </span>
+                  </div>
+                </button>
+              </div>
+            </PopoverContent>
+          </Popover>
         </div>
         <div className="lg:hidden flex items-center gap-2 text-gray-500 dark:text-gray-300">
           <i>

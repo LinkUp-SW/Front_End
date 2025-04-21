@@ -29,6 +29,7 @@ import {
   SignInAndSecurityPage,
   ChangePasswordPage,
   MyItemsPage,
+  CompanyCreationPage,
 } from "./pages";
 
 import React from "react";
@@ -93,7 +94,6 @@ const routes: RouteObject[] = [
     path: "/my-items/saved-posts",
     element: React.createElement(MyItemsPage),
   },
-
   {
     path: "/login",
     element: React.createElement(SignInPage),
@@ -153,6 +153,10 @@ const routes: RouteObject[] = [
   {
     path: "/settings/security/changepassword",
     element: React.createElement(ChangePasswordPage),
+  },
+  {
+    path: "/company-creation",
+    element: React.createElement(CompanyCreationPage),
   },
 ];
 
