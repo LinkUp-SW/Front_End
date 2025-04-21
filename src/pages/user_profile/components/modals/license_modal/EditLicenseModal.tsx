@@ -228,7 +228,7 @@ const EditLicenseModal: React.FC<AddLicenseModalProps> = ({
           disabled={isSubmitting}
           className="bg-purple-600 hover:bg-purple-700 w-full disabled:opacity-60 disabled:hover:bg-purple-600 disabled:cursor-not-allowed cursor-pointer text-white py-2 px-4 rounded-full transition-all duration-300"
         >
-          {isSubmitting ? <FormSpinner /> : "Save Education"}
+          {isSubmitting ? <FormSpinner /> : "Save License"}
         </button>
       </form>
     </div>
