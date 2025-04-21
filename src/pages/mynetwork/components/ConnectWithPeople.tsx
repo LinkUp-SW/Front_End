@@ -22,7 +22,9 @@ interface PeopleSectionProps {
 }
 
 const PeopleSection = ({ token, context, title }: PeopleSectionProps) => {
-  const [mainViewSuggestions, setMainViewSuggestions] = useState<PeopleYouMayKnow[]>([]);
+  const [mainViewSuggestions, setMainViewSuggestions] = useState<
+    PeopleYouMayKnow[]
+  >([]);
   const [allSuggestions, setAllSuggestions] = useState<PeopleYouMayKnow[]>([]);
   const [loading, setLoading] = useState(false);
   const [dialogLoading, setDialogLoading] = useState(false);
@@ -54,13 +56,13 @@ const PeopleSection = ({ token, context, title }: PeopleSectionProps) => {
     setDialogLoading(true);
     try {
       const data = await getPeopleYouMayKnow(token, context, cursor, 3);
-      
-      setAllSuggestions(prev => {
-        const existingIds = new Set(prev.map(p => p._id));
-        const newPeople = data.people.filter(p => !existingIds.has(p._id));
+
+      setAllSuggestions((prev) => {
+        const existingIds = new Set(prev.map((p) => p._id));
+        const newPeople = data.people.filter((p) => !existingIds.has(p._id));
         return [...prev, ...newPeople];
       });
-      
+
       setCursor(data.nextCursor);
       setHasMore(!!data.nextCursor);
     } catch (error) {
@@ -86,7 +88,7 @@ const PeopleSection = ({ token, context, title }: PeopleSectionProps) => {
     (node: HTMLDivElement) => {
       if (dialogLoading || !hasMore) return;
       if (observer.current) observer.current.disconnect();
-      
+
       observer.current = new IntersectionObserver(
         (entries) => {
           if (entries[0].isIntersecting) {
@@ -95,7 +97,7 @@ const PeopleSection = ({ token, context, title }: PeopleSectionProps) => {
         },
         { root: dialogRef.current, threshold: 0.1 }
       );
-      
+
       if (node) observer.current.observe(node);
     },
     [dialogLoading, hasMore, loadMorePeople]
@@ -103,28 +105,31 @@ const PeopleSection = ({ token, context, title }: PeopleSectionProps) => {
 
   const handleConnect = async (userId: string, email?: string) => {
     try {
-      setConnectingIds(prev => [...prev, userId]);
-      
+      setConnectingIds((prev) => [...prev, userId]);
+
       await connectWithUser(token, userId, email || "");
-      
+
       // Remove from both main view and all suggestions
-      setMainViewSuggestions(prev => prev.filter(p => p.user_id !== userId));
-      setAllSuggestions(prev => prev.filter(p => p.user_id !== userId));
-      
-      // Refetch to maintain 6 people in main view
-      const data = await getPeopleYouMayKnow(token, context, null, 6);
-      const newPeople = data.people.filter(newPerson => 
-        !mainViewSuggestions.some(p => p.user_id === newPerson.user_id) && 
-        newPerson.user_id !== userId
+      setMainViewSuggestions((prev) =>
+        prev.filter((p) => p.user_id !== userId)
       );
-      
-      setMainViewSuggestions(prev => [
-        ...prev.filter(p => p.user_id !== userId),
-        ...newPeople.slice(0, 6 - (prev.length - 1))
+      setAllSuggestions((prev) => prev.filter((p) => p.user_id !== userId));
+
+      // Refetch to maintain 6 people in main view//
+      const data = await getPeopleYouMayKnow(token, context, null, 6);
+      const newPeople = data.people.filter(
+        (newPerson) =>
+          !mainViewSuggestions.some((p) => p.user_id === newPerson.user_id) &&
+          newPerson.user_id !== userId
+      );
+
+      setMainViewSuggestions((prev) => [
+        ...prev.filter((p) => p.user_id !== userId),
+        ...newPeople.slice(0, 6 - (prev.length - 1)),
       ]);
-      
+
       toast.success("Connection request sent successfully");
-    } catch (error:unknown) {
+    } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
         switch (error.response?.status) {
           case 400:
@@ -146,13 +151,13 @@ const PeopleSection = ({ token, context, title }: PeopleSectionProps) => {
         toast.error("An unexpected error occurred");
       }
     } finally {
-      setConnectingIds(prev => prev.filter(id => id !== userId));
+      setConnectingIds((prev) => prev.filter((id) => id !== userId));
     }
   };
 
   const removePerson = (id: string) => {
-    setMainViewSuggestions(prev => prev.filter(p => p._id !== id));
-    setAllSuggestions(prev => prev.filter(p => p._id !== id));
+    setMainViewSuggestions((prev) => prev.filter((p) => p._id !== id));
+    setAllSuggestions((prev) => prev.filter((p) => p._id !== id));
   };
 
   const navigateToUser = (user_id: string) => {
@@ -169,13 +174,13 @@ const PeopleSection = ({ token, context, title }: PeopleSectionProps) => {
     isLast?: boolean;
   }) => {
     const isConnecting = connectingIds.includes(person.user_id);
-    
+
     return (
-      <div 
+      <div
         ref={isLast ? lastPersonRef : null}
         className="relative bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 flex flex-col items-center justify-between w-full max-w-[280px] min-h-[320px] mx-auto"
       >
-        <div 
+        <div
           className="h-20 w-full overflow-hidden rounded-t-lg cursor-pointer"
           onClick={() => navigateToUser(person.user_id)}
         >
@@ -189,7 +194,7 @@ const PeopleSection = ({ token, context, title }: PeopleSectionProps) => {
             <div className="w-full h-full bg-gray-200 dark:bg-gray-700" />
           )}
         </div>
-        <div 
+        <div
           className="flex justify-center -mt-10 cursor-pointer"
           onClick={() => navigateToUser(person.user_id)}
         >
@@ -201,11 +206,12 @@ const PeopleSection = ({ token, context, title }: PeopleSectionProps) => {
             />
           ) : (
             <div className="w-20 h-20 rounded-full border-4 border-white dark:border-gray-800 bg-gray-300 dark:bg-gray-600 flex items-center justify-center text-2xl font-semibold text-gray-600 dark:text-gray-300">
-              {person.bio.first_name.charAt(0)}{person.bio.last_name.charAt(0)}
+              {person.bio.first_name.charAt(0)}
+              {person.bio.last_name.charAt(0)}
             </div>
           )}
         </div>
-        <div 
+        <div
           className="text-center mt-2 space-y-0.5 cursor-pointer"
           onClick={() => navigateToUser(person.user_id)}
         >
@@ -220,6 +226,7 @@ const PeopleSection = ({ token, context, title }: PeopleSectionProps) => {
         </div>
         <div className="mt-4 w-full">
           <button
+            id="connect-button"
             onClick={() => handleConnect(person.user_id)}
             disabled={isConnecting}
             className={`w-full border border-blue-600 font-medium py-1 rounded-full flex items-center justify-center gap-2 transition ${
@@ -230,9 +237,25 @@ const PeopleSection = ({ token, context, title }: PeopleSectionProps) => {
           >
             {isConnecting ? (
               <>
-                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                <svg
+                  className="animate-spin -ml-1 mr-2 h-4 w-4 text-blue-600"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
                 </svg>
                 Connecting...
               </>
@@ -245,6 +268,7 @@ const PeopleSection = ({ token, context, title }: PeopleSectionProps) => {
           </button>
         </div>
         <button
+          id="remove-person-button"
           onClick={() => onRemove(person._id)}
           className="absolute top-2 right-2 text-gray-500 hover:text-gray-800 dark:hover:text-white"
         >
@@ -265,11 +289,14 @@ const PeopleSection = ({ token, context, title }: PeopleSectionProps) => {
 
         <Dialog onOpenChange={(open) => open && handleDialogOpen()}>
           <DialogTrigger asChild>
-            <button className="text-blue-600 dark:text-blue-400 hover:underline text-sm font-medium">
+            <button
+              id="show-all-button"
+              className="text-blue-600 dark:text-blue-400 hover:underline text-sm font-medium"
+            >
               Show all
             </button>
           </DialogTrigger>
-          <DialogContent 
+          <DialogContent
             className="max-w-6xl w-full max-h-[90vh] overflow-y-auto dark:bg-gray-900 bg-white p-6 rounded-lg"
             ref={dialogRef}
           >
@@ -304,7 +331,10 @@ const PeopleSection = ({ token, context, title }: PeopleSectionProps) => {
       {loading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {[...Array(6)].map((_, i) => (
-            <div key={i} className="animate-pulse bg-gray-200 dark:bg-gray-700 rounded-xl h-[320px] w-full" />
+            <div
+              key={i}
+              className="animate-pulse bg-gray-200 dark:bg-gray-700 rounded-xl h-[320px] w-full"
+            />
           ))}
         </div>
       ) : (
