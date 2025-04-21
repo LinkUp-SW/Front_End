@@ -22,10 +22,10 @@ import PostSettingsModal from "./modals/PostSettingsModal";
 import UploadMediaModal from "./modals/UploadMediaModal";
 import AddDocumentModal from "./modals/AddDocumentModal";
 import CommentControlModal from "./modals/CommentControlModal";
-import { MediaType, PostDBObject } from "@/types";
+import { MediaType, PostDBObject, PostType } from "@/types";
 import Cookies from "js-cookie";
 import { toast } from "sonner";
-import { createPost } from "@/endpoints/feed";
+import { createPost, fetchSinglePost } from "@/endpoints/feed";
 import { DialogDescription } from "@radix-ui/react-dialog";
 
 const useDismissModal = () => {
@@ -44,8 +44,12 @@ const useDismissModal = () => {
     dismiss,
   };
 };
+interface CreatePostProps {
+  posts: PostType[];
+  setPosts: React.Dispatch<React.SetStateAction<PostType[]>>;
+}
 
-const CreatePost: React.FC = () => {
+const CreatePost: React.FC<CreatePostProps> = ({ posts, setPosts }) => {
   const { data, loading } = useSelector((state: RootState) => state.userBio);
   const [privacySetting, setPrivacySetting] = useState<string>("Anyone");
   const [postText, setPostText] = useState<string>("");
@@ -205,6 +209,12 @@ const CreatePost: React.FC = () => {
           duration: 15000,
         }
       );
+      const post = await fetchSinglePost(response.postId, user_token, 0, 1);
+      console.log("Returne dpost:", post);
+      if (post) {
+        const newPosts = [post.post, ...posts];
+        setPosts(newPosts);
+      }
     } catch {
       toast.error("Error creating post. Please try again.");
     }
@@ -212,7 +222,7 @@ const CreatePost: React.FC = () => {
 
   return (
     <>
-      <Card className="mb-4 w-full bg-white border-0 pr-4 dark:bg-gray-900 ">
+      <Card className="mb-1 w-full bg-white border-0 pr-4 dark:bg-gray-900 ">
         <CardContent>
           <div className="flex space-x-3 justify-start items-start">
             <Link to={"#"}>
