@@ -69,7 +69,6 @@ const PeopleSection = ({ token, context, title }: PeopleSectionProps) => {
     } finally {
       setDialogLoading(false);
     }
-    console.log("All suggestions:", allSuggestions);
   }, [token, cursor, hasMore, dialogLoading, context]);
 
   useEffect(() => {
@@ -112,9 +111,20 @@ const PeopleSection = ({ token, context, title }: PeopleSectionProps) => {
       setMainViewSuggestions(prev => prev.filter(p => p.user_id !== userId));
       setAllSuggestions(prev => prev.filter(p => p.user_id !== userId));
       
+      // Refetch to maintain 6 people in main view
+      const data = await getPeopleYouMayKnow(token, context, null, 6);
+      const newPeople = data.people.filter(newPerson => 
+        !mainViewSuggestions.some(p => p.user_id === newPerson.user_id) && 
+        newPerson.user_id !== userId
+      );
+      
+      setMainViewSuggestions(prev => [
+        ...prev.filter(p => p.user_id !== userId),
+        ...newPeople.slice(0, 6 - (prev.length - 1))
+      ]);
+      
       toast.success("Connection request sent successfully");
     } catch (error:unknown) {
-      
       if (axios.isAxiosError(error)) {
         switch (error.response?.status) {
           case 400:
@@ -287,7 +297,6 @@ const PeopleSection = ({ token, context, title }: PeopleSectionProps) => {
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
               </div>
             )}
-            
           </DialogContent>
         </Dialog>
       </div>
