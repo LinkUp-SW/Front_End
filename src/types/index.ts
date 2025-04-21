@@ -29,23 +29,29 @@ export interface Notification {
 }
 
 export interface PostType {
-  user: {
-    name: string;
-    profileImage: string;
+  author: {
+    firstName: string;
+    lastName: string;
+    username: string;
+    profilePicture: string;
     headline?: string;
     followers?: string;
-    degree: string;
+    connectionDegree: string;
   };
-  post: {
-    content: string;
-    date: number;
-    images?: string[];
-    video?: string;
-    pdf?: string;
-    public: boolean;
-    edited?: boolean;
+  comments_disabled: string;
+  content: string;
+  date: number;
+  media: {
+    link: string[];
+    media_type: string;
   };
-  stats: {
+  public_post: boolean;
+  reacts: any[];
+  tagged_users: any[];
+  user_id: string;
+  _id: string;
+
+  stats?: {
     likes?: number;
     comments?: number;
     celebrate?: number;
@@ -56,6 +62,7 @@ export interface PostType {
     person?: string;
     reposts?: number;
   };
+
   action?: {
     name?: string;
     profileImage?: string;
@@ -324,6 +331,6 @@ export interface BioFormData {
     address: string;
     birthday: string;
     website: string;
-    country_code:string
+    country_code: string;
   };
 }

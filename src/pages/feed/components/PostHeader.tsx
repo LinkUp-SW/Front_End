@@ -36,13 +36,15 @@ interface PostData {
 }
 
 interface PostHeaderProps {
-  user: User;
+  user: any;
   action?: Action;
   postMenuOpen: boolean;
   setPostMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
   menuActions: MenuAction[]; // You can replace `any` with a more specific type if available
-  post: PostData;
   savedPostView?: boolean;
+  edited?: boolean;
+  publicPost?: boolean;
+  date: number;
 }
 
 const PostHeader: React.FC<PostHeaderProps> = ({
@@ -51,22 +53,29 @@ const PostHeader: React.FC<PostHeaderProps> = ({
   postMenuOpen,
   setPostMenuOpen,
   menuActions,
-  post,
   savedPostView = false,
+  edited,
+  publicPost,
+  date,
 }) => {
-  const timeAgo = moment(post.date).fromNow();
+  console.log("Date", date);
+  const timeAgo = moment(date * 1000).fromNow();
+
   return (
     <header className="flex items-center space-x-3 w-full pl-2">
       <img
-        src={user.profileImage}
-        alt={user.name}
+        src={user.profilePicture}
+        alt={user.username}
         className="w-8 h-8 md:w-12 md:h-12 rounded-full"
       />
       <div className="flex flex-col gap-0 w-full relative">
         <div className="flex justify-between">
-          <Link to="#" className="flex gap-1 items-center">
+          <Link
+            to={`/user-profile/${user.username}`}
+            className="flex gap-1 items-center"
+          >
             <h2 className="text-xs md:text-sm font-semibold sm:text-base hover:cursor-pointer hover:underline hover:text-blue-600 dark:hover:text-blue-400">
-              {user.name}
+              {user.firstName + " " + user.lastName}
             </h2>
             <p className="text-lg text-gray-500 dark:text-neutral-400 font-bold">
               {" "}
@@ -74,13 +83,16 @@ const PostHeader: React.FC<PostHeaderProps> = ({
             </p>
             <p className="text-xs text-gray-500 dark:text-neutral-400">
               {" "}
-              {user.degree}
+              {user.connectionDegree}
             </p>
           </Link>
           <nav className={`flex relative left-5 ${action ? "bottom-10" : ""}`}>
             <Dialog>
               <Popover open={postMenuOpen} onOpenChange={setPostMenuOpen}>
-                <PopoverTrigger className="rounded-full z-10 dark:hover:bg-zinc-700 hover:cursor-pointer dark:hover:text-neutral-200 h-8 gap-1.5 px-3 has-[>svg]:px-2.5">
+                <PopoverTrigger
+                  asChild
+                  className="rounded-full z-10 dark:hover:bg-zinc-700 hover:cursor-pointer dark:hover:text-neutral-200 h-8 gap-1.5 px-3 has-[>svg]:px-2.5"
+                >
                   <EllipsisIcon
                     onClick={() => setPostMenuOpen(!postMenuOpen)}
                   />
@@ -154,13 +166,13 @@ const PostHeader: React.FC<PostHeaderProps> = ({
 
           <div className="flex gap-x-1 items-center dark:text-neutral-400 text-gray-500">
             <time className="">{timeAgo}</time>
-            {post.edited && (
+            {edited && (
               <>
                 <p className="text-lg font-bold"> · </p>
                 <span>Edited </span>
               </>
             )}
-            {post.public && (
+            {publicPost && (
               <>
                 <p className="text-lg font-bold"> · </p>
                 <span className="text-lg">

@@ -2,14 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import Comment, { CommentProps } from "./Comment";
 import Reply from "./Reply";
 
-interface CommentWithRepliesProps extends CommentProps {
-  replies?: CommentProps[];
-}
-
-const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
-  replies,
-  ...commentProps
-}) => {
+const CommentWithReplies: React.FC<any> = ({ replies, ...commentProps }) => {
   const [showReplies] = useState(true);
   const [mainCommentHeight, setMainCommentHeight] = useState(0);
   const [replyHeights, setReplyHeights] = useState(0);
@@ -71,7 +64,7 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
 
           {showReplies && (
             <div className="mt-2 space-y-2">
-              {replies.map((reply, idx) => (
+              {replies.map((reply: any, idx: number) => (
                 <div
                   key={idx}
                   ref={(el) => {

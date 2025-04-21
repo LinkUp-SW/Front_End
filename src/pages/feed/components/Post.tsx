@@ -37,19 +37,24 @@ import PostImages from "./PostImages";
 import IconButton from "./buttons/IconButton";
 
 interface PostProps {
-  postData: PostType;
-  comments: CommentType[];
+  postUser: any;
+  postData: any;
+  comments: any[];
   viewMore: boolean;
   reactions: ReactionType[];
+  action: any;
 }
 
 const Post: React.FC<PostProps> = ({
+  postUser,
   postData,
   comments,
   viewMore,
   reactions,
+  action,
 }) => {
-  const { user, post, stats, action } = postData;
+  console.log("Post Data", postData);
+  const { date, media, reacts, tagged_users, postID } = postData;
   const [liked, setLiked] = useState(false);
   const [isLandscape, setIsLandscape] = useState<boolean>(false);
   const [postMenuOpen, setPostMenuOpen] = useState(false);
@@ -102,14 +107,14 @@ const Post: React.FC<PostProps> = ({
   };
 
   useEffect(() => {
-    if (post.images && post.images.length > 0) {
+    if (media && media.media_type === "none") {
       const img = new Image();
-      img.src = post.images[0];
+      img.src = media.link[0];
       img.onload = () => {
         setIsLandscape(img.width > img.height); // Check if the image is landscape
       };
     }
-  }, [post.images]);
+  }, [media]);
 
   const menuActions = getMenuActions();
 
@@ -121,6 +126,16 @@ const Post: React.FC<PostProps> = ({
     },
     () => handleToggleComments()
   );
+
+  const stats = {
+    likes: 15,
+    love: 2,
+    support: 1,
+    celebrate: 1,
+    comments: 4,
+    reposts: 5,
+    person: "Hamada",
+  };
 
   const { topStats, totalStats } = calculateTopStats(stats);
 
@@ -147,26 +162,33 @@ const Post: React.FC<PostProps> = ({
           </header>
         )}
         <PostHeader
-          user={user}
+          user={postUser}
           action={action}
           postMenuOpen={postMenuOpen}
           setPostMenuOpen={setPostMenuOpen}
           menuActions={menuActions}
-          post={post}
+          edited={postData.edited}
+          publicPost={postData.public}
+          date={date}
         />
-        <TruncatedText id="post-content" content={post.content} lineCount={3} />
+        <TruncatedText
+          id="post-content"
+          content={postData.content}
+          lineCount={3}
+        />
 
         {/* Post Image(s) */}
-        {post && post.images && post.images.length != 0 && (
-          <PostImages images={post.images || []} isLandscape={isLandscape} />
-        )}
+        {(media && media.media_type === "image") ||
+          (media.media_type === "images" && (
+            <PostImages images={media.link || []} isLandscape={isLandscape} />
+          ))}
 
-        {post.video && (
+        {media && media.media_type === "video" && (
           <div className="flex w-[100%] relative left-4 self-center justify-end">
-            <video className="w-full pt-4" controls src={post.video}></video>
+            <video className="w-full pt-4" controls src={media.link[0]}></video>
           </div>
         )}
-        {post.pdf && (
+        {media && media.media_type === "pdf" && (
           <div className="h-[37rem] self-center w-full max-w-[34rem] relative left-4.5 pt-4">
             <div className="App">
               <div className="header">React sample</div>
@@ -240,6 +262,7 @@ const Post: React.FC<PostProps> = ({
               ) =>
                 button.name === "Like" ? (
                   <PopoverTrigger
+                    asChild
                     key={index}
                     onMouseEnter={handleMouseEnter}
                     onMouseLeave={handleMouseLeave}
@@ -417,7 +440,7 @@ const Post: React.FC<PostProps> = ({
       <CardFooter>
         {commentsOpen && (
           <PostFooter
-            user={user}
+            user={postUser}
             sortingMenu={sortingMenu}
             setSortingMenu={setSortingMenu}
             sortingState={sortingState}

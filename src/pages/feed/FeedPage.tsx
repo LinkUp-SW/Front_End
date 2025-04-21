@@ -37,8 +37,8 @@ const FeedPage: React.FC<FeedPageProps> = ({ single = false }) => {
   const [viewMore, setViewMore] = useState(true);
   const screenWidth = useSelector((state: RootState) => state.screen.width);
 
-  const [posts, setPosts] = useState<PostType[]>([]);
-  const [comments, setComments] = useState<CommentType[]>([]);
+  const [posts, setPosts] = useState<any[]>([]);
+  const [comments, setComments] = useState<any>([]);
   const [reactions, setReactions] = useState<ReactionType[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -55,29 +55,38 @@ const FeedPage: React.FC<FeedPageProps> = ({ single = false }) => {
 
         // Call both endpoints concurrently
         const [fetchedPosts, fetchedComments, fetchedReactions] =
-          // await Promise.all([
-          //   !single || !id
-          //     ? getFeedPosts()
-          //     : user_token && fetchSinglePost(id, user_token),
-
-          //   !single || !id ? getPostComments() : getSingleComments(id),
-
-          //   getPostReactions(),
-          // ]);
           await Promise.all([
-            !single || !id ? getFeedPosts() : getSinglePost(id),
+            !single || !id
+              ? getFeedPosts()
+              : user_token && fetchSinglePost(id, user_token),
 
             !single || !id ? getPostComments() : getSingleComments(id),
 
             getPostReactions(),
           ]);
+        // await Promise.all([
+        //   !single || !id ? getFeedPosts() : getSinglePost(id),
+
+        //   !single || !id ? getPostComments() : getSingleComments(id),
+
+        //   getPostReactions(),
+        // ]);
         if (fetchedPosts)
-          setPosts(Array.isArray(fetchedPosts) ? fetchedPosts : [fetchedPosts]);
+          setPosts(
+            Array.isArray(fetchedPosts) ? fetchedPosts : [fetchedPosts.post]
+          );
         else setPosts([]);
-        if (fetchedComments) setComments(fetchedComments);
+        if (fetchedComments)
+          setComments(Object.values(fetchedPosts.comments.comments));
         else setComments([]);
         if (fetchedReactions) setReactions(fetchedReactions);
         else setReactions([]);
+        console.log([fetchedPosts.post]);
+        console.log(
+          "Tito's Comments",
+          Object.values(fetchedPosts.comments.comments)
+        );
+        console.log(fetchedReactions);
       } catch (error) {
         console.error("Error fetching feed data", error);
       }
@@ -139,10 +148,12 @@ const FeedPage: React.FC<FeedPageProps> = ({ single = false }) => {
             {posts.map((post, index) => (
               <Post
                 key={index}
+                postUser={post.author}
                 viewMore={viewMore}
                 postData={post}
                 comments={comments}
                 reactions={reactions}
+                action={post.action}
               />
             ))}
           </main>

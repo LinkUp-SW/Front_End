@@ -57,7 +57,7 @@ interface PostFooterProps {
   setSortingMenu: React.Dispatch<React.SetStateAction<boolean>>;
   sortingState: string;
   handleSortingState: (selectedState: string) => void;
-  comments: CommentType[];
+  comments: any[];
 }
 
 const PostFooter: React.FC<PostFooterProps> = ({
@@ -85,7 +85,18 @@ const PostFooter: React.FC<PostFooterProps> = ({
     }
   };
 
+  const stats = {
+    likes: 15,
+    love: 2,
+    support: 1,
+    celebrate: 1,
+    comments: 4,
+    reposts: 5,
+    person: "Hamada",
+  };
+
   const MemoizedEmojiPicker = memo(EmojiPicker);
+  console.log("Footer comments", comments);
 
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -237,10 +248,9 @@ const PostFooter: React.FC<PostFooterProps> = ({
         {comments.map((data, index: number) => (
           <CommentWithReplies
             key={index}
-            user={data.user}
-            comment={data.comment}
-            stats={data.stats}
-            replies={[data]}
+            comment={data}
+            stats={stats}
+            replies={data.children}
           />
         ))}
       </div>

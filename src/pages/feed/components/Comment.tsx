@@ -25,12 +25,13 @@ import ReportCommentModal from "./modals/ReportCommentModal";
 import ReactionsModal from "./modals/ReactionsModal";
 import { getPostReactions } from "@/endpoints/feed";
 import { ReactionType } from "@/types";
+import moment from "moment";
 
 export interface CommentProps {
   user: {
     profileImage: string;
     name: string;
-    degree: string;
+    connectionDegree: string;
     followers?: string;
     headline?: string;
   };
@@ -51,10 +52,21 @@ export interface CommentProps {
   };
 }
 
-const Comment: React.FC<CommentProps> = ({ user, comment, stats }) => {
-  const { profileImage, name, degree } = user;
+const Comment: React.FC<any> = ({ comment, stats }) => {
+  const {
+    profilePicture,
+    username,
+    firstName,
+    lastName,
+    connectionDegree,
+    headline,
+    followers,
+  } = comment.author;
 
-  const { text, edited } = comment;
+  console.log("Comment:", comment);
+
+  const { content, date, is_edited, media } = comment;
+
   const [commentMenuOpen, setCommentMenuOpen] = useState(false);
   const [reactions, setReactions] = useState<ReactionType[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -146,21 +158,26 @@ const Comment: React.FC<CommentProps> = ({ user, comment, stats }) => {
     },
   ];
 
+  const timeAgo = moment(date * 1000).fromNow();
+
   return (
     <div className="flex flex-col px-0">
       <header className="flex items-center space-x-3 w-full">
         <img
-          src={profileImage}
-          alt={name}
+          src={profilePicture}
+          alt={username}
           className="w-8 h-8 rounded-full relative z-10"
         />
         <div className="w-12 h-16 rounded-full z-0 bg-white dark:bg-gray-900 absolute" />
 
         <div className="flex flex-col gap-0 w-full relative">
           <section className="flex justify-between">
-            <Link to="#" className="flex gap-1 items-center">
+            <Link
+              to={`/user-profile/${username}`}
+              className="flex gap-1 items-center"
+            >
               <h2 className="text-xs font-semibold sm:text-sm hover:cursor-pointer hover:underline hover:text-blue-600 dark:hover:text-blue-400">
-                {name}
+                {firstName + " " + lastName}
               </h2>
               <p className="text-lg text-gray-500 dark:text-neutral-400 font-bold">
                 {" "}
@@ -168,17 +185,17 @@ const Comment: React.FC<CommentProps> = ({ user, comment, stats }) => {
               </p>
               <p className="text-xs text-gray-500 dark:text-neutral-400">
                 {" "}
-                {degree}
+                {connectionDegree}
               </p>
             </Link>
             <nav className={`flex relative left-5`}>
               <div className="flex gap-x-1 items-baseline text-xs dark:text-neutral-400 text-gray-500">
-                {edited && (
+                {is_edited && (
                   <>
                     <span>(edited) </span>
                   </>
                 )}
-                <time className="">1d</time>
+                <time className="">{timeAgo}</time>
               </div>
               <Dialog>
                 <Popover
@@ -231,12 +248,12 @@ const Comment: React.FC<CommentProps> = ({ user, comment, stats }) => {
           </section>
           <div className="text-xs text-gray-500 dark:text-neutral-400 relative -top-2">
             <Link to="#" className={`text-ellipsis line-clamp-1`}>
-              {user.followers ? user.followers + " followers" : user.headline}
+              {followers ? followers + " followers" : headline}
             </Link>
           </div>
         </div>
       </header>
-      <p className="p-1 pl-11 text-xs md:text-sm">{text}</p>
+      <p className="p-1 pl-11 text-xs md:text-sm">{content}</p>
       <footer className="flex pl-10 justify-start items-center gap-0.5 ">
         {/* <div className="flex justify-start w-full items-center pt-4 gap-0"> */}
         <Button
@@ -281,15 +298,19 @@ const Comment: React.FC<CommentProps> = ({ user, comment, stats }) => {
         >
           Reply
         </Button>
-        <p className="text-xs  text-gray-500 dark:text-neutral-400 font-bold">
-          {" "}
-          ·
-        </p>
-        <p className="hover:underlinetext-xs text-xs text-gray-500 line-clamp-1 text-ellipsis dark:text-neutral-400 hover:text-blue-600 hover:underline dark:hover:text-blue-400 hover:cursor-pointer">
-          {stats.replies && stats.replies == 1
-            ? "1 Reply"
-            : `${stats.replies} Replies`}
-        </p>
+        {stats.replies && (
+          <>
+            <p className="text-xs  text-gray-500 dark:text-neutral-400 font-bold">
+              {" "}
+              ·
+            </p>
+            <p className="hover:underlinetext-xs text-xs text-gray-500 line-clamp-1 text-ellipsis dark:text-neutral-400 hover:text-blue-600 hover:underline dark:hover:text-blue-400 hover:cursor-pointer">
+              {stats.replies && stats.replies == 1
+                ? "1 Reply"
+                : `${stats.replies} Replies`}
+            </p>
+          </>
+        )}
       </footer>
     </div>
   );
