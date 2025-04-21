@@ -88,14 +88,7 @@ const SignInPage: React.FC = () => {
       }
 
       
-      try {
-        const token = Cookies.get("linkup_auth_token") as string;
-        console.log('trying to connect');
-        await socketService.connect(token); 
-        console.log('Socket connected successfully after login');
-      } catch (socketError) {
-        console.error('Socket connection failed:', socketError);
-      }
+   
 
       toast.success("Signed in successfully!");
       setTimeout(() => {
