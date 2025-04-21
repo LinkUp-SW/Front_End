@@ -13,6 +13,7 @@ import {
   
 } from "@/endpoints/messaging";
 import {setEditingMessageId,setEditText} from "../../slices/messaging/messagingSlice";
+import { toast } from "sonner";
 
 const ChatingScreen = () => {
   const dispatch = useDispatch();
@@ -59,8 +60,10 @@ const ChatingScreen = () => {
 
         const res = await getConversation(token, selectedConvID);
         setChatData(res);
+        toast.success("Messages loaded successfully");
       } catch (error) {
         console.error("Failed to fetch conversations:", error);
+        toast.error("Failed to load Messages");
       } finally {
         setLoading(false);
       }
@@ -104,8 +107,10 @@ const ChatingScreen = () => {
         messages: prev!.messages.filter((msg) => msg.messageId !== msgId),
       }));
       setMsgDeleted(true);
+      toast.success("Message deleted");
     } catch (err) {
       console.log("Error deleting:", err);
+      toast.error("Failed to delete message");
     }
   };
 
@@ -119,8 +124,9 @@ const ChatingScreen = () => {
         <div className=" border border-[#e8e8e8] flex justify-between items-center px-3 py-3 flex-shrink-0">
           {dataChat?.otherUser && (
             <div>
-              <p id="user2Name" className="font-semibold">
-                {dataChat?.otherUser.firstName}
+              <p id="userName" className="font-semibold">
+                {dataChat?.otherUser.firstName} {dataChat?.otherUser.lastName}
+                
               </p>
               <p id="userStatuse" className="text-xs text-gray-500">
                 {dataChat.otherUser.onlineStatus ? "Online" : "Offine"}
@@ -173,7 +179,7 @@ const ChatingScreen = () => {
                       <p id="user-name" className="pl-3 font-semibold">
                         {msg.isOwnMessage
                           ? user2Name
-                          : dataChat.otherUser.firstName}
+                          : `${dataChat.otherUser.firstName} ${dataChat.otherUser.lastName}`}
                         <span className="text-xs text-gray-500">
                           {" "}
                           · {new Date(msg.timestamp).toLocaleTimeString()}
