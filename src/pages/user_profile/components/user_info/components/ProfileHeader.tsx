@@ -12,6 +12,7 @@ import {
 } from "@/components";
 import { FaPencilAlt } from "react-icons/fa";
 import EditUserBioModal from "../../modals/edit_user_bio_modal/EditUserBioModal";
+import { useState } from "react";
 
 type ProfileHeaderProps = {
   userid: string;
@@ -82,9 +83,10 @@ const EditUserBio: React.FC<Partial<ProfileHeaderProps>> = ({
   userid,
   intros,
 }) => {
+  const [open, setOpen] = useState(false);
   return (
     <div className="absolute right-[-1rem] top-[-5rem]">
-      <Dialog>
+      <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
           <button
             id="edit-user-bio"
@@ -96,7 +98,7 @@ const EditUserBio: React.FC<Partial<ProfileHeaderProps>> = ({
         </DialogTrigger>
         <DialogContent
           aria-describedby={undefined}
-          className="!max-w-5xl md:!w-[40rem] dark:bg-gray-900 dark:border-gray-600 !w-full border-2"
+          className="!max-w-5xl md:!w-[40rem] max-h-[40rem] overflow-y-auto dark:bg-gray-900 dark:border-gray-600 !w-full border-2"
         >
           <DialogHeader>
             <DialogTitle>Edit User Bio</DialogTitle>
@@ -105,6 +107,7 @@ const EditUserBio: React.FC<Partial<ProfileHeaderProps>> = ({
             </DialogDescription>
           </DialogHeader>
           <EditUserBioModal
+            setOpenEditDialog={setOpen}
             userData={user as Bio}
             userId={userid as string}
             intros={

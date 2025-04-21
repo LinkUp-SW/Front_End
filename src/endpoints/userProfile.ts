@@ -1,6 +1,7 @@
 import axiosInstance from "@/services/axiosInstance";
 import {
   About,
+  BioFormData,
   Education,
   Experience,
   License,
@@ -460,6 +461,19 @@ export const deleteUserCoverPhoto = async (token: string) => {
 export const getUserCoverPhoto = async (token: string, userId: string) => {
   const response = await axiosInstance(
     `/api/v1/user/profile/cover-photo/${userId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
+
+export const updateUserBio = async (token: string, bio: BioFormData) => {
+  const response = await axiosInstance.put(
+    "/api/v1/user/update-user-profile",
+    { bio: bio },
     {
       headers: {
         Authorization: `Bearer ${token}`,
