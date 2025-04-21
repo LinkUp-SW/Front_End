@@ -187,8 +187,24 @@ const CreatePost: React.FC = () => {
       dismiss();
       clearFields();
       const toastId = toast.loading("Submitting your post...");
-      await createPost(postObject, user_token);
-      toast.success("Post created successfully!", { id: toastId });
+      const response = await createPost(postObject, user_token);
+      console.log(response);
+      toast.success(
+        <span>
+          {response.message}{" "}
+          <a
+            href={`/feed/posts/${response.postId}`}
+            className="text-blue-600 dark:text-blue-300 hover:underline"
+            onClick={() => toast.dismiss(toastId)}
+          >
+            View post
+          </a>
+        </span>,
+        {
+          id: toastId,
+          duration: 15000,
+        }
+      );
     } catch {
       toast.error("Error creating post. Please try again.");
     }
