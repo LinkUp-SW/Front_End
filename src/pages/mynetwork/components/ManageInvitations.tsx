@@ -33,7 +33,7 @@ const ManageInvitations: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [allReceivedFetched, setAllReceivedFetched] = useState(false);
   const [allSentFetched, setAllSentFetched] = useState(false);
-  const [isDialogOpen, setIsDialogOpen] = useState(false); // Added dialog state
+  const [openWithdrawDialogId, setOpenWithdrawDialogId] = useState<string | null>(null); // Track which dialog is open
 
   const token = Cookies.get("linkup_auth_token");
 
@@ -169,7 +169,7 @@ const ManageInvitations: React.FC = () => {
     try {
       await withdrawInvitation(token, userId);
       setSentInvitations((prev) => prev.filter((c) => c.user_id !== userId));
-      setIsDialogOpen(false); // Close dialog after successful withdrawal
+      setOpenWithdrawDialogId(null); // Close dialog after successful withdrawal
     } catch (error) {
       console.error("Error withdrawing invitation", error);
     }
@@ -252,12 +252,21 @@ const ManageInvitations: React.FC = () => {
                     </button>
                   </div>
                 ) : (
-                  <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                  <Dialog 
+                    open={openWithdrawDialogId === invite.user_id} 
+                    onOpenChange={(open) => {
+                      if (!open) {
+                        setOpenWithdrawDialogId(null);
+                      } else {
+                        setOpenWithdrawDialogId(invite.user_id);
+                      }
+                    }}
+                  >
                     <DialogTrigger asChild>
                       <button
                         id="withdraw-invitation-button"
                         className="bg-gray-500 text-white px-3 py-1 text-sm rounded"
-                        onClick={() => setIsDialogOpen(true)}
+                        onClick={() => setOpenWithdrawDialogId(invite.user_id)}
                       >
                         Withdraw
                       </button>
@@ -273,7 +282,7 @@ const ManageInvitations: React.FC = () => {
                           userId: invite.user_id,
                         }}
                         onConfirm={() => withdrawInvitations(invite.user_id)}
-                        onCancel={() => setIsDialogOpen(false)} // Pass the close handler
+                        onCancel={() => setOpenWithdrawDialogId(null)}
                       />
                     </DialogContent>
                   </Dialog>
