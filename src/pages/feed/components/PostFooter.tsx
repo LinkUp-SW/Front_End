@@ -8,7 +8,7 @@ import { FaChevronDown, FaRocket, FaClock } from "react-icons/fa";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components";
 import { Link } from "react-router-dom";
-import { CommentType } from "@/types";
+import { CommentType, PostUserType } from "@/types";
 import { GoFileMedia as MediaIcon } from "react-icons/go";
 import CommentWithReplies from "./CommentWithReplies";
 import { MdOutlineEmojiEmotions } from "react-icons/md";
@@ -46,13 +46,7 @@ export const COMMENT_SORTING_MENU: SortingMenuItem[] = [
 ];
 
 interface PostFooterProps {
-  user: {
-    name: string;
-    profileImage: string;
-    headline?: string;
-    followers?: string;
-    degree: string;
-  };
+  user: PostUserType;
   sortingMenu: boolean;
   setSortingMenu: React.Dispatch<React.SetStateAction<boolean>>;
   sortingState: string;
@@ -147,7 +141,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
         <div className="flex space-x-3 justify-start items-center w-full">
           <Link to={"#"}>
             <Avatar className="h-8 w-8 pl-0">
-              <AvatarImage src={user.profileImage} alt="Profile" />
+              <AvatarImage src={user.profilePicture} alt="Profile" />
               <AvatarFallback>CN</AvatarFallback>
             </Avatar>
           </Link>
