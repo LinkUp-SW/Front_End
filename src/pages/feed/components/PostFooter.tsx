@@ -151,7 +151,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
               <AvatarFallback>CN</AvatarFallback>
             </Avatar>
           </Link>
-          <div className="flex relative w-full items-center">
+          <div className="flex relative w-full items-center pb-3">
             <input
               ref={inputRef}
               id="comment-input"
@@ -171,7 +171,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
               <PopoverTrigger asChild onClick={() => console.log("hi")}>
                 <Button
                   variant="ghost"
-                  className="absolute right-10 bottom-1 hover:cursor-pointer rounded-full dark:hover:bg-gray-800 dark:hover:text-neutral-200"
+                  className="absolute right-10 bottom-4 hover:cursor-pointer rounded-full dark:hover:bg-gray-800 dark:hover:text-neutral-200"
                 >
                   <MdOutlineEmojiEmotions />
                 </Button>
@@ -206,54 +206,58 @@ const PostFooter: React.FC<PostFooterProps> = ({
           </div>
         </div>
       </div>
-      <div className="flex relative -left-5">
-        <Popover open={sortingMenu} onOpenChange={setSortingMenu}>
-          <PopoverTrigger
-            asChild
-            className="rounded-full z-10 dark:hover:bg-zinc-700 hover:cursor-pointer dark:hover:text-neutral-200 h-8 gap-1.5 px-3"
-          >
-            <div className="flex items-center gap-1 text-gray-500 text-sm font-medium ">
-              <p>{sortingState}</p>
-              <FaChevronDown />
-            </div>
-          </PopoverTrigger>
-          <PopoverContent className="relative  dark:bg-gray-900 bg-white border-neutral-200 dark:border-gray-700 p-0 pt-1">
-            <div className="flex flex-col w-full p-0">
-              {COMMENT_SORTING_MENU.map((item, index) => (
-                <Button
-                  key={index}
-                  onClick={() => {
-                    handleSortingState(item.name);
-                    setSortingMenu(false);
-                    item.action();
-                  }}
-                  className="flex justify-start items-center rounded-none bg-transparent w-full h-16 pt-4 py-4 hover:bg-neutral-200 text-gray-900  dark:hover:bg-gray-600 dark:hover:text-white hover:cursor-pointer"
-                >
-                  <div className="flex justify-start w-full  text-gray-600 dark:text-neutral-200">
-                    <div className="p-4 pl-0 ">{item.icon}</div>
-                    <div className="flex flex-col items-start justify-center">
-                      <span className="font-medium">{item.name}</span>
-                      <span className="text-xs text-wrap text-left font-normal">
-                        {item.subtext}
-                      </span>
-                    </div>
-                  </div>
-                </Button>
-              ))}
-            </div>
-          </PopoverContent>
-        </Popover>
-      </div>
-      <div className="flex flex-col relative -left-1 -top-3">
-        {comments.map((data, index: number) => (
-          <CommentWithReplies
-            key={index}
-            comment={data}
-            stats={stats}
-            replies={data.children}
-          />
-        ))}
-      </div>
+      {comments.length != 0 && (
+        <>
+          <div className="flex relative -left-5">
+            <Popover open={sortingMenu} onOpenChange={setSortingMenu}>
+              <PopoverTrigger
+                asChild
+                className="rounded-full z-10 dark:hover:bg-zinc-700 hover:cursor-pointer dark:hover:text-neutral-200 h-8 gap-1.5 px-3"
+              >
+                <div className="flex items-center gap-1 text-gray-500 text-sm font-medium ">
+                  <p>{sortingState}</p>
+                  <FaChevronDown />
+                </div>
+              </PopoverTrigger>
+              <PopoverContent className="relative  dark:bg-gray-900 bg-white border-neutral-200 dark:border-gray-700 p-0 pt-1">
+                <div className="flex flex-col w-full p-0">
+                  {COMMENT_SORTING_MENU.map((item, index) => (
+                    <Button
+                      key={index}
+                      onClick={() => {
+                        handleSortingState(item.name);
+                        setSortingMenu(false);
+                        item.action();
+                      }}
+                      className="flex justify-start items-center rounded-none bg-transparent w-full h-16 pt-4 py-4 hover:bg-neutral-200 text-gray-900  dark:hover:bg-gray-600 dark:hover:text-white hover:cursor-pointer"
+                    >
+                      <div className="flex justify-start w-full  text-gray-600 dark:text-neutral-200">
+                        <div className="p-4 pl-0 ">{item.icon}</div>
+                        <div className="flex flex-col items-start justify-center">
+                          <span className="font-medium">{item.name}</span>
+                          <span className="text-xs text-wrap text-left font-normal">
+                            {item.subtext}
+                          </span>
+                        </div>
+                      </div>
+                    </Button>
+                  ))}
+                </div>
+              </PopoverContent>
+            </Popover>
+          </div>
+          <div className="flex flex-col relative -left-1 -top-3">
+            {comments.map((data, index: number) => (
+              <CommentWithReplies
+                key={index}
+                comment={data}
+                stats={stats}
+                replies={data.children}
+              />
+            ))}
+          </div>
+        </>
+      )}
     </section>
   );
 };
