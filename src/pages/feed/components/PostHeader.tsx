@@ -10,7 +10,7 @@ import { LiaEllipsisHSolid as EllipsisIcon } from "react-icons/lia";
 import { IoMdClose as CloseIcon } from "react-icons/io";
 import { Button, Dialog, DialogTrigger, DialogContent } from "@/components";
 import ReportPostModal from "./modals/ReportPostModal";
-import { MenuAction } from "@/types";
+import { MenuAction, PostUserType } from "@/types";
 import moment from "moment";
 
 interface User {
@@ -27,16 +27,8 @@ interface Action {
   action?: "like" | "comment" | "repost" | "love";
 }
 
-interface PostData {
-  content: string;
-  date: number;
-  images?: string[];
-  public: boolean;
-  edited?: boolean;
-}
-
 interface PostHeaderProps {
-  user: any;
+  user: PostUserType;
   action?: Action;
   postMenuOpen: boolean;
   setPostMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -62,7 +54,7 @@ const PostHeader: React.FC<PostHeaderProps> = ({
   const timeAgo = moment(date * 1000).fromNow();
 
   return (
-    <header className="flex items-center space-x-3 w-full pl-2">
+    <header className="flex items-center space-x-3 w-full pl-4 pt-1 pb-4">
       <img
         src={user.profilePicture}
         alt={user.username}
@@ -86,15 +78,20 @@ const PostHeader: React.FC<PostHeaderProps> = ({
               {user.connectionDegree}
             </p>
           </Link>
-          <nav className={`flex relative left-5 ${action ? "bottom-10" : ""}`}>
+          <nav
+            className={`flex relative left-5 gap-2 ${
+              action ? "bottom-10" : ""
+            }`}
+          >
             <Dialog>
               <Popover open={postMenuOpen} onOpenChange={setPostMenuOpen}>
                 <PopoverTrigger
                   asChild
-                  className="rounded-full z-10 dark:hover:bg-zinc-700 hover:cursor-pointer dark:hover:text-neutral-200 h-8 gap-1.5 px-3 has-[>svg]:px-2.5"
+                  className="rounded-full  relative top-1 z-10 w-7 h-7 px-1 aspect-square hover:bg-neutral-200 dark:hover:bg-zinc-700 hover:cursor-pointer dark:hover:text-neutral-200 "
                 >
                   <EllipsisIcon
                     onClick={() => setPostMenuOpen(!postMenuOpen)}
+                    className=""
                   />
                 </PopoverTrigger>
                 <PopoverContent className="relative right-30 dark:bg-gray-900 bg-white border-neutral-200 dark:border-gray-700 p-0 pt-1">
@@ -107,7 +104,7 @@ const PostHeader: React.FC<PostHeaderProps> = ({
                               item.action();
                               setPostMenuOpen(!postMenuOpen);
                             }}
-                            className="flex justify-start items-center rounded-none h-12 bg-transparent w-full p-0 m-0 hover:bg-neutral-200 text-gray-900 dark:text-neutral-200 dark:hover:bg-gray-600 hover:cursor-pointer"
+                            className="flex justify-start items-center rounded-none h-12 bg-transparent w-full p-0 m-0 hover:bg-neutral-100 text-gray-900 dark:text-neutral-200 dark:hover:bg-gray-600 hover:cursor-pointer"
                           >
                             {item.icon}
                             <span>{item.name}</span>
@@ -136,7 +133,7 @@ const PostHeader: React.FC<PostHeaderProps> = ({
             </Dialog>
             {!savedPostView && (
               <Button
-                className="rounded-full dark:hover:bg-zinc-700 hover:cursor-pointer dark:hover:text-neutral-200"
+                className="rounded-full hover:bg-neutral-100 w-7 h-7 relative top-1 aspect-square dark:hover:bg-zinc-700 hover:cursor-pointer dark:hover:text-neutral-200"
                 variant="ghost"
                 size="sm"
               >
@@ -161,7 +158,7 @@ const PostHeader: React.FC<PostHeaderProps> = ({
             to="#"
             className={`text-ellipsis line-clamp-1 ${action ? "pr-20" : ""}`}
           >
-            {user.followers ? user.followers + " followers" : user.headline}
+            {user.headline}
           </Link>
 
           <div className="flex gap-x-1 items-center dark:text-neutral-400 text-gray-500">

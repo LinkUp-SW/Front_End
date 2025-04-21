@@ -2,9 +2,12 @@ import {
   FaBan,
   FaBookmark,
   FaClock,
+  FaEdit,
+  FaEye,
   FaFlag,
   FaLink,
   FaRocket,
+  FaTrash,
   FaUserSlash,
 } from "react-icons/fa";
 import { BiRepost as RepostIcon } from "react-icons/bi";
@@ -17,6 +20,7 @@ import { BsFillSendFill as SendIcon } from "react-icons/bs";
 import { MenuAction } from "@/types";
 import React from "react";
 import { EditIcon } from "lucide-react";
+import { FaMessage } from "react-icons/fa6";
 
 export const getMenuActions: () => MenuAction[] = () => [
   {
@@ -43,6 +47,39 @@ export const getMenuActions: () => MenuAction[] = () => [
     name: "Unfollow",
     action: () => console.log("Unfollow clicked"),
     icon: React.createElement(FaUserSlash, { className: "mr-2" }),
+  },
+];
+
+export const getPersonalMenuActions: () => MenuAction[] = () => [
+  {
+    name: "Save",
+    action: () => console.log("Save clicked"),
+    icon: React.createElement(FaBookmark, { className: "mr-2" }),
+  },
+  {
+    name: "Copy Link",
+    action: () => console.log("Copy Link clicked"),
+    icon: React.createElement(FaLink, { className: "mr-2" }),
+  },
+  {
+    name: "Edit Post",
+    action: () => console.log("Edit Post clicked"),
+    icon: React.createElement(FaEdit, { className: "mr-2" }),
+  },
+  {
+    name: "Delete Post",
+    action: () => console.log("Delete Post Clicked"),
+    icon: React.createElement(FaTrash, { className: "mr-2" }),
+  },
+  {
+    name: "Who can comment on this post?",
+    action: () => console.log("Who can comment on this post? clicked"),
+    icon: React.createElement(FaMessage, { className: "mr-2" }),
+  },
+  {
+    name: "Who can see this post?",
+    action: () => console.log("Who can see this post? clicked"),
+    icon: React.createElement(FaEye, { className: "mr-2" }),
   },
 ];
 
