@@ -27,6 +27,7 @@ import {
 import { getAllConversations, deleteConversation } from "@/endpoints/messaging";
 import Cookies from "js-cookie";
 import { Conversation } from "@/endpoints/messaging";
+import { toast } from "sonner";
 
 const SideBar = () => {
   const token = Cookies.get("linkup_auth_token");
@@ -60,8 +61,10 @@ const SideBar = () => {
         const data: { conversations: Conversation[] } =
           await getAllConversations(token);
         setDataInfo(data.conversations);
+        toast.success("Conversations loaded successfully");
       } catch (error) {
         console.error("Failed to fetch conversations:", error);
+        toast.error("Failed to load Conversations");
       } finally {
         setLoading(false);
       }
@@ -199,8 +202,11 @@ const SideBar = () => {
       setDataInfo((prevData) =>
         prevData.filter((conv) => conversationID !== conv.conversationId)
       );
-    } catch (err) {
+      toast.success("Conversation deleted");
+    }
+    catch (err) {
       console.error("Error deleting:", err);
+      toast.error("Failed to delete conversation");
     }
   };
 
@@ -313,7 +319,7 @@ const SideBar = () => {
                           : "font-medium"
                       }`}
                     >
-                      {data.otherUser.firstName}
+                      {data.otherUser.firstName} {data.otherUser.lastName} 
                     </p>
 
                     {!dotAppearance.includes(data.conversationId) && (
