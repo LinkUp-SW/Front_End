@@ -13,6 +13,8 @@ import { useConnectionContext } from "./ConnectionContext";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { editUserBio } from "@/slices/user_profile/userBioSlice";
+import { toast } from "sonner";
+
 const Invitations = () => {
   const [invitations, setInvitations] = useState<ReceivedConnections[]>([]);
   const [numberOfReceived, setNumberOfReceived] = useState(0);
@@ -60,8 +62,10 @@ const Invitations = () => {
             number_of_connections: connectionCount + 1,
           })
         );
+        toast.success("Invitation accepted!");
       } catch (error) {
         console.error("can't", error);
+        toast.error("Failed to accept invitation.");
       }
     },
     [token, connectionCount, setConnectionCount]
@@ -81,8 +85,10 @@ const Invitations = () => {
           prevInvitations.filter((c) => c.user_id !== userId)
         );
         setNumberOfReceived((prev) => Math.max(prev - 1, 0));
+        toast.success("Invitation ignored.");
       } catch (error) {
         console.error("Error", error);
+        toast.error("Failed to ignore invitation.");
       }
     },
     [token]
