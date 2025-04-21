@@ -8,13 +8,14 @@ import FunnyIcon from "@/assets/Funny.svg";
 import InsightfulIcon from "@/assets/Insightful.svg";
 import SupportIcon from "@/assets/Support.svg";
 import { Link } from "react-router-dom";
-import { CommentType, PostType, ReactionType } from "@/types";
+import { CommentType, PostType, PostUserType, ReactionType } from "@/types";
 import { POST_ACTIONS } from "@/constants";
 import PostHeader from "./PostHeader";
 import PostFooter from "./PostFooter";
 import {
   getEngagementButtons,
   getMenuActions,
+  getPersonalMenuActions,
   REPOST_MENU,
 } from "../components/Menus";
 import {
@@ -35,26 +36,29 @@ import {
 import ReactionsModal from "./modals/ReactionsModal";
 import PostImages from "./PostImages";
 import IconButton from "./buttons/IconButton";
+import Cookies from "js-cookie";
 
 interface PostProps {
-  postUser: any;
-  postData: any;
-  comments: any[];
-  viewMore: boolean;
+  postData: PostType;
+  comments: CommentType[];
+  viewMore: boolean; // used to hide certain elements for responsive design
   reactions: ReactionType[];
-  action: any;
+  action: any; // used if the post is an action
 }
 
+const userId = Cookies.get("linkup_user_id");
+
 const Post: React.FC<PostProps> = ({
-  postUser,
   postData,
   comments,
   viewMore,
   reactions,
   action,
 }) => {
+  const { author }: { author: PostUserType } = postData;
   console.log("Post Data", postData);
-  const { date, media, reacts, tagged_users, postID } = postData;
+  console.log("Post User", author);
+  const { date, media, reacts, taggedUsers } = postData;
   const [liked, setLiked] = useState(false);
   const [isLandscape, setIsLandscape] = useState<boolean>(false);
   const [postMenuOpen, setPostMenuOpen] = useState(false);
@@ -107,7 +111,10 @@ const Post: React.FC<PostProps> = ({
   };
 
   useEffect(() => {
-    if (media && media.media_type === "none") {
+    if (
+      media &&
+      (media.media_type === "image" || media.media_type === "images")
+    ) {
       const img = new Image();
       img.src = media.link[0];
       img.onload = () => {
@@ -116,7 +123,8 @@ const Post: React.FC<PostProps> = ({
     }
   }, [media]);
 
-  const menuActions = getMenuActions();
+  const menuActions =
+    userId === author.username ? getPersonalMenuActions() : getMenuActions();
 
   const engagementButtons = getEngagementButtons(
     liked,
@@ -162,13 +170,13 @@ const Post: React.FC<PostProps> = ({
           </header>
         )}
         <PostHeader
-          user={postUser}
+          user={author}
           action={action}
           postMenuOpen={postMenuOpen}
           setPostMenuOpen={setPostMenuOpen}
           menuActions={menuActions}
-          edited={postData.edited}
-          publicPost={postData.public}
+          edited={postData.isEdited}
+          publicPost={postData.publicPost}
           date={date}
         />
         <TruncatedText
@@ -440,7 +448,7 @@ const Post: React.FC<PostProps> = ({
       <CardFooter>
         {commentsOpen && (
           <PostFooter
-            user={postUser}
+            user={author}
             sortingMenu={sortingMenu}
             setSortingMenu={setSortingMenu}
             sortingState={sortingState}
