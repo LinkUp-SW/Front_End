@@ -13,6 +13,7 @@ import { FaFileAlt } from "react-icons/fa";
 import {editMessage} from "@/endpoints/messaging";
 import Cookies from "js-cookie";
 import {setEditText,clearEditingState} from "../../slices/messaging/messagingSlice";
+import { toast } from "sonner";
 
 
 const SendingMessages = () => {
@@ -89,8 +90,10 @@ const SendingMessages = () => {
     try {
       await editMessage(token!, selectedConvID, editingMessageId, editText); // All synced from Redux
       dispatch(clearEditingState());
+      toast.success("Message updated successfully");
     } catch (error) {
       console.error("Error editing message:", error);
+      toast.error("Failed to update message");
     }
   };
   return (
