@@ -300,6 +300,7 @@ export interface BioFormData {
   first_name: string;
   last_name: string;
   headline: string;
+  website:'';
   location: {
     country_region: string;
     city: string;
