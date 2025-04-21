@@ -40,6 +40,7 @@ export interface PostType {
   };
   comments_disabled: string;
   content: string;
+  is_edited?: boolean;
   date: number;
   media: {
     link: string[];

@@ -2,16 +2,18 @@ import { CommentType, PostType, ReactionType } from "@/types";
 import { createGetHandler } from "../handler_wrapper/getHandler";
 const MOCK_POSTS: PostType[] = [
   {
-    user: {
-      name: "Abdelrahman Elsayed",
+    author: {
+      firstName: "Abdelrahman",
+      lastName: "Doma",
       headline:
         "Student at German University in cairo Student at German University in cairo Student at German University in cairo",
-      profileImage:
+      profilePicture:
         "https://gratisography.com/wp-content/uploads/2024/11/gratisography-augmented-reality-800x525.jpg",
-      degree: "Following",
+      connectionDegree: "Following",
+      username: "Abdelrahman-Doma32",
     },
-    post: {
-      content: `𝗛𝗶𝗿𝗶𝗻𝗴 𝗮 𝗷𝘂𝗻𝗶𝗼𝗿 𝗱𝗲𝘃 𝗶𝘀 𝗡𝗢𝗧 𝗲𝗮𝘀𝘆. 😵 😵😵
+
+    content: `𝗛𝗶𝗿𝗶𝗻𝗴 𝗮 𝗷𝘂𝗻𝗶𝗼𝗿 𝗱𝗲𝘃 𝗶𝘀 𝗡𝗢𝗧 𝗲𝗮𝘀𝘆. 😵 😵😵
 
 Recently, I started conducting interviews for Junior/Entry-Level-Mid Software Engineering positions.
 
@@ -30,10 +32,17 @@ I find these aspects far more important than details of a particular garbage col
 In junior interviews, you assess potential, not just skills or experience. That’s why it’s so hard and requires both judgment and instinct.
 
 Always happy to know your thoughts on this 👇`,
-      date: 0,
-      public: true,
-      edited: true,
-      images: [
+    date: 0,
+    public_post: true,
+    is_edited: true,
+    comments_disabled: "Anyone",
+    reacts: [],
+    user_id: "123",
+    _id: "111",
+    tagged_users: [],
+    media: {
+      media_type: "images",
+      link: [
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRHuwz1iiHfv1dnWFljnoUvBJiNaB4Uz2CG1g&s",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRHuwz1iiHfv1dnWFljnoUvBJiNaB4Uz2CG1g&s",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRHuwz1iiHfv1dnWFljnoUvBJiNaB4Uz2CG1g&s",
@@ -41,6 +50,7 @@ Always happy to know your thoughts on this 👇`,
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRHuwz1iiHfv1dnWFljnoUvBJiNaB4Uz2CG1g&s",
       ],
     },
+
     stats: {
       likes: 15,
       love: 2,
@@ -57,144 +67,18 @@ Always happy to know your thoughts on this 👇`,
     },
   },
   {
-    user: {
-      name: "Abdelrahman Elsayed",
+    author: {
+      firstName: "Abdelrahman",
+      lastName: "Doma",
       headline:
         "Student at German University in cairo Student at German University in cairo Student at German University in cairo",
-      profileImage:
+      profilePicture:
         "https://gratisography.com/wp-content/uploads/2024/11/gratisography-augmented-reality-800x525.jpg",
-      degree: "Following",
+      connectionDegree: "Following",
+      username: "Abdelrahman-Doma32",
     },
-    post: {
-      content: `"Software Engineer" in your LinkedIn headline? 🚩 Big mistake.
 
-That’s why recruiters aren’t finding you.
-
-Here’s how they actually search for candidates:
-
-When hiring a React developer, they type:
-- "React Engineer"
-- "React Developer"
-- "Frontend Developer React"
-
-🚫 They won't search for:
-- "Software Engineer"
-- "Developer"
-- "Programmer"
-
-Your broad title is burying your profile in search results!
-
-✅ Example: "Software Engineer" — low visibility
-🔎 Headline: "Frontend Developer | TypeScript" — Top of search results
-
-Think of LinkedIn like SEO:
-• The right keywords get you noticed.
-• Vague titles keep you invisible.
-• Recruiters filter faster, not slower.
-
-🔎 Better Headline Example:
-React | JavaScript | TypeScript
-Backend Engineer | Node.js | TypeScript | Nest.js
-Full-Stack Developer: React.js | Node.js | TypeScript
-
-Grab the job you want. Get specific. Get found.
-
-What's your current headline? Let's optimize it!`,
-      date: 0,
-      video:
-        "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-      public: true,
-      edited: true,
-    },
-    stats: {
-      likes: 15,
-      love: 2,
-      support: 1,
-      celebrate: 1,
-      comments: 4,
-      reposts: 5,
-    },
-    action: {
-      name: "Panda",
-      action: "like" as const,
-      profileImage:
-        "https://gratisography.com/wp-content/uploads/2024/11/gratisography-augmented-reality-800x525.jpg",
-    },
-  },
-  {
-    user: {
-      name: "Abdelrahman Elsayed",
-      headline:
-        "Student at German University in cairo Student at German University in cairo Student at German University in cairo",
-      profileImage:
-        "https://gratisography.com/wp-content/uploads/2024/11/gratisography-augmented-reality-800x525.jpg",
-      degree: "Following",
-    },
-    post: {
-      content: `"Software Engineer" in your LinkedIn headline? 🚨 Big mistake.
-
-That’s why recruiters aren’t finding you.
-
-Here’s how they actually search for candidates:
-
-🔎 When hiring a React developer, they type:
- ✅ "React Engineer"
- ✅ "React Developer"
- ✅ "Frontend Developer React"
-
-They don’t search for:
- ❌ "Software Engineer"
- ❌ "Developer"
- ❌ "Programmer"
-
-Your broad title is burying your profile in search results.
-For example:
- 🚫 Headline: Software Engineer → Low visibility
- ✅ Headline: Frontend Developer | React | TypeScript → Top of search results
-
-Think of LinkedIn like SEO:
- 📌 The right keywords get you noticed.
- 📌 Vague titles keep you invisible.
- 📌 Recruiters filter first, read later.
-
-Better headline ideas:
- ✨ Frontend Developer | React | JavaScript | TypeScript
- ✨ Backend Engineer | Node.js | TypeScript | Nest.js
- ✨ Full-Stack Developer | React | Node.js | TypeScript
-
-Ditch the generic title. Be specific. Get found.
-
-What’s your current headline? Let’s optimize it!`,
-      date: 0,
-      public: true,
-      edited: true,
-      pdf: "https://cdn.simplepdf.com/simple-pdf/assets/sample.pdf",
-    },
-    stats: {
-      likes: 15,
-      love: 2,
-      support: 1,
-      celebrate: 1,
-      comments: 4,
-    },
-    action: {
-      name: "Panda",
-      action: "like" as const,
-      profileImage:
-        "https://gratisography.com/wp-content/uploads/2024/11/gratisography-augmented-reality-800x525.jpg",
-    },
-  },
-  {
-    user: {
-      name: "Abdelrahman Elsayed",
-      headline:
-        "Student at German University in cairo Student at German University in cairo Student at German University in cairo",
-      profileImage:
-        "https://gratisography.com/wp-content/uploads/2024/11/gratisography-augmented-reality-800x525.jpg",
-      degree: "Following",
-    },
-    post: {
-      content: `𝗛𝗶𝗿𝗶𝗻𝗴 𝗮 𝗷𝘂𝗻𝗶𝗼𝗿 𝗱𝗲𝘃 𝗶𝘀 𝗡𝗢𝗧 𝗲𝗮𝘀𝘆. 😵 😵😵
+    content: `𝗛𝗶𝗿𝗶𝗻𝗴 𝗮 𝗷𝘂𝗻𝗶𝗼𝗿 𝗱𝗲𝘃 𝗶𝘀 𝗡𝗢𝗧 𝗲𝗮𝘀𝘆. 😵 😵😵
 
 Recently, I started conducting interviews for Junior/Entry-Level-Mid Software Engineering positions.
 
@@ -213,16 +97,28 @@ I find these aspects far more important than details of a particular garbage col
 In junior interviews, you assess potential, not just skills or experience. That’s why it’s so hard and requires both judgment and instinct.
 
 Always happy to know your thoughts on this 👇`,
-      date: 0,
-      public: true,
-      edited: true,
+    date: 0,
+    public_post: true,
+    is_edited: true,
+    comments_disabled: "Anyone",
+    reacts: [],
+    user_id: "123",
+    _id: "111",
+    tagged_users: [],
+    media: {
+      media_type: "video",
+      link: [
+        "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+      ],
     },
+
     stats: {
       likes: 15,
       love: 2,
       support: 1,
       celebrate: 1,
       comments: 4,
+      reposts: 10,
     },
     action: {
       name: "Panda",
