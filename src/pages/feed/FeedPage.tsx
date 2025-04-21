@@ -65,8 +65,6 @@ const FeedPage: React.FC<FeedPageProps> = ({ single = false }) => {
           ),
           getPostReactions(),
         ]);
-        console.log("Fetched data", fetchedData);
-
         const posts = fetchedData.map((data) => data.post);
         const comments = fetchedData.map((data) => data.comments);
         console.log("Posts:", posts);
