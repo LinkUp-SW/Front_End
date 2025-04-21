@@ -28,49 +28,6 @@ export interface Notification {
   isNew: boolean; // Make isNew non-optional to avoid undefined checks
 }
 
-export interface PostType {
-  author: {
-    firstName: string;
-    lastName: string;
-    username: string;
-    profilePicture: string;
-    headline?: string;
-    followers?: string;
-    connectionDegree: string;
-  };
-  comments_disabled: string;
-  content: string;
-  is_edited?: boolean;
-  date: number;
-  media: {
-    link: string[];
-    media_type: string;
-  };
-  public_post: boolean;
-  reacts: any[];
-  tagged_users: any[];
-  user_id: string;
-  _id: string;
-
-  stats?: {
-    likes?: number;
-    comments?: number;
-    celebrate?: number;
-    love?: number;
-    insightful?: number;
-    support?: number;
-    funny?: number;
-    person?: string;
-    reposts?: number;
-  };
-
-  action?: {
-    name?: string;
-    profileImage?: string;
-    action?: "like" | "comment" | "repost" | "love";
-  };
-}
-
 export interface ReactionType {
   id: number;
   name: string;
@@ -95,28 +52,88 @@ export interface ProfileCardType {
 }
 
 export interface CommentType {
-  user: {
-    profileImage: string;
-    name: string;
-    degree: string;
-    followers?: string;
-    headline?: string;
+  author: {
+    username: string;
+    firstName: string;
+    lastName: string;
+    headline: string;
+    profilePicture: string;
+    connectionDegree: string;
   };
-  comment: {
-    text: string;
-    image?: string;
-    edited?: boolean;
+  content: string;
+  media: {
+    link: string;
+    mediaType: "image" | "video" | "none";
   };
-  stats: {
+  reacts: {
+    total: number;
+    mostCommon: Record<string, any>;
+  };
+  tagged_users: string[];
+  is_edited: boolean;
+  date: number;
+  children: CommentType[];
+}
+
+export interface PostType {
+  author: PostUserType;
+  content: string;
+  media: {
+    link: string[];
+    media_type: MediaType;
+  };
+  commentsDisabled: string;
+  publicPost: boolean;
+  taggedUsers: string[];
+  date: number;
+  reacts?: any[];
+  isEdited?: boolean;
+  _id: string;
+  user_id: string;
+
+  stats?: {
     likes?: number;
-    replies?: number;
+    comments?: number;
     celebrate?: number;
     love?: number;
     insightful?: number;
     support?: number;
     funny?: number;
     person?: string;
+    reposts?: number;
   };
+
+  action?: {
+    name?: string;
+    profileImage?: string;
+    action?: "like" | "comment" | "repost" | "love";
+  };
+}
+
+export interface PostUserType {
+  firstName: string;
+  lastName: string;
+  username: string;
+  profilePicture: string;
+  connectionDegree: string;
+  headline: string;
+}
+
+export interface PostDataType {
+  author: PostUserType;
+  content: string;
+  media: {
+    link: string[];
+    media_type: MediaType;
+  };
+  commentsDisabled: string;
+  publicPost: boolean;
+  taggedUsers: string[];
+  date: number;
+  reacts?: any[];
+  isEdited?: boolean;
+  _id: string;
+  user_id: string;
 }
 
 export type PostFilter = "all" | "comments" | "reactions" | "reposts";
