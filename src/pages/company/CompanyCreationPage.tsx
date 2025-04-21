@@ -1,10 +1,10 @@
 import { useState} from 'react';
 import { WithNavBar } from '@/components';
 import { useNavigate } from 'react-router-dom';
-import PageTypeSelection from './components/PageTypeSelection';
-import PageHeader from './components/PageHeader';
-import PageForm from './components/PageForm';
-import PagePreview from './components/PagePreview';
+import PageTypeSelection from './components/companyCreationPageComponents/PageTypeSelection';
+import PageHeader from './components/companyCreationPageComponents/PageHeader';
+import PageForm from './components/companyCreationPageComponents/PageForm';
+import PagePreview from './components/companyCreationPageComponents/PagePreview';
 
 const CompanyCreationPage: React.FC = () => {
   const navigate = useNavigate();
