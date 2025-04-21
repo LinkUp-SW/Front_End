@@ -82,11 +82,20 @@ export const createPost = async (postPayload: PostDBObject, token: string) => {
   return response.data;
 };
 
-export const fetchSinglePost = async (postId: string, token: string) => {
+export const fetchSinglePost = async (
+  postId: string,
+  token: string,
+  cursor: number,
+  limit: number
+) => {
   try {
     const response = await axiosInstance.get(`api/v1/post/posts/${postId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
+      },
+      params: {
+        cursor: cursor,
+        limit: limit,
       },
     });
     return response.data;
