@@ -71,16 +71,6 @@ export const getPersonalMenuActions: () => MenuAction[] = () => [
     action: () => console.log("Delete Post Clicked"),
     icon: React.createElement(FaTrash, { className: "mr-2" }),
   },
-  {
-    name: "Who can comment on this post?",
-    action: () => console.log("Who can comment on this post? clicked"),
-    icon: React.createElement(FaMessage, { className: "mr-2" }),
-  },
-  {
-    name: "Who can see this post?",
-    action: () => console.log("Who can see this post? clicked"),
-    icon: React.createElement(FaEye, { className: "mr-2" }),
-  },
 ];
 
 export const REPOST_MENU = [
