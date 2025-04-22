@@ -50,7 +50,6 @@ const PostHeader: React.FC<PostHeaderProps> = ({
   publicPost,
   date,
 }) => {
-  console.log("Date", date);
   const timeAgo = moment(date * 1000).fromNow();
 
   return (

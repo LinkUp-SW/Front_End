@@ -34,7 +34,6 @@ const AddDocumentModal: React.FC<AddDocumentModalProps> = ({
       return false;
     }
     setCurrentSelectedMedia(files ? Array.from(files) : []);
-    console.log(files);
   };
 
   useEffect(() => {

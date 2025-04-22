@@ -186,7 +186,6 @@ const CreatePost: React.FC<CreatePostProps> = ({ posts, setPosts }) => {
       taggedUsers: [],
     };
 
-    //console.log("Post Object:", postObject);
     try {
       dismiss();
       clearFields();
@@ -210,7 +209,6 @@ const CreatePost: React.FC<CreatePostProps> = ({ posts, setPosts }) => {
         }
       );
       const post = await fetchSinglePost(response.postId, user_token, 0, 1);
-      console.log("Returne dpost:", post);
       if (post) {
         const newPosts = [post.post, ...posts];
         setPosts(newPosts);
