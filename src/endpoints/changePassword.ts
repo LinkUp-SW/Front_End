@@ -1,14 +1,14 @@
 // API endpoints for password change functionality
-import axios from 'axios';
+import axios from 'axios'; // Keep this import for isAxiosError
+import axiosInstance from '../services/axiosInstance';
 
-const API_BASE_URL = '//// el api';
-
+// Use relative endpoint instead of full URL
+const API_ENDPOINT = '/api/v1/user/update-password';
 
 export interface ChangePasswordRequest {
   currentPassword: string;
   newPassword: string;
 }
-
 
 export interface ChangePasswordResponse {
   success: boolean;
@@ -21,14 +21,20 @@ export interface ChangePasswordResponse {
  * @param newPassword - User's new password
  * @returns Promise with change password response
  */
-export const changePassword = async (
+export const changePassword = async (token: string,
   currentPassword: string,
   newPassword: string
 ): Promise<ChangePasswordResponse> => {
   try {
-    const response = await axios.post<ChangePasswordResponse>(
-      `${API_BASE_URL}/auth/change-password`,
-      { currentPassword, newPassword } as ChangePasswordRequest
+
+    const response = await axiosInstance.post<ChangePasswordResponse>(
+      API_ENDPOINT,
+      { currentPassword, newPassword } as ChangePasswordRequest,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        }
+      }
     );
     return response.data;
   } catch (error) {
