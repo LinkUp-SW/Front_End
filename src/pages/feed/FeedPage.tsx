@@ -16,7 +16,12 @@ import {
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
-import { CommentType, PostType, ReactionType } from "@/types";
+import {
+  CommentObjectType,
+  CommentType,
+  PostType,
+  ReactionType,
+} from "@/types";
 import { fetchSinglePost, getPostReactions } from "@/endpoints/feed";
 import { useParams } from "react-router-dom";
 import Cookies from "js-cookie";
@@ -32,7 +37,7 @@ const FeedPage: React.FC<FeedPageProps> = ({ single = false }) => {
   const screenWidth = useSelector((state: RootState) => state.screen.width);
 
   const [posts, setPosts] = useState<PostType[]>([]);
-  const [comments, setComments] = useState<CommentType[]>([]);
+  const [comments, setComments] = useState<CommentObjectType[]>([]);
   const [reactions, setReactions] = useState<ReactionType[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -66,9 +71,14 @@ const FeedPage: React.FC<FeedPageProps> = ({ single = false }) => {
           getPostReactions(),
         ]);
         const posts = fetchedData.map((data) => data.post);
-        const comments = fetchedData.map((data) => data.comments);
+        const comments: CommentObjectType[] = fetchedData.map(
+          (data) => data.comments
+        );
         console.log("Posts:", posts);
         console.log("Comments:", comments);
+        comments.forEach((block) => {
+          block.comments = Object.values(block.comments).reverse();
+        });
 
         if (posts.length > 0) setPosts(posts);
         else setPosts([]);
@@ -79,7 +89,6 @@ const FeedPage: React.FC<FeedPageProps> = ({ single = false }) => {
         }
         if (fetchedReactions) setReactions(fetchedReactions);
         else setReactions([]);
-        console.log(fetchedReactions);
       } catch (error) {
         console.error("Error fetching feed data", error);
       }
@@ -140,16 +149,23 @@ const FeedPage: React.FC<FeedPageProps> = ({ single = false }) => {
             {!single && <CreatePost posts={posts} setPosts={setPosts} />}
             <SortDown />
             {posts.length != 0 ? (
-              posts.map((post, index) => (
-                <Post
-                  key={index}
-                  viewMore={viewMore}
-                  postData={post}
-                  comments={[comments[index]]}
-                  reactions={reactions}
-                  action={post.action}
-                />
-              ))
+              posts.map((post, index) => {
+                return (
+                  <Post
+                    key={index}
+                    viewMore={viewMore}
+                    postData={post}
+                    comments={comments[index]}
+                    reactions={reactions}
+                    action={post.action}
+                    posts={posts}
+                    setPosts={setPosts}
+                    allComments={comments}
+                    setComments={setComments}
+                    order={index}
+                  />
+                );
+              })
             ) : (
               <p className="text-center text-2xl bg-white border rounded-lg p-4">
                 No posts to display. Start connecting to people!
