@@ -61,17 +61,7 @@ const SettingsLayoutPage: React.FC<SettingsLayoutPageProps> = ({ children }) => 
             />
           </Link>
         </div>
-        <div>
-          <img 
-            src="/profile-image.png" 
-            alt="Profile" 
-            className="w-8 h-8 rounded-full object-cover"
-            onError={(e) => {
-              const target = e.target as HTMLImageElement;
-              target.src = 'https://via.placeholder.com/30x30?text=P';
-            }}
-          />
-        </div>
+
       </header>
 
       {/* Main content area - removed gap and padding */}
