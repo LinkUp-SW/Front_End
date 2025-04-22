@@ -73,6 +73,21 @@ export interface CommentType {
   is_edited: boolean;
   date: number;
   children: CommentType[];
+  _id: string;
+}
+
+export interface CommentObjectType {
+  comments: CommentType[];
+  count: number;
+  nextCursor: number;
+}
+
+export interface CommentDBType {
+  post_id: string;
+  content: string;
+  media: string;
+  comment_id?: string;
+  tagged_users: string[];
 }
 
 export interface PostType {
