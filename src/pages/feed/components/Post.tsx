@@ -8,7 +8,14 @@ import FunnyIcon from "@/assets/Funny.svg";
 import InsightfulIcon from "@/assets/Insightful.svg";
 import SupportIcon from "@/assets/Support.svg";
 import { Link } from "react-router-dom";
-import { CommentType, PostType, PostUserType, ReactionType } from "@/types";
+import {
+  CommentDBType,
+  CommentObjectType,
+  CommentType,
+  PostType,
+  PostUserType,
+  ReactionType,
+} from "@/types";
 import { POST_ACTIONS } from "@/constants";
 import PostHeader from "./PostHeader";
 import PostFooter from "./PostFooter";
@@ -37,16 +44,25 @@ import ReactionsModal from "./modals/ReactionsModal";
 import PostImages from "./PostImages";
 import IconButton from "./buttons/IconButton";
 import Cookies from "js-cookie";
+import { createComment } from "@/endpoints/feed";
+import { toast } from "sonner";
 
 interface PostProps {
   postData: PostType;
-  comments: CommentType[];
+  comments: CommentObjectType;
   viewMore: boolean; // used to hide certain elements for responsive design
   reactions: ReactionType[];
   action: any; // used if the post is an action
+  posts: PostType[];
+  allComments: CommentObjectType[];
+  setPosts: React.Dispatch<React.SetStateAction<PostType[]>>;
+  setComments: React.Dispatch<React.SetStateAction<CommentObjectType[]>>;
+  order: number;
 }
 
 const userId = Cookies.get("linkup_user_id");
+const token = Cookies.get("linkup_auth_token");
+// console.log()
 
 const Post: React.FC<PostProps> = ({
   postData,
@@ -54,10 +70,13 @@ const Post: React.FC<PostProps> = ({
   viewMore,
   reactions,
   action,
+  posts,
+  allComments,
+  setPosts,
+  setComments,
+  order,
 }) => {
   const { author }: { author: PostUserType } = postData;
-  console.log("Post Data", postData);
-  console.log("Post User", author);
   const { date, media, reacts, taggedUsers } = postData;
   const [liked, setLiked] = useState(false);
   const [isLandscape, setIsLandscape] = useState<boolean>(false);
@@ -69,6 +88,57 @@ const Post: React.FC<PostProps> = ({
   const [selectedReaction, setSelectedReaction] = useState<string | null>(
     "Like"
   );
+
+  const addNewComment = async (newComment: CommentDBType) => {
+    if (!token) {
+      toast.error("You must be logged in to add a comment.");
+      return;
+    }
+
+    const loadingToastId = toast.loading("Adding your comment...");
+
+    try {
+      // Call the API to create the comment
+      const createdComment = await createComment(newComment, token);
+
+      // Update the comments state with the new comment
+      setComments(() => {
+        const updatedComments = [...allComments];
+        const oldObject = { ...updatedComments[order] };
+        oldObject.comments = [createdComment.comment, ...oldObject.comments];
+        updatedComments[order] = oldObject;
+        updatedComments[order].comments[0].author = {
+          username: "AmrDoma",
+          firstName: "Amr",
+          lastName: "Doma",
+          connectionDegree: "3rd+",
+          headline: "Hamada helal",
+          profilePicture:
+            "https://res.cloudinary.com/dmg8tdy5r/image/upload/v1745352686/r0zw2qum42olbs0jxchb.jpg",
+        };
+        updatedComments[order].comments[0].media = {
+          link: newComment.media,
+          mediaType: newComment.media.length != 0 ? "image" : "none",
+        };
+
+        return updatedComments;
+      });
+
+      // Update the toast to success
+      if (newComment.comment_id) {
+        toast.success("Reply added successfully!");
+      } else {
+        toast.success("Comment added successfully!");
+      }
+      toast.dismiss(loadingToastId); // Dismiss the loading toast
+    } catch (error) {
+      console.error("Error creating comment:", error);
+
+      // Update the toast to error
+      toast.error("Failed to add comment. Please try again.");
+      toast.dismiss(loadingToastId); // Dismiss the loading toast
+    }
+  };
 
   const reactionIcons = [
     { name: "Celebrate", icon: CelebrateIcon },
@@ -88,7 +158,6 @@ const Post: React.FC<PostProps> = ({
       const commentInput = document.getElementById(
         "comment-input"
       ) as HTMLInputElement;
-      console.log(commentInput);
       if (commentInput) {
         commentInput.focus();
       }
@@ -140,7 +209,7 @@ const Post: React.FC<PostProps> = ({
     love: 2,
     support: 1,
     celebrate: 1,
-    comments: 4,
+    comments: comments.count,
     reposts: 5,
     person: "Hamada",
   };
@@ -453,6 +522,8 @@ const Post: React.FC<PostProps> = ({
             setSortingMenu={setSortingMenu}
             sortingState={sortingState}
             handleSortingState={handleSortingState}
+            postId={postData._id}
+            addNewComment={addNewComment}
             comments={comments}
           />
         )}
