@@ -4,7 +4,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { data, Link } from "react-router-dom";
 import { LiaEllipsisHSolid as EllipsisIcon } from "react-icons/lia";
 import { Button } from "@/components/ui/button";
 import { FaEyeSlash, FaFlag, FaLink } from "react-icons/fa";
@@ -24,35 +24,23 @@ import { DialogTrigger } from "@radix-ui/react-dialog";
 import ReportCommentModal from "./modals/ReportCommentModal";
 import ReactionsModal from "./modals/ReactionsModal";
 import { getPostReactions } from "@/endpoints/feed";
-import { ReactionType } from "@/types";
+import { CommentType, ReactionType } from "@/types";
 import moment from "moment";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store";
+import DOMPurify from "dompurify";
 
 export interface CommentProps {
-  user: {
-    profileImage: string;
-    name: string;
-    connectionDegree: string;
-    followers?: string;
-    headline?: string;
-  };
-  comment: {
-    text: string;
-    image?: string;
-    edited?: boolean;
-  };
-  stats: {
-    likes?: number;
-    replies?: number;
-    celebrate?: number;
-    love?: number;
-    insightful?: number;
-    support?: number;
-    funny?: number;
-    person?: string;
-  };
+  comment: CommentType;
+  stats: any;
+  setIsReplyActive: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const Comment: React.FC<any> = ({ comment, stats }) => {
+const Comment: React.FC<CommentProps> = ({
+  comment,
+  stats,
+  setIsReplyActive,
+}) => {
   const {
     profilePicture,
     username,
@@ -60,16 +48,29 @@ const Comment: React.FC<any> = ({ comment, stats }) => {
     lastName,
     connectionDegree,
     headline,
-    followers,
   } = comment.author;
 
-  console.log("Comment:", comment);
+  if (!stats) {
+    stats = {
+      likes: 15,
+      love: 2,
+      support: 1,
+      celebrate: 1,
+      comments: 2,
+      reposts: 5,
+      person: "Hamada",
+    };
+  }
 
   const { content, date, is_edited, media } = comment;
+
+  const sanitizedContent = DOMPurify.sanitize(content);
 
   const [commentMenuOpen, setCommentMenuOpen] = useState(false);
   const [reactions, setReactions] = useState<ReactionType[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+
+  const { data } = useSelector((state: RootState) => state.userBio);
 
   useEffect(() => {
     setIsLoading(true);
@@ -88,6 +89,11 @@ const Comment: React.FC<any> = ({ comment, stats }) => {
     fetchData();
     setIsLoading(false);
   }, []);
+
+  let countChildren = 0;
+  if (comment.children) {
+    countChildren = Object.keys(comment.children).length;
+  }
 
   const statsArray = [
     {
@@ -248,12 +254,15 @@ const Comment: React.FC<any> = ({ comment, stats }) => {
           </section>
           <div className="text-xs text-gray-500 dark:text-neutral-400 relative -top-2">
             <Link to="#" className={`text-ellipsis line-clamp-1`}>
-              {followers ? followers + " followers" : headline}
+              {headline}
             </Link>
           </div>
         </div>
       </header>
-      <p className="p-1 pl-11 text-xs md:text-sm">{content}</p>
+      <p
+        className="p-1 pl-11 text-xs md:text-sm whitespace-pre-wrap"
+        dangerouslySetInnerHTML={{ __html: sanitizedContent }}
+      ></p>
       <footer className="flex pl-10 justify-start items-center gap-0.5 ">
         {/* <div className="flex justify-start w-full items-center pt-4 gap-0"> */}
         <Button
@@ -295,19 +304,20 @@ const Comment: React.FC<any> = ({ comment, stats }) => {
           variant="ghost"
           size="sm"
           className="text-gray-400 text-xs hover:cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-400 p-1"
+          onClick={() => {
+            setIsReplyActive(true);
+          }}
         >
           Reply
         </Button>
-        {stats.replies && (
+        {countChildren != 0 && (
           <>
             <p className="text-xs  text-gray-500 dark:text-neutral-400 font-bold">
               {" "}
               ·
             </p>
             <p className="hover:underlinetext-xs text-xs text-gray-500 line-clamp-1 text-ellipsis dark:text-neutral-400 hover:text-blue-600 hover:underline dark:hover:text-blue-400 hover:cursor-pointer">
-              {stats.replies && stats.replies == 1
-                ? "1 Reply"
-                : `${stats.replies} Replies`}
+              {countChildren == 1 ? "1 Reply" : `${countChildren} Replies`}
             </p>
           </>
         )}

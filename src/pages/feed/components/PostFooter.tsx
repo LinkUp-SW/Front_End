@@ -8,7 +8,7 @@ import { FaChevronDown, FaRocket, FaClock } from "react-icons/fa";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components";
 import { Link } from "react-router-dom";
-import { CommentType, PostUserType } from "@/types";
+import { CommentObjectType, CommentType, PostUserType } from "@/types";
 import { GoFileMedia as MediaIcon } from "react-icons/go";
 import CommentWithReplies from "./CommentWithReplies";
 import { MdOutlineEmojiEmotions } from "react-icons/md";
@@ -22,6 +22,9 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import { toast } from "sonner";
+import BlueButton from "./buttons/BlueButton";
+import Cookies from "js-cookie";
 
 interface SortingMenuItem {
   name: string;
@@ -29,6 +32,8 @@ interface SortingMenuItem {
   action: () => void;
   icon: React.ReactNode;
 }
+
+const userId = Cookies.get("linkup_user_id");
 
 export const COMMENT_SORTING_MENU: SortingMenuItem[] = [
   {
@@ -51,7 +56,9 @@ interface PostFooterProps {
   setSortingMenu: React.Dispatch<React.SetStateAction<boolean>>;
   sortingState: string;
   handleSortingState: (selectedState: string) => void;
-  comments: any[];
+  comments: CommentObjectType;
+  addNewComment: React.Dispatch<React.SetStateAction<any>>;
+  postId: string;
 }
 
 const PostFooter: React.FC<PostFooterProps> = ({
@@ -61,21 +68,88 @@ const PostFooter: React.FC<PostFooterProps> = ({
   sortingState,
   handleSortingState,
   comments,
+  addNewComment,
+  postId,
 }) => {
   // Create a ref for the horizontally scrollable container
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [commentInput, setCommentInput] = useState("");
-  const [selected, setSelectedImage] = useState<File | null>(null);
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  console.log("Comment for post:", comments);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const darkMode = useSelector((state: RootState) => state.theme.theme);
 
+  const { data } = useSelector((state: RootState) => state.userBio);
+
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      console.log(selected);
+      console.log(selectedImage);
       setSelectedImage(file);
+    }
+  };
+
+  const handleCreateComment = (
+    selectedImage: File | null,
+    commentInput: string,
+    setSelectedImage: React.Dispatch<React.SetStateAction<File | null>>,
+    setCommentInput: React.Dispatch<React.SetStateAction<string>>,
+    parentId?: string | null
+  ) => {
+    if (!commentInput.trim() && !selectedImage) {
+      toast.error("Cannot create an empty comment");
+      return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      const base64Image = reader.result as string;
+
+      const newComment = {
+        post_id: postId,
+        content: commentInput,
+        media: selectedImage ? [base64Image] : [],
+        tagged_users: [],
+        comment_id: parentId,
+      };
+
+      console.log("New comment created:", newComment);
+
+      // Reset input and selected image
+      setCommentInput("");
+      setSelectedImage(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ""; // Reset the file input value
+      }
+
+      // Add the new comment
+      addNewComment(newComment);
+    };
+
+    if (selectedImage) {
+      reader.readAsDataURL(selectedImage); // Convert the image to Base64
+    } else {
+      const newComment = {
+        post_id: postId,
+        content: commentInput,
+        media: [],
+        tagged_users: [],
+        comment_id: parentId,
+      };
+
+      console.log("New comment created:", newComment);
+
+      // Reset input and selected image
+      setCommentInput("");
+      setSelectedImage(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ""; // Reset the file input value
+      }
+
+      // Add the new comment
+      addNewComment(newComment);
     }
   };
 
@@ -84,7 +158,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
     love: 2,
     support: 1,
     celebrate: 1,
-    comments: 4,
+    comments: comments.count,
     reposts: 5,
     person: "Hamada",
   };
@@ -92,7 +166,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
   const MemoizedEmojiPicker = memo(EmojiPicker);
   console.log("Footer comments", comments);
 
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
   const handleEmojiRequest = (emoji: EmojiClickData) => {
     setCommentInput((prevMessage) => prevMessage + emoji.emoji);
@@ -137,16 +211,22 @@ const PostFooter: React.FC<PostFooterProps> = ({
         <CarouselNext className="dark:bg-gray-900 dark:text-neutral-400 absolute -right-8" />
       </Carousel>
 
-      <div className="flex w-full items-center justify-between">
-        <div className="flex space-x-3 justify-start items-center w-full">
+      <div className="flex w-full items-center justify-between h-full">
+        <div className="flex space-x-3 justify-start items-center w-full h-full">
           <Link to={"#"}>
             <Avatar className="h-8 w-8 pl-0">
-              <AvatarImage src={user.profilePicture} alt="Profile" />
+              <AvatarImage src={data?.profile_photo} alt="Profile" />
               <AvatarFallback>CN</AvatarFallback>
             </Avatar>
           </Link>
-          <div className="flex relative w-full items-center pb-3">
-            <input
+
+          <div
+            onClick={() => {
+              inputRef.current?.focus();
+            }}
+            className="w-full relative flex-col flex dark:focus:ring-0 dark:focus:border-0 border p-2 focus:ring-black focus:ring-2 transition-colors dark:hover:bg-gray-800 hover:text-gray-950 dark:hover:text-neutral-300 rounded-xl border-gray-400 font-normal text-sm text-black  text-left dark:text-neutral-300"
+          >
+            <textarea
               ref={inputRef}
               id="comment-input"
               placeholder="Add a comment..."
@@ -159,48 +239,99 @@ const PostFooter: React.FC<PostFooterProps> = ({
                 });
               }}
               onChange={(e) => setCommentInput(e.target.value)}
-              className=" w-full h-11 dark:focus:ring-0 dark:focus:border-0 border p-4 focus:ring-1 transition-colors dark:hover:bg-gray-800 hover:text-gray-950 dark:hover:text-neutral-300 rounded-full border-gray-400 font-normal text-sm text-black  text-left dark:text-neutral-300"
+              className="w-full h- resize-none py-0 placeholder:text-neutral-500 dark:placeholder:text-neutral-300 focus:ring-0 focus:border-0 active:border-0"
             />
-            <Popover>
-              <PopoverTrigger asChild onClick={() => console.log("hi")}>
-                <Button
-                  variant="ghost"
-                  className="absolute right-10 bottom-4 hover:cursor-pointer rounded-full dark:hover:bg-gray-800 dark:hover:text-neutral-200"
-                >
-                  <MdOutlineEmojiEmotions />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent
-                forceMount
-                className="dark:bg-gray-900 w-fit p-0 dark:border-gray-600"
-              >
-                <MemoizedEmojiPicker
-                  className="dark:bg-gray-900 w-full p-0"
-                  theme={darkMode === "dark" ? Theme.DARK : Theme.LIGHT}
-                  width={"full"}
-                  onEmojiClick={handleEmojiRequest}
+            {selectedImage && (
+              <div className="relative mt-2">
+                <img
+                  src={URL.createObjectURL(selectedImage)}
+                  alt="Selected"
+                  className="w-32 h-32 object-cover rounded-lg"
                 />
-              </PopoverContent>
-            </Popover>
+                <button
+                  onClick={() => {
+                    setSelectedImage(null);
+                    if (fileInputRef.current) {
+                      fileInputRef.current.value = ""; // Reset the file input value
+                    }
+                  }}
+                  className="absolute top-1 left-0 bg-gray-600 text-white rounded-full p-1 hover:bg-gray-600"
+                >
+                  ✕
+                </button>
+              </div>
+            )}
+            {
+              <div
+                className={`flex  ${
+                  selectedImage || commentInput.trim().length != 0
+                    ? "justify-between "
+                    : "absolute right-0 "
+                }`}
+              >
+                <div className="relative">
+                  <Popover>
+                    <PopoverTrigger asChild onClick={() => console.log("hi")}>
+                      <Button
+                        variant="ghost"
+                        className="hover:cursor-pointer rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 dark:hover:text-neutral-200"
+                      >
+                        <MdOutlineEmojiEmotions />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent
+                      forceMount
+                      className="dark:bg-gray-900 w-fit p-0 dark:border-gray-600"
+                    >
+                      <MemoizedEmojiPicker
+                        className="dark:bg-gray-900 w-full p-0"
+                        theme={darkMode === "dark" ? Theme.DARK : Theme.LIGHT}
+                        width={"full"}
+                        onEmojiClick={handleEmojiRequest}
+                      />
+                    </PopoverContent>
+                  </Popover>
 
-            <input
-              type="file"
-              accept="image/*"
-              ref={fileInputRef}
-              onChange={handleFileUpload}
-              className="hidden"
-            />
-            <Button
-              variant="ghost"
-              onClick={() => fileInputRef.current?.click()}
-              className="absolute right-1 hover:cursor-pointer rounded-full dark:hover:bg-gray-800 dark:hover:text-neutral-200"
-            >
-              <MediaIcon />
-            </Button>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    ref={fileInputRef}
+                    onChange={handleFileUpload}
+                    className="hidden"
+                  />
+                  <Button
+                    variant="ghost"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="hover:cursor-pointer rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 dark:hover:text-neutral-200"
+                  >
+                    <MediaIcon />
+                  </Button>
+                </div>
+                <BlueButton
+                  className={`${
+                    selectedImage || commentInput.trim().length != 0
+                      ? ""
+                      : "hidden"
+                  }`}
+                  onClick={() =>
+                    handleCreateComment(
+                      selectedImage,
+                      commentInput,
+                      setSelectedImage,
+                      setCommentInput,
+                      null
+                    )
+                  }
+                  disabled={commentInput.trim().length == 0 && !selectedImage}
+                >
+                  Comment
+                </BlueButton>
+              </div>
+            }
           </div>
         </div>
       </div>
-      {comments.length != 0 && (
+      {comments.count != 0 && (
         <>
           <div className="flex relative -left-5">
             <Popover open={sortingMenu} onOpenChange={setSortingMenu}>
@@ -241,12 +372,15 @@ const PostFooter: React.FC<PostFooterProps> = ({
             </Popover>
           </div>
           <div className="flex flex-col relative -left-1 -top-3">
-            {comments.map((data, index: number) => (
+            {comments.comments.map((data, index: number) => (
               <CommentWithReplies
                 key={index}
+                postId={postId}
                 comment={data}
                 stats={stats}
                 replies={data.children}
+                handleCreateComment={handleCreateComment}
+                commentId={data._id}
               />
             ))}
           </div>
