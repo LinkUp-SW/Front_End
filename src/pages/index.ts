@@ -29,6 +29,7 @@ import SignInAndSecurityPage from "./settings/SignInAndSecurityPage";
 import ChangePasswordPage from "./settings/ChangePasswordPage";
 import MyItemsPage from "./my_items/MyItemsPage";
 import CompanyCreationPage from "./company/CompanyCreationPage";
+import ManageCompanyPage from "./company/ManageCompanyPage"
 
 //Export the Imported Pages
 export {
@@ -62,5 +63,6 @@ export {
   ChangePasswordPage,
   MyItemsPage,
   CompanyCreationPage,
+  ManageCompanyPage,
   
 };

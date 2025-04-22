@@ -9,7 +9,9 @@ const Sidebar: React.FC = () => {
 
   const handleMenuItemClick = (label: string) => {
     if (label === "My jobs") {
-      navigate("/my-items/saved-jobs");
+      navigate("/my-items/saved-jobs")}
+    if (label === "Preferences") {
+      navigate("/company-manage");  
     }
   };
 
