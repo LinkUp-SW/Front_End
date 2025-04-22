@@ -5,6 +5,7 @@ import SettingsLayoutPage from '../../components/hoc/SettingsLayoutPage';
 import styles from './changePasswordPage.module.css';
 import { validatePassword } from '../../utils';
 import { changePassword } from '@/endpoints/changePassword';
+import Cookies from 'js-cookie';
 
 const ChangePasswordPage: React.FC = () => {
   const navigate = useNavigate();
@@ -58,24 +59,28 @@ const ChangePasswordPage: React.FC = () => {
     
     setIsLoading(true);
     setStatusMessage('');
-    
-    try {
-      const response = await changePassword(currentPassword, newPassword);
-      
-      if (response.success) {
-        setStatusMessage('Password changed successfully');
-        setTimeout(() => {
-          navigate('/settings/sign-in-security');
-        }, 1500);
-      } else {
-        setStatusMessage(response.message || 'Failed to change password');
+
+    const token = Cookies.get('linkup_auth_token');
+    if (token && currentPassword && newPassword)
+   {
+      try {
+          const response = await changePassword(token, currentPassword, newPassword);
+        
+        if ( response.success) {
+          setStatusMessage('Password changed successfully');
+          setTimeout(() => {
+            navigate('/settings/sign-in-security');
+          }, 1500);
+        } else {
+          setStatusMessage(response.message || 'Failed to change password');
+        }
+      } catch (error) {
+        setStatusMessage('An error occurred. Please try again later.');
+        console.error('Password change error:', error);
+      } finally {
+        setIsLoading(false);
       }
-    } catch (error) {
-      setStatusMessage('An error occurred. Please try again later.');
-      console.error('Password change error:', error);
-    } finally {
-      setIsLoading(false);
-    }
+   }
   };
 
   const handleForgotPassword = () => {
