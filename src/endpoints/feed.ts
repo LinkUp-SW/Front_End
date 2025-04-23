@@ -73,6 +73,15 @@ export const getPostReactions = async (): Promise<any> => {
   }
 };
 
+export const deletePost = async (postId: string, token: string) => {
+  const response = await axiosInstance.delete(`api/v1/post/posts/${postId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data;
+};
+
 export const createPost = async (postPayload: PostDBObject, token: string) => {
   const response = await axiosInstance.post("api/v1/post/posts", postPayload, {
     headers: {
