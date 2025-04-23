@@ -211,6 +211,8 @@ export interface UserProfileBio {
   education: Organization | null;
   work_experience: Organization | null;
   is_defult_cover_photo: boolean;
+  profile_visibility:string;
+
 }
 
 // Add to types.ts

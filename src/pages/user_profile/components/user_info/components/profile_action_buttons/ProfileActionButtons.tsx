@@ -2,10 +2,11 @@ import React, { useState, useMemo, useCallback } from "react";
 import CustomButton from "./CustomButton";
 import AddSectionModal from "./AddSectionModal";
 import ResourcesPopover from "./ResourcesPopover";
-import { IoCloseCircle } from "react-icons/io5";
+import { IoCheckmarkSharp, IoCloseCircle } from "react-icons/io5";
 import { CiCirclePlus, CiClock2 } from "react-icons/ci";
 import { FaUserPlus, FaUserMinus, FaPaperPlane } from "react-icons/fa";
 import {
+  acceptInvitation,
   connectWithUser,
   followUser,
   removeUserFromConnection,
@@ -28,12 +29,16 @@ import {
   FormInput,
 } from "@/components";
 import { blockUser } from "@/endpoints/userProfile";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "@/store";
+import { editUserBio } from "@/slices/user_profile/userBioSlice";
 
 export type FollowStatus = {
   isFollowing?: boolean;
   isPending?: boolean;
   followPrimary?: boolean;
   isInConnection?: boolean;
+  isInRecievedConnections?: boolean;
 };
 
 export interface ProfileActionButtonsProps {
@@ -41,6 +46,9 @@ export interface ProfileActionButtonsProps {
   followStatus: FollowStatus;
   isConnectByEmail: boolean;
   email: string;
+  setNumOfConnections: React.Dispatch<React.SetStateAction<number>>;
+  setIsInConnections: React.Dispatch<React.SetStateAction<undefined | boolean>>;
+  connectionCount: number;
 }
 
 const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
@@ -48,8 +56,13 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
   followStatus,
   isConnectByEmail,
   email,
+  setNumOfConnections,
+  setIsInConnections,
+  connectionCount,
 }) => {
   const { id } = useParams();
+  const userBioState = useSelector((state: RootState) => state.userBio);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const authToken = Cookies.get("linkup_auth_token");
   const [localFollowStatus, setLocalFollowStatus] =
@@ -111,6 +124,32 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
         isPending: false,
         isInConnection: false,
       }));
+    }
+  }, []);
+
+  const handleAcceptConnection = useCallback(async () => {
+    try {
+      const response = await acceptInvitation(
+        authToken as string,
+        id as string
+      );
+      toast.success(response.message);
+      setLocalFollowStatus((prev) => ({
+        ...prev,
+        isFollowing: true,
+        isInConnection: true,
+      }));
+      setNumOfConnections((prev: number) => prev + 1);
+      setIsInConnections(true);
+      dispatch(
+        editUserBio({
+          ...userBioState,
+          number_of_connections: connectionCount + 1,
+        })
+      );
+    } catch (error) {
+      toast.error(getErrorMessage(error));
+      setLocalFollowStatus((prev) => ({ ...prev, isInConnection: false }));
     }
   }, []);
 
@@ -216,6 +255,14 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
         );
         toast.success(response.message);
         setLocalFollowStatus((prev) => ({ ...prev, isInConnection: false }));
+        dispatch(
+          editUserBio({
+            ...userBioState,
+            number_of_connections: connectionCount - 1,
+          })
+        );
+        setNumOfConnections((prev) => prev - 1);
+        setIsInConnections(false);
       } catch (error) {
         toast.error(getErrorMessage(error));
         setLocalFollowStatus((prev) => ({ ...prev, isInConnection: true }));
@@ -362,6 +409,8 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
                 ? handleCancelRequest
                 : effectiveStatus.isInConnection
                 ? handleRemoveConnection
+                : effectiveStatus.isInRecievedConnections
+                ? handleAcceptConnection
                 : isConnectByEmail
                 ? () => setOpenEmailDialog(true)
                 : () => handleConnect(email)
@@ -376,6 +425,11 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
               <>
                 <FaUserMinus size={16} />
                 Remove Connection
+              </>
+            ) : effectiveStatus.isInRecievedConnections ? (
+              <>
+                <IoCheckmarkSharp size={14} />
+                Accept Request
               </>
             ) : (
               <>
@@ -401,6 +455,8 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
         isFollowing={effectiveStatus.isFollowing}
         isPendingConnection={effectiveStatus.isPending}
         isInConnection={effectiveStatus.isInConnection}
+        isInRecievedConnection={effectiveStatus.isInRecievedConnections}
+        onAccept={handleAcceptConnection}
         onFollow={handleFollow}
         onUnfollow={handleUnfollow}
         onConnect={handleConnect}

@@ -23,6 +23,7 @@ type ProfileHeaderProps = {
     education: Organization | null;
   };
   isOwner: boolean;
+  isInConnection?: boolean;
 };
 
 export const ProfileHeader = ({
@@ -31,6 +32,7 @@ export const ProfileHeader = ({
   connectionsCount,
   intros,
   isOwner,
+  isInConnection,
 }: ProfileHeaderProps) => (
   <div className="mb-4 grid gap-1 relative">
     <h1 className="text-2xl font-bold text-gray-800 dark:text-white">
@@ -43,12 +45,19 @@ export const ProfileHeader = ({
       </p>
       <ContactInfoModal user={user} triggerLabel={`Contact Info`} />
     </div>
-    <Link
-      to={`/connections/${userid}`}
-      className="text-blue-600 hover:underline w-fit font-semibold dark:text-blue-400"
-    >
-      {connectionsCount} connections
-    </Link>
+    {isOwner || isInConnection ? (
+      <Link
+        to={`/connections/${userid}`}
+        className="text-blue-600 hover:underline w-fit font-semibold dark:text-blue-400"
+      >
+        {connectionsCount} connections
+      </Link>
+    ) : (
+      <p className="text-gray-600  w-fit font-semibold dark:text-gray-400">
+        {connectionsCount} connections
+      </p>
+    )}
+
     {isOwner && <EditUserBio user={user} userid={userid} intros={intros} />}
     <div className="sm:grid gap-2 absolute right-0 hidden">
       {intros.work_experience && (
