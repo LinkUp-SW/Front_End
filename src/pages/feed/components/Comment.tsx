@@ -77,7 +77,6 @@ const Comment: React.FC<CommentProps> = ({
 
   const { content, date, is_edited, media } = comment;
   const myUserId = Cookies.get("linkup_user_id");
-  console.log("Final ID", postId);
 
   const sanitizedContent = DOMPurify.sanitize(content);
 

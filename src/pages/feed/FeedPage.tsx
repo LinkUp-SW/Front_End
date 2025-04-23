@@ -43,7 +43,7 @@ const FeedPage: React.FC<FeedPageProps> = ({ single = false }) => {
 
   const temporary_feed = [
     "6806a2058db9403282340f23",
-    "680830310435eb5e4d53a7a9",
+
     "6806b5a2bfb3de42b857be4c",
   ];
 

@@ -72,6 +72,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
   postId,
 }) => {
   // Create a ref for the horizontally scrollable container
+  console.log("This is real", postId);
   const [commentInput, setCommentInput] = useState("");
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   console.log("Comment for post:", comments);

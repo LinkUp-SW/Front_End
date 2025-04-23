@@ -39,7 +39,6 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
   const [isReplyActive, setIsReplyActive] = useState(false);
   const [commentInput, setCommentInput] = useState("");
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  console.log("postID", postId);
 
   if (!stats) {
     stats = {
