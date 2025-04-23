@@ -20,7 +20,12 @@ const stats = {
   person: "Hamada",
 };
 
-const Reply: React.FC<ReplyProps> = ({ comment, setIsReplyActive, stats }) => {
+const Reply: React.FC<ReplyProps> = ({
+  comment,
+  setIsReplyActive,
+  stats,
+  postId,
+}) => {
   return (
     // Example: adding left padding and a border to indicate a reply
     <div className="pl-10">
@@ -28,6 +33,7 @@ const Reply: React.FC<ReplyProps> = ({ comment, setIsReplyActive, stats }) => {
         comment={comment}
         setIsReplyActive={setIsReplyActive}
         stats={stats}
+        postId={postId}
       />
     </div>
   );

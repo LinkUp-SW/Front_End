@@ -4,7 +4,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import React, { useEffect, useState } from "react";
-import { data, Link } from "react-router-dom";
+import { data, Link, useNavigate } from "react-router-dom";
 import { LiaEllipsisHSolid as EllipsisIcon } from "react-icons/lia";
 import { Button } from "@/components/ui/button";
 import { FaEyeSlash, FaFlag, FaLink } from "react-icons/fa";
@@ -15,31 +15,44 @@ import LaughIcon from "@/assets/Funny.svg";
 import InsightfulIcon from "@/assets/Insightful.svg";
 import SupportIcon from "@/assets/Support.svg";
 import {
+  getCommentActions,
+  getPrivateCommentActions,
+} from "../components/Menus";
+import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogHeader,
   DialogTitle,
 } from "@/components";
 import { DialogTrigger } from "@radix-ui/react-dialog";
 import ReportCommentModal from "./modals/ReportCommentModal";
 import ReactionsModal from "./modals/ReactionsModal";
-import { getPostReactions } from "@/endpoints/feed";
+import { deleteComment, getPostReactions } from "@/endpoints/feed";
 import { CommentType, ReactionType } from "@/types";
 import moment from "moment";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 import DOMPurify from "dompurify";
+import Cookies from "js-cookie";
+import TransparentButton from "./buttons/TransparentButton";
+import BlueButton from "./buttons/BlueButton";
+import { toast } from "sonner";
 
 export interface CommentProps {
   comment: CommentType;
   stats: any;
   setIsReplyActive: React.Dispatch<React.SetStateAction<boolean>>;
+  postId: string;
 }
+
+const token = Cookies.get("linkup_auth_token");
 
 const Comment: React.FC<CommentProps> = ({
   comment,
   stats,
   setIsReplyActive,
+  postId,
 }) => {
   const {
     profilePicture,
@@ -63,12 +76,15 @@ const Comment: React.FC<CommentProps> = ({
   }
 
   const { content, date, is_edited, media } = comment;
+  const myUserId = Cookies.get("linkup_user_id");
+  console.log("Final ID", postId);
 
   const sanitizedContent = DOMPurify.sanitize(content);
 
   const [commentMenuOpen, setCommentMenuOpen] = useState(false);
   const [reactions, setReactions] = useState<ReactionType[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [deleteModal, setDeleteModal] = useState(false);
 
   const { data } = useSelector((state: RootState) => state.userBio);
 
@@ -138,6 +154,8 @@ const Comment: React.FC<CommentProps> = ({
     topStats.push(statsArray[5]);
   }
 
+  const navigate = useNavigate();
+
   const totalStats =
     (stats.likes || 0) +
     (stats.celebrate || 0) +
@@ -146,23 +164,46 @@ const Comment: React.FC<CommentProps> = ({
     (stats.support || 0) +
     (stats.funny || 0);
 
-  const menuActions = [
-    {
-      name: "Copy link to comment",
-      action: () => console.log("Copy Link clicked"),
-      icon: <FaLink className="mr-2" />,
-    },
-    {
-      name: "Report Comment",
-      action: () => {},
-      icon: <FaFlag className="mr-2" />,
-    },
-    {
-      name: "I don't want to see this",
-      action: () => console.log("Unfollow clicked"),
-      icon: <FaEyeSlash className="mr-2" />,
-    },
-  ];
+  const copyLink = () => {};
+  const editComment = () => {};
+  const deleteCommentModal = () => {
+    setDeleteModal(true);
+  };
+  const reportComment = () => {};
+  const hideComment = () => {};
+
+  const handleDeleteComment = async () => {
+    if (!token) {
+      toast.error("You must be logged in to delete a post.");
+      navigate("/login", { replace: true });
+      return;
+    }
+
+    const loadingToastId = toast.loading("Deleting your post...");
+
+    try {
+      // Call the API to delete the post
+      await deleteComment({ comment_id: comment._id, post_id: postId }, token);
+
+      // Show success toast
+      toast.success("Comment deleted successfully!");
+      toast.dismiss(loadingToastId); // Dismiss the loading toast
+      // SET NEW STATE HERE
+      setDeleteModal(false);
+    } catch (error) {
+      console.error("Error deleting Comment:", error);
+
+      // Show error toast
+      toast.error("Failed to delete the Comment. Please try again.");
+      toast.dismiss(loadingToastId); // Dismiss the loading toast
+      setDeleteModal(false);
+    }
+  };
+
+  const menuActions =
+    comment.author.username === myUserId
+      ? getPrivateCommentActions(copyLink, editComment, deleteCommentModal)
+      : getCommentActions(copyLink, reportComment, hideComment);
 
   const timeAgo = moment(date * 1000).fromNow();
 
@@ -203,6 +244,41 @@ const Comment: React.FC<CommentProps> = ({
                 )}
                 <time className="">{timeAgo}</time>
               </div>
+              <Dialog
+                open={deleteModal}
+                onOpenChange={() => setDeleteModal(!deleteModal)}
+              >
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Are you absolutely sure?</DialogTitle>
+                    <DialogDescription>
+                      <div className="flex flex-col gap-5">
+                        <p>
+                          This action cannot be undone. This will permanently
+                          delete this comment from LinkUp.
+                        </p>
+                        <p>
+                          {" "}
+                          All likes and replies on this comment will also be
+                          removed.
+                        </p>
+                      </div>
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="flex w-full justify-end gap-4">
+                    <TransparentButton
+                      onClick={() => {
+                        setDeleteModal(false);
+                      }}
+                    >
+                      Back
+                    </TransparentButton>
+                    <BlueButton onClick={() => handleDeleteComment()}>
+                      Delete
+                    </BlueButton>
+                  </div>
+                </DialogContent>
+              </Dialog>
               <Dialog>
                 <Popover
                   open={commentMenuOpen}

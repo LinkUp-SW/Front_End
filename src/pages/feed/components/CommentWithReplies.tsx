@@ -39,6 +39,7 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
   const [isReplyActive, setIsReplyActive] = useState(false);
   const [commentInput, setCommentInput] = useState("");
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  console.log("postID", postId);
 
   if (!stats) {
     stats = {
@@ -117,6 +118,7 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
           comment={comment}
           setIsReplyActive={setIsReplyActive}
           stats={stats}
+          postId={postId}
         />
       </div>
 
@@ -150,6 +152,7 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
                     comment={reply}
                     stats={stats}
                     setIsReplyActive={setIsReplyActive}
+                    postId={postId}
                   />
                 </div>
               ))}
