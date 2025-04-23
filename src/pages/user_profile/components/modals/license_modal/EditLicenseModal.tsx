@@ -133,7 +133,8 @@ const EditLicenseModal: React.FC<AddLicenseModalProps> = ({
         newLicense
       );
       toast.success(response.message);
-      onSuccess?.({ ...newLicense, _id: response.license._id });
+      console.log(response.license)
+      onSuccess?.(newLicense);
       onClose?.();
     } catch (error) {
       toast.error(getErrorMessage(error));
