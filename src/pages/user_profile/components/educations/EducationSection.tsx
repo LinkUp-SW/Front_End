@@ -22,6 +22,14 @@ import EditEducationModal from "../modals/education_modal/EditEducationModal";
 import EducationsList from "./EducationsList";
 import EducationSkeletonLoader from "./EducationSkeletonLoader";
 import EducationHeaderSection from "./EducationHeaderSection";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/store";
+import {
+  setEducations as setGlobalEducations,
+  addEducation as addGlobalEducation,
+  updateEducation as updateGlobalEducation,
+  removeEducation as removeGlobalEducation,
+} from "@/slices/education/educationsSlice";
 
 interface FetchDataResult {
   education: Education[];
@@ -31,7 +39,6 @@ interface FetchDataResult {
 const EducationSection: React.FC = () => {
   const authToken = Cookies.get("linkup_auth_token");
   const { id } = useParams();
-  const [educations, setEducations] = useState<Education[]>([]);
   const [editOpen, setEditOpen] = useState(false);
   const [educationToEdit, setEducationToEdit] = useState<Education | null>(
     null
@@ -48,9 +55,12 @@ const EducationSection: React.FC = () => {
     return Promise.resolve(null);
   }, [authToken, id]);
 
+  const dispatch = useDispatch<AppDispatch>();
+  const educations = useSelector((state: RootState) => state.education.items);
+
   useEffect(() => {
     if (data?.education) {
-      setEducations(data.education);
+      dispatch(setGlobalEducations(data.education));
     }
   }, [data]);
 
@@ -58,9 +68,7 @@ const EducationSection: React.FC = () => {
     if (authToken && selectedEducationId) {
       try {
         const response = await removeEducation(authToken, selectedEducationId);
-        setEducations((prev) =>
-          prev.filter((edu) => edu._id !== selectedEducationId)
-        );
+        dispatch(removeGlobalEducation(selectedEducationId));
         toast.success(response.message);
       } catch (error) {
         console.error("Failed to delete education", error);
@@ -101,18 +109,15 @@ const EducationSection: React.FC = () => {
 
   // Handler for adding a new education
   const handleAddEducation = (newEducation: Education) => {
-    setEducations((prev) => [...prev, newEducation]);
+    dispatch(addGlobalEducation(newEducation));
   };
 
   // Handler for updating an existing education
   const handleEditEducation = (updatedEdu: Education) => {
-    setEducations((prev) =>
-      prev.map((edu) => (edu._id === updatedEdu._id ? updatedEdu : edu))
-    );
+    dispatch(updateGlobalEducation(updatedEdu));
     setEditOpen(false);
     setEducationToEdit(null);
   };
-
   return (
     <section
       id="education-section"
