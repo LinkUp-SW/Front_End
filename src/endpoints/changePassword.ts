@@ -6,8 +6,8 @@ import axiosInstance from '../services/axiosInstance';
 const API_ENDPOINT = '/api/v1/user/update-password';
 
 export interface ChangePasswordRequest {
-  currentPassword: string;
-  newPassword: string;
+  old_password: string;
+  new_password: string;
 }
 
 export interface ChangePasswordResponse {
@@ -26,10 +26,10 @@ export const changePassword = async (token: string,
   newPassword: string
 ): Promise<ChangePasswordResponse> => {
   try {
-
-    const response = await axiosInstance.post<ChangePasswordResponse>(
+    const requestData: ChangePasswordRequest = { old_password:currentPassword, new_password:newPassword };
+    const response = await axiosInstance.patch<ChangePasswordResponse>(
       API_ENDPOINT,
-      { currentPassword, newPassword } as ChangePasswordRequest,
+      requestData,
       {
         headers: {
           Authorization: `Bearer ${token}`,
