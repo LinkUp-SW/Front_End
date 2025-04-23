@@ -12,7 +12,7 @@ async function enableMocking() {
   }
 }
 
-//await enableMocking();
+await enableMocking();
 
 
 createRoot(document.getElementById('root')!).render(
