@@ -23,7 +23,14 @@ import { LiaCertificateSolid } from "react-icons/lia";
 import LicensesList from "./LicensesList";
 import LicensesSkeletonLoader from "./LicensesSkeletonLoader";
 import LicenseHeaderSection from "./LicenseHeaderSection";
-
+import { useDispatch, useSelector } from "react-redux";
+import { RootState, AppDispatch } from "@/store";
+import {
+  setLicenses as setGlobalLicense,
+  addLicense as addGlobalLicense,
+  updateLicense as updateGlobalLicense,
+  removeLicense as removeGlobalLicense,
+} from "@/slices/license/licensesSlice";
 interface FetchDataResult {
   licenses: License[];
   is_me: boolean;
@@ -32,7 +39,6 @@ interface FetchDataResult {
 const LicenseSection: React.FC = () => {
   const authToken = Cookies.get("linkup_auth_token");
   const { id } = useParams();
-  const [licenses, setLicenses] = useState<License[]>([]);
   const [editOpen, setEditOpen] = useState(false);
   const [licenseToEdit, setLicenseToEdit] = useState<License | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -46,10 +52,12 @@ const LicenseSection: React.FC = () => {
     }
     return Promise.resolve(null);
   }, [authToken, id]);
+  const dispatch = useDispatch<AppDispatch>();
+  const licenses = useSelector((state: RootState) => state.license.items);
 
   useEffect(() => {
     if (data?.licenses) {
-      setLicenses(data.licenses);
+      dispatch(setGlobalLicense(data.licenses));
     }
   }, [data]);
 
@@ -57,9 +65,7 @@ const LicenseSection: React.FC = () => {
     if (authToken && selectedEducationId) {
       try {
         const response = await removeLicense(authToken, selectedEducationId);
-        setLicenses((prev) =>
-          prev.filter((edu) => edu._id !== selectedEducationId)
-        );
+        dispatch(removeGlobalLicense(selectedEducationId));
         toast.success(response.message);
       } catch (error) {
         console.error("Failed to delete education", error);
@@ -100,14 +106,12 @@ const LicenseSection: React.FC = () => {
 
   // Handler for adding a new education
   const handleAddLicense = (newLicense: License) => {
-    setLicenses((prev) => [...prev, newLicense]);
+    dispatch(addGlobalLicense(newLicense));
   };
 
   // Handler for updating an existing Licsense
   const handleEditLicense = (updatedEdu: License) => {
-    setLicenses((prev) =>
-      prev.map((edu) => (edu._id === updatedEdu._id ? updatedEdu : edu))
-    );
+    dispatch(updateGlobalLicense(updatedEdu));
     setEditOpen(false);
     setLicenseToEdit(null);
   };
