@@ -20,9 +20,9 @@ import { updateUserBio } from "@/endpoints/userProfile";
 import Cookies from "js-cookie";
 import { toast } from "sonner";
 import { getErrorMessage } from "@/utils/errorHandler";
-// import { useDispatch, useSelector } from "react-redux";
-// import { RootState } from "@/store";
-// import { editUserBio } from "@/slices/user_profile/userBioSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "@/store";
+import { editUserBio } from "@/slices/user_profile/userBioSlice";
 
 type EditUserBioModalProps = {
   userId: string;
@@ -57,8 +57,8 @@ const EditUserBioModal: React.FC<EditUserBioModalProps> = ({
     website: "",
   });
   const [openContactInfoModal, setOpenContactInfoModal] = useState(false);
-  // const userBio = useSelector((state: RootState) => state.userBio.data);
-  // const dispatch = useDispatch();
+  const userBio = useSelector((state: RootState) => state.userBio.data);
+  const dispatch = useDispatch();
   // Generic input/textarea change
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -107,11 +107,7 @@ const EditUserBioModal: React.FC<EditUserBioModalProps> = ({
       const response = await updateUserBio(authToken, formData);
       setOpenEditDialog(false);
       console.log(response);
-      // dispatch(editUserBio({...userBio,
-      //   contact_info:{
-      //     phone_number:response.
-      //   }
-      // }))
+      dispatch(editUserBio({ ...userBio, bio: response.user }));
       toast.success(response.message);
     } catch (error) {
       toast.error(getErrorMessage(error));
