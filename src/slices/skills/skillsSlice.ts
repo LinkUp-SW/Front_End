@@ -1,6 +1,6 @@
 // src/store/skillSlice.ts
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Skill } from "@/types";
+import { Organization, Skill } from "@/types";
 
 interface SkillState {
   items: Skill[];
@@ -41,9 +41,98 @@ const skillSlice = createSlice({
         skill.total_endorsements = (skill.total_endorsements || 0) + 1;
       }
     },
+    addExperienceToSkill(
+      state,
+      action: PayloadAction<{
+        skillId: string;
+        skillName: string;
+        experience: Organization;
+      }>
+    ) {
+      const { skillId, skillName, experience } = action.payload;
+      const skill = state.items.find((s) => s._id === skillId);
+      if (skill) {
+        if (!skill.experiences) skill.experiences = [];
+        if (!skill.experiences.some((exp) => exp._id === experience._id)) {
+          skill.experiences.push(experience);
+        }
+      } else {
+        state.items.push({
+          _id: skillId,
+          name: skillName,
+          experiences: [experience],
+          educations: [],
+          licenses: [],
+          total_endorsements: 0,
+          endorsments: [],
+        });
+      }
+    },
+    addEducationToSkill(
+      state,
+      action: PayloadAction<{
+        skillId: string;
+        skillName: string;
+        education: Organization;
+      }>
+    ) {
+      const { skillId, skillName, education } = action.payload;
+      const skill = state.items.find((s) => s._id === skillId);
+      if (skill) {
+        if (!skill.educations) skill.educations = [];
+        if (!skill.educations.some((exp) => exp._id === education._id)) {
+          skill.educations.push(education);
+        }
+      } else {
+        state.items.push({
+          _id: skillId,
+          name: skillName,
+          experiences: [],
+          educations: [education],
+          licenses: [],
+          total_endorsements: 0,
+          endorsments: [],
+        });
+      }
+    },
+    addLicenseToSkill(
+      state,
+      action: PayloadAction<{
+        skillId: string;
+        skillName: string;
+        license: Organization;
+      }>
+    ) {
+      const { skillId, skillName, license } = action.payload;
+      const skill = state.items.find((s) => s._id === skillId);
+      if (skill) {
+        if (!skill.licenses) skill.licenses = [];
+        if (!skill.licenses.some((exp) => exp._id === license._id)) {
+          skill.licenses.push(license);
+        }
+      } else {
+        state.items.push({
+          _id: skillId,
+          name: skillName,
+          experiences: [],
+          educations: [],
+          licenses: [license],
+          total_endorsements: 0,
+          endorsments: [],
+        });
+      }
+    },
   },
 });
 
-export const { setSkills, addSkill, updateSkill, removeSkill, endorseSkill } =
-  skillSlice.actions;
+export const {
+  setSkills,
+  addSkill,
+  updateSkill,
+  removeSkill,
+  endorseSkill,
+  addExperienceToSkill,
+  addEducationToSkill,
+  addLicenseToSkill
+} = skillSlice.actions;
 export default skillSlice.reducer;
