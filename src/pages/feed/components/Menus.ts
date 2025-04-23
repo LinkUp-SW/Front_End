@@ -9,6 +9,7 @@ import {
   FaRocket,
   FaTrash,
   FaUserSlash,
+  FaEyeSlash,
 } from "react-icons/fa";
 import { BiRepost as RepostIcon } from "react-icons/bi";
 import { FaRegCommentDots as CommentIcon } from "react-icons/fa";
@@ -142,5 +143,49 @@ export const getEngagementButtons = (
     name: "Send",
     icon: React.createElement(SendIcon),
     callback: () => {},
+  },
+];
+
+export const getCommentActions: (
+  copyLink: () => void,
+  reportComment: () => void,
+  hideComment: () => void
+) => MenuAction[] = (copyLink, reportComment, hideComment) => [
+  {
+    name: "Copy link to comment",
+    action: () => copyLink(),
+    icon: React.createElement(FaLink, { className: "mr-2" }),
+  },
+  {
+    name: "Report Comment",
+    action: () => reportComment(),
+    icon: React.createElement(FaFlag, { className: "mr-2" }),
+  },
+  {
+    name: "I don't want to see this",
+    action: () => hideComment(),
+    icon: React.createElement(FaEyeSlash, { className: "mr-2" }),
+  },
+];
+
+export const getPrivateCommentActions: (
+  copyLink: () => void,
+  editComment: () => void,
+  deleteComment: () => void
+) => MenuAction[] = (copyLink, editComment, deleteComment) => [
+  {
+    name: "Copy link to comment",
+    action: () => copyLink(),
+    icon: React.createElement(FaLink, { className: "mr-2" }),
+  },
+  {
+    name: "Edit",
+    action: () => editComment(),
+    icon: React.createElement(FaEdit, { className: "mr-2" }),
+  },
+  {
+    name: "Delete",
+    action: () => deleteComment(),
+    icon: React.createElement(FaTrash, { className: "mr-2" }),
   },
 ];
