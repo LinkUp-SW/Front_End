@@ -82,6 +82,40 @@ export const deletePost = async (postId: string, token: string) => {
   return response.data;
 };
 
+export const deleteComment = async (
+  postPayload: { comment_id: string; post_id: string },
+  token: string
+) => {
+  const response = await axiosInstance.delete(
+    `api/v1/post/comment/${postPayload.post_id}/${postPayload.comment_id}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
+
+export const editComment = async (
+  postPayload: {
+    post_id: string;
+    comment_id: string;
+    content: string;
+    media: string;
+    tagged_users: string[];
+  },
+  token: string
+) => {
+  const response = await axiosInstance.patch(`api/v1/post/comment`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    data: postPayload,
+  });
+  return response.data;
+};
+
 export const createPost = async (postPayload: PostDBObject, token: string) => {
   const response = await axiosInstance.post("api/v1/post/posts", postPayload, {
     headers: {
