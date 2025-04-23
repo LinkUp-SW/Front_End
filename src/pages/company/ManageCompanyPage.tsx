@@ -1,52 +1,62 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import { WithNavBar } from '../../components';
 import { FaEye, FaChartLine, FaInfoCircle } from "react-icons/fa";
 import EditPageDialog from './components/manageCompanyPageComponents/EditPageDialog';
+import { getCompanyAdminView } from '@/endpoints/company';
 
 // Define a type for the navigation tabs
 type NavigationTab = 'analytics' | 'page-posts' | 'edit-page' | 'jobs' | 'settings';
 type AnalyticsTab = 'content' | 'visitors' | 'followers' | 'leads' | 'competitors';
 
 const ManageCompanyPage = () => {
+  const { companyId } = useParams<{ companyId: string }>();
   const [activeTab, setActiveTab] = useState<NavigationTab>('analytics');
   const [activeAnalyticsTab, setActiveAnalyticsTab] = useState<AnalyticsTab>('content');
   const [dateRange, setDateRange] = useState('Mar 21, 2025 - Apr 19, 2025');
   const [impressionsSelected, setImpressionsSelected] = useState(true);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   // Company data state
   const [companyData, setCompanyData] = useState({
-    name: "LinkUp Test",
+    _id: "",
+    name: "",
+    logo: "",
     url: "",
-    industry: "Software Development",
-    size: "0-1 employees",
-    type: "Non Profit",
+    industry: "",
+    size: "",
+    type: "",
     phone: "",
     founded: "",
-    overview: ""
+    overview: "",
+    followerCount: 0
   });
 
-  // Mock data
-  const highlightsData = {
-    impressions: 40,
-    reactions: 0,
-    comments: 0,
-    reposts: 0
-  };
+  // Fetch company data on component mount or when companyId changes
+  useEffect(() => {
+    const fetchCompanyData = async () => {
+      if (!companyId) return;
+      
+      try {
+        setIsLoading(true);
+        const response = await getCompanyAdminView(companyId);
+        
+        if (response && response.company) {
+          setCompanyData(response.company);
+        }
+        setError(null);
+      } catch (err: any) {
+        console.error('Failed to fetch company data:', err);
+        setError(err.message || 'Failed to load company data');
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  const contentData = [
-    {
-      title: "asdfkjlh",
-      author: "Omar Khaled",
-      date: "4/18/2025",
-      type: "Text",
-      audience: "All followers",
-      impressions: 108,
-      views: "-",
-      clicks: 5,
-      ctr: "4.63%"
-    }
-  ];
+    fetchCompanyData();
+  }, [companyId]);
 
   const handleNavClick = (tab: NavigationTab) => {
     if (tab === 'edit-page') {
@@ -60,6 +70,24 @@ const ManageCompanyPage = () => {
     setCompanyData({...companyData, ...data});
     console.log("Saved company data:", data);
   };
+
+  // Shows loading state while fetching company data
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-xl text-gray-600">Loading company data...</div>
+      </div>
+    );
+  }
+
+  // Shows error state if fetching failed
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-xl text-red-600">{error}</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen">
@@ -78,17 +106,20 @@ const ManageCompanyPage = () => {
               <div className="absolute bottom-0 left-4 transform translate-y-1/2 bg-white p-1 rounded-lg shadow">
                 <div className="w-16 h-16 flex overflow-hidden rounded-lg bg-gray-200">
                   <img 
-                  src="/src/assets/buildings.jpeg" 
-                  alt="Company logo" 
-                  className="w-full object-cover"
-                />
+                    src={companyData.logo || "/src/assets/buildings.jpeg"} 
+                    alt={`${companyData.name} logo`} 
+                    className="w-full object-cover"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = "/api/placeholder/50/50";
+                    }}
+                  />
                 </div>
               </div>
             </div>
             
             <div className="p-4 pb-3 mt-8">
               <h2 className="text-lg font-medium">{companyData.name}</h2>
-              <p className="text-sm text-gray-500 mt-0.5">22 followers</p>
+              <p className="text-sm text-gray-500 mt-0.5">{companyData.followerCount} followers</p>
              
               <button className="mt-4 w-full border border-gray-300 rounded-full py-2 text-sm flex justify-center items-center text-gray-600 hover:bg-gray-50 transition-colors">
                 <FaEye className="mr-2" size={16} />
@@ -165,7 +196,29 @@ const ManageCompanyPage = () => {
             {/* Content based on active tab would go here */}
             {activeTab === 'analytics' && (
               <div>
-                <p>Analytics dashboard content here...</p>
+                <p>Analytics dashboard for {companyData.name}</p>
+                {/* Add your analytics components here */}
+              </div>
+            )}
+            
+            {activeTab === 'page-posts' && (
+              <div>
+                <p>Posts for {companyData.name}</p>
+                {/* Add your posts components here */}
+              </div>
+            )}
+            
+            {activeTab === 'jobs' && (
+              <div>
+                <p>Jobs for {companyData.name}</p>
+                {/* Add your jobs components here */}
+              </div>
+            )}
+            
+            {activeTab === 'settings' && (
+              <div>
+                <p>Settings for {companyData.name}</p>
+                {/* Add your settings components here */}
               </div>
             )}
           </div>

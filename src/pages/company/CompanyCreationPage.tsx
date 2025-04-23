@@ -1,4 +1,4 @@
-import { useState} from 'react';
+import { useState } from 'react';
 import { WithNavBar } from '@/components';
 import { useNavigate } from 'react-router-dom';
 import PageTypeSelection from './components/companyCreationPageComponents/PageTypeSelection';
@@ -9,28 +9,50 @@ import PagePreview from './components/companyCreationPageComponents/PagePreview'
 const CompanyCreationPage: React.FC = () => {
   const navigate = useNavigate();
   const [selectedType, setSelectedType] = useState<'company' | 'education' | null>(null);
-
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   // Handle type selection
   const handleTypeSelection = (type: 'company' | 'education') => {
     setSelectedType(type);
+    setErrorMessage(null);
   };
 
   // Handle back button click
   const handleBack = () => {
     setSelectedType(null);
+    setErrorMessage(null);
   };
 
   // Handle form submission
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Here you would handle form submission, validation, etc.
-    // For now, just navigate to a success page
-    navigate('/pages/success');
+    
+    // Form data will be handled in the PageForm component
+    // This just handles the navigation after successful submission
+    try {
+      setIsSubmitting(true);
+      // The actual API call is now handled within the PageForm component
+      // Here we just handle navigation upon successful form submission
+      navigate('/feed');
+    } catch (error: any) {
+      console.error('Error creating company:', error);
+      setErrorMessage(error.message || 'Failed to create company. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <div className="min-h-screen">
+      {errorMessage && (
+        <div className="max-w-6xl mx-auto px-4 py-2 mt-2">
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+            {errorMessage}
+          </div>
+        </div>
+      )}
+      
       {!selectedType ? (
         <PageTypeSelection onSelectType={handleTypeSelection} />
       ) : (

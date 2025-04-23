@@ -160,7 +160,7 @@ const routes: RouteObject[] = [
     element: React.createElement(CompanyCreationPage),
   },
   {
-    path: "/company-manage",
+    path: "/company-manage/:companyId",
     element: React.createElement(ManageCompanyPage),
   },
 ];

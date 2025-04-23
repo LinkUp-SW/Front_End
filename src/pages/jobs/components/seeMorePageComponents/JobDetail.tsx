@@ -94,8 +94,7 @@ const JobDetail: React.FC<JobDetailProps> = ({ job, isLoading = false }) => {
         
         <div className="text-sm text-gray-700 dark:text-gray-400 mb-3">
           {job.companyInfo?.industryType || "Information Technology"} • 
-          {job.companyInfo?.employeeCount || "51-200 employees"} • 
-          {job.companyInfo?.linkupPresence || "100+ on LinkUp"}
+          {job.companyInfo?.employeeCount || "51-200 employees"} 
         </div>
         
         <p className="text-sm mb-2 text-gray-700 dark:text-gray-400">

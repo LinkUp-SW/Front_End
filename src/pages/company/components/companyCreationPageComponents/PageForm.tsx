@@ -1,4 +1,6 @@
-import { FormEvent } from 'react';
+import { FormEvent, useState } from 'react';
+import { createCompanyProfile } from '@/endpoints/company';
+import {CompanyProfileData} from "../../../jobs/types"
 
 interface PageFormProps {
   type: 'company' | 'education';
@@ -6,14 +8,115 @@ interface PageFormProps {
 }
 
 export const PageForm: React.FC<PageFormProps> = ({ type, onSubmit }) => {
+  const [formData, setFormData] = useState<CompanyProfileData>({
+    name: '',
+    category_type: type,
+    unique_url: '',
+    website: '',
+    logo: '',
+    description: '',
+    industry: '',
+    location: '',
+    size: '',
+    type: '',
+  });
+  
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [charCount, setCharCount] = useState(0);
+  
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData((prevData: CompanyProfileData) => ({ ...prevData, [name]: value }));
+    
+    if (name === 'description') {
+      setCharCount(value.length);
+    }
+  };
+  
+  const validateForm = (): boolean => {
+    // Basic validation
+    if (!formData.name.trim()) {
+      setError('Name is required.');
+      return false;
+    }
+    
+    if (!formData.industry.trim()) {
+      setError('Industry is required.');
+      return false;
+    }
+    
+    if (!formData.size) {
+      setError('Organization size is required.');
+      return false;
+    }
+    
+    if (!formData.type) {
+      setError('Organization type is required.');
+      return false;
+    }
+    
+    return true;
+  };
+  
+  const handleSubmitForm = async (e: FormEvent) => {
+    e.preventDefault();
+    
+    if (!validateForm()) {
+      return;
+    }
+    
+    setIsSubmitting(true);
+    setError(null);
+    
+    try {
+      console.log('Submitting form data:', formData);
+      
+      // Format data for API
+      const apiData: CompanyProfileData = {
+        ...formData,
+        // Make sure category_type matches what the API expects
+        category_type: type,
+      };
+      
+      // Log the API request for debugging
+      console.log('Sending API request with data:', apiData);
+      
+      const response = await createCompanyProfile(apiData);
+      console.log('API response:', response);
+      
+      onSubmit(e);
+    } catch (err: any) {
+      console.error('Error creating company profile:', err);
+      
+      // More user-friendly error message
+      if (err.message) {
+        setError(err.message);
+      } else {
+        setError('Failed to create profile. Please try again later.');
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
-    <form onSubmit={onSubmit}>
+    <form onSubmit={handleSubmitForm}>
+      {error && (
+        <div className="mb-4 p-3 bg-red-100 text-red-700 rounded">
+          {error}
+        </div>
+      )}
+      
       <p className="text-xs text-gray-500 mb-4">* indicates required</p>
 
       <div className="mb-6">
         <label className="block text-gray-700 dark:text-gray-300 mb-1 font-medium">Name*</label>
         <input 
           type="text" 
+          name="name"
+          value={formData.name}
+          onChange={handleChange}
           placeholder="Add your organization's name" 
           className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
           required
@@ -21,21 +124,12 @@ export const PageForm: React.FC<PageFormProps> = ({ type, onSubmit }) => {
       </div>
 
       <div className="mb-6">
-        <label className="block text-gray-700 dark:text-gray-300 mb-1 font-medium">
-          {type === 'company' ? 'linkUp.com/company/*' : 'linkUp.com/school/*'}
-        </label>
-        <input 
-          type="text" 
-          placeholder="Add your unique LinkUp address" 
-          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-        />
-        <a href="#" className="text-blue-600 text-sm mt-1 block">Learn more about the Page Public URL</a>
-      </div>
-
-      <div className="mb-6">
         <label className="block text-gray-700 dark:text-gray-300 mb-1 font-medium">Website</label>
         <input 
           type="text" 
+          name="website"
+          value={formData.website || ''}
+          onChange={handleChange}
           placeholder="Begin with http://, https:// or www." 
           className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
         />
@@ -45,6 +139,9 @@ export const PageForm: React.FC<PageFormProps> = ({ type, onSubmit }) => {
         <label className="block text-gray-700 dark:text-gray-300 mb-1 font-medium">Industry*</label>
         <input 
           type="text" 
+          name="industry"
+          value={formData.industry}
+          onChange={handleChange}
           placeholder="ex: Information Services" 
           className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
           required
@@ -52,21 +149,36 @@ export const PageForm: React.FC<PageFormProps> = ({ type, onSubmit }) => {
       </div>
 
       <div className="mb-6">
+        <label className="block text-gray-700 dark:text-gray-300 mb-1 font-medium">Location</label>
+        <input 
+          type="text" 
+          name="location"
+          value={formData.location || ''}
+          onChange={handleChange}
+          placeholder="ex: New York, NY" 
+          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+        />
+      </div>
+
+      <div className="mb-6">
         <label className="block text-gray-700 dark:text-gray-300 mb-1 font-medium">Organization size*</label>
         <div className="relative">
           <select 
+            name="size"
+            value={formData.size}
+            onChange={handleChange}
             className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded appearance-none focus:outline-none focus:ring-1 focus:ring-blue-500"
             required
           >
             <option value="">Select size</option>
-            <option value="1-10">1-10 employees</option>
-            <option value="11-50">11-50 employees</option>
-            <option value="51-200">51-200 employees</option>
-            <option value="201-500">201-500 employees</option>
-            <option value="501-1000">501-1000 employees</option>
-            <option value="1001-5000">1001-5000 employees</option>
-            <option value="5001-10000">5001-10000 employees</option>
-            <option value="10001+">10001+ employees</option>
+            <option value="1-10 employees">1-10 employees</option>
+            <option value="11-50 employees">11-50 employees</option>
+            <option value="51-200 employees">51-200 employees</option>
+            <option value="201-500 employees">201-500 employees</option>
+            <option value="501-1000 employees">501-1000 employees</option>
+            <option value="1001-5000 employees">1001-5000 employees</option>
+            <option value="5001-10000 employees">5001-10000 employees</option>
+            <option value="10001+ employees">10001+ employees</option>
           </select>
           <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
             <svg className="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
@@ -80,25 +192,28 @@ export const PageForm: React.FC<PageFormProps> = ({ type, onSubmit }) => {
         <label className="block text-gray-700 dark:text-gray-300 mb-1 font-medium">Organization type*</label>
         <div className="relative">
           <select 
+            name="type"
+            value={formData.type}
+            onChange={handleChange}
             className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded appearance-none focus:outline-none focus:ring-1 focus:ring-blue-500"
             required
           >
             <option value="">Select type</option>
             {type === 'company' ? (
               <>
-                <option value="public">Public company</option>
-                <option value="private">Private company</option>
-                <option value="nonprofit">Nonprofit</option>
-                <option value="government">Government agency</option>
-                <option value="partnership">Partnership</option>
+                <option value="Public company">Public company</option>
+                <option value="Private company">Private company</option>
+                <option value="Nonprofit">Nonprofit</option>
+                <option value="Government agency">Government agency</option>
+                <option value="Partnership">Partnership</option>
               </>
             ) : (
               <>
-                <option value="university">University</option>
-                <option value="college">College</option>
-                <option value="highschool">High School</option>
-                <option value="middleschool">Middle School</option>
-                <option value="elementary">Elementary School</option>
+                <option value="University">University</option>
+                <option value="College">College</option>
+                <option value="High School">High School</option>
+                <option value="Middle School">Middle School</option>
+                <option value="Elementary School">Elementary School</option>
               </>
             )}
           </select>
@@ -125,8 +240,11 @@ export const PageForm: React.FC<PageFormProps> = ({ type, onSubmit }) => {
       </div>
 
       <div className="mb-6">
-        <label className="block text-gray-700 dark:text-gray-300 mb-1 font-medium">Tagline</label>
+        <label className="block text-gray-700 dark:text-gray-300 mb-1 font-medium">Description</label>
         <textarea 
+          name="description"
+          value={formData.description || ''}
+          onChange={handleChange}
           placeholder="ex: An information services firm helping small businesses succeed." 
           className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
           rows={3}
@@ -134,7 +252,7 @@ export const PageForm: React.FC<PageFormProps> = ({ type, onSubmit }) => {
         ></textarea>
         <div className="flex justify-between text-xs text-gray-500 mt-1">
           <span>Use your tagline to briefly describe what your organization does. This can be changed later.</span>
-          <span>0/120</span>
+          <span>{charCount}/120</span>
         </div>
       </div>
 
@@ -156,9 +274,10 @@ export const PageForm: React.FC<PageFormProps> = ({ type, onSubmit }) => {
       <div className="flex justify-center mt-6">
         <button 
           type="submit"
-          className="px-6 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors duration-300"
+          disabled={isSubmitting}
+          className={`px-6 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors duration-300 ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
         >
-          Create page
+          {isSubmitting ? 'Creating page...' : 'Create page'}
         </button>
       </div>
     </form>

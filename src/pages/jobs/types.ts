@@ -1,11 +1,57 @@
-export interface CompanyInfo {
+// export interface CompanyInfo {
+//   name: string;
+//   logo: string;
+//   followers: string;
+//   industryType: string;
+//   employeeCount: string;
+//   description: string;
+// }
+
+// Company interface for API responses
+export interface Company {
+  _id: string;
   name: string;
   logo: string;
-  followers: string;
+  category_type?: string;
+  unique_url?: string;
+  website?: string;
+  description?: string;
+  industry?: string;
+  location?: string;
+  size?: string;
+  type?: string;
+  posts?: any[];
+  followers?: any[];
+  blocked?: any[];
+  conversations?: any[];
+  admins?: string[];
+  __v?: number;
   industryType: string;
   employeeCount: string;
-  linkupPresence: string;
-  description: string;
+}
+
+// API response interfaces
+export interface UserCompaniesResponse {
+  organizations: Company[];
+}
+
+export interface CompanyProfileResponse {
+  message: string;
+  companyProfile: Company;
+}
+
+// Request payload interface
+export interface CompanyProfileData {
+  name: string;
+  category_type: "company" | "education";
+  unique_url: string;
+  website?: string;
+  logo?: string;
+  description?: string;
+  industry: string;
+  location?: string;
+  size: string;
+  type: string;
 }
 
 export interface Job {
@@ -27,7 +73,7 @@ export interface Job {
   responseTime?: string;
   postedTime?: string;
   workMode: 'On-site' | 'Remote' | 'Hybrid';
-  companyInfo?: CompanyInfo;  
+  companyInfo?: Company;  
   description?: string;
   qualifications?: string[];
   responsibilities?: string[];

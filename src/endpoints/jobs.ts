@@ -17,7 +17,6 @@ export interface JobData {
     name: string;
     logo: string;
     description: string;
-    linkup_presence: string;
     size: string;
     industry: string;
     followers: string;
@@ -127,13 +126,15 @@ export const convertJobDataToJob = (jobData: JobData): Job => {
     benefits: jobData.benefits,
     salary: jobData.salary,
     companyInfo: jobData.organization ? {
+      _id: jobData.organization._id,
       name: jobData.organization.name,
       logo: jobData.organization.logo,
-      followers: jobData.organization.followers,
+      description: jobData.organization.description,
+      industry: jobData.organization.industry,
+      size: jobData.organization.size,
+      followers: jobData.organization.followers ? [jobData.organization.followers] : [],
       industryType: jobData.organization.industry,
-      employeeCount: jobData.organization.size,
-      linkupPresence: jobData.organization.linkup_presence,
-      description: jobData.organization.description
+      employeeCount: jobData.organization.size
     } : undefined
   };
 };
