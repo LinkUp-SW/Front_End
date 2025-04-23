@@ -22,53 +22,64 @@ import React from "react";
 import { EditIcon } from "lucide-react";
 import { FaMessage } from "react-icons/fa6";
 
-export const getMenuActions: () => MenuAction[] = () => [
+export const getMenuActions: (
+  savePost: () => void,
+  copyLink: () => void,
+  blockPost: () => void,
+  reportPost: () => void,
+  unfollow: () => void
+) => MenuAction[] = (savePost, copyLink, blockPost, reportPost, unfollow) => [
   {
     name: "Save",
-    action: () => console.log("Save clicked"),
+    action: () => savePost(),
     icon: React.createElement(FaBookmark, { className: "mr-2" }),
   },
   {
     name: "Copy Link",
-    action: () => console.log("Copy Link clicked"),
+    action: () => copyLink(),
     icon: React.createElement(FaLink, { className: "mr-2" }),
   },
   {
     name: "Block Post",
-    action: () => console.log("Block Post clicked"),
+    action: () => blockPost(),
     icon: React.createElement(FaBan, { className: "mr-2" }),
   },
   {
     name: "Report Post",
-    action: () => console.log("Report Post Clicked"),
+    action: () => reportPost(),
     icon: React.createElement(FaFlag, { className: "mr-2" }),
   },
   {
     name: "Unfollow",
-    action: () => console.log("Unfollow clicked"),
+    action: () => unfollow(),
     icon: React.createElement(FaUserSlash, { className: "mr-2" }),
   },
 ];
 
-export const getPersonalMenuActions: () => MenuAction[] = () => [
+export const getPersonalMenuActions: (
+  savePost: any,
+  copyLink: any,
+  editPost: any,
+  deletePost: any
+) => MenuAction[] = (savePost, copyLink, editPost, deletePost) => [
   {
     name: "Save",
-    action: () => console.log("Save clicked"),
+    action: () => savePost(),
     icon: React.createElement(FaBookmark, { className: "mr-2" }),
   },
   {
     name: "Copy Link",
-    action: () => console.log("Copy Link clicked"),
+    action: () => copyLink(),
     icon: React.createElement(FaLink, { className: "mr-2" }),
   },
   {
     name: "Edit Post",
-    action: () => console.log("Edit Post clicked"),
+    action: () => editPost(),
     icon: React.createElement(FaEdit, { className: "mr-2" }),
   },
   {
     name: "Delete Post",
-    action: () => console.log("Delete Post Clicked"),
+    action: () => deletePost(),
     icon: React.createElement(FaTrash, { className: "mr-2" }),
   },
 ];

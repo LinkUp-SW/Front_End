@@ -8,6 +8,7 @@ import FunnyIcon from "@/assets/Funny.svg";
 import InsightfulIcon from "@/assets/Insightful.svg";
 import SupportIcon from "@/assets/Support.svg";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
   CommentDBType,
   CommentObjectType,
@@ -29,6 +30,7 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogHeader,
   DialogTitle,
   DialogTrigger,
   Popover,
@@ -44,8 +46,10 @@ import ReactionsModal from "./modals/ReactionsModal";
 import PostImages from "./PostImages";
 import IconButton from "./buttons/IconButton";
 import Cookies from "js-cookie";
-import { createComment } from "@/endpoints/feed";
+import { createComment, deletePost } from "@/endpoints/feed";
 import { toast } from "sonner";
+import TransparentButton from "./buttons/TransparentButton";
+import BlueButton from "./buttons/BlueButton";
 
 interface PostProps {
   postData: PostType;
@@ -76,6 +80,7 @@ const Post: React.FC<PostProps> = ({
   setComments,
   order,
 }) => {
+  const navigate = useNavigate();
   const { author }: { author: PostUserType } = postData;
   const { date, media, reacts, taggedUsers } = postData;
   const [liked, setLiked] = useState(false);
@@ -85,6 +90,7 @@ const Post: React.FC<PostProps> = ({
   const [sortingState, setSortingState] = useState("Most relevant");
   const [commentsOpen, setCommentsOpen] = useState(false);
   const [reactionsOpen, setReactionsOpen] = useState(false);
+  const [willDelete, setWillDelete] = useState(false);
   const [selectedReaction, setSelectedReaction] = useState<string | null>(
     "Like"
   );
@@ -191,9 +197,48 @@ const Post: React.FC<PostProps> = ({
       };
     }
   }, [media]);
+  const savePost = () => {};
+  const copyLink = () => {};
+  const editPost = () => {};
+  const deleteModal = () => {
+    setWillDelete(true);
+  };
+  const blockPost = () => {};
+  const reportPost = () => {};
+  const unfollow = () => {};
+
+  const handleDeletePost = async () => {
+    if (!token) {
+      toast.error("You must be logged in to delete a post.");
+      navigate("/login", { replace: true });
+      return;
+    }
+
+    const loadingToastId = toast.loading("Deleting your post...");
+
+    try {
+      // Call the API to delete the post
+      await deletePost(postData._id, token);
+
+      // Show success toast
+      toast.success("Post deleted successfully!");
+      toast.dismiss(loadingToastId); // Dismiss the loading toast
+      setPosts(posts.filter((post) => post._id !== postData._id));
+      setWillDelete(false);
+    } catch (error) {
+      console.error("Error deleting post:", error);
+
+      // Show error toast
+      toast.error("Failed to delete the post. Please try again.");
+      toast.dismiss(loadingToastId); // Dismiss the loading toast
+      setWillDelete(false);
+    }
+  };
 
   const menuActions =
-    userId === author.username ? getPersonalMenuActions() : getMenuActions();
+    userId === author.username
+      ? getPersonalMenuActions(savePost, copyLink, editPost, deleteModal)
+      : getMenuActions(savePost, copyLink, blockPost, reportPost, unfollow);
 
   const engagementButtons = getEngagementButtons(
     liked,
@@ -209,7 +254,7 @@ const Post: React.FC<PostProps> = ({
     love: 2,
     support: 1,
     celebrate: 1,
-    comments: comments.count,
+    comments: comments ? (comments.count ? comments.count : 1) : 0,
     reposts: 5,
     person: "Hamada",
   };
@@ -272,6 +317,30 @@ const Post: React.FC<PostProps> = ({
             </div>
           </div>
         )}
+        <Dialog
+          open={willDelete}
+          onOpenChange={() => setWillDelete(!willDelete)}
+        >
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Are you absolutely sure?</DialogTitle>
+              <DialogDescription>
+                This action cannot be undone. This will permanently delete this
+                post from LinkUp.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="flex w-full justify-end gap-4">
+              <TransparentButton
+                onClick={() => {
+                  setWillDelete(false);
+                }}
+              >
+                Back
+              </TransparentButton>
+              <BlueButton onClick={() => handleDeletePost()}>Delete</BlueButton>
+            </div>
+          </DialogContent>
+        </Dialog>
 
         <footer className="flex justify-between w-full items-center pt-4 pl-4">
           <Dialog>
