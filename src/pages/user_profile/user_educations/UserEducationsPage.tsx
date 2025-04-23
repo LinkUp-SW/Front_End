@@ -33,6 +33,7 @@ import {
   updateEducation as updateGlobalEducation,
   removeEducation as removeGlobalEducation,
 } from "@/slices/education/educationsSlice";
+import { removeOrganizationFromSkills as removeEducationFromSkills } from "@/slices/skills/skillsSlice";
 
 interface FetchDataResult {
   education: Education[];
@@ -72,6 +73,8 @@ const UserEducationsPage = () => {
       try {
         const response = await removeEducation(authToken, selectedEducationId);
         dispatch(removeGlobalEducation(selectedEducationId));
+        dispatch(removeEducationFromSkills({ orgId: selectedEducationId }));
+
         toast.success(response.message);
       } catch (error) {
         console.error("Failed to delete education", error);

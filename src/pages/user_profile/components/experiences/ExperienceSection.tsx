@@ -35,6 +35,7 @@ import {
   updateExperience as updateGlobalExperience,
   removeExperience as removeGlobalExperience,
 } from "@/slices/experience/experiencesSlice";
+import { removeOrganizationFromSkills as removeExperienceFromSkills } from "@/slices/skills/skillsSlice";
 
 interface FetchDataResult {
   work_experience: Experience[];
@@ -77,7 +78,7 @@ const ExperienceSection: React.FC = () => {
           selectedExperienceId
         );
         dispatch(removeGlobalExperience(selectedExperienceId));
-
+        dispatch(removeExperienceFromSkills({ orgId: selectedExperienceId }));
         toast.success(response.message);
       } catch (error) {
         console.error("Failed to delete experience", error);

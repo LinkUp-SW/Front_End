@@ -122,6 +122,22 @@ const skillSlice = createSlice({
         });
       }
     },
+    removeOrganizationFromSkills(
+      state,
+      action: PayloadAction<{ orgId: string }>
+    ) {
+      const { orgId } = action.payload;
+      state.items.forEach(skill => {
+        const eduIdx = skill.educations.findIndex(e => e._id === orgId);
+        if (eduIdx !== -1) return skill.educations.splice(eduIdx, 1);
+    
+        const expIdx = skill.experiences.findIndex(e => e._id === orgId);
+        if (expIdx !== -1) return skill.experiences.splice(expIdx, 1);
+    
+        const licIdx = skill.licenses.findIndex(l => l._id === orgId);
+        if (licIdx !== -1) return skill.licenses.splice(licIdx, 1);
+      });
+    },
   },
 });
 
@@ -133,6 +149,7 @@ export const {
   endorseSkill,
   addExperienceToSkill,
   addEducationToSkill,
-  addLicenseToSkill
+  addLicenseToSkill,
+  removeOrganizationFromSkills
 } = skillSlice.actions;
 export default skillSlice.reducer;
