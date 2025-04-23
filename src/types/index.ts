@@ -103,6 +103,10 @@ export interface Organization {
   logo: string;
   name: string;
 }
+export interface SkillResponse{
+  _id:string;
+  name:string
+}
 
 export interface Experience {
   _id?: string;
