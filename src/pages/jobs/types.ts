@@ -1,12 +1,3 @@
-// export interface CompanyInfo {
-//   name: string;
-//   logo: string;
-//   followers: string;
-//   industryType: string;
-//   employeeCount: string;
-//   description: string;
-// }
-
 // Company interface for API responses
 export interface Company {
   _id: string;
@@ -17,7 +8,14 @@ export interface Company {
   website?: string;
   description?: string;
   industry?: string;
-  location?: string;
+  location?: {
+    country: string;
+    address: string;
+    city: string;
+    state: string;
+    postal_code: string;
+    location_name: string;
+  };
   size?: string;
   type?: string;
   posts?: any[];
@@ -28,6 +26,7 @@ export interface Company {
   __v?: number;
   industryType: string;
   employeeCount: string;
+  phone?: string;
 }
 
 // API response interfaces

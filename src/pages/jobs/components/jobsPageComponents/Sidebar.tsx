@@ -101,9 +101,6 @@ const Sidebar: React.FC = () => {
                       src={company.logo || "/src/assets/buildings.jpeg"} 
                       alt={company.name} 
                       className="w-8 h-8 bg-gray-200 dark:bg-gray-600 rounded mr-3"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = "/api/placeholder/50/50";
-                      }}
                     />
                     <div>
                       <p className="font-medium text-gray-800 dark:text-gray-200">{company.name}</p>
