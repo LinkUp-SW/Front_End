@@ -26,6 +26,27 @@ export const store = configureStore({
     skill: skillReducer,
     experience: experienceReducer,
   },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        // ignore all actions from license/addLicense and that slice’s state
+        ignoredActions: [
+          "license/addLicense",
+          "license/updateLicense",
+          "education/addEducation",
+          "education/updateEducation",
+          "experience/addExperience",
+          "experience/updateExperience",
+          "skill/addLicenseToSkill",
+        ],
+        ignoredPaths: [
+          "license.items",
+          "education.items",
+          "experience.items",
+          "skill.items",
+        ],
+      },
+    }),
 });
 
 // Infer the `RootState` and `AppDispatch` types from the store itself
