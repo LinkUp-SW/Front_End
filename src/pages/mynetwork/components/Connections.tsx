@@ -21,6 +21,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { editUserBio } from "@/slices/user_profile/userBioSlice";
+import { toast } from "sonner";
 
 const Connections: React.FC = () => {
   const navigate = useNavigate();
@@ -50,8 +51,10 @@ const Connections: React.FC = () => {
         setConnections((prevConnections) =>
           prevConnections.filter((c) => c.user_id !== userId)
         );
+        toast.success("Connection removed successfully!");
       } catch (error) {
         console.error("Error removing connection:", error);
+        toast.error("Failed to remove connection.");
       }
     },
     [token]
