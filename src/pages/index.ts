@@ -28,7 +28,7 @@ import UserExperiencesPage from "./user_profile/user_experiences/UserExperiences
 import SignInAndSecurityPage from "./settings/SignInAndSecurityPage";
 import ChangePasswordPage from "./settings/ChangePasswordPage";
 import MyItemsPage from "./my_items/MyItemsPage";
-
+import AllPeoplePage from "./search/AllPeoplePage";
 //Export the Imported Pages
 export {
   LandingPage,
@@ -60,4 +60,5 @@ export {
   SignInAndSecurityPage,
   ChangePasswordPage,
   MyItemsPage,
+  AllPeoplePage,
 };

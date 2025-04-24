@@ -18,6 +18,7 @@ import {
 import UnfollowUserModal from "./modals/UnfollowUserModal";
 import { DialogDescription, DialogTitle } from "@radix-ui/react-dialog";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 const LIMIT = 100; // Number of items per page
 
@@ -147,10 +148,12 @@ const FollowingFollowers: React.FC = () => {
 
       try {
         await unfollowUser(token, userId);
+        toast.success("You unfollowed the user successfully!");
         // Re-fetch data after unfollowing
         loadFollowingFollowers();
       } catch (error) {
         console.error("Error unfollowing user:", error);
+        toast.error("Failed to unfollow the user.");
       }
     },
     [token, loadFollowingFollowers]
@@ -166,10 +169,12 @@ const FollowingFollowers: React.FC = () => {
 
       try {
         await followUser(token, userId);
+        toast.success("You followed the user successfully!");
         // Re-fetch data after following
         loadFollowingFollowers();
       } catch (error) {
         console.error("Error following user:", error);
+        toast.error("Failed to follow the user.");
       }
     },
     [token, loadFollowingFollowers]

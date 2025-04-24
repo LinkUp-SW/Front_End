@@ -1,111 +1,97 @@
+// src/pages/SearchPage/SearchPage.tsx
+import React, { useEffect, useState } from "react";
 import { WithNavBar } from "../../components";
-import { useParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import People from "./components/People";
-import Jobs from "./components/Jobs";
+// import Jobs from "./components/Jobs";
+import Cookies from "js-cookie";
+import { getusers } from "@/endpoints/myNetwork";
+import { Person } from "@/endpoints/myNetwork";
 
-// Sample Data
-const people = [
-  {
-    name: "Nada Salem",
-    title: "Front end developer",
-    location: "Giza",
-    mutualConnections: "Ahmed Khattab, Yousef Gilany, and 19 other mutual connections",
-    avatar: "https://via.placeholder.com/50",
-    isConnected: true,
-    industry: "Front end",
-  },
-  {
-    name: "Nada Khaled",
-    title: "Front end developer",
-    location: "Cairo, Egypt",
-    mutualConnections: "Marwan Abdellah, AbdEl-Monem El-Sharkawy, PhD, and 70 other mutual connections",
-    avatar: "https://via.placeholder.com/50",
-    isConnected: true,
-    industry: "Front end",
-  },
-  {
-    name: "Nada Zayed",
-    title: "Backend Developer",
-    location: "Alexandria, Egypt",
-    mutualConnections: "Ibrahim Sobh, PhD, and 47 other mutual connections",
-    avatar: "https://via.placeholder.com/50",
-    isConnected: false,
-    industry: "Backend",
-  },
-];
+// export interface Job {
+//   id: string;
+//   title: string;
+//   company: string;
+//   location: string;
+//   type: string;
+//   posted: string;
+//   applicants: string;
+//   description: string;
+//   alumni: string;
+//   time: string;
+//   logo: string;
+// }
 
-const jobs = [
-  {
-    title: "Front end Developer - Internship",
-    company: "Tech Solutions",
-    location: "Cairo, Egypt (Hybrid)",
-    applicants: "<10 Applicants",
-    alumni: "23 alumni work here",
-    time: "3 days ago",
-    logo: "https://via.placeholder.com/50",
-  },
-  {
-    title: "Internship Program - Front end developer - Jumia (Full Time)",
-    company: "Jumia Group",
-    location: "Cairo, Cairo, Egypt (Hybrid)",
-    applicants: "<10 Applicants",
-    alumni: "23 alumni work here",
-    time: "3 months ago",
-    logo: "https://via.placeholder.com/50",
-  },
-  {
-    title: "Front end developer Intern",
-    company: "Aleph Group, Inc",
-    location: "Cairo, Cairo, Egypt (Hybrid)",
-    applicants: "<10 Applicants",
-    alumni: "13 alumni work here",
-    time: "1 week ago",
-    logo: "https://via.placeholder.com/50",
-  },
-  {
-    title: "Backend Developer - Junior",
-    company: "Innovatech",
-    location: "Alexandria, Egypt (Remote)",
-    applicants: "<50 Applicants",
-    alumni: "10 alumni work here",
-    time: "1 week ago",
-    logo: "https://via.placeholder.com/50",
-  },
-  {
-    title: "Front end developer - Part time",
-    company: "Aim Consultants LLC",
-    location: "Heliopolis, Cairo, Egypt (On-site)",
-    applicants: "<10 Applicants",
-    alumni: "",
-    time: "10 hours ago",
-    logo: "https://via.placeholder.com/50",
-  },
-];
+// const mockJobs: Job[] = [
+//   {
+//     id: "1",
+//     title: "Software Engineer",
+//     company: "Tech Corp",
+//     location: "San Francisco, CA",
+//     type: "Full-time",
+//     posted: "2 days ago",
+//     applicants: "45 applicants",
+//     description: "We're looking for a skilled software engineer...",
+//     alumni: "5 alumni",
+//     time: "Full-time",
+//     logo: "/path/to/logo.png"
+//   },
+// ];
 
 const SearchPage: React.FC = () => {
-  const { query } = useParams<{ query: string }>();
+  const [searchParams] = useSearchParams();
+  const query = searchParams.get("query") || "";
+  const [people, setPeople] = useState<Person[]>([]);
+  const [loading, setLoading] = useState(false);
+  const token = Cookies.get("linkup_auth_token");
 
-  const filteredPeople = people.filter(
-    (person) =>
-      person.name.toLowerCase().includes(query?.toLowerCase() || "") ||
-      person.industry.toLowerCase().includes(query?.toLowerCase() || "")
-  );
+  useEffect(() => {
+    const fetchUsers = async () => {
+      if (!token || !query) {
+        setPeople([]);
+        return;
+      }
 
-  const filteredJobs = jobs.filter(
-    (job) =>
-      job.title.toLowerCase().includes(query?.toLowerCase() || "") ||
-      job.company.toLowerCase().includes(query?.toLowerCase() || "")
-  );
+      setLoading(true);
+      try {
+        const response = await getusers(
+          token,
+          query,
+          "",
+          1,
+          6
+        );
+        setPeople(response.people);
+      } catch (error) {
+        console.error("Failed to fetch users", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUsers();
+  }, [token, query]);
+
+  // const filteredJobs = mockJobs.filter(
+  //   (job) =>
+  //     job.title.toLowerCase().includes(query?.toLowerCase() || "") ||
+  //     job.company.toLowerCase().includes(query?.toLowerCase() || "")
+  // );
 
   return (
     <div className="container mx-auto p-4">
-      
-      {query ? (
-        <>
-          <People people={filteredPeople} />
-          <Jobs jobs={filteredJobs} />
-        </>
-      ) : null}
+      {loading ? (
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+        </div>
+      ) : (
+        query && (
+          <>
+            {people.length > 0 && <People people={people} setPeople={setPeople} query={query} />}
+            {/* <Jobs jobs={filteredJobs} /> */}
+          </>
+        )
+      )}
     </div>
   );
 };
