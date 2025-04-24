@@ -1,10 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
-import { getusers, connectWithUser } from "@/endpoints/myNetwork";
+import {
+  getusers,
+  connectWithUser,
+  acceptInvitation,
+} from "@/endpoints/myNetwork";
 import { Person, UsersResponse, Pagination } from "@/endpoints/myNetwork";
 import withSidebarAd from "@/components/hoc/withSidebarAd";
 import { toast } from "sonner";
+import { getErrorMessage } from "@/utils/errorHandler";
+import manOnChair from "../../../assets/man_on_chair.svg";
 
 const AllPeople: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -18,35 +24,38 @@ const AllPeople: React.FC = () => {
     pages: 1,
   });
   const [currentPage, setCurrentPage] = useState(1);
-  const [connectionFilter, setConnectionFilter] = useState<"all" | "1st" | "2nd" | "3rd">("all");
+  const [connectionFilter, setConnectionFilter] = useState<
+    "all" | "1st" | "2nd" | "3rd"
+  >("all");
   const [loading, setLoading] = useState(false);
   const [connectingUserIds, setConnectingUserIds] = useState<string[]>([]);
+  const [acceptingUserIds, setAcceptingUserIds] = useState<string[]>([]);
   const token = Cookies.get("linkup_auth_token");
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      if (!token) return;
-      setLoading(true);
-      try {
-        const response: UsersResponse = await getusers(
-          token,
-          query,
-          connectionFilter === "all" ? "" : connectionFilter,
-          currentPage,
-          pagination.limit
-        );
-        setPeople(response.people);
-        setPagination({
-          ...response.pagination,
-          limit: 5,
-        });
-      } catch (error) {
-        console.error("Failed to fetch users", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchUsers = async () => {
+    if (!token) return;
+    setLoading(true);
+    try {
+      const response: UsersResponse = await getusers(
+        token,
+        query,
+        connectionFilter === "all" ? "" : connectionFilter,
+        currentPage,
+        pagination.limit
+      );
+      setPeople(response.people);
+      setPagination({
+        ...response.pagination,
+        limit: 5,
+      });
+    } catch (error) {
+      console.error("Failed to fetch users", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchUsers();
   }, [token, query, connectionFilter, currentPage, pagination.limit]);
 
@@ -65,11 +74,44 @@ const AllPeople: React.FC = () => {
     try {
       await connectWithUser(token, userId, "");
       toast.success("Connection request sent successfully!");
+      setPeople((prev) =>
+        prev.map((person) =>
+          person.user_id === userId
+            ? { ...person, is_in_sent_connections: true }
+            : person
+        )
+      );
     } catch (error) {
       console.error("Connection failed", error);
-      toast.error("Failed to send connection request.");
+      toast.error(getErrorMessage(error) || "Failed to sent connection");
     } finally {
       setConnectingUserIds((prev) => prev.filter((id) => id !== userId));
+    }
+  };
+
+  const handleAccept = async (userId: string) => {
+    if (!token) return;
+    setAcceptingUserIds((prev) => [...prev, userId]);
+    try {
+      await acceptInvitation(token, userId);
+      toast.success("Connection accepted!");
+      setPeople((prev) =>
+        prev.map((person) =>
+          person.user_id === userId
+            ? {
+                ...person,
+                connection_degree: "1st",
+                is_in_received_connections: false,
+                is_in_sent_connections: false,
+              }
+            : person
+        )
+      );
+    } catch (error) {
+      console.error("Accepting invitation failed", error);
+      toast.error("Failed to accept connection.");
+    } finally {
+      setAcceptingUserIds((prev) => prev.filter((id) => id !== userId));
     }
   };
 
@@ -129,13 +171,27 @@ const AllPeople: React.FC = () => {
                         <h3 className="font-medium text-gray-900 dark:text-white text-sm sm:text-base truncate">
                           {person.name}
                         </h3>
-                        <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 truncate">{person.headline}</p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">{person.location}</p>
+                        <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 truncate">
+                          {person.headline}
+                        </p>
                         <p className="text-xs text-gray-500 dark:text-gray-400">
-                          {person.mutual_connections?.count > 0 &&
-                            `${person.mutual_connections.count} mutual connection${
-                              person.mutual_connections.count > 1 ? "s" : ""
-                            }`}
+                          {person.location}
+                        </p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                        {person.mutual_connections.count === 1 ? (
+                    <span>
+                      {person.mutual_connections.suggested_name} is a mutual connection
+                    </span>
+                  ) : person.mutual_connections.count > 1 ? (
+                    <span>
+                      {person.mutual_connections.suggested_name} and{" "}
+                      {person.mutual_connections.count - 1}{" "}
+                      {person.mutual_connections.count- 1 === 1
+                        ? "other"
+                        : "others"}{" "}
+                      are mutual connections
+                    </span>
+                     ) : null}
                         </p>
                       </div>
                     </div>
@@ -144,21 +200,42 @@ const AllPeople: React.FC = () => {
                         <button className="w-full sm:w-auto px-4 py-2 border rounded-full text-blue-600 border-blue-600 hover:bg-blue-100 dark:hover:bg-gray-700">
                           Message
                         </button>
+                      ) : person.is_in_received_connections ? (
+                        <button
+                          onClick={() => handleAccept(person.user_id)}
+                          disabled={acceptingUserIds.includes(person.user_id)}
+                          className="w-full sm:w-auto px-4 py-2 border rounded-full  text-blue-600 border-blue-600 hover:bg-green-100 dark:hover:bg-gray-700 disabled:opacity-50"
+                        >
+                          {acceptingUserIds.includes(person.user_id)
+                            ? "Accepting..."
+                            : "Accept"}
+                        </button>
+                      ) : person.is_in_sent_connections ? (
+                        <button className="w-full sm:w-auto px-4 py-2 border rounded-full text-gray-400 border-gray-400 cursor-not-allowed">
+                          Pending
+                        </button>
                       ) : (
                         <button
                           onClick={() => handleConnect(person.user_id)}
                           disabled={connectingUserIds.includes(person.user_id)}
                           className="w-full sm:w-auto px-4 py-2 border rounded-full text-gray-600 border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50"
                         >
-                          {connectingUserIds.includes(person.user_id) ? "Connecting..." : "Connect"}
+                          {connectingUserIds.includes(person.user_id)
+                            ? "Connecting..."
+                            : "Connect"}
                         </button>
                       )}
                     </div>
                   </div>
                 ))
               ) : (
-                <div className="text-center py-10 text-gray-500 dark:text-gray-400">
-                  No people found matching your search criteria
+                <div className="flex flex-col items-center justify-center py-10 text-gray-500 dark:text-gray-400">
+                  <img
+                    src={manOnChair}
+                    alt="No results"
+                    className="w-40 h-40 mb-4"
+                  />
+                  <p>No people found.</p>
                 </div>
               )}
             </div>
@@ -167,36 +244,43 @@ const AllPeople: React.FC = () => {
             {pagination.pages > 1 && (
               <div className="flex flex-wrap justify-center mt-6 gap-2">
                 <button
-                  onClick={() => paginate(currentPage > 1 ? currentPage - 1 : 1)}
+                  onClick={() =>
+                    paginate(currentPage > 1 ? currentPage - 1 : 1)
+                  }
                   disabled={currentPage === 1}
                   className="px-3 py-1 rounded disabled:opacity-50 bg-gray-100"
                 >
                   &lt; Previous
                 </button>
 
-                {Array.from({ length: Math.min(5, pagination.pages) }, (_, i) => {
-                  let pageNum;
-                  if (pagination.pages <= 5) {
-                    pageNum = i + 1;
-                  } else if (currentPage <= 3) {
-                    pageNum = i + 1;
-                  } else if (currentPage >= pagination.pages - 2) {
-                    pageNum = pagination.pages - 4 + i;
-                  } else {
-                    pageNum = currentPage - 2 + i;
+                {Array.from(
+                  { length: Math.min(5, pagination.pages) },
+                  (_, i) => {
+                    let pageNum;
+                    if (pagination.pages <= 5) {
+                      pageNum = i + 1;
+                    } else if (currentPage <= 3) {
+                      pageNum = i + 1;
+                    } else if (currentPage >= pagination.pages - 2) {
+                      pageNum = pagination.pages - 4 + i;
+                    } else {
+                      pageNum = currentPage - 2 + i;
+                    }
+                    return (
+                      <button
+                        key={pageNum}
+                        onClick={() => paginate(pageNum)}
+                        className={`px-3 py-1 rounded ${
+                          currentPage === pageNum
+                            ? "bg-blue-500 text-white"
+                            : "bg-gray-200"
+                        }`}
+                      >
+                        {pageNum}
+                      </button>
+                    );
                   }
-                  return (
-                    <button
-                      key={pageNum}
-                      onClick={() => paginate(pageNum)}
-                      className={`px-3 py-1 rounded ${
-                        currentPage === pageNum ? "bg-blue-500 text-white" : "bg-gray-200"
-                      }`}
-                    >
-                      {pageNum}
-                    </button>
-                  );
-                })}
+                )}
 
                 {pagination.pages > 5 && currentPage < pagination.pages - 2 && (
                   <>
@@ -204,7 +288,9 @@ const AllPeople: React.FC = () => {
                     <button
                       onClick={() => paginate(pagination.pages)}
                       className={`px-3 py-1 rounded ${
-                        currentPage === pagination.pages ? "bg-blue-500 text-white" : "bg-gray-200"
+                        currentPage === pagination.pages
+                          ? "bg-blue-500 text-white"
+                          : "bg-gray-200"
                       }`}
                     >
                       {pagination.pages}
@@ -213,7 +299,13 @@ const AllPeople: React.FC = () => {
                 )}
 
                 <button
-                  onClick={() => paginate(currentPage < pagination.pages ? currentPage + 1 : pagination.pages)}
+                  onClick={() =>
+                    paginate(
+                      currentPage < pagination.pages
+                        ? currentPage + 1
+                        : pagination.pages
+                    )
+                  }
                   disabled={currentPage === pagination.pages}
                   className="px-3 py-1 rounded disabled:opacity-50 bg-gray-100"
                 >
