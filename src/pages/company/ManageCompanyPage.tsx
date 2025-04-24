@@ -1,30 +1,28 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { WithNavBar } from '../../components';
-import { FaEye, FaChartLine, FaInfoCircle } from "react-icons/fa";
+import { FaEye } from "react-icons/fa";
 import EditPageDialog from './components/manageCompanyPageComponents/EditPageDialog';
-import { getCompanyAdminView } from '@/endpoints/company';
+import { getCompanyAdminView, getCompanyAllView, updateCompanyProfile } from '@/endpoints/company';
+import { toast } from 'sonner'; // Import the toast from sonner
 
 // Define a type for the navigation tabs
 type NavigationTab = 'analytics' | 'page-posts' | 'edit-page' | 'jobs' | 'settings';
-type AnalyticsTab = 'content' | 'visitors' | 'followers' | 'leads' | 'competitors';
 
 const ManageCompanyPage = () => {
   const { companyId } = useParams<{ companyId: string }>();
   const [activeTab, setActiveTab] = useState<NavigationTab>('analytics');
-  const [activeAnalyticsTab, setActiveAnalyticsTab] = useState<AnalyticsTab>('content');
-  const [dateRange, setDateRange] = useState('Mar 21, 2025 - Apr 19, 2025');
-  const [impressionsSelected, setImpressionsSelected] = useState(true);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [fullCompanyData, setFullCompanyData] = useState<any>(null);
 
   // Company data state
   const [companyData, setCompanyData] = useState({
     _id: "",
     name: "",
     logo: "",
-    url: "",
+    website: "",
     industry: "",
     size: "",
     type: "",
@@ -58,17 +56,97 @@ const ManageCompanyPage = () => {
     fetchCompanyData();
   }, [companyId]);
 
-  const handleNavClick = (tab: NavigationTab) => {
+  // Function to fetch full company data for editing
+  const fetchFullCompanyData = async () => {
+    if (!companyId) {
+      console.error("Company ID is missing");
+      return null;
+    }
+    
+    try {
+      console.log(`Fetching full company data for ID: ${companyId}`);
+      const response = await getCompanyAllView(companyId);
+      console.log("API Response:", response);
+      
+      // Check for companyProfile key instead of company
+      if (response && response.companyProfile) {
+        setFullCompanyData(response.companyProfile);
+        return response.companyProfile;
+      } else {
+        console.error("Invalid response format:", response);
+        return null;
+      }
+    } catch (err: any) {
+      console.error('Failed to fetch full company data:', err);
+      if (err.response) {
+        console.error('API error response:', err.response.data);
+        console.error('API error status:', err.response.status);
+      }
+      return null;
+    }
+  };
+
+  const handleNavClick = async (tab: NavigationTab) => {
     if (tab === 'edit-page') {
-      setEditDialogOpen(true);
+      try {
+        setIsLoading(true);
+        // Fetch complete company data before opening dialog
+        const data = await fetchFullCompanyData();
+        if (data) {
+          setEditDialogOpen(true);
+        } else {
+          // Show error with toast instead of console.error
+          toast.error("Failed to load company data for editing");
+        }
+      } catch (error) {
+        console.error("Error loading company data for editing:", error);
+        toast.error("Error loading company data for editing");
+      } finally {
+        setIsLoading(false);
+      }
     } else {
       setActiveTab(tab);
     }
   };
 
-  const handleEditSubmit = (data: any) => {
-    setCompanyData({...companyData, ...data});
-    console.log("Saved company data:", data);
+  const handleEditSubmit = async (data: any) => {
+    if (!companyId) return;
+    
+    try {
+      // Update the company profile in the backend
+      const response = await updateCompanyProfile(companyId, data);
+      
+      if (response && (response.success || response.message)) {
+        console.log("Company profile updated successfully");
+        
+        // Close the dialog first
+        setEditDialogOpen(false);
+        
+        // Show toast notification instead of alert
+        toast.success("Company information updated successfully!");
+        
+        // Refresh all company data
+        setIsLoading(true);
+        
+        // Refresh the main company data
+        const basicDataResponse = await getCompanyAdminView(companyId);
+        if (basicDataResponse && basicDataResponse.company) {
+          setCompanyData(basicDataResponse.company);
+        }
+        
+        // Refresh the full company data
+        const fullDataResponse = await getCompanyAllView(companyId);
+        if (fullDataResponse && fullDataResponse.companyProfile) {
+          setFullCompanyData(fullDataResponse.companyProfile);
+        }
+        
+        setIsLoading(false);
+      }
+    } catch (err: any) {
+      console.error('Failed to update company profile:', err);
+      // Show toast error instead of alert
+      toast.error(`Failed to update company profile: ${err.message || "Unknown error"}`);
+    }
   };
 
   // Shows loading state while fetching company data
@@ -229,7 +307,7 @@ const ManageCompanyPage = () => {
       <EditPageDialog 
         open={editDialogOpen} 
         onOpenChange={setEditDialogOpen}
-        companyData={companyData}
+        companyData={fullCompanyData || companyData}
         onSubmit={handleEditSubmit}
       />
     </div>
