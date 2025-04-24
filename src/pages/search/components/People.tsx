@@ -1,11 +1,32 @@
-// src/components/People.tsx
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from 'react-router-dom';
-import { Person } from "@/endpoints/myNetwork";
+import { Person, connectWithUser } from "@/endpoints/myNetwork";
+import Cookies from "js-cookie";
+import { toast } from "sonner";
 
 const People: React.FC<{ people: Person[]; query: string }> = ({ people, query }) => {
   const navigate = useNavigate();
-  
+  const [connectingUserIds, setConnectingUserIds] = useState<string[]>([]);
+  const token = Cookies.get("linkup_auth_token");
+
+  const navigateToUser = (user_id: string) => {
+    return navigate(`/user-profile/${user_id}`);
+  };
+
+  const handleConnect = async (userId: string) => {
+    if (!token) return;
+    setConnectingUserIds((prev) => [...prev, userId]);
+    try {
+      await connectWithUser(token, userId, "");
+      toast.success("Connection request sent successfully!");
+    } catch (error) {
+      console.error("Connection failed", error);
+      toast.error("Failed to send connection request.");
+    } finally {
+      setConnectingUserIds((prev) => prev.filter(id => id !== userId));
+    }
+  };
+
   return (
     <div className="flex justify-center">
       <div className="max-w-3xl w-full bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 flex flex-col">
@@ -14,7 +35,7 @@ const People: React.FC<{ people: Person[]; query: string }> = ({ people, query }
         <div className="space-y-4">
           {people.slice(0, 3).map((person, index) => (
             <div key={index} className="flex justify-between items-center p-4 border-b last:border-none bg-white dark:bg-gray-800">
-              <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-4 cursor-pointer" onClick={() => navigateToUser(person.user_id)}>
                 {person.profile_photo ? (
                   <img 
                     src={person.profile_photo} 
@@ -39,7 +60,13 @@ const People: React.FC<{ people: Person[]; query: string }> = ({ people, query }
               {person.connection_degree === "1st" ? (
                 <button className="px-4 py-2 border rounded-full text-blue-600 border-blue-600 hover:bg-blue-100 dark:hover:bg-gray-700">Message</button>
               ) : (
-                <button className="px-4 py-2 border rounded-full text-gray-600 border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-700">Connect</button>
+                <button
+                  onClick={() => handleConnect(person.user_id)}
+                  disabled={connectingUserIds.includes(person.user_id)}
+                  className="px-4 py-2 border rounded-full text-gray-600 border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50"
+                >
+                  {connectingUserIds.includes(person.user_id) ? 'Connecting...' : 'Connect'}
+                </button>
               )}
             </div>
           ))}
@@ -49,7 +76,7 @@ const People: React.FC<{ people: Person[]; query: string }> = ({ people, query }
             onClick={() => navigate(`/search/users?query=${encodeURIComponent(query)}`)}
             className="w-full mt-2 py-2 text-gray-500 dark:text-gray-400 border-t pt-2"
           >
-            See all people results ({people.length})
+            See all people results
           </button>
         )}
       </div>
