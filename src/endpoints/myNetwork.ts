@@ -90,10 +90,6 @@ export interface PeopleYouMayKnowResponse {
   people: PeopleYouMayKnow[];
   nextCursor: string | null;
 }
-interface MutualConnections {
-  count: number;
-  suggested_name: string;
-}
 
 export interface Person {
   user_id: string;
@@ -103,6 +99,13 @@ export interface Person {
   profile_photo: string;
   connection_degree: string;
   mutual_connections: MutualConnections;
+  is_in_sent_connections: boolean;
+  is_in_received_connections: boolean;
+}
+
+export interface MutualConnections {
+  count: number;
+  suggested_name: string;
 }
 
 export interface Pagination {
@@ -116,6 +119,7 @@ export interface UsersResponse {
   people: Person[];
   pagination: Pagination;
 }
+
 
 
 export const fetchConnections = async (
