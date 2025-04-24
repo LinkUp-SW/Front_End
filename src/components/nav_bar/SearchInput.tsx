@@ -1,3 +1,4 @@
+// src/components/SearchInput.tsx
 import { useState, useEffect } from "react";
 import { ImSearch } from "react-icons/im";
 import { useNavigate } from "react-router-dom";
@@ -8,9 +9,7 @@ import type { SearchSuggestion } from "@/endpoints/search";
 const SearchInput = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
-  const [filteredResults, setFilteredResults] = useState<SearchSuggestion[]>(
-    []
-  );
+  const [filteredResults, setFilteredResults] = useState<SearchSuggestion[]>([]);
   const [open, setOpen] = useState(false);
   const token = Cookies.get("linkup_auth_token");
 
@@ -38,15 +37,20 @@ const SearchInput = () => {
     setSearchTerm(e.target.value);
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" && searchTerm) {
-      navigate(`/search/${searchTerm}`);
+  const handleKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && searchTerm.trim()) {
+      navigate(`/search?query=${encodeURIComponent(searchTerm.trim())}`);
+      setSearchTerm("");
       setFilteredResults([]);
+      setOpen(false);
     }
   };
 
   const navigateToUser = (user_id: string) => {
-    return navigate(`/user-profile/${user_id}`);
+    navigate(`/user-profile/${user_id}`);
+    setSearchTerm("");
+    setFilteredResults([]);
+    setOpen(false);
   };
 
   return (
