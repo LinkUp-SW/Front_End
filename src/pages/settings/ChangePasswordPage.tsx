@@ -4,7 +4,7 @@ import { FaInfoCircle } from 'react-icons/fa';
 import SettingsLayoutPage from '../../components/hoc/SettingsLayoutPage';
 import styles from './changePasswordPage.module.css';
 import { validatePassword } from '../../utils';
-import { changePassword } from '@/endpoints/changePassword';
+import { changePassword} from '@/endpoints/settingsEndpoints';
 import Cookies from 'js-cookie';
 
 const ChangePasswordPage: React.FC = () => {
