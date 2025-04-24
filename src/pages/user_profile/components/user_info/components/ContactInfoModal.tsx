@@ -8,7 +8,7 @@ import {
 } from "@/components";
 import { Link } from "react-router-dom";
 import { formatIsoDateToHumanReadable } from "@/utils";
-import { FaBirthdayCake, FaPhone, FaGlobe, FaMobileAlt } from "react-icons/fa";
+import { FaBirthdayCake, FaPhone, FaGlobe } from "react-icons/fa";
 import { CiHome } from "react-icons/ci";
 import { Link as LinkIcon } from "lucide-react";
 
@@ -27,17 +27,12 @@ export const ContactInfoModal = ({
   user,
   triggerLabel,
 }: ContactInfoModalProps) => {
-  const { website, birthday, address, phone_number, country_code, phone_type } =
+  const { website, birthday, address, phone_number, country_code } =
     user.contact_info;
 
   // Check if there is any contact info available
   const hasAnyInfo =
-    website ||
-    birthday ||
-    address ||
-    phone_number ||
-    country_code ||
-    phone_type;
+    website || birthday || address || phone_number || country_code;
 
   return (
     <Dialog>
@@ -56,38 +51,46 @@ export const ContactInfoModal = ({
           <h2 className="font-bold text-xl">Contact Info</h2>
           {hasAnyInfo ? (
             <>
-              <ContactInfoItem
-                icon={<FaPhone />}
-                label="Phone Number"
-                value={phone_number !== null ? phone_number : "N/A"}
-              />
-              <ContactInfoItem
-                icon={<FaGlobe />}
-                label="Country Code"
-                value={country_code || "N/A"}
-              />
-              <ContactInfoItem
-                icon={<FaMobileAlt />}
-                label="Phone Type"
-                value={phone_type || "N/A"}
-              />
-              <ContactInfoItem
-                icon={<LinkIcon />}
-                label="Website"
-                value={website ? <Link to={website}>{website}</Link> : "N/A"}
-              />
-              <ContactInfoItem
-                icon={<FaBirthdayCake />}
-                label="Birthday"
-                value={
-                  birthday ? formatIsoDateToHumanReadable(birthday) : "N/A"
-                }
-              />
-              <ContactInfoItem
-                icon={<CiHome />}
-                label="Address"
-                value={address || "N/A"}
-              />
+              {!!phone_number && (
+                <ContactInfoItem
+                  icon={<FaPhone />}
+                  label="Phone Number"
+                  value={phone_number !== null ? phone_number : "N/A"}
+                />
+              )}
+
+              {!!country_code && (
+                <ContactInfoItem
+                  icon={<FaGlobe />}
+                  label="Country Code"
+                  value={country_code || "N/A"}
+                />
+              )}
+              {!!website && (
+                <ContactInfoItem
+                  icon={<LinkIcon />}
+                  label="Website"
+                  value={website ? <Link to={website}>{website}</Link> : "N/A"}
+                />
+              )}
+
+              {!!birthday && (
+                <ContactInfoItem
+                  icon={<FaBirthdayCake />}
+                  label="Birthday"
+                  value={
+                    birthday ? formatIsoDateToHumanReadable(birthday) : "N/A"
+                  }
+                />
+              )}
+
+              {!!address && (
+                <ContactInfoItem
+                  icon={<CiHome />}
+                  label="Address"
+                  value={address}
+                />
+              )}
             </>
           ) : (
             <p className="text-sm font-semibold text-gray-700 dark:text-gray-400">
