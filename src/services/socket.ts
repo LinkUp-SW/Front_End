@@ -10,6 +10,11 @@ export interface SocketIncomingMessage {
     is_seen: boolean;
   };
 }
+export interface incomingTypingIndicator {
+  conversationId: string;
+  userId: string;
+}
+
 
 
 class SocketService {
