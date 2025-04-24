@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 
 
-interface Message {
+/*interface Message {
   id: string;
   message:string;
   media:string[];
@@ -23,18 +23,60 @@ interface Conversation {
   user2_id: string;
   user2_name:string;
   user1_sent_messages: Message[];
-  /*user2_sent_messages: Message[];*/
+  
   last_message_time:Date;
   last_message_text:string;
-  /*
+  
   unread_count_user1:number;
   unread_count_user2:number;
   is_blocked_by_user1:boolean;
   is_blocked_by_user2:boolean
-  */
+  
   profileImg_user2: string;
   type: string[];
   status:string;
+}
+*/
+
+
+interface User {
+  userId: string;
+  firstName: string;
+  lastName: string;
+  profilePhoto: string;
+  onlineStatus: boolean;
+}
+
+interface LastMessage {
+  message: string;
+  timestamp:string | Date; 
+  isOwnMessage: boolean;
+}
+
+interface Conversation {
+  conversationId: string;
+  conversationType:string[];
+  otherUser: User;
+  lastMessage: LastMessage;
+  unreadCount: number;
+
+}
+interface MessageChat
+  {
+    messageId:string
+    senderId: string;
+    senderName: string;
+    message: string;
+    media: string[];
+    timestamp: string | Date ;
+    reacted: boolean;
+    isSeen: boolean;
+    isOwnMessage: boolean;
+  }
+interface chattingMessages{
+  conversationId: string;
+  otherUser: User;
+  messages: MessageChat[];
 }
 
 interface MessageState {
@@ -42,11 +84,13 @@ interface MessageState {
   selectedMessages: string;
   activeFilter: string;
   search: string;
-  starredConversations: string[],/*initial state should be starred from database*/
+  starredConversations: string[],
   user2Name:string;
   userStatus:boolean;
   editingMessageId:string;
-  editText: string
+  editText: string;
+  user2Id:string;
+
 }
 
 const initialState: MessageState = {
@@ -58,41 +102,17 @@ const initialState: MessageState = {
   user2Name:"",
   userStatus:false,
   editingMessageId: "",
-  editText: ""
+  editText: "",
+  user2Id:""
+
 };
+
+
 
 const MessagingSlice = createSlice({
   name: "messaging",
   initialState,
   reducers: {
-    sendMessage: (state, action: PayloadAction<{user2Name:string,convID: string;lastTextMessage:string; date:Date; user2ID:string; senderID: string; profileImg: string;  message: Message }>) => {
-      const {user2Name,lastTextMessage, date, convID, message, senderID,user2ID, profileImg } = action.payload;
-      const conversation = state.conversations.find((conv) => conv.conversationID === convID);
-
-      if (conversation) {
-        conversation.user1_sent_messages.push(message);
-      } else {
-        state.conversations.push({
-          conversationID: convID,
-          user1_id: senderID,
-          user2_id: user2ID,/*TEMP*/
-          user2_name:user2Name,
-          user1_sent_messages: [message],
-          /*user2_sent_messages: [message],/*TEMP*/
-          last_message_time: date,
-          last_message_text:lastTextMessage,
-          /*
-          unread_count_user1:number;
-          unread_count_user2:number;
-          is_blocked_by_user1:boolean;
-          is_blocked_by_user2:boolean,
-         */
-          profileImg_user2: profileImg,
-          type: ["Focused"],
-          status:"online"
-        });
-      }
-    },
 
     selectMessage: (state, action: PayloadAction<string>) => {
       state.selectedMessages = action.payload; 
@@ -117,6 +137,9 @@ const MessagingSlice = createSlice({
       state.userStatus = action.payload; 
     },
 
+    selectUserId: (state, action: PayloadAction<string>) => {
+      state.user2Id = action.payload; 
+    },
 
     searchFiltering: (state, action: PayloadAction<string>) => {
       state.search = action.payload; 
@@ -144,5 +167,5 @@ const MessagingSlice = createSlice({
   },
 });
 
-export const {toggleStarred, activeButton, searchFiltering, selectMessage,selectUserName,selectUserStatus, sendMessage,setEditingMessageId,setEditText,clearEditingState} = MessagingSlice.actions;
+export const {toggleStarred, activeButton, searchFiltering, selectMessage,selectUserName,selectUserStatus,setEditingMessageId,setEditText,clearEditingState,selectUserId} = MessagingSlice.actions;
 export default MessagingSlice.reducer;
