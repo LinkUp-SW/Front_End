@@ -178,20 +178,21 @@ const AllPeople: React.FC = () => {
                           {person.location}
                         </p>
                         <p className="text-xs text-gray-500 dark:text-gray-400">
-                        {person.mutual_connections.count === 1 ? (
-                    <span>
-                      {person.mutual_connections.suggested_name} is a mutual connection
-                    </span>
-                  ) : person.mutual_connections.count > 1 ? (
-                    <span>
-                      {person.mutual_connections.suggested_name} and{" "}
-                      {person.mutual_connections.count - 1}{" "}
-                      {person.mutual_connections.count- 1 === 1
-                        ? "other"
-                        : "others"}{" "}
-                      are mutual connections
-                    </span>
-                     ) : null}
+                          {person.mutual_connections.count === 1 ? (
+                            <span>
+                              {person.mutual_connections.suggested_name} is a
+                              mutual connection
+                            </span>
+                          ) : person.mutual_connections.count > 1 ? (
+                            <span>
+                              {person.mutual_connections.suggested_name} and{" "}
+                              {person.mutual_connections.count - 1}{" "}
+                              {person.mutual_connections.count - 1 === 1
+                                ? "other"
+                                : "others"}{" "}
+                              are mutual connections
+                            </span>
+                          ) : null}
                         </p>
                       </div>
                     </div>
