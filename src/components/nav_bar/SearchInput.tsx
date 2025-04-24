@@ -1,17 +1,25 @@
 // src/components/SearchInput.tsx
 import { useState, useEffect } from "react";
 import { ImSearch } from "react-icons/im";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Cookies from "js-cookie";
 import { getSearchSuggestions } from "@/endpoints/search";
 import type { SearchSuggestion } from "@/endpoints/search";
 
 const SearchInput = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredResults, setFilteredResults] = useState<SearchSuggestion[]>([]);
   const [open, setOpen] = useState(false);
   const token = Cookies.get("linkup_auth_token");
+
+  // Update search term when URL query changes
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const query = searchParams.get("query") || "";
+    setSearchTerm(query);
+  }, [location.search]);
 
   useEffect(() => {
     const fetchSuggestions = async () => {
@@ -40,7 +48,6 @@ const SearchInput = () => {
   const handleKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && searchTerm.trim()) {
       navigate(`/search?query=${encodeURIComponent(searchTerm.trim())}`);
-      setSearchTerm("");
       setFilteredResults([]);
       setOpen(false);
     }
