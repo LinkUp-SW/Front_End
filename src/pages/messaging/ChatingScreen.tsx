@@ -10,13 +10,18 @@ import {
   getConversation,
   chattingMessages,
   deleteMessages,
-  MessageChat
-  
+  MessageChat,
 } from "@/endpoints/messaging";
-import {setEditingMessageId,setEditText} from "../../slices/messaging/messagingSlice";
+import {
+  setEditingMessageId,
+  setEditText,
+} from "../../slices/messaging/messagingSlice";
 import { toast } from "sonner";
 import { socketService } from "@/services/socket";
-import {SocketIncomingMessage} from "@/services/socket";
+import {
+  SocketIncomingMessage,
+  incomingTypingIndicator,
+} from "@/services/socket";
 import { useParams } from "react-router-dom";
 
 const ChatingScreen = () => {
@@ -27,9 +32,9 @@ const ChatingScreen = () => {
     (state: RootState) => state.messaging.selectedMessages
   );
 
-  const user2Name = "testUser"; 
+  const user2Name = "testUser";
   const user2Img =
-    "https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg"; 
+    "https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg";
   /* const user2Name = useSelector(
     (state: RootState) => state.messaging.user2Name
   );
@@ -55,7 +60,8 @@ const ChatingScreen = () => {
   const [dataChat, setChatData] = useState<chattingMessages>();
   const [loading, setLoading] = useState<boolean>(true);
   const [msgDeleted, setMsgDeleted] = useState<boolean>(false);
-  
+  const [isTyping, setIsTyping] =
+    useState(false); /*related to typing indicator (sockets) */
 
   useEffect(() => {
     const fetchChatting = async () => {
@@ -82,37 +88,74 @@ const ChatingScreen = () => {
       setMsgDeleted(false);
     }
   }, [msgDeleted]);
+  useEffect(() => {
+    const unsubscribeT = socketService.on<incomingTypingIndicator>(
+      "user_typing",
+      (incomingTyping) => {
+        if (
+          incomingTyping.conversationId === selectedConvID &&
+          incomingTyping.userId !== id
+        ) {
+          setIsTyping(true);
+        }
+      }
+    );
+
+    const unsubscribeS = socketService.on<incomingTypingIndicator>(
+      "user_stop_typing",
+      (incomingStop) => {
+        if (
+          incomingStop.conversationId === selectedConvID &&
+          incomingStop.userId !== id
+        ) {
+          setIsTyping(false);
+        }
+      }
+    );
+
+    return () => {
+      unsubscribeT();
+      unsubscribeS();
+    };
+  }, [selectedConvID, id]);
 
   useEffect(() => {
-    const unsubscribe = socketService.on<SocketIncomingMessage>("new_message", (incoming) => {
-      if (incoming.conversationId !== selectedConvID) return;
-  
-      const newMsg: MessageChat = {
-        messageId: Date.now().toString(), // temp ID
-        senderId: incoming.senderId,
-        senderName: incoming.senderId === id ? "You" : dataChat?.otherUser?.firstName || "", 
-        message: incoming.message.message,
-        media: incoming.message.media || [],
-        timestamp: incoming.message.timestamp,
-        reacted: false,
-        isSeen: incoming.message.is_seen,
-        isOwnMessage: incoming.senderId === id // Compare with your user ID
-      };
-  
-      setChatData((prev) =>
-        prev
-          ? {
-              ...prev,
-              messages: [...prev.messages, newMsg],
-            }
-          : prev // or null-safe fallback
-      );
-    });
-  
+    const unsubscribe = socketService.on<SocketIncomingMessage>(
+      "new_message",
+      (incoming) => {
+        if (incoming.conversationId !== selectedConvID) return;
+
+        const newMsg: MessageChat = {
+          messageId: Date.now().toString(), // temp ID
+          senderId: incoming.senderId,
+          senderName:
+            incoming.senderId === id
+              ? "You"
+              : dataChat?.otherUser?.firstName || "",
+          message: incoming.message.message,
+          media: incoming.message.media || [],
+          timestamp: incoming.message.timestamp,
+          reacted: false,
+          isSeen: incoming.message.is_seen,
+          isOwnMessage: incoming.senderId === id, // Compare with your user ID
+        };
+
+        setChatData(
+          (prev) =>
+            prev
+              ? {
+                  ...prev,
+                  messages: [...prev.messages, newMsg],
+                }
+              : prev // or null-safe fallback
+        );
+      }
+    );
+
     return () => {
       unsubscribe();
     };
-  }, [selectedConvID, dataChat, id]); 
+  }, [selectedConvID, dataChat, id]);
   if (loading) return <div>Loading...</div>;
 
   const shouldShowProfile = (index: number) => {
@@ -149,8 +192,6 @@ const ChatingScreen = () => {
     }
   };
 
- 
-
   return (
     <>
       <div className=" flex flex-col h-full overflow-hidden">
@@ -161,7 +202,6 @@ const ChatingScreen = () => {
             <div>
               <p id="userName" className="font-semibold">
                 {dataChat?.otherUser.firstName} {dataChat?.otherUser.lastName}
-                
               </p>
               <p id="userStatuse" className="text-xs text-gray-500">
                 {dataChat.otherUser.onlineStatus ? "Online" : "Offine"}
@@ -222,6 +262,7 @@ const ChatingScreen = () => {
                       </p>
                     </div>
                     <div>
+                      
                       {msgDeleted ? (
                         <div>This message has been deleted.</div>
                       ) : (
@@ -273,9 +314,10 @@ const ChatingScreen = () => {
                                     id="edit"
                                     className="block w-full text-left py-2 px-3 text-sm hover:bg-gray-100 rounded"
                                     onClick={() => {
-                                      dispatch(setEditingMessageId(msg.messageId));
-                                      dispatch(setEditText(msg.message));  
-
+                                      dispatch(
+                                        setEditingMessageId(msg.messageId)
+                                      );
+                                      dispatch(setEditText(msg.message));
                                     }}
                                   >
                                     Edit
@@ -283,6 +325,7 @@ const ChatingScreen = () => {
                                 </Popover.Content>
                               </Popover.Portal>
                             </Popover.Root>
+
                           </div>
                         </div>
                       )}
@@ -292,11 +335,15 @@ const ChatingScreen = () => {
                   <div className="w-full hover:bg-gray-200 pl-14 hover:cursor-pointer ">
                     {msg.message}
                   </div>
-                ) }
+                )}
               </div>
             ))
           )}
         </div>
+        {/* Typing Indicator */}
+        {isTyping && (
+          <span className="p-2 text-gray-500 italic w-full pl-14 border-0  "> Typing...</span>
+        )}
       </div>
     </>
   );
