@@ -126,11 +126,15 @@ const People: React.FC<{
                 </div>
               </div>
               {person.connection_degree === "1st" ? (
-                <button className="px-4 py-2 border rounded-full text-blue-600 border-blue-600 hover:bg-blue-100 dark:hover:bg-gray-700">
+                <button
+                  id="message-button"
+                  className="px-4 py-2 border rounded-full text-blue-600 border-blue-600 hover:bg-blue-100 dark:hover:bg-gray-700"
+                >
                   Message
                 </button>
               ) : person.is_in_received_connections ? (
                 <button
+                  id="accept-invitation-button"
                   onClick={() => handleAccept(person.user_id)}
                   disabled={acceptingUserIds.includes(person.user_id)}
                   className="px-4 py-2 border rounded-fullc hover:bg-green-100 dark:hover:bg-gray-700 disabled:opacity-50"
@@ -140,11 +144,15 @@ const People: React.FC<{
                     : "Accept"}
                 </button>
               ) : person.is_in_sent_connections ? (
-                <button className="px-4 py-2 border rounded-full text-gray-400 border-gray-400 cursor-not-allowed">
+                <button
+                  id="pending-button"
+                  className="px-4 py-2 border rounded-full text-gray-400 border-gray-400 cursor-not-allowed"
+                >
                   Pending
                 </button>
               ) : (
                 <button
+                  id="connect-button"
                   onClick={() => handleConnect(person.user_id)}
                   disabled={connectingUserIds.includes(person.user_id)}
                   className="px-4 py-2 border rounded-full text-gray-600 border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50"
@@ -159,6 +167,7 @@ const People: React.FC<{
         </div>
         {people.length > 3 && (
           <button
+            id="see-all-people-button"
             onClick={() =>
               navigate(`/search/users?query=${encodeURIComponent(query)}`)
             }

@@ -123,6 +123,7 @@ const AllPeople: React.FC = () => {
         <div className="mb-4 flex flex-wrap gap-2">
           {["all", "1st", "2nd", "3rd"].map((degree) => (
             <button
+              id="connections-filter"
               key={degree}
               onClick={() => {
                 setConnectionFilter(degree as "all" | "1st" | "2nd" | "3rd");
@@ -198,11 +199,15 @@ const AllPeople: React.FC = () => {
                     </div>
                     <div className="mt-2 sm:mt-0 sm:ml-4 w-full sm:w-auto text-right">
                       {person.connection_degree === "1st" ? (
-                        <button className="w-full sm:w-auto px-4 py-2 border rounded-full text-blue-600 border-blue-600 hover:bg-blue-100 dark:hover:bg-gray-700">
+                        <button
+                          id="message-button"
+                          className="w-full sm:w-auto px-4 py-2 border rounded-full text-blue-600 border-blue-600 hover:bg-blue-100 dark:hover:bg-gray-700"
+                        >
                           Message
                         </button>
                       ) : person.is_in_received_connections ? (
                         <button
+                          id="accept-invitation-button"
                           onClick={() => handleAccept(person.user_id)}
                           disabled={acceptingUserIds.includes(person.user_id)}
                           className="w-full sm:w-auto px-4 py-2 border rounded-full  text-blue-600 border-blue-600 hover:bg-green-100 dark:hover:bg-gray-700 disabled:opacity-50"
@@ -212,11 +217,15 @@ const AllPeople: React.FC = () => {
                             : "Accept"}
                         </button>
                       ) : person.is_in_sent_connections ? (
-                        <button className="w-full sm:w-auto px-4 py-2 border rounded-full text-gray-400 border-gray-400 cursor-not-allowed">
+                        <button
+                          id="pending-button"
+                          className="w-full sm:w-auto px-4 py-2 border rounded-full text-gray-400 border-gray-400 cursor-not-allowed"
+                        >
                           Pending
                         </button>
                       ) : (
                         <button
+                          id="connect-button"
                           onClick={() => handleConnect(person.user_id)}
                           disabled={connectingUserIds.includes(person.user_id)}
                           className="w-full sm:w-auto px-4 py-2 border rounded-full text-gray-600 border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50"
@@ -245,6 +254,7 @@ const AllPeople: React.FC = () => {
             {pagination.pages > 1 && (
               <div className="flex flex-wrap justify-center mt-6 gap-2">
                 <button
+                  id="previous-button"
                   onClick={() =>
                     paginate(currentPage > 1 ? currentPage - 1 : 1)
                   }
@@ -269,6 +279,7 @@ const AllPeople: React.FC = () => {
                     }
                     return (
                       <button
+                        id="page-number-button"
                         key={pageNum}
                         onClick={() => paginate(pageNum)}
                         className={`px-3 py-1 rounded ${
@@ -287,6 +298,7 @@ const AllPeople: React.FC = () => {
                   <>
                     <span className="px-3 py-1">...</span>
                     <button
+                      id="last-page-button"
                       onClick={() => paginate(pagination.pages)}
                       className={`px-3 py-1 rounded ${
                         currentPage === pagination.pages
@@ -300,6 +312,7 @@ const AllPeople: React.FC = () => {
                 )}
 
                 <button
+                  id="next-button"
                   onClick={() =>
                     paginate(
                       currentPage < pagination.pages
