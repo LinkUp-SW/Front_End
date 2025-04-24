@@ -4,6 +4,7 @@ import {
   selectMessage,
   selectUserName,
   selectUserStatus,
+  selectUserId
 } from "../../slices/messaging/messagingSlice";
 import { toggleStarred } from "../../slices/messaging/messagingSlice";
 import * as Popover from "@radix-ui/react-popover";
@@ -109,11 +110,13 @@ const SideBar = () => {
     conversationID: string,
     dataType: string[],
     user2Name: string,
-    userStatus: boolean
+    userStatus: boolean,
+    user2Id:string
   ) => {
     dispatch(selectMessage(conversationID.toString()));
     dispatch(selectUserName(user2Name));
     dispatch(selectUserStatus(userStatus));
+    dispatch(selectUserId(user2Id))
     if (dataType.includes("unread")) {
       setDataInfo((prevData) =>
         prevData.map((message) =>
@@ -260,7 +263,8 @@ const SideBar = () => {
                   data.conversationId,
                   data.conversationType,
                   data.otherUser.firstName,
-                  data.otherUser.onlineStatus
+                  data.otherUser.onlineStatus,
+                  data.otherUser.userId
                 );
               }}
               key={data.conversationId}
