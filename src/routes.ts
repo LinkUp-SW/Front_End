@@ -29,9 +29,11 @@ import {
   SignInAndSecurityPage,
   ChangePasswordPage,
   MyItemsPage,
+  AllPeoplePage,
 } from "./pages";
 
 import React from "react";
+
 
 // Define your routes as an array of RouteObject (compatible with React Router v6)
 const routes: RouteObject[] = [
@@ -127,7 +129,7 @@ const routes: RouteObject[] = [
     element: React.createElement(NotFoundPage),
   },
   {
-    path: "/search/:query",
+    path: "/search",
     element: React.createElement(SearchPage),
   },
   {
@@ -153,6 +155,10 @@ const routes: RouteObject[] = [
   {
     path: "/settings/security/changepassword",
     element: React.createElement(ChangePasswordPage),
+  },
+  {
+    path: "/search/users",
+    element: React.createElement(AllPeoplePage),
   },
 ];
 
