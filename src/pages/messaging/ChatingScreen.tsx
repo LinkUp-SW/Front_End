@@ -10,12 +10,17 @@ import {
   getConversation,
   chattingMessages,
   deleteMessages,
+  MessageChat
   
 } from "@/endpoints/messaging";
 import {setEditingMessageId,setEditText} from "../../slices/messaging/messagingSlice";
 import { toast } from "sonner";
+import { socketService } from "@/services/socket";
+import {SocketIncomingMessage} from "@/services/socket";
+import { useParams } from "react-router-dom";
 
 const ChatingScreen = () => {
+  const { id } = useParams();
   const dispatch = useDispatch();
   const token = Cookies.get("linkup_auth_token");
   const selectedConvID = useSelector(
@@ -78,6 +83,36 @@ const ChatingScreen = () => {
     }
   }, [msgDeleted]);
 
+  useEffect(() => {
+    const unsubscribe = socketService.on<SocketIncomingMessage>("new_message", (incoming) => {
+      if (incoming.conversationId !== selectedConvID) return;
+  
+      const newMsg: MessageChat = {
+        messageId: Date.now().toString(), // temp ID
+        senderId: incoming.senderId,
+        senderName: incoming.senderId === id ? "You" : dataChat?.otherUser?.firstName || "", 
+        message: incoming.message.message,
+        media: incoming.message.media || [],
+        timestamp: incoming.message.timestamp,
+        reacted: false,
+        isSeen: incoming.message.is_seen,
+        isOwnMessage: incoming.senderId === id // Compare with your user ID
+      };
+  
+      setChatData((prev) =>
+        prev
+          ? {
+              ...prev,
+              messages: [...prev.messages, newMsg],
+            }
+          : prev // or null-safe fallback
+      );
+    });
+  
+    return () => {
+      unsubscribe();
+    };
+  }, [selectedConvID, dataChat, id]); 
   if (loading) return <div>Loading...</div>;
 
   const shouldShowProfile = (index: number) => {
