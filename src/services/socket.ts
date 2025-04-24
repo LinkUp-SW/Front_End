@@ -1,5 +1,17 @@
 import { io, Socket } from 'socket.io-client';
 
+export interface SocketIncomingMessage {
+  conversationId: string;
+  senderId: string;
+  message: {
+    message: string;
+    media?: string[];
+    timestamp: string;
+    is_seen: boolean;
+  };
+}
+
+
 class SocketService {
   private socket: Socket | null = null;
   private listeners: Map<string, Set<(data: any) => void>> = new Map();
