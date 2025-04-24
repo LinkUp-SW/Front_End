@@ -91,6 +91,36 @@ export interface PeopleYouMayKnowResponse {
   nextCursor: string | null;
 }
 
+export interface Person {
+  user_id: string;
+  name: string;
+  headline: string;
+  location: string;
+  profile_photo: string;
+  connection_degree: string;
+  mutual_connections: MutualConnections;
+  is_in_sent_connections: boolean;
+  is_in_received_connections: boolean;
+}
+
+export interface MutualConnections {
+  count: number;
+  suggested_name: string;
+}
+
+export interface Pagination {
+  total: number;
+  page: number;
+  limit: number;
+  pages: number;
+}
+
+export interface UsersResponse {
+  people: Person[];
+  pagination: Pagination;
+}
+
+
 
 export const fetchConnections = async (
   token: string,
@@ -345,6 +375,27 @@ export const getPeopleYouMayKnow = async (
   );
     return response.data;
   };
+
+
+export const getusers = async (
+  token: string,
+  query:string,
+  connectionDegree: string,
+  page:number,
+  limit:number
+): Promise<UsersResponse> => {
+  const response = await axiosInstance.get(
+    "/api/v1/search/users",
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      params: { query, connectionDegree, page, limit },
+    }
+  );
+  return response.data;
+}
+
 
 
   
