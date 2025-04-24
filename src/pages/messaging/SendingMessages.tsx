@@ -1,5 +1,5 @@
 import { useDispatch } from "react-redux";
-import { sendMessage,setEditingMessageId } from "../../slices/messaging/messagingSlice";
+import { setEditingMessageId } from "../../slices/messaging/messagingSlice";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { useState } from "react";
@@ -14,12 +14,16 @@ import {editMessage} from "@/endpoints/messaging";
 import Cookies from "js-cookie";
 import {setEditText,clearEditingState} from "../../slices/messaging/messagingSlice";
 import { toast } from "sonner";
+import { socketService } from "@/services/socket";
 
 
 const SendingMessages = () => {
   const token = Cookies.get("linkup_auth_token");
   const selectedConvID = useSelector(
     (state: RootState) => state.messaging.selectedMessages
+  );
+  const selectedUser2ID = useSelector(
+    (state: RootState) => state.messaging.user2Id
   );
   const editingMessageId = useSelector(
     (state: RootState) => state.messaging.editingMessageId
@@ -52,36 +56,7 @@ const SendingMessages = () => {
 
   const handleSendMessage = () => {
     if (!text.trim()) return;
-    const newMessage = {
-      id: new Date().toISOString(),
-      message: text,
-      media: [],
-      media_type: [],
-      timestamp: new Date(),
-      reacted: false,
-      is_seen: true,
-      user1_img:
-        "https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg",
-      user2_img:
-        "https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg",
-      user1_name: "7amada",
-      user2_name: "ayhaga2",
-    };
-
-    dispatch(
-      sendMessage({
-        convID: selectedConvID,
-        senderID: "user_101",
-        user2ID: "user_202",
-        user2Name: "ALI",
-        lastTextMessage: newMessage.message,
-        date: new Date(),
-        profileImg:
-          "https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg",
-        message: newMessage,
-      })
-    );
-
+    socketService.sendPrivateMessage(selectedUser2ID, text, []); 
     setText("");
   };
 
