@@ -125,3 +125,23 @@ export const updateCompanyProfile = async (companyId: string, companyData: Parti
     throw error;
   }
 };
+
+
+
+export const deactivateCompanyPage = async (companyId: string): Promise<any> => {
+  try {
+    const token = getAuthToken();
+    const url = `/api/v1/company/delete-company-profile/${companyId}`;
+    
+    console.log('Deactivating company page:', companyId);
+    
+    const response = await axiosInstance.delete(url, getAuthHeader(token));
+    return response.data;
+  } catch (error: any) {
+    console.error('Failed to deactivate company page:', error.response?.data || error.message);
+    if (error.response?.data?.message) {
+      throw new Error(error.response.data.message);
+    }
+    throw new Error('Failed to deactivate company page');
+  }
+};

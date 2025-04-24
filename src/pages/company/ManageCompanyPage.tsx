@@ -3,8 +3,9 @@ import { useParams } from 'react-router-dom';
 import { WithNavBar } from '../../components';
 import { FaEye } from "react-icons/fa";
 import EditPageDialog from './components/manageCompanyPageComponents/EditPageDialog';
+import SettingsComponent from './components/manageCompanyPageComponents/SettingsPage';
 import { getCompanyAdminView, getCompanyAllView, updateCompanyProfile } from '@/endpoints/company';
-import { toast } from 'sonner'; // Import the toast from sonner
+import { toast } from 'sonner';
 
 // Define a type for the navigation tabs
 type NavigationTab = 'analytics' | 'page-posts' | 'edit-page' | 'jobs' | 'settings';
@@ -263,43 +264,42 @@ const ManageCompanyPage = () => {
         
         {/* Main content area */}
         <div className="flex-1">
-          <div className="bg-white rounded-lg shadow p-6">
-            <h1 className="text-2xl font-bold mb-4">
-              {activeTab === 'analytics' ? 'Analytics' : 
-               activeTab === 'page-posts' ? 'Page Posts' : 
-               activeTab === 'jobs' ? 'Jobs' : 
-               activeTab === 'settings' ? 'Settings' : 'Dashboard'}
-            </h1>
-            
-            {/* Content based on active tab would go here */}
-            {activeTab === 'analytics' && (
-              <div>
-                <p>Analytics dashboard for {companyData.name}</p>
-                {/* Add your analytics components here */}
-              </div>
-            )}
-            
-            {activeTab === 'page-posts' && (
-              <div>
-                <p>Posts for {companyData.name}</p>
-                {/* Add your posts components here */}
-              </div>
-            )}
-            
-            {activeTab === 'jobs' && (
-              <div>
-                <p>Jobs for {companyData.name}</p>
-                {/* Add your jobs components here */}
-              </div>
-            )}
-            
-            {activeTab === 'settings' && (
-              <div>
-                <p>Settings for {companyData.name}</p>
-                {/* Add your settings components here */}
-              </div>
-            )}
-          </div>
+        {activeTab === 'settings' ? (
+  <SettingsComponent 
+    companyName={companyData.name} 
+    companyId={companyId} 
+      />
+    ) : (
+      <div className="bg-white rounded-lg shadow p-6">
+        <h1 className="text-2xl font-bold mb-4">
+          {activeTab === 'analytics' ? 'Analytics' : 
+          activeTab === 'page-posts' ? 'Page Posts' : 
+          activeTab === 'jobs' ? 'Jobs' : 'Dashboard'}
+        </h1>
+              
+              {/* Content based on active tab would go here */}
+              {activeTab === 'analytics' && (
+                <div>
+                  <p>Analytics dashboard for {companyData.name}</p>
+                  {/* Add your analytics components here */}
+                </div>
+              )}
+              
+              {activeTab === 'page-posts' && (
+                <div>
+                  <p>Posts for {companyData.name}</p>
+                  {/* Add your posts components here */}
+                </div>
+              )}
+              
+              {activeTab === 'jobs' && (
+                <div>
+                  <p>Jobs for {companyData.name}</p>
+                  {/* Add your jobs components here */}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
       

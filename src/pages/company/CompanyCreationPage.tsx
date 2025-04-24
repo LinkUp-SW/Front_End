@@ -34,7 +34,7 @@ const CompanyCreationPage: React.FC = () => {
       setIsSubmitting(true);
       // The actual API call is now handled within the PageForm component
       // Here we just handle navigation upon successful form submission
-      navigate('/feed');
+      navigate('/jobs');
     } catch (error: any) {
       console.error('Error creating company:', error);
       setErrorMessage(error.message || 'Failed to create company. Please try again.');

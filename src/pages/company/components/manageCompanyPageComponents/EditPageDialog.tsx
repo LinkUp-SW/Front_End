@@ -265,15 +265,6 @@ const EditPageDialog = ({ open, onOpenChange, companyData, onSubmit }: EditPageD
             
             <div className="mb-6">
               <label className="block text-gray-700 mb-1 text-sm font-medium">Website URL</label>
-              <div className="flex items-center mb-2">
-                <input
-                  type="checkbox"
-                  checked={hasWebsite}
-                  onChange={() => setHasWebsite(!hasWebsite)}
-                  className="mr-2"
-                />
-                <span className="text-sm text-gray-700">My {isEducationalInstitution ? 'institution' : 'organization'} has a website</span>
-              </div>
               <input
                 type="text"
                 name="website"
