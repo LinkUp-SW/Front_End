@@ -31,6 +31,7 @@ import {
   MyItemsPage,
   CompanyCreationPage,
   ManageCompanyPage,
+  AddJobFormPage
 } from "./pages";
 
 import React from "react";
@@ -162,6 +163,10 @@ const routes: RouteObject[] = [
   {
     path: "/company-manage/:companyId",
     element: React.createElement(ManageCompanyPage),
+  },
+  {
+    path: "/company-manage/:companyId/jobs/create",
+    element: React.createElement(AddJobFormPage),
   },
 ];
 
