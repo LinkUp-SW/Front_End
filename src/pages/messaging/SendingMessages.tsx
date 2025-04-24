@@ -18,6 +18,7 @@ import { socketService } from "@/services/socket";
 
 
 const SendingMessages = () => {
+  let typingTimeout: NodeJS.Timeout;
   const token = Cookies.get("linkup_auth_token");
   const selectedConvID = useSelector(
     (state: RootState) => state.messaging.selectedMessages
@@ -70,6 +71,17 @@ const SendingMessages = () => {
       console.error("Error editing message:", error);
       toast.error("Failed to update message");
     }
+  };
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setText(e.target.value)
+
+    socketService.sendTypingIndicator(selectedConvID);
+
+    // Clear previous timer and start a new one to emit stop typing after a delay
+    clearTimeout(typingTimeout);
+    typingTimeout = setTimeout(() => {
+      socketService.sendStopTypingIndicator(selectedConvID);
+    }, 3000);
   };
   return (
     <>
@@ -164,7 +176,7 @@ const SendingMessages = () => {
               <textarea
                 id="text-message"
                 value={text}
-                onChange={(e) => setText(e.target.value)}
+                onChange={handleInputChange}
                 placeholder="Write a message..."
                 className="w-full min-h-16 max-h-24 bg-gray-50 text-gray-700 p-3 rounded-md resize-none outline-none border-none"
               />
