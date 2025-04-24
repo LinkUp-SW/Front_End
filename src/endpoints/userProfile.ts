@@ -224,7 +224,7 @@ export const updateEducation = async (
   token: string,
   id: string,
   form: Education
-): Promise<{ message: string }> => {
+): Promise<{ message: string;education:Education }> => {
   const response = await axiosInstance.put(
     `/api/v1/user/update-education/${id}`,
     form,
