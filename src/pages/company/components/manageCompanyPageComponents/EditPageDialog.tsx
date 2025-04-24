@@ -15,6 +15,7 @@ interface EditPageDialogProps {
     founded?: string;
     description?: string;
     tagline?: string;
+    category_type?: string; // Add this field to check if it's company or educational
     location?: {
       country?: string;
       address?: string;
@@ -29,39 +30,88 @@ interface EditPageDialogProps {
 
 const EditPageDialog = ({ open, onOpenChange, companyData, onSubmit }: EditPageDialogProps) => {
   const [activeSection, setActiveSection] = useState<string>('Page info');
-  const [formData, setFormData] = useState(companyData || {});
-  const [hasWebsite, setHasWebsite] = useState(!formData.website?.includes('no-website'));
-  const [logoUrl, setLogoUrl] = useState('/src/assets/buildings.jpeg');
-  const [hasLocation, setHasLocation] = useState(!!formData.location);
-  const [hasStreetAddress, setHasStreetAddress] = useState(!!formData.location?.address);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  // Update form data when companyData changes
-  useEffect(() => {
-    if (companyData) {
-      setFormData(companyData);
-      setHasWebsite(!companyData.website?.includes('no-website'));
-      setHasLocation(!!companyData.location);
-      setHasStreetAddress(!!companyData.location?.address);
-    }
-  }, [companyData]);
-  
-  // Determine if this is an educational institution or company based on type
-  const isEducationalInstitution = formData.type === 'University' || 
-                                  formData.type === 'College' || 
-                                  formData.type === 'High School' ||
-                                  formData.type === 'Middle School' ||
-                                  formData.type === 'Elementary School';
-
-  // Initialize location data
-  const [locationData, setLocationData] = useState({
-    country: formData.location?.country || '',
-    address: formData.location?.address || '',
-    city: formData.location?.city || '',
-    state: formData.location?.state || '',
-    postal_code: formData.location?.postal_code || '',
-    location_name: formData.location?.location_name || ''
+  const [formData, setFormData] = useState({
+    name: '',
+    website: '',
+    industry: '',
+    size: '',
+    type: '',
+    phone: '',
+    founded: '',
+    description: '',
+    tagline: '',
+    category_type: '', 
   });
+  const [logoUrl, setLogoUrl] = useState('/src/assets/buildings.jpeg');
+  const [hasLocation, setHasLocation] = useState(false);
+  const [hasStreetAddress, setHasStreetAddress] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [locationData, setLocationData] = useState({
+    country: '',
+    address: '',
+    city: '',
+    state: '',
+    postal_code: '',
+    location_name: ''
+  });
+  
+  // Determine if this is an educational institution based on category_type
+  const isEducationalInstitution = formData.category_type === 'education';
+  
+  // Size options mapping - exactly match the values from backend
+  const sizeOptions = [
+    { value: "", label: "Select size" },
+    { value: "1-10 employees", label: "1-10 employees" },
+    { value: "11-50 employees", label: "11-50 employees" },
+    { value: "51-200 employees", label: "51-200 employees" },
+    { value: "201-500 employees", label: "201-500 employees" },
+    { value: "501-1000 employees", label: "501-1000 employees" },
+    { value: "1001-5000 employees", label: "1001-5000 employees" },
+    { value: "5001-10000 employees", label: "5001-10000 employees" },
+    { value: "10001+ employees", label: "10001+ employees" }
+  ];
+  
+  // Define type options based on category
+  const educationalTypes = ['University', 'College', 'High School', 'Middle School', 'Elementary School'];
+  const companyTypes = ['Public Company', 'Private Company', 'Nonprofit', 'Government Agency', 'Partnership'];
+  
+  // Update form data when companyData changes or dialog opens
+  useEffect(() => {
+    if (companyData && open) {
+      console.log("Updating form data with:", companyData);
+      
+      // Set the main form data
+      setFormData({
+        name: companyData.name || '',
+        website: companyData.website || '',
+        industry: companyData.industry || '',
+        size: companyData.size || '',
+        type: companyData.type || '',
+        phone: companyData.phone || '',
+        founded: companyData.founded || '',
+        description: companyData.description || '',
+        tagline: companyData.tagline || '',
+        category_type: companyData.category_type || '',
+      });
+      
+      // Update location data and checkboxes
+      const hasLoc = !!companyData.location;
+      setHasLocation(hasLoc);
+      
+      if (hasLoc && companyData.location) {
+        setLocationData({
+          country: companyData.location.country || '',
+          address: companyData.location.address || '',
+          city: companyData.location.city || '',
+          state: companyData.location.state || '',
+          postal_code: companyData.location.postal_code || '',
+          location_name: companyData.location.location_name || ''
+        });
+        
+        setHasStreetAddress(!!companyData.location.address);
+      }
+    }
+  }, [companyData, open]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -87,13 +137,6 @@ const EditPageDialog = ({ open, onOpenChange, companyData, onSubmit }: EditPageD
         toast.error(`${label} is required`);
         return false;
       }
-    }
-    
-    // Description validation
-    if (!formData.description) {
-      toast.error('Description is required');
-      setActiveSection('Details');
-      return false;
     }
     
     // Location validation
@@ -162,7 +205,7 @@ const EditPageDialog = ({ open, onOpenChange, companyData, onSubmit }: EditPageD
     }
   };
 
-  // Rest of component code remains unchanged
+
   const navigationStructure = [
     {
       header: 'Header',
@@ -213,30 +256,24 @@ const EditPageDialog = ({ open, onOpenChange, companyData, onSubmit }: EditPageD
               <input
                 type="text"
                 name="name"
-                value={formData.name || ''}
+                value={formData.name}
                 onChange={handleInputChange}
                 placeholder={isEducationalInstitution ? "Enter institution name" : "Enter company name"}
                 className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
                 required
               />
-              <div className="flex justify-end mt-1">
-                <span className="text-sm text-gray-500">{formData.name?.length || 0}/100</span>
-              </div>
             </div>
             
             <div className="mb-6">
               <label className="block text-gray-700 mb-1 text-sm font-medium">Tagline</label>
               <textarea
                 name="tagline"
-                value={formData.tagline || ''}
+                value={formData.tagline}
                 onChange={handleInputChange}
-                placeholder={isEducationalInstitution ? "Add your motto or mission statement" : "Add your slogan or mission statement"}
+                placeholder="Add your slogan or mission statement"
                 className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
                 rows={3}
               />
-              <div className="flex justify-end mt-1">
-                <span className="text-sm text-gray-500">{formData.tagline?.length || 0}/120</span>
-              </div>
             </div>
           </div>
         );
@@ -248,19 +285,15 @@ const EditPageDialog = ({ open, onOpenChange, companyData, onSubmit }: EditPageD
             <p className="text-sm text-gray-500 mb-4">* indicates required</p>
             
             <div className="mb-6">
-              <label className="block text-gray-700 mb-1 text-sm font-medium">Description*</label>
+              <label className="block text-gray-700 mb-1 text-sm font-medium">Description</label>
               <textarea
                 name="description"
-                value={formData.description || ''}
+                value={formData.description}
                 onChange={handleInputChange}
                 placeholder={isEducationalInstitution ? "Add an About Us with a brief overview of your institution" : "Add an About Us with a brief overview of your products and services"}
                 className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
                 rows={3}
-                required
               />
-              <div className="flex justify-end mt-1">
-                <span className="text-sm text-gray-500">{formData.description?.length || 0}/500</span>
-              </div>
             </div>
             
             <div className="mb-6">
@@ -268,11 +301,10 @@ const EditPageDialog = ({ open, onOpenChange, companyData, onSubmit }: EditPageD
               <input
                 type="text"
                 name="website"
-                value={hasWebsite ? (formData.website || '') : ''}
+                value={formData.website}
                 onChange={handleInputChange}
                 placeholder="Add your website homepage (www.example.com)"
                 className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-                disabled={!hasWebsite}
               />
             </div>
             
@@ -281,7 +313,7 @@ const EditPageDialog = ({ open, onOpenChange, companyData, onSubmit }: EditPageD
               <input
                 type="text"
                 name="industry"
-                value={formData.industry || (isEducationalInstitution ? 'Education' : '')}
+                value={formData.industry}
                 onChange={handleInputChange}
                 placeholder={isEducationalInstitution ? "Education" : "Software Development"}
                 className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
@@ -294,20 +326,14 @@ const EditPageDialog = ({ open, onOpenChange, companyData, onSubmit }: EditPageD
               <div className="relative">
                 <select
                   name="size"
-                  value={formData.size || ''}
+                  value={formData.size}
                   onChange={handleInputChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded appearance-none focus:outline-none focus:ring-1 focus:ring-blue-500"
                   required
                 >
-                  <option value="">Select size</option>
-                  <option value="1-10">1-10 employees</option>
-                  <option value="11-50">11-50 employees</option>
-                  <option value="51-200">51-200 employees</option>
-                  <option value="201-500">201-500 employees</option>
-                  <option value="501-1000">501-1000 employees</option>
-                  <option value="1001-5000">1001-5000 employees</option>
-                  <option value="5001-10000">5001-10000 employees</option>
-                  <option value="10001+">10001+ employees</option>
+                  {sizeOptions.map(option => (
+                    <option key={option.value} value={option.value}>{option.label}</option>
+                  ))}
                 </select>
                 <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
                   <svg className="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
@@ -322,28 +348,20 @@ const EditPageDialog = ({ open, onOpenChange, companyData, onSubmit }: EditPageD
               <div className="relative">
                 <select
                   name="type"
-                  value={formData.type || ''}
+                  value={formData.type}
                   onChange={handleInputChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded appearance-none focus:outline-none focus:ring-1 focus:ring-blue-500"
                   required
                 >
                   <option value="">Select type</option>
                   {isEducationalInstitution ? (
-                    <>
-                      <option value="University">University</option>
-                      <option value="College">College</option>
-                      <option value="High School">High School</option>
-                      <option value="Middle School">Middle School</option>
-                      <option value="Elementary School">Elementary School</option>
-                    </>
+                    educationalTypes.map(type => (
+                      <option key={type} value={type}>{type}</option>
+                    ))
                   ) : (
-                    <>
-                      <option value="Public Company">Public Company</option>
-                      <option value="Private Company">Private Company</option>
-                      <option value="Nonprofit">Nonprofit</option>
-                      <option value="Government Agency">Government Agency</option>
-                      <option value="Partnership">Partnership</option>
-                    </>
+                    companyTypes.map(type => (
+                      <option key={type} value={type}>{type}</option>
+                    ))
                   )}
                 </select>
                 <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
@@ -359,7 +377,7 @@ const EditPageDialog = ({ open, onOpenChange, companyData, onSubmit }: EditPageD
               <input
                 type="tel"
                 name="phone"
-                value={formData.phone || ''}
+                value={formData.phone}
                 onChange={handleInputChange}
                 placeholder="Enter a phone number"
                 className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"

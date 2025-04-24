@@ -52,7 +52,7 @@ const DeactivatePageDialog: React.FC<DeactivatePageDialogProps> = ({
       
       // Redirect to company listings or home page
       setTimeout(() => {
-        navigate('/feed'); 
+        navigate('/jobs'); 
       }, 1500);
 
     } catch (error: any) {

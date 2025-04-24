@@ -71,10 +71,17 @@ const ManageCompanyPage = () => {
       
       // Check for companyProfile key instead of company
       if (response && response.companyProfile) {
-        setFullCompanyData(response.companyProfile);
-        return response.companyProfile;
+        // Make sure we're setting the full data
+        const fullData = response.companyProfile;
+        setFullCompanyData(fullData);
+        
+        // Log the company type for debugging
+        console.log("Company type:", fullData.type);
+        
+        return fullData;
       } else {
         console.error("Invalid response format:", response);
+        toast.error("Unable to load company data");
         return null;
       }
     } catch (err: any) {
@@ -83,6 +90,7 @@ const ManageCompanyPage = () => {
         console.error('API error response:', err.response.data);
         console.error('API error status:', err.response.status);
       }
+      toast.error("Error loading company data");
       return null;
     }
   };
