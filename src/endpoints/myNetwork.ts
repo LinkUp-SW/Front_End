@@ -279,7 +279,7 @@ export const followUser = async (
 export const acceptInvitation = async (
   token: string,
   userId: string
-): Promise<void> => {
+): Promise<{message:string}> => {
   const response = await axiosInstance.post(
     `/api/v1/user/accept/${userId}`,
     {}, // Empty body if no additional data is required

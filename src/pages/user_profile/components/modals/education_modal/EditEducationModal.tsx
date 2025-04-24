@@ -18,6 +18,8 @@ import MediaManager from "../components/MediaManager";
 import { MediaItem } from "../components/types";
 import { v4 as uuid } from "uuid";
 import { extractMonthAndYear } from "@/utils";
+import { useDispatch } from "react-redux";
+import { removeOrganizationFromSkills } from "@/slices/skills/skillsSlice";
 
 interface EditEducationModalProps {
   education: Education;
@@ -53,6 +55,8 @@ const EditEducationModal: React.FC<EditEducationModalProps> = ({
   );
 
   const authToken = Cookies.get("linkup_auth_token");
+    const dispatch = useDispatch();
+  
   const [schoolSearch, setSchoolSearch] = useState("");
   const [isSchoolsLoading, setIsSchoolsLoading] = useState(false);
   const { isSubmitting, startSubmitting, stopSubmitting } = useFormStatus();
@@ -156,6 +160,26 @@ const EditEducationModal: React.FC<EditEducationModalProps> = ({
       );
       toast.success(res.message || "Education updated successfully!");
       onSuccess?.(updatedEducation);
+      if(res.education.skills.length===0){
+        dispatch(
+          removeOrganizationFromSkills({orgId:res.education._id as string})
+        )
+      }
+      // res.education.skills.forEach((skill) => {
+      //         if (isSkillResponse(skill)) {
+      //           dispatch(
+      //             addEducationToSkill({
+      //               skillId: skill._id,
+      //               skillName: skill.name,
+      //               education: {
+      //                 _id: res.education._id as string,
+      //                 logo: res.education.school.logo,
+      //                 name: res.education.school.name,
+      //               },
+      //             })
+      //           );
+      //         }
+      //       });
       onClose?.();
     } catch (err) {
       console.error(err);
