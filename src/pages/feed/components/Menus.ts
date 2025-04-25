@@ -10,6 +10,7 @@ import {
   FaTrash,
   FaUserSlash,
   FaEyeSlash,
+  FaRegBookmark,
 } from "react-icons/fa";
 import { BiRepost as RepostIcon } from "react-icons/bi";
 import { FaRegCommentDots as CommentIcon } from "react-icons/fa";
@@ -19,7 +20,7 @@ import {
 } from "react-icons/ai";
 import { BsFillSendFill as SendIcon } from "react-icons/bs";
 import { MenuAction } from "@/types";
-import React from "react";
+import React, { ReactNode } from "react";
 import { EditIcon } from "lucide-react";
 import { FaMessage } from "react-icons/fa6";
 
@@ -28,12 +29,22 @@ export const getMenuActions: (
   copyLink: () => void,
   blockPost: () => void,
   reportPost: () => void,
-  unfollow: () => void
-) => MenuAction[] = (savePost, copyLink, blockPost, reportPost, unfollow) => [
+  unfollow: () => void,
+  isSaved?: boolean
+) => MenuAction[] = (
+  savePost,
+  copyLink,
+  blockPost,
+  reportPost,
+  unfollow,
+  isSaved
+) => [
   {
     name: "Save",
     action: () => savePost(),
-    icon: React.createElement(FaBookmark, { className: "mr-2" }),
+    icon: React.createElement(isSaved ? FaBookmark : FaRegBookmark, {
+      className: "mr-2",
+    }),
   },
   {
     name: "Copy Link",
@@ -58,15 +69,18 @@ export const getMenuActions: (
 ];
 
 export const getPersonalMenuActions: (
-  savePost: any,
-  copyLink: any,
-  editPost: any,
-  deletePost: any
-) => MenuAction[] = (savePost, copyLink, editPost, deletePost) => [
+  savePost: () => void,
+  copyLink: () => void,
+  editPost: () => void,
+  deletePost: () => void,
+  isSaved?: boolean
+) => MenuAction[] = (savePost, copyLink, editPost, deletePost, isSaved) => [
   {
-    name: "Save",
+    name: isSaved ? "Unsave" : "Save",
     action: () => savePost(),
-    icon: React.createElement(FaBookmark, { className: "mr-2" }),
+    icon: React.createElement(isSaved ? FaBookmark : FaRegBookmark, {
+      className: "mr-2",
+    }),
   },
   {
     name: "Copy Link",
@@ -116,15 +130,16 @@ export const COMMENT_SORTING_MENU: MenuAction[] = [
 ];
 
 export const getEngagementButtons = (
-  liked: boolean,
+  selectedReaction: string,
   toggleLiked: () => void,
   toggleComments: () => void
 ) => [
   {
     name: "Like",
-    icon: liked
-      ? React.createElement(LikedIcon)
-      : React.createElement(LikeIcon),
+    icon:
+      selectedReaction == "Like"
+        ? React.createElement(LikedIcon)
+        : React.createElement(LikeIcon),
     callback: toggleLiked,
   },
   {
