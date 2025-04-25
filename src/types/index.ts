@@ -28,38 +28,18 @@ export interface Notification {
   isNew: boolean; // Make isNew non-optional to avoid undefined checks
 }
 
-export interface PostType {
-  user: {
-    name: string;
-    profileImage: string;
-    headline?: string;
-    followers?: string;
-    degree: string;
-  };
-  post: {
-    content: string;
-    date: number;
-    images?: string[];
-    video?: string;
-    pdf?: string;
-    public: boolean;
-    edited?: boolean;
-  };
-  stats: {
-    likes?: number;
-    comments?: number;
-    celebrate?: number;
-    love?: number;
-    insightful?: number;
-    support?: number;
-    funny?: number;
-    person?: string;
-  };
-  action?: {
-    name?: string;
-    profileImage?: string;
-    action?: "like" | "comment" | "repost" | "love";
-  };
+export interface ReactionType {
+  id: number;
+  name: string;
+  title: string;
+  profileImage: string;
+  reactionType:
+    | "like"
+    | "love"
+    | "celebrate"
+    | "insightful"
+    | "support"
+    | "funny";
 }
 
 export interface ProfileCardType {
@@ -72,28 +52,126 @@ export interface ProfileCardType {
 }
 
 export interface CommentType {
-  user: {
-    profileImage: string;
-    name: string;
-    degree: string;
-    followers?: string;
-    headline?: string;
+  author: {
+    username: string;
+    firstName: string;
+    lastName: string;
+    headline: string;
+    profilePicture: string;
+    connectionDegree: string;
   };
-  comment: {
-    text: string;
-    image?: string;
-    edited?: boolean;
+  content: string;
+  media: {
+    link: string;
+    mediaType: "image" | "video" | "none";
   };
-  stats: {
+  reacts: string[];
+  tagged_users: string[];
+  is_edited: boolean;
+  date: number;
+  reactions: {
+    reaction: string;
+  }[];
+  reactionsCount: number;
+  children?: Record<string, CommentType>;
+  userId?: string;
+  parentId: string;
+  _id: string;
+}
+
+export interface CommentObjectType {
+  comments: CommentType[];
+  count: number;
+  nextCursor: number;
+}
+
+export interface CommentDBType {
+  post_id: string;
+  content: string;
+  media: string;
+  parent_id: string | null;
+  tagged_users: string[];
+}
+
+export interface PostType {
+  author: PostUserType;
+  content: string;
+  media: {
+    link: string[];
+    media_type: "image" | "images" | "video" | "link" | "pdf" | "post" | "none";
+  };
+  commentsDisabled: string;
+  publicPost: boolean;
+  taggedUsers: string[];
+  date: number;
+  reacts: string[];
+  isEdited?: boolean;
+  _id: string;
+  user_id: string;
+  comments: string[];
+  isSaved?: boolean;
+  reactions: {
+    reaction: string;
+  }[];
+  reactionsCount: number;
+
+  stats?: {
     likes?: number;
-    replies?: number;
+    comments?: number;
     celebrate?: number;
     love?: number;
     insightful?: number;
     support?: number;
     funny?: number;
     person?: string;
+    reposts?: number;
   };
+
+  action?: ActionType;
+}
+
+export interface StatsType {
+  likes?: number;
+  love?: number;
+  support?: number;
+  celebrate?: number;
+  insightful?: number;
+  funny?: number;
+  comments?: number;
+  reposts?: number;
+  person?: string;
+}
+
+export interface ActionType {
+  name?: string;
+  profileImage?: string;
+  action?: "like" | "comment" | "repost" | "love";
+}
+
+export interface PostUserType {
+  firstName: string;
+  lastName: string;
+  username: string;
+  profilePicture: string;
+  connectionDegree: string;
+  headline: string;
+}
+
+export interface PostDataType {
+  author: PostUserType;
+  content: string;
+  media: {
+    link: string[];
+    media_type: MediaType;
+  };
+  commentsDisabled: string;
+  publicPost: boolean;
+  taggedUsers: string[];
+  date: number;
+  reacts: string[];
+  isEdited?: boolean;
+  _id: string;
+  user_id: string;
 }
 
 export type PostFilter = "all" | "comments" | "reactions" | "reposts";
@@ -208,6 +286,8 @@ export interface UserProfileBio {
   isInConnections?: boolean;
   isConnectByEmail: boolean;
   isAlreadyFollowing?: boolean;
+  number_of_saved_jobs?: number;
+  number_of_saved_posts?: number;
   is_default_profile_photo: boolean;
   education: Organization | null;
   work_experience: Organization | null;

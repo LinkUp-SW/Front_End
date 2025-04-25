@@ -71,7 +71,7 @@ import {
   TooltipProvider,
 } from "@/components/ui/tooltip";
 import LeftSidebar from "@/components/my_items/LeftSideBar";
-import JobsDashboard from "@/components/my_items/SavedJobsDashboard";
+import JobsDashboard from "@/components/my_items/JobsDashboard";
 import InterviewTipsPanel from "@/components/my_items/InterviewTipsPanel";
 import Footer from "@/components/my_items/Footer";
 import SavedPostsDashboard from "@/components/my_items/SavedPostsDashboard";

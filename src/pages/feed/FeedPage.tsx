@@ -6,45 +6,94 @@ import {
   LinkUpFooter,
   WhosHiringImage,
 } from "../../components";
-import {
-  StatsCard,
-  PremiumBanner,
-  Shortcuts,
-  CreatePost,
-  Post,
-} from "./components";
+import { PremiumBanner, Shortcuts, CreatePost, Post } from "./components";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
-import { useSelector } from "react-redux";
+import { CommentObjectType } from "@/types";
+import { fetchSinglePost } from "@/endpoints/feed";
+import { useParams } from "react-router-dom";
+import Cookies from "js-cookie";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
-import { CommentType, PostType } from "@/types";
-import { getFeedPosts, getPostComments } from "@/endpoints/feed";
+import { setPosts } from "@/slices/feed/postsSlice"; // adjust if needed
+import { setComments } from "@/slices/feed/commentsSlice";
 
-const FeedPage = () => {
+interface FeedPageProps {
+  single?: boolean;
+}
+import PostSkeleton from "./components/PostSkeleton";
+
+const FeedPage: React.FC<FeedPageProps> = ({ single = false }) => {
+  const posts = useSelector((state: RootState) => state.posts.list);
+  const comments = useSelector((state: RootState) => state.comments.list);
+  const dispatch = useDispatch();
+  const { id } = useParams<{ id: string }>(); // Extract the 'id' parameter from the URL
   const [viewMore, setViewMore] = useState(true);
   const screenWidth = useSelector((state: RootState) => state.screen.width);
 
-  const [posts, setPosts] = useState<PostType[]>([]);
-  const [comments, setComments] = useState<CommentType[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const temporary_feed = [
+    "6806b5a2bfb3de42b857be4c",
+
+    "680ba14b801a855626ece75c",
+    "680ba0a9801a855626ece74d",
+    "680ba090801a855626ece73e",
+    "680b70ca2ea9ffaf2afa7c12",
+    "680ace66b57681e1e91b8d39",
+    "680a6fafb57681e1e91b7c0b",
+    "680a6f79b57681e1e91b7bf9",
+    "680a6b3eb57681e1e91b7b52",
+    "680a6702b57681e1e91b7a52",
+  ];
+
+  const user_token = Cookies.get("linkup_auth_token");
 
   useEffect(() => {
+    setIsLoading(true);
     const fetchData = async () => {
       try {
+        if (single && !id) {
+          console.error("ID is required for single post view");
+          return;
+        }
+
         // Call both endpoints concurrently
-        const [fetchedPosts, fetchedComments] = await Promise.all([
-          getFeedPosts(),
-          getPostComments(),
+        const [fetchedData] = await Promise.all([
+          Promise.all(
+            (!single || !id
+              ? temporary_feed.map((postId) =>
+                  fetchSinglePost(postId, user_token ?? "", 0, 10)
+                )
+              : [fetchSinglePost(id, user_token ?? "", 0, 10)]
+            ).filter(Boolean)
+          ),
         ]);
-        if (fetchedPosts) setPosts(fetchedPosts);
-        else setPosts([]);
-        if (fetchedComments) setComments(fetchedComments);
-        else setComments([]);
+        const posts = fetchedData.map((data) => data.post);
+        const comments: CommentObjectType[] = fetchedData.map(
+          (data) => data.comments
+        );
+        console.log(fetchedData);
+        console.log("Posts:", posts);
+        console.log("Comments:", comments);
+        comments.forEach((block) => {
+          block.comments = Object.values(block.comments).reverse();
+        });
+
+        if (posts.length > 0) dispatch(setPosts(posts));
+        else dispatch(setPosts([]));
+        if (comments.length > 0) {
+          dispatch(setComments(comments));
+        } else {
+          dispatch(setComments([]));
+        }
+        setIsLoading(false);
       } catch (error) {
         console.error("Error fetching feed data", error);
       }
     };
 
     fetchData();
-  }, []);
+  }, [id]);
 
   useEffect(() => {
     if (screenWidth < 768) {
@@ -82,7 +131,6 @@ const FeedPage = () => {
             </Button>
             {viewMore && (
               <>
-                <StatsCard profileViewers={27} postImpressions={22} />
                 <PremiumBanner />
                 <Shortcuts />
               </>
@@ -90,15 +138,35 @@ const FeedPage = () => {
           </aside>
           {/* Main Content */}
           <main className="flex flex-col w-full max-w-auto md:max-w-[27.8rem] lg:max-w-[35rem]">
-            <CreatePost />
-            {posts.map((post, index) => (
-              <Post
-                key={index}
-                viewMore={viewMore}
-                postData={post}
-                comments={comments}
-              />
-            ))}
+            {!single && <CreatePost />}
+            <div className="mt-4"></div>
+            {isLoading ? (
+              // Skeleton loaders while loading
+              <div className="space-y-4">
+                {Array.from({ length: 5 }).map((_, index) => (
+                  <PostSkeleton key={`skeleton-${index}`} />
+                ))}
+              </div>
+            ) : posts.length != 0 ? (
+              posts.map((post, index) => {
+                return (
+                  <Post
+                    key={`post-${post._id}`}
+                    viewMore={viewMore}
+                    postData={post}
+                    comments={comments[index]}
+                    action={post.action}
+                    posts={posts}
+                    allComments={comments}
+                    order={index}
+                  />
+                );
+              })
+            ) : (
+              <p className="text-center text-2xl bg-white border rounded-lg p-4">
+                No posts to display. Start connecting to people!
+              </p>
+            )}
           </main>
           {/* Right Sidebar */}
           {screenWidth > 1158 && (
