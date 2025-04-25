@@ -16,10 +16,10 @@ const DocumentPreview: React.FC<{ currentSelectedMedia: File[] }> = ({
           {/* File Details */}
           <FaRegFilePdf size={50} />
           <div className="flex flex-col">
-            <p className="text-sm font-medium text-gray-800 dark:text-gray-200">
+            <p className="text-sm font-medium text-ellipsis break-all text-gray-800 dark:text-gray-200">
               {currentSelectedMedia[0]?.name || "No file selected"}
             </p>
-            <p className="text-xs text-gray-500 dark:text-gray-400">
+            <p className="text-xs text-gray-500 text-ellipsis dark:text-gray-400">
               {currentSelectedMedia[0]
                 ? `${(currentSelectedMedia[0].size / 1024).toFixed(2)} KB`
                 : ""}
