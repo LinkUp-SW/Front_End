@@ -11,7 +11,6 @@ import { Skeleton } from "@/components/ui/skeleton"; // Import the Skeleton comp
 import { refetchUserBio } from "@/slices/user_profile/userBioSlice";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/store";
-import CompactLinkPreview from "@/pages/feed/components/CompactLinkPreview";
 import DocumentPreview from "@/pages/feed/components/modals/DocumentPreview";
 import LinkPreview from "@/pages/feed/components/LinkPreview";
 
