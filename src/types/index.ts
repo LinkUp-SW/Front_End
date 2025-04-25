@@ -181,6 +181,10 @@ export interface Organization {
   logo: string;
   name: string;
 }
+export interface SkillResponse{
+  _id:string;
+  name:string
+}
 
 export interface Experience {
   _id?: string;
@@ -287,6 +291,8 @@ export interface UserProfileBio {
   education: Organization | null;
   work_experience: Organization | null;
   is_defult_cover_photo: boolean;
+  profile_visibility:string;
+
 }
 
 // Add to types.ts
@@ -380,6 +386,7 @@ export interface BioFormData {
   first_name: string;
   last_name: string;
   headline: string;
+  website:'';
   location: {
     country_region: string;
     city: string;

@@ -26,6 +26,17 @@ import { useFormStatus } from "@/hooks/useFormStatus";
 import { FaRegLightbulb } from "react-icons/fa";
 import SkillsSkeleton from "../components/skills/SkillsSkeleton";
 import SkillsActionButtons from "../components/skills/SkillsActionButtons";
+
+// Redux
+import { useSelector, useDispatch } from "react-redux";
+import { RootState, AppDispatch } from "@/store";
+import {
+  setSkills as setGlobalSkills,
+  addSkill as addGlobalSkill,
+  updateSkill as updateGlobalSkill,
+  removeSkill as removeGlobalSkill,
+} from "@/slices/skills/skillsSlice";
+
 interface FetchDataResult {
   skills: Skill[];
   is_me: boolean;
@@ -37,63 +48,58 @@ const UserSkillsPage = () => {
   const { data, loading, error } = useFetchData<FetchDataResult | null>(
     () =>
       authToken && id ? getUserSkills(authToken, id) : Promise.resolve(null),
-    [id] // add id as a dependency so that when it changes, the effect runs again
+    [id]
   );
-  const [skills, setSkills] = useState<Skill[]>([]);
-  const [selectedSkill, setSelectedSkill] = useState<string | null>(null);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [skillToEdit, setSkillToEdit] = useState<Skill | null>(null);
-  const [editOpen, setEditOpen] = useState(false);
+
+  const dispatch = useDispatch<AppDispatch>();
+  const skills = useSelector((state: RootState) => state.skill.items);
   const isMe = data?.is_me ?? false;
   const isEmpty = skills.length === 0;
   const { isSubmitting, startSubmitting, stopSubmitting } = useFormStatus();
 
+  // Load from server into Redux on fetch
+  useEffect(() => {
+    if (data?.skills) {
+      dispatch(setGlobalSkills(data.skills));
+    }
+  }, [data, dispatch]);
+
+  // Handlers now dispatch to Redux slice
   const handleAddSkill = (newSkill: Skill) => {
-    setSkills((prev) => [...prev, newSkill]);
+    dispatch(addGlobalSkill(newSkill));
   };
 
-  // Handler for updating an existing skill
   const handleEditSkill = (updatedSkill: Skill) => {
-    setSkills((prev) =>
-      prev.map((skill) =>
-        skill._id === updatedSkill._id ? updatedSkill : skill
-      )
-    );
+    dispatch(updateGlobalSkill(updatedSkill));
     setEditOpen(false);
     setSkillToEdit(null);
   };
 
-  useEffect(() => {
-    if (data?.skills) {
-      setSkills(data.skills);
-    }
-  }, [data]);
-
   const handleConfirmDelete = async () => {
+    if (!selectedSkill) return;
     startSubmitting();
     try {
-      const response = await deleteUserSkills(
-        authToken as string,
-        selectedSkill as string
-      );
-      setSkills(skills.filter((skill) => skill._id !== selectedSkill));
+      const response = await deleteUserSkills(authToken as string, selectedSkill);
+      dispatch(removeGlobalSkill(selectedSkill));
       setDeleteDialogOpen(false);
       toast.success(response.message);
-    } catch (error) {
-      toast.error(getErrorMessage(error));
+    } catch (err) {
+      toast.error(getErrorMessage(err));
     } finally {
       stopSubmitting();
     }
   };
+
+  // Local UI state
+  const [selectedSkill, setSelectedSkill] = useState<string | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [skillToEdit, setSkillToEdit] = useState<Skill | null>(null);
+  const [editOpen, setEditOpen] = useState(false);
+
   if (error) {
     return (
-      <section
-        id="skills-section"
-        className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow"
-      >
-        <p className="text-red-500">
-          Failed to load skills. Please try again later.
-        </p>
+      <section id="skills-section" className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow">
+        <p className="text-red-500">Failed to load skills. Please try again later.</p>
       </section>
     );
   }
@@ -119,34 +125,27 @@ const UserSkillsPage = () => {
             <div className="mt-2 divide-y divide-gray-200 dark:divide-gray-700">
               {loading ? (
                 <SkillsSkeleton />
+              ) : isEmpty ? (
+                <EmptySkills onAddSkill={handleAddSkill} isMe={isMe} />
               ) : (
-                <>
-                  {isEmpty ? (
-                    <EmptySkills onAddSkill={handleAddSkill} isMe={isMe} />
-                  ) : (
-                    <>
-                      {skills.map((skill, idx) => (
-                        <Fragment key={idx}>
-                          <SkillsList
-                            skill={skill}
-                            setDeleteDialogOpen={setDeleteDialogOpen}
-                            setEditOpen={setEditOpen}
-                            setSkillToEdit={setSkillToEdit}
-                            setSelectedSkill={setSelectedSkill}
-                            idx={idx}
-                            isMe={isMe}
-                          />
-                        </Fragment>
-                      ))}
-                    </>
-                  )}
-                </>
+                skills.map((skill, idx) => (
+                  <Fragment key={skill._id || idx}>
+                    <SkillsList
+                      skill={skill}
+                      setDeleteDialogOpen={setDeleteDialogOpen}
+                      setEditOpen={setEditOpen}
+                      setSkillToEdit={setSkillToEdit}
+                      setSelectedSkill={setSelectedSkill}
+                      idx={idx}
+                      isMe={isMe}
+                    />
+                  </Fragment>
+                ))
               )}
             </div>
           </section>
         </div>
 
-        {/* Right Sidebar */}
         <div className="lg:col-span-1 space-y-4">
           <ViewedSection />
           <ResourcesSection />
@@ -160,7 +159,6 @@ const UserSkillsPage = () => {
           id="edit-skill-dialog-content"
           className="max-h-[45rem] overflow-y-auto dark:bg-gray-900 overflow-x-hidden !max-w-5xl sm:!w-[38.5rem] !w-full"
         >
-          <DialogTitle className="hidden"></DialogTitle>
           <DialogHeader>
             <Header title={`Edit ${skillToEdit?.name}`} />
           </DialogHeader>
@@ -179,10 +177,7 @@ const UserSkillsPage = () => {
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <DialogContent
-          aria-describedby={undefined}
-          className="max-w-[425px] dark:bg-gray-900"
-        >
+        <DialogContent aria-describedby={undefined} className="max-w-[425px] dark:bg-gray-900">
           <DialogHeader>
             <DialogTitle className="text-lg flex items-center gap-2">
               <MdDeleteForever className="text-pink-500" />
@@ -198,7 +193,6 @@ const UserSkillsPage = () => {
               variant="outline"
               disabled={isSubmitting}
               onClick={() => setDeleteDialogOpen(false)}
-              className="border-gray-300 hover:bg-gray-100 dark:text-black dark:hover:bg-gray-700 dark:hover:text-white dark:border-gray-700 transition-all duration-300 ease-in-out"
             >
               Cancel
             </Button>
@@ -206,7 +200,6 @@ const UserSkillsPage = () => {
               variant="destructive"
               disabled={isSubmitting}
               onClick={handleConfirmDelete}
-              className="destructiveBtn"
             >
               Delete
             </Button>
@@ -226,10 +219,7 @@ const EmptySkills: React.FC<{
     <div className="grid gap-2 dark:text-gray-100">
       <div className="opacity-65 flex gap-2 items-center">
         <div className="p-3 rounded-xl border-2 dark:border-gray-600">
-          <FaRegLightbulb
-            size={20}
-            className="text-gray-600 dark:text-gray-300"
-          />
+          <FaRegLightbulb size={20} className="text-gray-600 dark:text-gray-300" />
         </div>
         {isMe ? (
           <div className="flex flex-col justify-center">
@@ -238,7 +228,7 @@ const EmptySkills: React.FC<{
           </div>
         ) : (
           <div className="flex flex-col justify-center">
-            <p className="text-sm">This user does not have skills yet :{"("}</p>
+            <p className="text-sm">This user does not have skills yet :(</p>
           </div>
         )}
       </div>
@@ -247,7 +237,7 @@ const EmptySkills: React.FC<{
           <DialogTrigger asChild>
             <button
               id="add-skill-button"
-              className="w-fit py-1.5 px-4 border-2 rounded-full dark:border-blue-400 font-semibold text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-600 dark:hover:bg-blue-400 hover:text-white transition-all duration-300 ease-in-out border-blue-600 cursor-pointer"
+              className="w-fit py-1.5 px-4 border-2 rounded-full dark:border-blue-400 font-semibold text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-600 dark:hover:bg-blue-400 hover:text-white transition-all duration-300 ease-in-out cursor-pointer"
             >
               Add Skill
             </button>

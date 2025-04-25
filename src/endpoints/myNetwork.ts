@@ -71,6 +71,57 @@ export interface SentConnectionsResponse {
   nextCursor: string;
 }
 
+export interface PeopleYouMayKnow {
+  _id: string;
+  user_id: string;
+  bio: {
+    first_name:string,
+    last_name:string,
+    headline: string;
+  };
+  profile_photo: string;
+  cover_photo: string;
+  privacy_settings: {
+    flag_who_can_send_you_invitations: string;
+  };
+}
+
+export interface PeopleYouMayKnowResponse {
+  people: PeopleYouMayKnow[];
+  nextCursor: string | null;
+}
+
+export interface Person {
+  user_id: string;
+  name: string;
+  headline: string;
+  location: string;
+  profile_photo: string;
+  connection_degree: string;
+  mutual_connections: MutualConnections;
+  is_in_sent_connections: boolean;
+  is_in_received_connections: boolean;
+}
+
+export interface MutualConnections {
+  count: number;
+  suggested_name: string;
+}
+
+export interface Pagination {
+  total: number;
+  page: number;
+  limit: number;
+  pages: number;
+}
+
+export interface UsersResponse {
+  people: Person[];
+  pagination: Pagination;
+}
+
+
+
 export const fetchConnections = async (
   token: string,
   userId: string,
@@ -228,7 +279,7 @@ export const followUser = async (
 export const acceptInvitation = async (
   token: string,
   userId: string
-): Promise<void> => {
+): Promise<{message:string}> => {
   const response = await axiosInstance.post(
     `/api/v1/user/accept/${userId}`,
     {}, // Empty body if no additional data is required
@@ -306,3 +357,48 @@ export const removeUserFromConnection = async (
   );
   return response.data;
 };
+
+export const getPeopleYouMayKnow = async (
+  token: string,
+  context:string,
+  cursor: string | null,
+  limit: number
+): Promise<PeopleYouMayKnowResponse> => {
+  const response = await axiosInstance.get(
+    "/api/v1/user/people-you-may-know",
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      params: { context, cursor, limit },
+    }
+  );
+    return response.data;
+  };
+
+
+export const getusers = async (
+  token: string,
+  query:string,
+  connectionDegree: string,
+  page:number,
+  limit:number
+): Promise<UsersResponse> => {
+  const response = await axiosInstance.get(
+    "/api/v1/search/users",
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      params: { query, connectionDegree, page, limit },
+    }
+  );
+  return response.data;
+}
+
+
+
+  
+  
+
+
