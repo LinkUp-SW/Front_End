@@ -22,6 +22,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { editUserBio } from "@/slices/user_profile/userBioSlice";
 import { toast } from "sonner";
+import { AxiosError } from "axios";
+import { getErrorMessage } from "@/utils/errorHandler";
 
 const Connections: React.FC = () => {
   const navigate = useNavigate();
@@ -38,6 +40,7 @@ const Connections: React.FC = () => {
   const observer = useRef<IntersectionObserver | null>(null);
   const hasFetchedInitial = useRef(false); // Prevents double fetching on mount
   const [openDialogUserId, setOpenDialogUserId] = useState<string | null>(null);
+  const[error, setError]=useState<AxiosError| null>(null);
 
   const handleRemoveConnection = useCallback(
     async (userId: string) => {
@@ -59,6 +62,7 @@ const Connections: React.FC = () => {
     },
     [token]
   );
+  
 
   const loadConnections = useCallback(async () => {
     if (!token || loading || !hasMore) return;
@@ -78,6 +82,8 @@ const Connections: React.FC = () => {
       setCursor(data.nextCursor);
       setHasMore(!!data.nextCursor);
     } catch (error) {
+      if(error instanceof AxiosError)
+      setError(error)
       console.error("Error fetching connections:", error);
     } finally {
       setLoading(false);
@@ -117,6 +123,10 @@ const Connections: React.FC = () => {
   const navigateToUser = (user_id: string) => {
     return navigate(`/user-profile/${user_id}`);
   };
+
+  if (error) {
+    return <ErrorFallback error={error} />;
+  }
 
   return (
     <div className="min-h-screen p-2 sm:p-4 md:p-6 lg:p-8 xl:p-10 flex flex-col">
@@ -224,6 +234,19 @@ const Connections: React.FC = () => {
         )}
       </div>
       <Modal />
+    </div>
+  );
+};
+
+const ErrorFallback = ({ error }: { error: unknown }) => {
+  if (error instanceof AxiosError) {
+    if (error.response?.status === 403) {
+      window.location.replace("/unAuthorized");
+    }
+  }
+  return (
+    <div className="text-red-500 p-4 bg-red-100 rounded-lg">
+      {getErrorMessage(error)}
     </div>
   );
 };
