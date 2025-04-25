@@ -156,7 +156,7 @@ export const updateWorkExperience = async (
   token: string,
   id: string,
   form: Experience
-): Promise<{ message: string }> => {
+): Promise<{ message: string,experience:Experience }> => {
   const response = await axiosInstance.put(
     `api/v1/user/update-work-experience/${id}`,
     form,
