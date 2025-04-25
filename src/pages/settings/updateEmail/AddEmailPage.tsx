@@ -5,6 +5,7 @@ import styles from './addEmailPage.module.css';
 import { updateEmail } from '@/endpoints/settingsEndpoints';
 import { toast } from 'sonner';
 import Cookies from 'js-cookie';
+import { getErrorMessage } from '@/utils/errorHandler';
 
 const AddEmailPage: React.FC = () => {
   const navigate = useNavigate();
