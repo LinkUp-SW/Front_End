@@ -32,7 +32,7 @@ const AddEmailPage: React.FC = () => {
       toast.success('Email updated successfully');
       navigate('/settings/security/email');
     } catch (error) {
-      toast.error('Failed to update email');
+      toast.error(getErrorMessage(error));
     } finally {
       setIsSubmitting(false);
     }
