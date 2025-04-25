@@ -22,19 +22,14 @@ import PostSettingsModal from "./modals/PostSettingsModal";
 import UploadMediaModal from "./modals/UploadMediaModal";
 import AddDocumentModal from "./modals/AddDocumentModal";
 import CommentControlModal from "./modals/CommentControlModal";
-import {
-  CommentObjectType,
-  CommentType,
-  MediaType,
-  PostDBObject,
-  PostType,
-} from "@/types";
+import { CommentObjectType, MediaType, PostDBObject } from "@/types";
 import Cookies from "js-cookie";
 import { toast } from "sonner";
 import { createPost, fetchSinglePost } from "@/endpoints/feed";
 import { DialogDescription } from "@radix-ui/react-dialog";
 import { setPosts } from "@/slices/feed/postsSlice";
 import { setComments } from "@/slices/feed/commentsSlice";
+import React from "react";
 
 const useDismissModal = () => {
   const dismiss = () => {
@@ -75,7 +70,9 @@ const CreatePost: React.FC = () => {
     setSelectedMedia([]);
   };
 
-  const submitPost = async () => {
+  // Add a useMemo for handling text changes
+
+  const submitPost = async (link?: string) => {
     let media_type: string | undefined;
     const media: string[] = [];
 
@@ -168,6 +165,10 @@ const CreatePost: React.FC = () => {
 
       // Wait for all FileReader operations to complete
       await Promise.all(fileReaders);
+    } else if (link) {
+      console.log("here", link);
+      media_type = "link";
+      media.push(link);
     } else {
       media_type = "none";
     }

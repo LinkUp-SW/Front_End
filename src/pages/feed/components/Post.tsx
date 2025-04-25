@@ -1,4 +1,4 @@
-import React, { JSX, useEffect, useRef, useState } from "react";
+import React, { JSX, useEffect, useState } from "react";
 import { Button } from "../../../components/ui/button";
 import { Card, CardContent, CardFooter } from "../../../components/ui/card";
 import CelebrateIcon from "@/assets/Celebrate.svg";
@@ -10,12 +10,11 @@ import SupportIcon from "@/assets/Support.svg";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import {
+  ActionType,
   CommentDBType,
   CommentObjectType,
-  CommentType,
   PostType,
   PostUserType,
-  ReactionType,
 } from "@/types";
 import { POST_ACTIONS } from "@/constants";
 import PostHeader from "./PostHeader";
@@ -60,12 +59,14 @@ import BlueButton from "./buttons/BlueButton";
 import { setPosts } from "@/slices/feed/postsSlice"; // adjust if needed
 import { setComments } from "@/slices/feed/commentsSlice";
 import { useDispatch } from "react-redux";
+import DocumentPreview from "./modals/DocumentPreview";
+import LinkPreview from "./LinkPreview";
 
 interface PostProps {
   postData: PostType;
   comments: CommentObjectType;
   viewMore: boolean; // used to hide certain elements for responsive design
-  action: any; // used if the post is an action
+  action?: ActionType; // used if the post is an action
   posts: PostType[];
   allComments: CommentObjectType[];
   order: number;
@@ -130,6 +131,7 @@ const Post: React.FC<PostProps> = ({
             )
           )
         );
+        console.log(reacts, taggedUsers);
       } else {
         const updatedComments = allComments.map((block) => ({
           ...block,
@@ -229,7 +231,7 @@ const Post: React.FC<PostProps> = ({
 
   const handleReact = (value: string) => {
     console.log(value);
-    console.log("Liked");
+
     setSelectedReaction(value);
 
     if (value != "None") {
@@ -239,7 +241,6 @@ const Post: React.FC<PostProps> = ({
     }
   };
 
-  const handleCopyLinkButton = () => {};
   const handleEditPostButton = () => {};
   const deleteModal = () => {
     setWillDelete(true);
@@ -281,36 +282,6 @@ const Post: React.FC<PostProps> = ({
     }
   };
 
-  const handleCreateReaction = async (selected_reaction: string) => {
-    if (!token) {
-      toast.error("You must be logged in to add a comment.");
-      navigate("/login", { replace: true });
-      return;
-    }
-    const reaction = {
-      target_type: "Post",
-      reaction: selected_reaction.toLowerCase(),
-    };
-    try {
-      const result = await createReaction(reaction, postData._id, token);
-      dispatch(
-        setPosts(
-          posts.map((post, index) =>
-            index === order
-              ? {
-                  ...post,
-                  reacts: [...post.reacts, result.reaction.reaction._id],
-                }
-              : post
-          )
-        )
-      );
-      console.log("New posts", posts);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
   const handleSaveButton = async () => {
     if (!token) {
       toast.error("You must be logged in to save or unsave a post.");
@@ -338,19 +309,9 @@ const Post: React.FC<PostProps> = ({
               onClick={() =>
                 navigate("/my-items/saved-posts/", { replace: true })
               }
-              style={{
-                color: "blue",
-                textDecoration: "none",
-                cursor: "pointer",
-              }}
-              onMouseEnter={(e) =>
-                (e.currentTarget.style.textDecoration = "underline")
-              }
-              onMouseLeave={(e) =>
-                (e.currentTarget.style.textDecoration = "none")
-              }
+              className="text-blue-600 dark:text-blue-300 hover:underline hover:cursor-pointer"
             >
-              View post
+              View saved posts
             </span>
           </span>
         )
@@ -364,10 +325,40 @@ const Post: React.FC<PostProps> = ({
     }
   };
 
+  const handleCreateReaction = async (selected_reaction: string) => {
+    if (!token) {
+      toast.error("You must be logged in to add a reaction.");
+      navigate("/login", { replace: true });
+      return;
+    }
+    const reaction = {
+      target_type: "Post",
+      reaction: selected_reaction.toLowerCase(),
+    };
+    try {
+      const result = await createReaction(reaction, postData._id, token);
+      dispatch(
+        setPosts(
+          posts.map((post, index) =>
+            index === order
+              ? {
+                  ...post,
+                  reacts: [...post.reacts, result.reaction.reaction._id],
+                }
+              : post
+          )
+        )
+      );
+      console.log("New posts", posts);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const handleDeleteReaction = async () => {
     console.log("Deleting reaction", selectedReaction);
     if (!token) {
-      toast.error("You must be logged in to add a comment.");
+      toast.error("You must be logged in to remove a reaction.");
       navigate("/login", { replace: true });
       return;
     }
@@ -402,17 +393,17 @@ const Post: React.FC<PostProps> = ({
     userId === author.username
       ? getPersonalMenuActions(
           handleSaveButton,
-          handleCopyLinkButton,
           handleEditPostButton,
           deleteModal,
+          postData._id,
           isSaved
         )
       : getMenuActions(
           handleSaveButton,
-          handleCopyLinkButton,
           blockPost,
           reportPost,
           unfollow,
+          postData._id,
           isSaved
         );
 
@@ -435,10 +426,10 @@ const Post: React.FC<PostProps> = ({
     celebrate: 1,
     comments: postData.comments.length,
     reposts: 5,
-    total: postData.reacts ? postData.reacts.length : 0,
+    total: postData.reactionsCount,
   };
 
-  const { topStats, totalStats } = calculateTopStats(stats);
+  const topStats = getReactionIcons(postData.reactions);
 
   return (
     <Card className="p-2 bg-white border-0 mb-4 pl-0 dark:bg-gray-900 dark:text-neutral-200">
@@ -485,25 +476,58 @@ const Post: React.FC<PostProps> = ({
           ))}
 
         {media && media.media_type === "video" && (
-          <div className="flex w-[100%] relative left-4 self-center justify-end">
+          <div className="flex w-1/3 relative left-4 self-center justify-end">
             <video className="w-full pt-4" controls src={media.link[0]}></video>
           </div>
         )}
         {media && media.media_type === "pdf" && (
-          <div className="h-[37rem] self-center w-full max-w-[34rem] relative left-4.5 pt-4">
-            <div className="App">
-              <div className="header">React sample</div>
-            </div>
+          <div className="flex w-full justify-center pt-4">
+            {(() => {
+              try {
+                return (
+                  <iframe
+                    src={media.link[0]}
+                    className="w-[800px] h-[600px]"
+                    title="PDF Document"
+                  />
+                );
+              } catch (error) {
+                console.log(error);
+                // Assuming you have a DocumentPreview component
+                return (
+                  <DocumentPreview
+                    currentSelectedMedia={[
+                      new File(
+                        [
+                          new Blob([media.link[0]], {
+                            type: "application/pdf",
+                          }),
+                        ],
+                        "document.pdf",
+                        { type: "application/pdf" }
+                      ),
+                    ]}
+                  />
+                );
+              }
+            })()}
+          </div>
+        )}
+        {media && media.media_type == "link" && (
+          <div className="w-full pl-4 pt-4">
+            <LinkPreview url={media.link[0]} className="w-full" />
           </div>
         )}
         <Dialog
           open={willDelete}
           onOpenChange={() => setWillDelete(!willDelete)}
         >
-          <DialogContent>
+          <DialogContent className="dark:bg-gray-900 border-0 ">
             <DialogHeader>
-              <DialogTitle>Are you absolutely sure?</DialogTitle>
-              <DialogDescription>
+              <DialogTitle className="dark:text-white">
+                Are you absolutely sure?
+              </DialogTitle>
+              <DialogDescription className="dark:text-neutral-300">
                 This action cannot be undone. This will permanently delete this
                 post from LinkUp.
               </DialogDescription>
@@ -530,13 +554,13 @@ const Post: React.FC<PostProps> = ({
                     key={`topstats-${index}`}
                     className="flex items-center text-black dark:text-neutral-200 text-lg"
                   >
-                    {stat.icon}
+                    {stat}
                   </span>
                 ))}
                 {
                   /* {stats.person
                   ? stats.person + " and " + (totalStats - 1) + " others"
-                  : totalStats} */ totalStats
+                  : totalStats} */ stats.total > 0 && stats.total
                 }
               </button>
             </DialogTrigger>
@@ -560,13 +584,14 @@ const Post: React.FC<PostProps> = ({
                 {stats.comments} comments
               </p>
             )}
+            {stats.reposts != 0 && stats.comments != 0 && (
+              <p className="text-xs text-gray-500 dark:text-neutral-400 font-bold">
+                {" "}
+                ·
+              </p>
+            )}
             {stats.reposts && (
               <>
-                <p className="text-xs text-gray-500 dark:text-neutral-400 font-bold">
-                  {" "}
-                  ·
-                </p>
-
                 <p className="hover:underline hover:text-blue-600 dark:hover:text-blue-400 hover:cursor-pointer">
                   {stats.reposts} reposts
                 </p>
@@ -600,9 +625,11 @@ const Post: React.FC<PostProps> = ({
                           variant="ghost"
                           size="lg"
                           onClick={() => {
-                            selectedReaction === "None"
-                              ? handleReact("Like")
-                              : handleReact("None");
+                            if (selectedReaction === "None") {
+                              handleReact("Like");
+                            } else {
+                              handleReact("None");
+                            }
                           }}
                           className={`flex dark:hover:bg-zinc-800 dark:hover:text-neutral-200 ${
                             selectedReaction === "Like"
@@ -783,7 +810,6 @@ const Post: React.FC<PostProps> = ({
       <CardFooter>
         {commentsOpen && (
           <PostFooter
-            user={author}
             sortingMenu={sortingMenu}
             setSortingMenu={setSortingMenu}
             sortingState={sortingState}
@@ -800,58 +826,19 @@ const Post: React.FC<PostProps> = ({
 
 export default Post;
 
-function calculateTopStats(stats: {
-  likes?: number;
-  comments?: number;
-  celebrate?: number;
-  love?: number;
-  insightful?: number;
-  support?: number;
-  funny?: number;
-  person?: string;
-  total: number;
-}) {
-  const statsArray = [
-    {
-      name: "celebrate",
-      count: stats.celebrate,
-      icon: <img src={CelebrateIcon} alt="Celebrate" className="w-4 h-4" />,
-    },
-    {
-      name: "love",
-      count: stats.love,
-      icon: <img src={LoveIcon} alt="Love" className="w-4 h-4" />,
-    },
-    {
-      name: "insightful",
-      count: stats.insightful,
-      icon: <img src={InsightfulIcon} alt="Insightful" className="w-4 h-4" />,
-    },
-    {
-      name: "support",
-      count: stats.support,
-      icon: <img src={SupportIcon} alt="Support" className="w-4 h-4" />,
-    },
-    {
-      name: "funny",
-      count: stats.funny,
-      icon: <img src={FunnyIcon} alt="Funny" className="w-4 h-4" />,
-    },
-    {
-      name: "like",
-      count: stats.likes,
-      icon: <img src={LikeIcon} alt="Like" className="w-4 h-4" />,
-    },
-  ];
+function getReactionIcons(reactions: { reaction: string }[]) {
+  const reactionIconsMap: Record<string, JSX.Element> = {
+    celebrate: <img src={CelebrateIcon} alt="Celebrate" className="w-4 h-4" />,
+    love: <img src={LoveIcon} alt="Love" className="w-4 h-4" />,
+    insightful: (
+      <img src={InsightfulIcon} alt="Insightful" className="w-4 h-4" />
+    ),
+    support: <img src={SupportIcon} alt="Support" className="w-4 h-4" />,
+    funny: <img src={FunnyIcon} alt="Funny" className="w-4 h-4" />,
+    like: <img src={LikeIcon} alt="Like" className="w-4 h-4" />,
+  };
 
-  const topStats = statsArray
-    .filter((stat) => stat.count)
-    .sort((a, b) => (b.count || 0) - (a.count || 0))
-    .slice(0, 3);
-  if (!topStats.length) {
-    topStats.push(statsArray[5]);
-  }
-
-  const totalStats = stats.total;
-  return { topStats, totalStats };
+  return reactions
+    .map((reaction) => reactionIconsMap[reaction.reaction.toLowerCase()])
+    .filter((icon) => icon); // Filter out undefined icons
 }
