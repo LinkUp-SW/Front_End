@@ -84,13 +84,20 @@ const CompanyJobsComponent: React.FC<CompanyJobsComponentProps> = ({ companyId, 
       toast.error('Company ID is required to post a job');
       return;
     }
-    // Implement job edit logic here
     navigate(`/company-manage/${companyId}/jobs/create`);
   };
 
   const handleEditJob = (jobId: string) => {
     if (!companyId) return;
     navigate(`/company-manage/${companyId}/jobs/edit/${jobId}`);
+  };
+
+  const tabNames = {
+    open: 'Open',
+    draft: 'Draft',
+    inReview: 'In review',
+    paused: 'Paused',
+    closed: 'Closed'
   };
 
   const renderEmptyState = () => {
@@ -111,19 +118,19 @@ const CompanyJobsComponent: React.FC<CompanyJobsComponentProps> = ({ companyId, 
     };
 
     return (
-      <div className="flex flex-col items-center justify-center py-16">
-        <div className="w-64 h-64 mb-6 flex justify-center">
+      <div className="flex flex-col items-center justify-center py-8 sm:py-16 px-4">
+        <div className="w-40 h-40 sm:w-64 sm:h-64 mb-4 sm:mb-6 flex justify-center">
           <img 
             src='/src/assets/man_on_chair.svg'  
             alt="Person working on chair" 
-            className="w-full dark:invert"
+            className="w-full "
           />
         </div>
-        <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-2">{messages[activeTab]}</h2>
-        <p className="text-gray-600 dark:text-gray-400 mb-6 text-center">{descriptions[activeTab]}</p>
+        <h2 className="text-xl sm:text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-2 text-center">{messages[activeTab]}</h2>
+        <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mb-4 sm:mb-6 text-center max-w-md">{descriptions[activeTab]}</p>
         <button 
           onClick={handlePostJob}
-          className="rounded-full px-6 py-2 text-blue-600 dark:text-blue-400 border border-blue-600 dark:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors"
+          className="rounded-full px-4 sm:px-6 py-2 text-blue-600 dark:text-blue-400 border border-blue-600 dark:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors text-sm sm:text-base"
         >
           Post a job
         </button>
@@ -133,9 +140,9 @@ const CompanyJobsComponent: React.FC<CompanyJobsComponentProps> = ({ companyId, 
 
   if (isLoading) {
     return (
-      <div className="bg-white dark:bg-gray-900 rounded-lg shadow dark:shadow-gray-800 p-6">
-        <h1 className="text-2xl font-bold mb-4 dark:text-white">Jobs</h1>
-        <div className="flex justify-center items-center h-64">
+      <div className="bg-white dark:bg-gray-900 rounded-lg shadow dark:shadow-gray-800 p-4 sm:p-6">
+        <h1 className="text-xl sm:text-2xl font-bold mb-4 dark:text-white">Jobs</h1>
+        <div className="flex justify-center items-center h-48 sm:h-64">
           <p className="text-gray-500 dark:text-gray-400">Loading job listings...</p>
         </div>
       </div>
@@ -143,16 +150,16 @@ const CompanyJobsComponent: React.FC<CompanyJobsComponentProps> = ({ companyId, 
   }
 
   return (
-    <div className="bg-white dark:bg-gray-900 rounded-lg shadow dark:shadow-gray-800">
-      <div className="p-6">
-        <div className="flex justify-between items-center mb-4">
+    <div className="bg-white dark:bg-gray-900 rounded-lg shadow dark:shadow-gray-800 w-full max-w-4xl mx-auto">
+      <div className="p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-4">
           <div>
-            <h1 className="text-2xl font-bold dark:text-white">Jobs</h1>
-            <p className="text-gray-600 dark:text-gray-400">Manage your page's job posts.</p>
+            <h1 className="text-xl sm:text-2xl font-bold dark:text-white">Jobs</h1>
+            <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">Manage your page's job posts.</p>
           </div>
           <button 
             onClick={handlePostJob}
-            className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700 text-white rounded-full px-4 py-2 flex items-center transition-colors"
+            className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700 text-white rounded-full px-4 py-2 flex items-center justify-center sm:justify-start transition-colors text-sm sm:text-base w-full sm:w-auto"
           >
             <FaPlus className="mr-2" size={14} />
             Post a job
@@ -160,17 +167,17 @@ const CompanyJobsComponent: React.FC<CompanyJobsComponentProps> = ({ companyId, 
         </div>
       </div>
 
-      <div className="border-t border-gray-200 dark:border-gray-700">
-        <div className="flex">
+      <div className="border-t border-gray-200 dark:border-gray-700 overflow-x-auto">
+        <div className="flex whitespace-nowrap min-w-full">
           {(['open', 'draft', 'inReview', 'paused', 'closed'] as JobStatus[]).map((tab) => (
             <button 
               key={tab}
-              className={`py-2 px-6 ${activeTab === tab 
+              className={`py-2 px-3 sm:px-6 text-sm sm:text-base ${activeTab === tab 
                 ? 'text-green-700 dark:text-green-400 border-b-2 border-green-700 dark:border-green-400 font-medium' 
                 : 'text-gray-600 dark:text-gray-400'}`}
               onClick={() => setActiveTab(tab)}
             >
-              {tab === 'inReview' ? 'In review' : tab.charAt(0).toUpperCase() + tab.slice(1)}
+              {tabNames[tab]}
             </button>
           ))}
         </div>
