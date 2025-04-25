@@ -11,6 +11,8 @@ import { Skeleton } from "@/components/ui/skeleton"; // Import the Skeleton comp
 import { refetchUserBio } from "@/slices/user_profile/userBioSlice";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/store";
+import CompactLinkPreview from "@/pages/feed/components/CompactLinkPreview";
+import DocumentPreview from "@/pages/feed/components/modals/DocumentPreview";
 
 const token = Cookies.get("linkup_auth_token");
 const userId = Cookies.get("linkup_user_id");
@@ -172,7 +174,10 @@ const SavedPostsDashboard: React.FC = () => {
                   </div>
                   <Link to={`/feed/posts/${post._id}`}>
                     <div
-                      className="flex"
+                      className={`flex ${
+                        post.media.media_type === "pdf" ||
+                        (post.media.media_type === "link" ? "flex-col" : "")
+                      }`}
                       ref={index == savedPosts.length - 2 ? observerRef : null}
                     >
                       {post.media && post.media.media_type != "none" ? (
@@ -193,7 +198,7 @@ const SavedPostsDashboard: React.FC = () => {
                             />
                           </div>
                         ) : (
-                          <div>PDF</div>
+                          <></>
                         )
                       ) : null}
                       <TruncatedText
@@ -201,6 +206,18 @@ const SavedPostsDashboard: React.FC = () => {
                         content={post.content}
                         lineCount={3}
                       />
+                      {post.media.media_type === "pdf" && (
+                        <DocumentPreview
+                          currentSelectedMedia={[
+                            new File([], post.media.link[0], {
+                              type: "application/pdf",
+                            }),
+                          ]}
+                        />
+                      )}
+                      {post.media.media_type === "link" && (
+                        <CompactLinkPreview url={post.media.link[0]} />
+                      )}
                     </div>
                   </Link>
                 </div>
