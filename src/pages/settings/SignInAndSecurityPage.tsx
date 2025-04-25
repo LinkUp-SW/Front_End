@@ -16,7 +16,7 @@ const SignInAndSecurityPage: React.FC = () => {
               <div className={styles.accessItemInfo}>
                 <span className={styles.accessItemTitle}>Email addresses</span>
               </div>
-              <Link to="/settings/email" className={styles.accessItemAction}>
+              <Link to="/settings/security/email" className={styles.accessItemAction}>
                 <FaArrowRight />
               </Link>
             </div>
@@ -32,7 +32,7 @@ const SignInAndSecurityPage: React.FC = () => {
             
             <div className={styles.accessItem}>
               <div className={styles.accessItemInfo}>
-                <span className={styles.accessItemTitle}>Two-step verification</span>
+                <span className={styles.accessItemTitle}>Verification</span>
                 <span className={styles.accessItemStatus}>Off</span>
               </div>
               <Link to="/settings/two-factor" className={styles.accessItemAction}>

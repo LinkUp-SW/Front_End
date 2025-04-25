@@ -12,6 +12,7 @@ import {
 } from "@/components";
 import { FaPencilAlt } from "react-icons/fa";
 import EditUserBioModal from "../../modals/edit_user_bio_modal/EditUserBioModal";
+import { useState } from "react";
 
 type ProfileHeaderProps = {
   userid: string;
@@ -22,6 +23,7 @@ type ProfileHeaderProps = {
     education: Organization | null;
   };
   isOwner: boolean;
+  isInConnection?: boolean;
 };
 
 export const ProfileHeader = ({
@@ -30,6 +32,7 @@ export const ProfileHeader = ({
   connectionsCount,
   intros,
   isOwner,
+  isInConnection,
 }: ProfileHeaderProps) => (
   <div className="mb-4 grid gap-1 relative">
     <h1 className="text-2xl font-bold text-gray-800 dark:text-white">
@@ -42,12 +45,19 @@ export const ProfileHeader = ({
       </p>
       <ContactInfoModal user={user} triggerLabel={`Contact Info`} />
     </div>
-    <Link
-      to={`/connections/${userid}`}
-      className="text-blue-600 hover:underline w-fit font-semibold dark:text-blue-400"
-    >
-      {connectionsCount} connections
-    </Link>
+    {isOwner || isInConnection ? (
+      <Link
+        to={`/connections/${userid}`}
+        className="text-blue-600 hover:underline w-fit font-semibold dark:text-blue-400"
+      >
+        {connectionsCount} connections
+      </Link>
+    ) : (
+      <p className="text-gray-600  w-fit font-semibold dark:text-gray-400">
+        {connectionsCount} connections
+      </p>
+    )}
+
     {isOwner && <EditUserBio user={user} userid={userid} intros={intros} />}
     <div className="sm:grid gap-2 absolute right-0 hidden">
       {intros.work_experience && (
@@ -82,9 +92,10 @@ const EditUserBio: React.FC<Partial<ProfileHeaderProps>> = ({
   userid,
   intros,
 }) => {
+  const [open, setOpen] = useState(false);
   return (
     <div className="absolute right-[-1rem] top-[-5rem]">
-      <Dialog>
+      <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
           <button
             id="edit-user-bio"
@@ -96,7 +107,7 @@ const EditUserBio: React.FC<Partial<ProfileHeaderProps>> = ({
         </DialogTrigger>
         <DialogContent
           aria-describedby={undefined}
-          className="!max-w-5xl md:!w-[40rem] dark:bg-gray-900 dark:border-gray-600 !w-full border-2"
+          className="!max-w-5xl md:!w-[40rem] max-h-[40rem] overflow-y-auto dark:bg-gray-900 dark:border-gray-600 !w-full border-2"
         >
           <DialogHeader>
             <DialogTitle>Edit User Bio</DialogTitle>
@@ -105,6 +116,7 @@ const EditUserBio: React.FC<Partial<ProfileHeaderProps>> = ({
             </DialogDescription>
           </DialogHeader>
           <EditUserBioModal
+            setOpenEditDialog={setOpen}
             userData={user as Bio}
             userId={userid as string}
             intros={
