@@ -1,21 +1,56 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SettingsLayoutPage from '@/components/hoc/SettingsLayoutPage';
 import styles from './OTP.module.css';
+import { sendEmailVerificationOTP, verifyEmailOTP, getCurrentEmail } from '@/endpoints/settingsEndpoints';
+import { toast } from 'sonner';
+import Cookies from 'js-cookie';
 
 const OTP: React.FC = () => {
   const navigate = useNavigate();
   const [verificationCode, setVerificationCode] = useState('');
-  const userEmail = "malak.abdullrhman03@eng-st.cu.edu.eg"; // This would normally come from state or context
+  const [userEmail, setUserEmail] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  useEffect(() => {
+    const fetchEmail = async () => {
+      try {
+        const token = Cookies.get('linkup_auth_token');
+        if (!token) {
+          toast.error('Authentication required');
+          navigate('/login');
+          return;
+        }
+
+        const response = await getCurrentEmail(token);
+        setUserEmail(response.email);
+        await sendEmailVerificationOTP(response.email);
+      } catch (error) {
+        toast.error('Failed to send verification code');
+        navigate('/settings/security/email');
+      }
+    };
+
+    fetchEmail();
+  }, [navigate]);
   
   const handleBack = () => {
     navigate('/settings/security/email');
   };
   
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app, you would verify the OTP here
-    navigate('/settings/security/email/add');
+    setIsSubmitting(true);
+
+    try {
+      await verifyEmailOTP(verificationCode, userEmail);
+      toast.success('Email verified successfully');
+      navigate('/settings/security/email/add');
+    } catch (error) {
+      toast.error('Invalid verification code');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -25,7 +60,6 @@ const OTP: React.FC = () => {
           <button className={styles.backButton} onClick={handleBack}>
             ← Back
           </button>
-          
           <h2 className={styles.title}>Email addresses</h2>
           <p className={styles.subtitle}>We sent a code to your email</p>
         </div>
@@ -48,9 +82,9 @@ const OTP: React.FC = () => {
             <button 
               type="submit"
               className={styles.submitButton}
-              disabled={verificationCode.length !== 6}
+              disabled={verificationCode.length !== 6 || isSubmitting}
             >
-              Submit
+              {isSubmitting ? 'Verifying...' : 'Submit'}
             </button>
           </form>
           
