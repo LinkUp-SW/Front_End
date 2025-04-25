@@ -46,6 +46,7 @@ export interface ProfileActionButtonsProps {
   followStatus: FollowStatus;
   isConnectByEmail: boolean;
   email: string;
+  resume: string | null;
   setNumOfConnections: React.Dispatch<React.SetStateAction<number>>;
   setIsInConnections: React.Dispatch<React.SetStateAction<undefined | boolean>>;
   connectionCount: number;
@@ -59,6 +60,7 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
   setNumOfConnections,
   setIsInConnections,
   connectionCount,
+  resume,
 }) => {
   const { id } = useParams();
   const userBioState = useSelector((state: RootState) => state.userBio);
@@ -467,6 +469,7 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
         onRemoveConnection={handleRemoveConnection}
         onBlock={handleBlock}
         onAboutProfile={handleAboutProfile}
+        resume={resume}
       />
       <EmailConnectionDialog
         onOpenChange={setOpenEmailDialog}

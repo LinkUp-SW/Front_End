@@ -23,6 +23,11 @@ import {
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { getErrorMessage } from "@/utils/errorHandler";
+import { addUserResume } from "@/endpoints/userProfile";
+import Cookies from "js-cookie";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "@/store";
+import { editUserBio } from "@/slices/user_profile/userBioSlice";
 // PDF viewer removed as requested
 
 export interface AddResumeModalProps {
@@ -30,7 +35,7 @@ export interface AddResumeModalProps {
   onSuccess?: () => void;
 }
 
-const AddResumeModal = () => {
+const AddResumeModal: React.FC<AddResumeModalProps> = ({ onClose }) => {
   const [file, setFile] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -39,6 +44,9 @@ const AddResumeModal = () => {
   >("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const token = Cookies.get("linkup_auth_token");
+  const userBio = useSelector((state: RootState) => state.userBio.data);
+  const dispatch = useDispatch();
 
   // Handle file validation
   const validateFile = (file: File): boolean => {
@@ -115,7 +123,9 @@ const AddResumeModal = () => {
 
     try {
       // Simulate upload with a delay
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      if (!token) {
+        return new Error("You are not authorized to upload resume");
+      }
 
       // Check for PDF corruption (this is a simplified simulation)
       // In a real app, you would validate the PDF on the server
@@ -124,15 +134,26 @@ const AddResumeModal = () => {
       if (!isPDFValid) {
         throw new Error("The PDF file appears to be corrupted or invalid");
       }
+      const response = await addUserResume(token, file);
+
+      console.log(response);
+
+      dispatch(
+        editUserBio({
+          ...userBio,
+          resume: response.resume,
+        })
+      );
 
       setUploadStatus("success");
       toast.success("Your resume has been successfully uploaded");
+      setTimeout(() => {
+        onClose?.();
+      }, 1000);
     } catch (error) {
       setUploadStatus("error");
-      setErrorMessage(
-        error instanceof Error ? error.message : "Failed to upload resume"
-      );
-      toast.error(getErrorMessage(error));
+      setErrorMessage(getErrorMessage(error) || "Failed to upload resume");
+      // toast.error(getErrorMessage(error));
     } finally {
       setIsUploading(false);
     }
@@ -192,6 +213,7 @@ const AddResumeModal = () => {
             onChange={handleFileChange}
             accept="application/pdf"
             className="hidden"
+            id="resume-uploader"
           />
 
           {!file ? (
@@ -233,10 +255,16 @@ const AddResumeModal = () => {
 
         {/* Error message */}
         {errorMessage && (
-          <Alert variant="destructive" className="dark:bg-gray-900 dark:!text-red-400 dark:border-red-400">
+          <Alert
+            variant="destructive"
+            className="dark:bg-gray-900 dark:!text-red-400 dark:border-red-400"
+          >
             <AlertCircle className="h-4 w-4 " />
-            <AlertTitle >Error</AlertTitle>
-            <AlertDescription className="dark:!text-red-300">
+            <AlertTitle>Error</AlertTitle>
+            <AlertDescription
+              id="resume-alert-description"
+              className="dark:!text-red-300"
+            >
               {errorMessage}
             </AlertDescription>
           </Alert>
@@ -245,6 +273,7 @@ const AddResumeModal = () => {
       <CardFooter className="dark:border-gray-700">
         <Button
           className="w-full affirmativeBtn"
+          id="upload-resume-btn"
           onClick={handleUpload}
           disabled={!file || isUploading || uploadStatus === "success"}
         >
