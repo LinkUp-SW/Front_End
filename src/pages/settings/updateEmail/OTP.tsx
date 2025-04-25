@@ -26,7 +26,7 @@ const OTP: React.FC = () => {
         setUserEmail(response.email);
         await sendEmailVerificationOTP(response.email);
       } catch (error) {
-        toast.error('Failed to send verification code');
+        toast.error(getErrorMessage(error));
         navigate('/settings/security/email');
       }
     };
@@ -43,11 +43,11 @@ const OTP: React.FC = () => {
     setIsSubmitting(true);
 
     try {
-      await verifyEmailOTP(verificationCode, userEmail);
+      await verifyEmailOTP(verificationCode, userEmail,true);
       toast.success('Email verified successfully');
       navigate('/settings/security/email/add');
     } catch (error) {
-      toast.error('Invalid verification code');
+      toast.error(getErrorMessage(error));
     } finally {
       setIsSubmitting(false);
     }
