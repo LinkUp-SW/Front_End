@@ -5,6 +5,7 @@ import styles from './primaryEmailPage.module.css';
 import { getCurrentEmail } from '@/endpoints/settingsEndpoints';
 import { toast } from 'sonner';
 import Cookies from 'js-cookie';
+import { getErrorMessage } from '@/utils/errorHandler';
 
 const PrimaryEmailPage: React.FC = () => {
   const navigate = useNavigate();
