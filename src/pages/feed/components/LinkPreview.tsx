@@ -37,7 +37,7 @@ const LinkPreview: React.FC<LinkPreviewProps> = ({ url, className }) => {
   if (loading) {
     return (
       <div
-        className={`border dark:border-gray-700 rounded-lg overflow-hidden shadow-sm ${className}`}
+        className={`border  dark:border-gray-700 rounded-lg overflow-hidden shadow-sm ${className}`}
       >
         <div className="h-40 w-full">
           <Skeleton className="h-full w-full dark:bg-gray-700 bg-gray-200" />
@@ -75,7 +75,7 @@ const LinkPreview: React.FC<LinkPreviewProps> = ({ url, className }) => {
       href={url}
       target="_blank"
       rel="noopener noreferrer"
-      className={`block border dark:border-gray-700 rounded-lg overflow-hidden hover:bg-gray-50 dark:hover:bg-gray-800 transition shadow-sm ${className}`}
+      className={`block border mt-5 dark:border-gray-700 rounded-lg overflow-hidden hover:bg-gray-50 dark:hover:bg-gray-800 transition shadow-sm ${className}`}
     >
       {metadata.image && (
         <div className="h-48 w-full bg-gray-100 dark:bg-gray-800 overflow-hidden">

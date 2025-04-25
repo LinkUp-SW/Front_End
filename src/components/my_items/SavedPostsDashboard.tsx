@@ -13,6 +13,7 @@ import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/store";
 import CompactLinkPreview from "@/pages/feed/components/CompactLinkPreview";
 import DocumentPreview from "@/pages/feed/components/modals/DocumentPreview";
+import LinkPreview from "@/pages/feed/components/LinkPreview";
 
 const token = Cookies.get("linkup_auth_token");
 const userId = Cookies.get("linkup_user_id");
@@ -192,10 +193,26 @@ const SavedPostsDashboard: React.FC = () => {
                           <div className="relative w-20 h-20 shrink-0">
                             <video
                               src={post.media.link[0]}
-                              className="w-full h-full"
-                              poster={post.media.link[0]}
-                              controls={false}
+                              className="w-full h-full object-cover"
+                              muted
+                              playsInline
                             />
+                            <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
+                              <div className="rounded-full bg-black/50 p-2 backdrop-blur-sm">
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  viewBox="0 0 24 24"
+                                  fill="currentColor"
+                                  className="w-6 h-6 text-white"
+                                >
+                                  <path
+                                    fillRule="evenodd"
+                                    d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.348c1.295.712 1.295 2.573 0 3.285L7.28 19.991c-1.25.687-2.779-.217-2.779-1.643V5.653z"
+                                    clipRule="evenodd"
+                                  />
+                                </svg>
+                              </div>
+                            </div>
                           </div>
                         ) : (
                           <></>
@@ -209,14 +226,20 @@ const SavedPostsDashboard: React.FC = () => {
                       {post.media.media_type === "pdf" && (
                         <DocumentPreview
                           currentSelectedMedia={[
-                            new File([], post.media.link[0], {
-                              type: "application/pdf",
-                            }),
+                            new File(
+                              [
+                                new Blob([post.media.link[0]], {
+                                  type: "application/pdf",
+                                }),
+                              ],
+                              "document.pdf",
+                              { type: "application/pdf" }
+                            ),
                           ]}
                         />
                       )}
                       {post.media.media_type === "link" && (
-                        <CompactLinkPreview url={post.media.link[0]} />
+                        <LinkPreview url={post.media.link[0]} />
                       )}
                     </div>
                   </Link>

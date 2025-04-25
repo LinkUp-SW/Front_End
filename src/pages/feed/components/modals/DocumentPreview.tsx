@@ -10,7 +10,7 @@ const DocumentPreview: React.FC<{ currentSelectedMedia: File[] }> = ({
           const blobUrl = URL.createObjectURL(currentSelectedMedia[0]);
           window.open(blobUrl, "_blank");
         }}
-        className="flex my-10 hover:cursor-pointer items-center justify-between p-4 mx-2 border dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-700"
+        className="flex my-10 w-full hover:cursor-pointer items-center justify-between p-4 mx-2 border dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-700"
       >
         <div className="flex items-center gap-4">
           {/* File Details */}
