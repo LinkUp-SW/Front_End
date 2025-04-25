@@ -49,7 +49,7 @@ export interface ExperienceFormData {
   media: MediaItem[];
 }
 
-interface AddExperienceModalProps {
+export interface AddExperienceModalProps {
   /** Called when the modal should be closed, typically after a successful submission */
   onClose?: () => void;
   /** Called on a successful experience creation; passes the newly created experience */

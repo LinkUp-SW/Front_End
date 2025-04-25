@@ -37,7 +37,7 @@ interface EducationFormData {
   media: MediaItem[];
 }
 
-interface AddEducationModalProps {
+export interface AddEducationModalProps {
   onClose?: () => void;
   onSuccess?: (newEducation: Education) => void;
 }

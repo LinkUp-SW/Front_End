@@ -141,29 +141,188 @@ const skillSlice = createSlice({
     updateEducationSkills(
       state,
       action: PayloadAction<{
-        eduId: string;
+        education: Organization;
         newSkills: {
           _id: string;
           name: string;
         }[];
       }>
     ) {
-      const { eduId, newSkills } = action.payload;
-      const educationSkillsIds = state.items
-        .filter((skill) => skill.educations.some((edu) => edu._id === eduId))
+      const { education, newSkills } = action.payload;
+      const newSkillIds = newSkills.map((skill) => skill._id);
+
+      // Find current skills associated with this education
+      const oldSkillIds = state.items
+        .filter((skill) =>
+          skill.educations.some((edu) => edu._id === education._id)
+        )
         .map((skill) => skill._id);
 
-      const newSkillsIds = newSkills.map((skill) => skill._id);
-      newSkillsIds.forEach((newSkill) => {
-        if (!educationSkillsIds.includes(newSkill)) {
-          educationSkillsIds.push(newSkill);
+      // Skills to which we need to add the education
+      const toAdd = newSkillIds.filter((id) => !oldSkillIds.includes(id));
+      // Skills from which we need to remove the education
+      const toRemove = oldSkillIds.filter(
+        (id) => !newSkillIds.includes(id as string)
+      );
+
+      // Remove education from skills no longer associated
+      state.items.forEach((skill) => {
+        if (toRemove.includes(skill._id)) {
+          skill.educations = skill.educations.filter(
+            (edu) => edu._id !== education._id
+          );
         }
       });
-      // const filteredEducationSkillsIds = educationSkillsIds.filter(
-      //   (skillId) => {
-      //     if (skillId) return newSkillsIds.includes(skillId); // Keep only the IDs that are in newSkillsIds
-      //   }
-      // );
+
+      // Add education to existing skills
+      state.items.forEach((skill) => {
+        if (toAdd.includes(skill._id as string)) {
+          if (!skill.educations) skill.educations = [];
+          // Avoid duplicates
+          if (!skill.educations.some((edu) => edu._id === education._id)) {
+            skill.educations.push(education);
+          }
+        }
+      });
+
+      // Add new skill entries for any newSkills not already in state
+      newSkills.forEach((skillData) => {
+        if (!state.items.some((skill) => skill._id === skillData._id)) {
+          state.items.push({
+            _id: skillData._id,
+            name: skillData.name,
+            experiences: [],
+            educations: [education],
+            licenses: [],
+            total_endorsements: 0,
+            endorsments: [],
+          });
+        }
+      });
+    },
+    updateExperienceSkills(
+      state,
+      action: PayloadAction<{
+        experience: Organization;
+        newSkills: {
+          _id: string;
+          name: string;
+        }[];
+      }>
+    ) {
+      const { experience, newSkills } = action.payload;
+      const newSkillIds = newSkills.map((skill) => skill._id);
+
+      // Find current skills associated with this experience
+      const oldSkillIds = state.items
+        .filter((skill) =>
+          skill.experiences.some((exp) => exp._id === experience._id)
+        )
+        .map((skill) => skill._id);
+
+      // Skills to which we need to add the education
+      const toAdd = newSkillIds.filter((id) => !oldSkillIds.includes(id));
+      // Skills from which we need to remove the education
+      const toRemove = oldSkillIds.filter(
+        (id) => !newSkillIds.includes(id as string)
+      );
+
+      // Remove education from skills no longer associated
+      state.items.forEach((skill) => {
+        if (toRemove.includes(skill._id)) {
+          skill.educations = skill.educations.filter(
+            (exp) => exp._id !== experience._id
+          );
+        }
+      });
+
+      // Add education to existing skills
+      state.items.forEach((skill) => {
+        if (toAdd.includes(skill._id as string)) {
+          if (!skill.experiences) skill.experiences = [];
+          // Avoid duplicates
+          if (!skill.experiences.some((edu) => edu._id === experience._id)) {
+            skill.experiences.push(experience);
+          }
+        }
+      });
+
+      // Add new skill entries for any newSkills not already in state
+      newSkills.forEach((skillData) => {
+        if (!state.items.some((skill) => skill._id === skillData._id)) {
+          state.items.push({
+            _id: skillData._id,
+            name: skillData.name,
+            experiences: [experience],
+            educations: [],
+            licenses: [],
+            total_endorsements: 0,
+            endorsments: [],
+          });
+        }
+      });
+    },
+    updateLicenseSkills(
+      state,
+      action: PayloadAction<{
+        license: Organization;
+        newSkills: {
+          _id: string;
+          name: string;
+        }[];
+      }>
+    ) {
+      const { license, newSkills } = action.payload;
+      const newSkillIds = newSkills.map((skill) => skill._id);
+
+      // Find current skills associated with this license
+      const oldSkillIds = state.items
+        .filter((skill) =>
+          skill.licenses.some((edu) => edu._id === license._id)
+        )
+        .map((skill) => skill._id);
+
+      // Skills to which we need to add the license
+      const toAdd = newSkillIds.filter((id) => !oldSkillIds.includes(id));
+      // Skills from which we need to remove the license
+      const toRemove = oldSkillIds.filter(
+        (id) => !newSkillIds.includes(id as string)
+      );
+
+      // Remove license from skills no longer associated
+      state.items.forEach((skill) => {
+        if (toRemove.includes(skill._id)) {
+          skill.licenses = skill.licenses.filter(
+            (edu) => edu._id !== license._id
+          );
+        }
+      });
+
+      // Add license to existing skills
+      state.items.forEach((skill) => {
+        if (toAdd.includes(skill._id as string)) {
+          if (!skill.licenses) skill.licenses = [];
+          // Avoid duplicates
+          if (!skill.licenses.some((edu) => edu._id === license._id)) {
+            skill.licenses.push(license);
+          }
+        }
+      });
+
+      // Add new skill entries for any newSkills not already in state
+      newSkills.forEach((skillData) => {
+        if (!state.items.some((skill) => skill._id === skillData._id)) {
+          state.items.push({
+            _id: skillData._id,
+            name: skillData.name,
+            experiences: [],
+            educations: [],
+            licenses: [license],
+            total_endorsements: 0,
+            endorsments: [],
+          });
+        }
+      });
     },
   },
 });
@@ -178,5 +337,8 @@ export const {
   addEducationToSkill,
   addLicenseToSkill,
   removeOrganizationFromSkills,
+  updateEducationSkills,
+  updateExperienceSkills,
+  updateLicenseSkills,
 } = skillSlice.actions;
 export default skillSlice.reducer;
