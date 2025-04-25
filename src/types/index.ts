@@ -72,7 +72,9 @@ export interface CommentType {
   tagged_users: string[];
   is_edited: boolean;
   date: number;
-  children: CommentType[];
+  children?: Record<string, any>;
+  userId?: string;
+  parentId: string;
   _id: string;
 }
 
@@ -86,7 +88,7 @@ export interface CommentDBType {
   post_id: string;
   content: string;
   media: string;
-  comment_id?: string;
+  parent_id: string | null;
   tagged_users: string[];
 }
 
@@ -101,10 +103,12 @@ export interface PostType {
   publicPost: boolean;
   taggedUsers: string[];
   date: number;
-  reacts?: any[];
+  reacts: any[];
   isEdited?: boolean;
   _id: string;
   user_id: string;
+  comments: string[];
+  isSaved?: boolean;
 
   stats?: {
     likes?: number;
