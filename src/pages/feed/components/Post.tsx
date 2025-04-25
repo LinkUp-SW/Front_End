@@ -46,21 +46,28 @@ import ReactionsModal from "./modals/ReactionsModal";
 import PostImages from "./PostImages";
 import IconButton from "./buttons/IconButton";
 import Cookies from "js-cookie";
-import { createComment, deletePost } from "@/endpoints/feed";
+import {
+  createComment,
+  createReaction,
+  deletePost,
+  deleteReaction,
+  savePost,
+  unsavePost,
+} from "@/endpoints/feed";
 import { toast } from "sonner";
 import TransparentButton from "./buttons/TransparentButton";
 import BlueButton from "./buttons/BlueButton";
+import { setPosts } from "@/slices/feed/postsSlice"; // adjust if needed
+import { setComments } from "@/slices/feed/commentsSlice";
+import { useDispatch } from "react-redux";
 
 interface PostProps {
   postData: PostType;
   comments: CommentObjectType;
   viewMore: boolean; // used to hide certain elements for responsive design
-  reactions: ReactionType[];
   action: any; // used if the post is an action
   posts: PostType[];
   allComments: CommentObjectType[];
-  setPosts: React.Dispatch<React.SetStateAction<PostType[]>>;
-  setComments: React.Dispatch<React.SetStateAction<CommentObjectType[]>>;
   order: number;
 }
 
@@ -72,66 +79,88 @@ const Post: React.FC<PostProps> = ({
   postData,
   comments,
   viewMore,
-  reactions,
   action,
   posts,
   allComments,
-  setPosts,
-  setComments,
+
   order,
 }) => {
   const navigate = useNavigate();
   const { author }: { author: PostUserType } = postData;
   const { date, media, reacts, taggedUsers } = postData;
-  const [liked, setLiked] = useState(false);
   const [isLandscape, setIsLandscape] = useState<boolean>(false);
+  const [isSaved, setIsSaved] = useState<boolean>(false);
   const [postMenuOpen, setPostMenuOpen] = useState(false);
   const [sortingMenu, setSortingMenu] = useState(false);
   const [sortingState, setSortingState] = useState("Most relevant");
   const [commentsOpen, setCommentsOpen] = useState(false);
   const [reactionsOpen, setReactionsOpen] = useState(false);
   const [willDelete, setWillDelete] = useState(false);
-  const [selectedReaction, setSelectedReaction] = useState<string | null>(
-    "Like"
-  );
+  const dispatch = useDispatch();
+  const [selectedReaction, setSelectedReaction] = useState<string>("None");
 
   const addNewComment = async (newComment: CommentDBType) => {
     if (!token) {
       toast.error("You must be logged in to add a comment.");
+      navigate("/login", { replace: true });
       return;
     }
 
     const loadingToastId = toast.loading("Adding your comment...");
+    console.log("New comment:", newComment);
 
     try {
       // Call the API to create the comment
       const createdComment = await createComment(newComment, token);
+      console.log("Created comment:", createdComment);
 
-      // Update the comments state with the new comment
-      setComments(() => {
+      if (!newComment.parent_id) {
         const updatedComments = [...allComments];
         const oldObject = { ...updatedComments[order] };
         oldObject.comments = [createdComment.comment, ...oldObject.comments];
+        oldObject.count = oldObject.count + 1;
         updatedComments[order] = oldObject;
-        updatedComments[order].comments[0].author = {
-          username: "AmrDoma",
-          firstName: "Amr",
-          lastName: "Doma",
-          connectionDegree: "3rd+",
-          headline: "Hamada helal",
-          profilePicture:
-            "https://res.cloudinary.com/dmg8tdy5r/image/upload/v1745352686/r0zw2qum42olbs0jxchb.jpg",
-        };
-        updatedComments[order].comments[0].media = {
-          link: newComment.media,
-          mediaType: newComment.media.length != 0 ? "image" : "none",
-        };
+        dispatch(setComments(updatedComments));
+        dispatch(
+          setPosts(
+            posts.map((post, index) =>
+              index === order
+                ? { ...post, comments: [...post.comments, createdComment._id] }
+                : post
+            )
+          )
+        );
+      } else {
+        const updatedComments = allComments.map((block) => ({
+          ...block,
+          comments: block.comments.map((comment) => {
+            if (comment._id === newComment.parent_id) {
+              return {
+                ...comment,
+                children: {
+                  ...(comment.children || {}),
+                  [createdComment.comment._id]: createdComment.comment,
+                },
+              };
+            }
+            return comment;
+          }),
+        }));
 
-        return updatedComments;
-      });
+        dispatch(setComments(updatedComments));
+        dispatch(
+          setPosts(
+            posts.map((post, index) =>
+              index === order
+                ? { ...post, comments: [...post.comments, createdComment._id] }
+                : post
+            )
+          )
+        );
+      }
 
       // Update the toast to success
-      if (newComment.comment_id) {
+      if (newComment.parent_id) {
         toast.success("Reply added successfully!");
       } else {
         toast.success("Comment added successfully!");
@@ -197,9 +226,21 @@ const Post: React.FC<PostProps> = ({
       };
     }
   }, [media]);
-  const savePost = () => {};
-  const copyLink = () => {};
-  const editPost = () => {};
+
+  const handleReact = (value: string) => {
+    console.log(value);
+    console.log("Liked");
+    setSelectedReaction(value);
+
+    if (value != "None") {
+      handleCreateReaction(value);
+    } else {
+      handleDeleteReaction();
+    }
+  };
+
+  const handleCopyLinkButton = () => {};
+  const handleEditPostButton = () => {};
   const deleteModal = () => {
     setWillDelete(true);
   };
@@ -218,13 +259,18 @@ const Post: React.FC<PostProps> = ({
 
     try {
       // Call the API to delete the post
+      setWillDelete(false);
       await deletePost(postData._id, token);
 
       // Show success toast
       toast.success("Post deleted successfully!");
       toast.dismiss(loadingToastId); // Dismiss the loading toast
-      setPosts(posts.filter((post) => post._id !== postData._id));
-      setWillDelete(false);
+      dispatch(setPosts(posts.filter((post) => post._id !== postData._id)));
+      dispatch(
+        setComments(
+          allComments.filter((_, index) => index !== order) // remove the one at "order"
+        )
+      );
     } catch (error) {
       console.error("Error deleting post:", error);
 
@@ -235,28 +281,161 @@ const Post: React.FC<PostProps> = ({
     }
   };
 
+  const handleCreateReaction = async (selected_reaction: string) => {
+    if (!token) {
+      toast.error("You must be logged in to add a comment.");
+      navigate("/login", { replace: true });
+      return;
+    }
+    const reaction = {
+      target_type: "Post",
+      reaction: selected_reaction.toLowerCase(),
+    };
+    try {
+      const result = await createReaction(reaction, postData._id, token);
+      dispatch(
+        setPosts(
+          posts.map((post, index) =>
+            index === order
+              ? {
+                  ...post,
+                  reacts: [...post.reacts, result.reaction.reaction._id],
+                }
+              : post
+          )
+        )
+      );
+      console.log("New posts", posts);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleSaveButton = async () => {
+    if (!token) {
+      toast.error("You must be logged in to save or unsave a post.");
+      navigate("/login", { replace: true });
+      return;
+    }
+
+    setIsSaved((prevState) => !prevState);
+
+    try {
+      const loading = toast.loading(
+        isSaved ? "Unsaving post..." : "Saving post..."
+      );
+      await (isSaved
+        ? unsavePost(postData._id, token)
+        : savePost(postData._id, token));
+
+      toast.success(
+        isSaved ? (
+          "Post unsaved."
+        ) : (
+          <span>
+            Post saved.{" "}
+            <span
+              onClick={() =>
+                navigate("/my-items/saved-posts/", { replace: true })
+              }
+              style={{
+                color: "blue",
+                textDecoration: "none",
+                cursor: "pointer",
+              }}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.textDecoration = "underline")
+              }
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.textDecoration = "none")
+              }
+            >
+              View post
+            </span>
+          </span>
+        )
+      );
+      toast.dismiss(loading);
+    } catch (error) {
+      console.error(`Error ${isSaved ? "unsaving" : "saving"} post:`, error);
+      toast.error(
+        `Failed to ${isSaved ? "unsave" : "save"} the post. Please try again.`
+      );
+    }
+  };
+
+  const handleDeleteReaction = async () => {
+    console.log("Deleting reaction", selectedReaction);
+    if (!token) {
+      toast.error("You must be logged in to add a comment.");
+      navigate("/login", { replace: true });
+      return;
+    }
+
+    try {
+      const result = await deleteReaction(
+        { target_type: "Post" },
+        postData._id,
+        token
+      );
+      console.log(result);
+      dispatch(
+        setPosts(
+          posts.map((post) =>
+            post.reacts.includes(result.reaction._id)
+              ? {
+                  ...post,
+
+                  reacts: post.reacts.filter((r) => r !== result.reaction._id),
+                }
+              : post
+          )
+        )
+      );
+      console.log("New posts", posts);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const menuActions =
     userId === author.username
-      ? getPersonalMenuActions(savePost, copyLink, editPost, deleteModal)
-      : getMenuActions(savePost, copyLink, blockPost, reportPost, unfollow);
+      ? getPersonalMenuActions(
+          handleSaveButton,
+          handleCopyLinkButton,
+          handleEditPostButton,
+          deleteModal,
+          isSaved
+        )
+      : getMenuActions(
+          handleSaveButton,
+          handleCopyLinkButton,
+          blockPost,
+          reportPost,
+          unfollow,
+          isSaved
+        );
 
   const engagementButtons = getEngagementButtons(
-    liked,
+    selectedReaction,
     () => {
-      setLiked(!liked);
-      setSelectedReaction("Like");
+      handleReact("Like");
     },
     () => handleToggleComments()
   );
+
+  useEffect(() => {
+    if (postData.isSaved) setIsSaved(postData.isSaved);
+  }, [postData.isSaved]);
 
   const stats = {
     likes: 15,
     love: 2,
     support: 1,
     celebrate: 1,
-    comments: comments ? (comments.count ? comments.count : 1) : 0,
+    comments: postData.comments.length,
     reposts: 5,
-    person: "Hamada",
+    total: postData.reacts ? postData.reacts.length : 0,
   };
 
   const { topStats, totalStats } = calculateTopStats(stats);
@@ -348,25 +527,26 @@ const Post: React.FC<PostProps> = ({
               <button className="flex relative text-gray-500 dark:text-neutral-400 text-sm hover:underline hover:cursor-pointer hover:text-blue-600 dark:hover:text-blue-400">
                 {topStats.map((stat, index) => (
                   <span
-                    key={index}
+                    key={`topstats-${index}`}
                     className="flex items-center text-black dark:text-neutral-200 text-lg"
                   >
                     {stat.icon}
                   </span>
                 ))}
-                {stats.person
+                {
+                  /* {stats.person
                   ? stats.person + " and " + (totalStats - 1) + " others"
-                  : totalStats}
+                  : totalStats} */ totalStats
+                }
               </button>
             </DialogTrigger>
             <DialogContent className="dark:bg-gray-900 min-w-[20rem] sm:min-w-[35rem] w-auto dark:border-gray-700">
-              <DialogTitle>
-                <h1 className=" px-2 text-xl font-medium">Reactions</h1>
+              <DialogTitle className=" px-2 text-xl font-medium">
+                Reactions
               </DialogTitle>
               <DialogDescription />
-              {reactions && reactions.length && (
-                <ReactionsModal reactions={reactions} />
-              )}
+
+              <ReactionsModal postId={postData._id} />
             </DialogContent>
           </Dialog>
           <div className="flex text-gray-500 dark:text-neutral-400 gap-2 text-sm items-center ">
@@ -405,55 +585,105 @@ const Post: React.FC<PostProps> = ({
                   callback: () => void;
                 },
                 index: number
-              ) =>
-                button.name === "Like" ? (
-                  <PopoverTrigger
-                    asChild
-                    key={index}
-                    onMouseEnter={handleMouseEnter}
-                    onMouseLeave={handleMouseLeave}
-                  >
-                    <Button
-                      variant="ghost"
-                      size="lg"
-                      onClick={button.callback}
-                      className={`flex dark:hover:bg-zinc-800 dark:hover:text-neutral-200 ${
-                        liked && selectedReaction === "Like"
-                          ? "text-blue-700 dark:text-blue-500 hover:text-blue-700 dark:hover:text-blue-400"
-                          : selectedReaction === "Insightful"
-                          ? "text-yellow-700 dark:text-yellow-500 hover:text-yellow-700 dark:hover:text-yellow-400"
-                          : selectedReaction === "Love"
-                          ? "text-red-700 dark:text-red-500 hover:text-red-700 dark:hover:text-red-400"
-                          : selectedReaction === "Funny"
-                          ? "text-cyan-700 dark:text-cyan-500 hover:text-cyan-700 dark:hover:text-cyan-400"
-                          : selectedReaction === "Celebrate"
-                          ? "text-green-700 dark:text-green-500 hover:text-green-700 dark:hover:text-green-400"
-                          : selectedReaction === "Support"
-                          ? "text-purple-700 dark:text-purple-500 hover:text-purple-700 dark:hover:text-purple-400"
-                          : ""
-                      } items-center hover:cursor-pointer transition-all`}
-                    >
-                      {selectedReaction && liked ? (
-                        <img
-                          src={
-                            reactionIcons.find(
-                              (reaction) => reaction.name === selectedReaction
-                            )?.icon
-                          }
-                          alt={selectedReaction}
-                          className="w-4 h-4"
-                        />
-                      ) : (
-                        button.icon
-                      )}
-                      {viewMore && selectedReaction}
-                    </Button>
-                  </PopoverTrigger>
-                ) : button.name === "Repost" ? (
-                  <Popover>
-                    <PopoverTrigger asChild>
+              ) => {
+                const key = `engagement-${button.name}-${index}`;
+                return (
+                  <React.Fragment key={key}>
+                    {button.name === "Like" ? (
+                      <PopoverTrigger
+                        asChild
+                        key={`like-${index}`}
+                        onMouseEnter={handleMouseEnter}
+                        onMouseLeave={handleMouseLeave}
+                      >
+                        <Button
+                          variant="ghost"
+                          size="lg"
+                          onClick={() => {
+                            selectedReaction === "None"
+                              ? handleReact("Like")
+                              : handleReact("None");
+                          }}
+                          className={`flex dark:hover:bg-zinc-800 dark:hover:text-neutral-200 ${
+                            selectedReaction === "Like"
+                              ? "text-blue-700 dark:text-blue-500 hover:text-blue-700 dark:hover:text-blue-400"
+                              : selectedReaction === "Insightful"
+                              ? "text-yellow-700 dark:text-yellow-500 hover:text-yellow-700 dark:hover:text-yellow-400"
+                              : selectedReaction === "Love"
+                              ? "text-red-700 dark:text-red-500 hover:text-red-700 dark:hover:text-red-400"
+                              : selectedReaction === "Funny"
+                              ? "text-cyan-700 dark:text-cyan-500 hover:text-cyan-700 dark:hover:text-cyan-400"
+                              : selectedReaction === "Celebrate"
+                              ? "text-green-700 dark:text-green-500 hover:text-green-700 dark:hover:text-green-400"
+                              : selectedReaction === "Support"
+                              ? "text-purple-700 dark:text-purple-500 hover:text-purple-700 dark:hover:text-purple-400"
+                              : ""
+                          } items-center hover:cursor-pointer transition-all`}
+                        >
+                          {selectedReaction != "None" ? (
+                            <img
+                              src={
+                                reactionIcons.find(
+                                  (reaction) =>
+                                    reaction.name === selectedReaction
+                                )?.icon
+                              }
+                              alt={selectedReaction}
+                              className="w-4 h-4"
+                            />
+                          ) : (
+                            button.icon
+                          )}
+                          {selectedReaction == "None"
+                            ? viewMore
+                              ? "Like"
+                              : ""
+                            : selectedReaction}
+                        </Button>
+                      </PopoverTrigger>
+                    ) : button.name === "Repost" ? (
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            key={`repost-${index}`}
+                            variant="ghost"
+                            size="lg"
+                            onClick={button.callback}
+                            className={`flex dark:hover:bg-zinc-800 dark:hover:text-neutral-200 items-center gap-2 hover:cursor-pointer transition-all`}
+                          >
+                            {button.icon}
+                            {viewMore && button.name}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="relative  dark:bg-gray-900 bg-white border-neutral-200 dark:border-gray-700 p-0 pt-1">
+                          <div className="flex flex-col w-full p-2 gap-4">
+                            {REPOST_MENU.map((item, index) => (
+                              <Button
+                                key={`repost-button-${index}`}
+                                variant="ghost"
+                                size="lg"
+                                onClick={button.callback}
+                                className={`flex w-fit h-fit dark:hover:bg-zinc-800 dark:hover:text-neutral-200 items-center gap-2 hover:cursor-pointer transition-all`}
+                              >
+                                <div className="flex justify-start w-full  text-gray-600 dark:text-neutral-200">
+                                  <div className="p-4 pl-0 ">{item.icon}</div>
+                                  <div className="flex flex-col items-start justify-center">
+                                    <span className="font-medium">
+                                      {item.name}
+                                    </span>
+                                    <span className="text-xs text-wrap text-left font-normal">
+                                      {item.subtext}
+                                    </span>
+                                  </div>
+                                </div>
+                              </Button>
+                            ))}
+                          </div>
+                        </PopoverContent>
+                      </Popover>
+                    ) : (
                       <Button
-                        key={index}
+                        key={`engagement-${index}`}
                         variant="ghost"
                         size="lg"
                         onClick={button.callback}
@@ -462,43 +692,10 @@ const Post: React.FC<PostProps> = ({
                         {button.icon}
                         {viewMore && button.name}
                       </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="relative  dark:bg-gray-900 bg-white border-neutral-200 dark:border-gray-700 p-0 pt-1">
-                      <div className="flex flex-col w-full p-2 gap-4">
-                        {REPOST_MENU.map((item, index) => (
-                          <Button
-                            key={index}
-                            variant="ghost"
-                            size="lg"
-                            onClick={button.callback}
-                            className={`flex w-fit h-fit dark:hover:bg-zinc-800 dark:hover:text-neutral-200 items-center gap-2 hover:cursor-pointer transition-all`}
-                          >
-                            <div className="flex justify-start w-full  text-gray-600 dark:text-neutral-200">
-                              <div className="p-4 pl-0 ">{item.icon}</div>
-                              <div className="flex flex-col items-start justify-center">
-                                <span className="font-medium">{item.name}</span>
-                                <span className="text-xs text-wrap text-left font-normal">
-                                  {item.subtext}
-                                </span>
-                              </div>
-                            </div>
-                          </Button>
-                        ))}
-                      </div>
-                    </PopoverContent>
-                  </Popover>
-                ) : (
-                  <Button
-                    key={index}
-                    variant="ghost"
-                    size="lg"
-                    onClick={button.callback}
-                    className={`flex dark:hover:bg-zinc-800 dark:hover:text-neutral-200 items-center gap-2 hover:cursor-pointer transition-all`}
-                  >
-                    {button.icon}
-                    {viewMore && button.name}
-                  </Button>
-                )
+                    )}
+                  </React.Fragment>
+                );
+              }
             )}
             <TooltipProvider>
               <PopoverContent
@@ -516,7 +713,7 @@ const Post: React.FC<PostProps> = ({
                     { icon: InsightfulIcon, alt: "Insightful" },
                     { icon: FunnyIcon, alt: "Funny" },
                   ].map((reaction, index) => (
-                    <Tooltip key={reaction.alt}>
+                    <Tooltip key={`reaction-${reaction.alt}`}>
                       <IconButton
                         className={`hover:scale-200 hover:bg-gray-200 w-12 h-12 dark:hover:bg-zinc-800 duration-300 ease-in-out transform transition-all mx-0 hover:mx-7 hover:-translate-y-5`}
                         style={{
@@ -526,8 +723,8 @@ const Post: React.FC<PostProps> = ({
                           opacity: 0,
                         }}
                         onClick={() => {
-                          setSelectedReaction(reaction.alt);
-                          setLiked(true);
+                          handleReact(reaction.alt);
+
                           setReactionsOpen(false);
                         }}
                       >
@@ -612,6 +809,7 @@ function calculateTopStats(stats: {
   support?: number;
   funny?: number;
   person?: string;
+  total: number;
 }) {
   const statsArray = [
     {
@@ -654,12 +852,6 @@ function calculateTopStats(stats: {
     topStats.push(statsArray[5]);
   }
 
-  const totalStats =
-    (stats.likes || 0) +
-    (stats.celebrate || 0) +
-    (stats.love || 0) +
-    (stats.insightful || 0) +
-    (stats.support || 0) +
-    (stats.funny || 0);
+  const totalStats = stats.total;
   return { topStats, totalStats };
 }
