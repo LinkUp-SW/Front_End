@@ -225,6 +225,23 @@ export const unsavePost = async (postId: string, token: string) => {
   return response.data;
 };
 
+export const getSavedPosts = async (
+  postPayload: {
+    limit: number;
+    cursor: number;
+  },
+  token: string
+) => {
+  const response = await axiosInstance.get(`api/v1/post/save-post`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    params: postPayload, // Use params instead of data for GET requests
+  });
+
+  return response.data;
+};
+
 export const fetchSinglePost = async (
   postId: string,
   token: string,
