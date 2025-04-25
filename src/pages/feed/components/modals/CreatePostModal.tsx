@@ -49,6 +49,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
   submitPost,
   privacySetting,
 }) => {
+  const { data } = useSelector((state: RootState) => state.userBio);
   const MemoizedEmojiPicker = memo(EmojiPicker);
   const darkMode = useSelector((state: RootState) => state.theme.theme);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -106,7 +107,9 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
           </Avatar>
           <div className="flex flex-col  text-black dark:text-neutral-200 ">
             <div className="flex items-center gap-3">
-              <p className="text-xl font-medium text-nowrap">Amr Doma</p>
+              <p className="text-xl font-medium text-nowrap">
+                {data?.bio.first_name + " " + data?.bio.last_name}
+              </p>
               <FaChevronDown />
             </div>
             <p className="text-md text-nowrap">Post to {privacySetting}</p>
