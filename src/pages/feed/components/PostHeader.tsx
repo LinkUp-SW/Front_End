@@ -13,14 +13,6 @@ import ReportPostModal from "./modals/ReportPostModal";
 import { MenuAction, PostUserType } from "@/types";
 import moment from "moment";
 
-interface User {
-  name: string;
-  profileImage: string;
-  headline?: string;
-  followers?: string;
-  degree: string;
-}
-
 interface Action {
   name?: string;
   profileImage?: string;
@@ -31,7 +23,7 @@ interface PostHeaderProps {
   user: PostUserType;
   action?: Action;
   postMenuOpen: boolean;
-  setPostMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setPostMenuOpen: (isOpen: boolean) => void;
   menuActions: MenuAction[]; // You can replace `any` with a more specific type if available
   savedPostView?: boolean;
   edited?: boolean;
@@ -54,11 +46,13 @@ const PostHeader: React.FC<PostHeaderProps> = ({
 
   return (
     <header className="flex items-center space-x-3 w-full pl-4 pt-1 pb-4">
-      <img
-        src={user.profilePicture}
-        alt={user.username}
-        className="w-8 h-8 md:w-12 md:h-12 rounded-full"
-      />
+      <Link to={`/user-profile/${user.username}`}>
+        <img
+          src={user.profilePicture}
+          alt={user.username}
+          className="w-8 h-8 md:w-12 md:h-12 rounded-full"
+        />
+      </Link>
       <div className="flex flex-col gap-0 w-full relative">
         <div className="flex justify-between">
           <Link
@@ -99,8 +93,9 @@ const PostHeader: React.FC<PostHeaderProps> = ({
                       item.name == "Report Post" ? (
                         <DialogTrigger asChild key={index}>
                           <Button
-                            onClick={() => {
+                            onClick={(e) => {
                               item.action();
+                              e.stopPropagation();
                               setPostMenuOpen(!postMenuOpen);
                             }}
                             className="flex justify-start items-center rounded-none h-12 bg-transparent w-full p-0 m-0 hover:bg-neutral-100 text-gray-900 dark:text-neutral-200 dark:hover:bg-gray-600 hover:cursor-pointer"
