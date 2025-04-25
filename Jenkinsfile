@@ -3,25 +3,21 @@ pipeline {
     environment {
         CI = "true"  
         VAULT_SECRET = vault path: 'secret/jenkins/front_env', engineVersion: "2", key: 'value'
-        DOCKERHUB_CREDENTIALS = credentials('docker-token')
+        DOCKER_IMAGE = credentials('docker-token')
         IMAGE_NAME = credentials('DockerHub-repo')
+        BRANCH_NAME = env.BRANCH_NAME
     }
     stages {
         stage('Checkout') {
             steps {
-                sh ' rm -rf mywork' // Ensure it's clean
+                //sh ' rm -rf mywork' // Ensure it's clean
                 checkout scm       // Clone the repo in the root directory
-                sh 'mkdir mywork && mv * mywork/ 2>/dev/null || true' // Move everything to mywork
+                //sh 'mkdir mywork && mv * mywork/ 2>/dev/null || true' // Move everything to mywork
                 }
         }
-       stage('Install Dependencies') { 
+        stage('Build Docker Image') {
             steps {
-                echo 'installing dependencies...' 
-                sh '''
-                    cd mywork
-                    npm install
-                '''
-                 
+                sh "docker build -t ${DOCKER_IMAGE}:${BUILD_NUMBER} ."
             }
         }
         stage('Set up environment') { 
@@ -31,35 +27,47 @@ pipeline {
                  
             }
         }
-        stage('Lint Code') { 
+
+        
+        stage('Test Artifact') {
             steps {
-                 echo 'Linting...'   
-                 sh '''
-                    cd mywork
-                    npm run lint
-                 '''
-            }
-        }
-        stage('Test') { 
-            steps {
-                 echo 'test...'  
-                 sh '''
-                    cd mywork
-                    npx vitest
-                 '''
+                sh """
+                    docker run --rm ${DOCKER_IMAGE}:${BUILD_NUMBER} \
+                    sh -c "ls /dist && test -f /dist/index.html"
+                """
             }
         }
 
-         stage('Docker Build & Push') {
+        stage('Push Docker Image') {
+            when {
+                branch 'main'
+            }
             steps {
-                script {
-                    docker.build("${IMAGE_NAME}:${BUILD_NUMBER}")
-                    docker.withRegistry('https://index.docker.io/v1/', 'docker-token') {
-                        docker.image("${IMAGE_NAME}:${BUILD_NUMBER}").push('latest')
-                    }
+                withCredentials([usernamePassword(credentialsId: 'docker-token', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh """
+                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                        docker push ${DOCKER_IMAGE}:${BUILD_NUMBER}
+                        docker tag ${DOCKER_IMAGE}:${BUILD_NUMBER} ${DOCKER_IMAGE}:latest
+                        docker push ${DOCKER_IMAGE}:latest
+                    """
                 }
             }
         }
+
+        stage('Deploy to Nginx') {
+            when {
+                branch 'main'
+            }
+            steps {
+                sh """
+                    docker create --name frontend-temp ${DOCKER_IMAGE}:${BUILD_NUMBER}
+                    docker cp frontend-temp:/dist/. /home/azureuser/Front_deploy
+                    docker rm frontend-temp
+                """
+            }
+        }
+
+        
         /*
         stage('Build') { 
             steps {
