@@ -83,7 +83,6 @@ const Post: React.FC<PostProps> = ({
   action,
   posts,
   allComments,
-
   order,
 }) => {
   const navigate = useNavigate();
@@ -429,7 +428,7 @@ const Post: React.FC<PostProps> = ({
     total: postData.reactionsCount,
   };
 
-  const topStats = getReactionIcons(postData.reactions);
+  const topStats = getReactionIcons(postData.reactions || []);
 
   return (
     <Card className="p-2 bg-white border-0 mb-4 pl-0 dark:bg-gray-900 dark:text-neutral-200">
