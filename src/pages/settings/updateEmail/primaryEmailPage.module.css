@@ -74,18 +74,3 @@
 .addEmailButton:hover {
   background-color: rgba(8, 145, 178, 0.1);
 }
-
-.verificationText {
-  font-size: 13px;
-  color: #666;
-}
-
-.verificationLink {
-  color: #0891b2;
-  cursor: pointer;
-  font-weight: 600;
-}
-
-.verificationLink:hover {
-  text-decoration: underline;
-}
