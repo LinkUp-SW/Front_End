@@ -167,8 +167,8 @@ const CreateJobPage: React.FC = () => {
   };
 
   const renderProgressBar = () => (
-    <div className="mb-8">
-      <h1 className="text-2xl font-bold mb-4 text-gray-900 dark:text-gray-100">
+    <div className="mb-6 sm:mb-8">
+      <h1 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4 text-gray-900 dark:text-gray-100">
         {currentStep} of {totalSteps}: {
           currentStep === 1 ? 'Job details' :
           currentStep === 2 ? 'Requirements & benefits' :
@@ -191,7 +191,7 @@ const CreateJobPage: React.FC = () => {
       <div className="mb-6">
         <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">Job details*</h2>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Job title*</label>
             <input
@@ -221,7 +221,7 @@ const CreateJobPage: React.FC = () => {
 
         <div className="mt-4">
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Work mode*</label>
-          <div className="flex space-x-4 mb-4">
+          <div className="flex flex-wrap gap-2 mb-4">
             {(['On-site', 'Remote', 'Hybrid'] as const).map((mode) => (
               <button
                 key={mode}
@@ -239,7 +239,7 @@ const CreateJobPage: React.FC = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mt-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Job location*</label>
             <input
@@ -302,7 +302,7 @@ const CreateJobPage: React.FC = () => {
       </div>
 
       <div className="mb-6">
-        <label className="block text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">Description*</label>
+        <label className="block text-lg font-semibold mb-3 sm:mb-4 text-gray-900 dark:text-gray-100">Description*</label>
         <div className="border border-gray-300 dark:border-gray-600 rounded p-2 mb-2 bg-white dark:bg-gray-800">
           <textarea
             name="description"
@@ -310,7 +310,7 @@ const CreateJobPage: React.FC = () => {
             onChange={handleInputChange}
             placeholder="The ideal candidate will be responsible for designing, developing, testing, and debugging responsive web and mobile applications..."
             className="w-full border-none focus:ring-0 min-h-32 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-            rows={10}
+            rows={8}
           />
         </div>
       </div>
@@ -341,7 +341,7 @@ const CreateJobPage: React.FC = () => {
         <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">Requirements & Benefits</h2>
         
         {textareaFields.map(({ label, field, placeholder }) => (
-          <div className="mb-6" key={field}>
+          <div className="mb-5 sm:mb-6" key={field}>
             <label className="block text-md font-medium mb-2 text-gray-700 dark:text-gray-300">{label}</label>
             <textarea
               name={field}
@@ -349,7 +349,7 @@ const CreateJobPage: React.FC = () => {
               onChange={(e) => handleArrayFieldChange(e, field)}
               placeholder={placeholder}
               className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 min-h-32 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-              rows={6}
+              rows={5}
             />
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Enter each item on a new line</p>
           </div>
@@ -361,28 +361,28 @@ const CreateJobPage: React.FC = () => {
   const renderStepThree = () => (
     <div>
       <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">Review and Publish</h2>
-      <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded mb-6 border border-gray-200 dark:border-gray-700">
-        <h3 className="font-medium text-xl mb-2 text-gray-900 dark:text-gray-100">{jobData.title}</h3>
-        <div className="flex items-center text-sm text-gray-600 dark:text-gray-400 mb-1">
+      <div className="bg-gray-50 dark:bg-gray-800 p-3 sm:p-4 rounded mb-6 border border-gray-200 dark:border-gray-700">
+        <h3 className="font-medium text-lg sm:text-xl mb-2 text-gray-900 dark:text-gray-100">{jobData.title}</h3>
+        <div className="flex flex-wrap text-sm text-gray-600 dark:text-gray-400 mb-1 gap-2">
           <span>{jobData.location}</span>
-          <span className="mx-2">•</span>
+          <span className="hidden sm:inline mx-2">•</span>
           <span>{jobData.workMode}</span>
-          <span className="mx-2">•</span>
+          <span className="hidden sm:inline mx-2">•</span>
           <span>{jobData.experience_level}</span>
         </div>
         <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Salary: {jobData.salary}</p>
         
         <h4 className="font-medium mb-2 text-gray-800 dark:text-gray-200">Description</h4>
-        <p className="text-sm mb-4 text-gray-700 dark:text-gray-300">{jobData.description || "No description provided."}</p>
+        <p className="text-sm mb-4 text-gray-700 dark:text-gray-300 break-words">{jobData.description || "No description provided."}</p>
         
         {[
           { title: "Responsibilities", items: jobData.responsibilities },
           { title: "Qualifications", items: jobData.qualifications },
           { title: "Benefits", items: jobData.benefits }
         ].map(section => (
-          <div key={section.title}>
+          <div key={section.title} className="mb-4">
             <h4 className="font-medium mb-2 text-gray-800 dark:text-gray-200">{section.title}</h4>
-            <ul className="list-disc pl-5 mb-4">
+            <ul className="list-disc pl-5">
               {section.items?.length > 0 
                 ? section.items.map((item, index) => (
                     <li key={index} className="text-sm mb-1 text-gray-700 dark:text-gray-300">{item}</li>
@@ -397,12 +397,12 @@ const CreateJobPage: React.FC = () => {
   );
 
   const renderNavigationButtons = () => (
-    <div className="flex justify-between mt-8">
+    <div className="flex flex-col-reverse sm:flex-row sm:justify-between items-center gap-3 mt-6 sm:mt-8">
       <div>
         {currentStep > 1 && (
           <button
             onClick={handleBack}
-            className="px-6 py-2 border border-gray-300 dark:border-gray-600 rounded text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+            className="w-full sm:w-auto px-4 sm:px-6 py-2 border border-gray-300 dark:border-gray-600 rounded text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
             disabled={isLoading}
           >
             Back
@@ -412,7 +412,7 @@ const CreateJobPage: React.FC = () => {
       
       <button
         onClick={handleNext}
-        className={`px-6 py-2 ${isLoading ? 'bg-blue-400 dark:bg-blue-600' : 'bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600'} text-white rounded`}
+        className={`w-full sm:w-auto px-4 sm:px-6 py-2 ${isLoading ? 'bg-blue-400 dark:bg-blue-600' : 'bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600'} text-white rounded`}
         disabled={isLoading}
       >
         {isLoading 
@@ -426,9 +426,9 @@ const CreateJobPage: React.FC = () => {
 
   if (isLoading && !companyData) {
     return (
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        <div className="bg-white dark:bg-gray-900 rounded-lg shadow-md p-6 border border-gray-200 dark:border-gray-700">
-          <div className="flex justify-center items-center h-64">
+      <div className="max-w-4xl mx-auto px-4 py-6 sm:py-8">
+        <div className="bg-white dark:bg-gray-900 rounded-lg shadow-md p-4 sm:p-6 border border-gray-200 dark:border-gray-700">
+          <div className="flex justify-center items-center h-48 sm:h-64">
             <p className="text-gray-500 dark:text-gray-400">Loading job form...</p>
           </div>
         </div>
@@ -437,10 +437,10 @@ const CreateJobPage: React.FC = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
+    <div className="max-w-4xl mx-auto px-3 sm:px-4 py-6 sm:py-8">
       {renderProgressBar()}
 
-      <div className="bg-white dark:bg-gray-900 rounded-lg shadow-md p-6 border border-gray-200 dark:border-gray-700">
+      <div className="bg-white dark:bg-gray-900 rounded-lg shadow-md p-4 sm:p-6 border border-gray-200 dark:border-gray-700">
         {currentStep === 1 && renderStepOne()}
         {currentStep === 2 && renderStepTwo()}
         {currentStep === 3 && renderStepThree()}
