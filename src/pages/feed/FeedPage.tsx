@@ -93,7 +93,7 @@ const FeedPage: React.FC<FeedPageProps> = ({ single = false }) => {
     };
 
     fetchData();
-  }, []);
+  }, [id]);
 
   useEffect(() => {
     if (screenWidth < 768) {
