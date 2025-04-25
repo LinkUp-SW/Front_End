@@ -15,18 +15,26 @@ import {
 } from "@/components";
 import { Link, useNavigate } from "react-router-dom";
 import CreatePostModal from "./modals/CreatePostModal";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { useState } from "react";
 import PostSettingsModal from "./modals/PostSettingsModal";
 import UploadMediaModal from "./modals/UploadMediaModal";
 import AddDocumentModal from "./modals/AddDocumentModal";
 import CommentControlModal from "./modals/CommentControlModal";
-import { MediaType, PostDBObject, PostType } from "@/types";
+import {
+  CommentObjectType,
+  CommentType,
+  MediaType,
+  PostDBObject,
+  PostType,
+} from "@/types";
 import Cookies from "js-cookie";
 import { toast } from "sonner";
 import { createPost, fetchSinglePost } from "@/endpoints/feed";
 import { DialogDescription } from "@radix-ui/react-dialog";
+import { setPosts } from "@/slices/feed/postsSlice";
+import { setComments } from "@/slices/feed/commentsSlice";
 
 const useDismissModal = () => {
   const dismiss = () => {
@@ -44,12 +52,11 @@ const useDismissModal = () => {
     dismiss,
   };
 };
-interface CreatePostProps {
-  posts: PostType[];
-  setPosts: React.Dispatch<React.SetStateAction<PostType[]>>;
-}
 
-const CreatePost: React.FC<CreatePostProps> = ({ posts, setPosts }) => {
+const CreatePost: React.FC = () => {
+  const posts = useSelector((state: RootState) => state.posts.list);
+  const comments = useSelector((state: RootState) => state.comments.list);
+  const dispatch = useDispatch();
   const { data, loading } = useSelector((state: RootState) => state.userBio);
   const [privacySetting, setPrivacySetting] = useState<string>("Anyone");
   const [postText, setPostText] = useState<string>("");
@@ -209,9 +216,16 @@ const CreatePost: React.FC<CreatePostProps> = ({ posts, setPosts }) => {
         }
       );
       const post = await fetchSinglePost(response.postId, user_token, 0, 1);
+      const comment: CommentObjectType = {
+        comments: [],
+        count: 0,
+        nextCursor: 0,
+      };
       if (post) {
         const newPosts = [post.post, ...posts];
-        setPosts(newPosts);
+        dispatch(setPosts(newPosts));
+        const newComments = [comment, ...comments];
+        dispatch(setComments(newComments));
       }
     } catch {
       toast.error("Error creating post. Please try again.");
