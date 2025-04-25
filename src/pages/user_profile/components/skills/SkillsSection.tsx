@@ -32,6 +32,9 @@ import { getErrorMessage } from "@/utils/errorHandler";
 import SkillsList from "./SkillsList";
 import SkillsSkeleton from "./SkillsSkeleton";
 import SkillsActionButtons from "./SkillsActionButtons";
+import { updateLicense as updateGlobalLicense } from "@/slices/license/licensesSlice";
+import { updateExperience as updateGlobalExperience } from "@/slices/experience/experiencesSlice";
+import { updateEducation as updateGlobalEducation } from "@/slices/education/educationsSlice";
 
 interface FetchDataResult {
   skills: Skill[];
@@ -48,6 +51,9 @@ const SkillsSection = () => {
   );
 
   const dispatch = useDispatch<AppDispatch>();
+  const licenses = useSelector((state: RootState) => state.license.items);
+  const experiences = useSelector((state: RootState) => state.experience.items);
+  const educations = useSelector((state: RootState) => state.education.items);
   const skills = useSelector((state: RootState) => state.skill.items);
   const isMe = data?.is_me ?? false;
   const isEmpty = skills.length === 0;
@@ -68,6 +74,7 @@ const SkillsSection = () => {
   // Handler for editing
   const handleEditSkill = (updatedSkill: Skill) => {
     dispatch(updateGlobalSkill(updatedSkill));
+
     setEditOpen(false);
     setSkillToEdit(null);
   };
@@ -79,9 +86,39 @@ const SkillsSection = () => {
     try {
       const response = await deleteUserSkills(
         authToken as string,
-        selectedSkill
+        selectedSkill._id as string
       );
-      dispatch(removeGlobalSkill(selectedSkill));
+      dispatch(removeGlobalSkill(selectedSkill._id as string));
+      educations.forEach((education) => {
+        dispatch(
+          updateGlobalEducation({
+            ...education,
+            skills: education.skills.filter(
+              (skill) => skill !== selectedSkill.name
+            ),
+          })
+        );
+      });
+      experiences.forEach((experience) => {
+        dispatch(
+          updateGlobalExperience({
+            ...experience,
+            skills: experience.skills.filter(
+              (skill) => skill !== selectedSkill.name
+            ),
+          })
+        );
+      });
+      licenses.forEach((license) => {
+        dispatch(
+          updateGlobalLicense({
+            ...license,
+            skills: license.skills.filter(
+              (skill) => skill !== selectedSkill.name
+            ),
+          })
+        );
+      });
       setDeleteDialogOpen(false);
       toast.success(response.message);
     } catch (err) {
@@ -92,10 +129,84 @@ const SkillsSection = () => {
   };
 
   // Local UI state
-  const [selectedSkill, setSelectedSkill] = useState<string | null>(null);
+  const [selectedSkill, setSelectedSkill] = useState<Skill | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [skillToEdit, setSkillToEdit] = useState<Skill | null>(null);
   const [editOpen, setEditOpen] = useState(false);
+
+  const skillNamesByLicenseId = skills.reduce<Record<string, string[]>>(
+    (map, skill) => {
+      skill.licenses.forEach((lic) => {
+        if (!map[lic._id]) {
+          map[lic._id] = [];
+        }
+        map[lic._id].push(skill.name);
+      });
+      return map;
+    },
+    {}
+  );
+  const skillNamesByEducationId = skills.reduce<Record<string, string[]>>(
+    (map, skill) => {
+      skill.educations.forEach((edu) => {
+        if (!map[edu._id]) {
+          map[edu._id] = [];
+        }
+        map[edu._id].push(skill.name);
+      });
+      return map;
+    },
+    {}
+  );
+
+  const skillNamesByExperienceId = skills.reduce<Record<string, string[]>>(
+    (map, skill) => {
+      skill.experiences.forEach((exp) => {
+        if (!map[exp._id]) {
+          map[exp._id] = [];
+        }
+        map[exp._id].push(skill.name);
+      });
+      return map;
+    },
+    {}
+  );
+
+  useEffect(() => {
+    licenses.forEach((license) => {
+      const skillNames = license._id
+        ? skillNamesByLicenseId[license._id] || []
+        : [];
+      dispatch(
+        updateGlobalLicense({
+          ...license,
+          skills: skillNames,
+        })
+      );
+    });
+    experiences.forEach((experience) => {
+      const skillNames = experience._id
+        ? skillNamesByExperienceId[experience._id] || []
+        : [];
+      dispatch(
+        updateGlobalExperience({
+          ...experience,
+          skills: skillNames,
+        })
+      );
+    });
+    educations.forEach((education) => {
+      const skillNames = education._id
+        ? skillNamesByEducationId[education._id] || []
+        : [];
+      dispatch(
+        updateGlobalEducation({
+          ...education,
+          skills: skillNames,
+        })
+      );
+    });
+  }, [skills]);
 
   if (error) {
     return (
