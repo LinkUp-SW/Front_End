@@ -7,17 +7,28 @@ import {
   Footer,
 } from "@/components";
 import { useEffect, useState } from "react";
+import { AppDispatch, RootState } from "@/store";
+import { useDispatch, useSelector } from "react-redux";
+import { refetchUserBio } from "@/slices/user_profile/userBioSlice";
+import Cookies from "js-cookie";
+
+const token = Cookies.get("linkup_auth_token");
+const userId = Cookies.get("linkup_user_id");
 
 const MyItemsPage: React.FC = () => {
   const [selectedPage, setSelectedPage] = useState("saved-jobs");
   const location = useLocation();
   const pathname = location.pathname.split("/")[2];
+  const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
     if (pathname === "saved-jobs" || !pathname) {
       setSelectedPage("saved-jobs");
     } else {
       setSelectedPage("saved-posts");
+    }
+    if (token && userId) {
+      dispatch(refetchUserBio({ token, userId }));
     }
   }, []);
 
