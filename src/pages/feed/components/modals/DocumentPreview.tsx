@@ -1,3 +1,5 @@
+import { FaRegFilePdf } from "react-icons/fa";
+
 const DocumentPreview: React.FC<{ currentSelectedMedia: File[] }> = ({
   currentSelectedMedia,
 }) => {
@@ -12,6 +14,7 @@ const DocumentPreview: React.FC<{ currentSelectedMedia: File[] }> = ({
       >
         <div className="flex items-center gap-4">
           {/* File Details */}
+          <FaRegFilePdf size={50} />
           <div className="flex flex-col">
             <p className="text-sm font-medium text-gray-800 dark:text-gray-200">
               {currentSelectedMedia[0]?.name || "No file selected"}
