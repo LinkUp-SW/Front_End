@@ -4,7 +4,8 @@ import {
   Company, 
   CompanyProfileData, 
   CompanyProfileResponse, 
-  UserCompaniesResponse 
+  UserCompaniesResponse,
+  Job 
 } from "../pages/jobs/types"; 
 
 // Helper functions
@@ -143,5 +144,45 @@ export const deactivateCompanyPage = async (companyId: string): Promise<any> => 
       throw new Error(error.response.data.message);
     }
     throw new Error('Failed to deactivate company page');
+  }
+};
+
+
+
+export const createJobFromCompany = async (organizationId: string, jobData: Partial<Job>): Promise<any> => {
+  try {
+    const token = getAuthToken();
+    const url = `/api/v1/company/create-job-from-company/${organizationId}`;
+    
+    // Clean up data before sending - removing undefined values
+    const cleanData = Object.fromEntries(
+      Object.entries(jobData).filter(([_, v]) => v !== undefined && v !== '')
+    );
+    
+    const response = await axiosInstance.post(url, cleanData, getAuthHeader(token));
+    return response.data;
+  } catch (error: any) {
+    console.error('API Error Details:', error.response?.data || error.message);
+    if (error.response?.data?.message) {
+      throw new Error(error.response.data.message);
+    }
+    throw error;
+  }
+};
+
+// Get jobs from a company
+export const getJobsFromCompany = async (organizationId: string): Promise<any> => {
+  try {
+    const token = getAuthToken();
+    const url = `/api/v1/company/get-jobs-from-company/${organizationId}`;
+    
+    const response = await axiosInstance.get(url, getAuthHeader(token));
+    return response.data;
+  } catch (error: any) {
+    console.error('Failed to fetch company jobs:', error.response?.data || error.message);
+    if (error.response?.data?.message) {
+      throw new Error(error.response.data.message);
+    }
+    throw new Error('Failed to load company jobs');
   }
 };

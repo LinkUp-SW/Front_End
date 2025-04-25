@@ -2,20 +2,33 @@ import React, { useState, useEffect } from 'react';
 import { FaPlus } from 'react-icons/fa';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
+import { getJobsFromCompany } from '@/endpoints/company';
+import { JobCard, Job } from './CompanyJobCard';
 
-interface JobsComponentProps {
+interface CompanyJobsComponentProps {
   companyId?: string;
   companyName?: string;
 }
 
-// Define job status types for type safety
 type JobStatus = 'open' | 'draft' | 'inReview' | 'paused' | 'closed';
 
-const CompanyJobsComponent: React.FC<JobsComponentProps> = ({ companyId, companyName = "Your Company" }) => {
+interface JobsState {
+  open: Job[];
+  draft: Job[];
+  inReview: Job[];
+  paused: Job[];
+  closed: Job[];
+}
+
+interface JobsResponse {
+  jobs: Job[];
+}
+
+const CompanyJobsComponent: React.FC<CompanyJobsComponentProps> = ({ companyId, companyName = "Your Company" }) => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<JobStatus>('open');
   const [isLoading, setIsLoading] = useState(false);
-  const [jobs, setJobs] = useState<Record<JobStatus, any[]>>({
+  const [jobs, setJobs] = useState<JobsState>({
     open: [],
     draft: [],
     inReview: [],
@@ -23,22 +36,42 @@ const CompanyJobsComponent: React.FC<JobsComponentProps> = ({ companyId, company
     closed: []
   });
 
-  // Fetch jobs data
   useEffect(() => {
     const fetchJobs = async () => {
       if (!companyId) return;
       
       try {
         setIsLoading(true);
-        // This would be replaced with your actual API call
-        // const response = await getCompanyJobs(companyId);
-        // setJobs(response.jobs);
+        const response = await getJobsFromCompany(companyId) as JobsResponse;
         
-        // For now, we'll just simulate empty states
-        setIsLoading(false);
+        const categorizedJobs: JobsState = {
+          open: [],
+          draft: [],
+          inReview: [],
+          paused: [],
+          closed: []
+        };
+        
+        response.jobs.forEach((job: Job) => {
+          const status = job.job_status.toLowerCase();
+          if (status === 'open') {
+            categorizedJobs.open.push(job);
+          } else if (status === 'draft') {
+            categorizedJobs.draft.push(job);
+          } else if (status === 'in review') {
+            categorizedJobs.inReview.push(job);
+          } else if (status === 'paused') {
+            categorizedJobs.paused.push(job);
+          } else if (status === 'closed') {
+            categorizedJobs.closed.push(job);
+          }
+        });
+        
+        setJobs(categorizedJobs);
       } catch (err) {
         console.error('Failed to fetch jobs:', err);
         toast.error('Failed to load job listings');
+      } finally {
         setIsLoading(false);
       }
     };
@@ -47,122 +80,57 @@ const CompanyJobsComponent: React.FC<JobsComponentProps> = ({ companyId, company
   }, [companyId]);
 
   const handlePostJob = () => {
-    // Navigate to the job posting form page
     if (!companyId) {
       toast.error('Company ID is required to post a job');
       return;
     }
-    
-    // Navigate to the job posting form with company ID
-    navigate(`/company-manage/:companyId/jobs/create`);
+    // Implement job edit logic here
+    navigate(`/company-manage/${companyId}/jobs/create`);
   };
 
-  // Helper function to render the appropriate empty state
+  const handleEditJob = (jobId: string) => {
+    if (!companyId) return;
+    navigate(`/company-manage/${companyId}/jobs/edit/${jobId}`);
+  };
+
+ 
+
   const renderEmptyState = () => {
-    switch (activeTab) {
-      case 'open':
-        return (
-          <div className="flex flex-col items-center justify-center py-16">
-            <div className="w-64 h-64 mb-6 flex justify-center">
-              <img 
-                src='/src/assets/man_on_chair.svg'  
-                alt="Person working on chair" 
-                className="w-full"
-              />
-            </div>
-            <h2 className="text-2xl font-semibold text-gray-800 mb-2">You haven't posted any jobs yet</h2>
-            <p className="text-gray-600 mb-6 text-center">Post a job in minutes and reach qualified candidates you can't find anywhere else.</p>
-            <button 
-              onClick={handlePostJob}
-              className="rounded-full px-6 py-2 text-blue-600 border border-blue-600 hover:bg-blue-50 transition-colors"
-            >
-              Post a job
-            </button>
-          </div>
-        );
-      case 'draft':
-        return (
-          <div className="flex flex-col items-center justify-center py-16">
-            <div className="w-64 h-64 mb-6 flex justify-center">
-              <img 
-                src='/src/assets/man_on_chair.svg' 
-                alt="Person working on chair" 
-                className="w-full"
-              />
-            </div>
-            <h2 className="text-2xl font-semibold text-gray-800 mb-2">You don't have draft jobs yet</h2>
-            <p className="text-gray-600 mb-6">Jobs that are in drafts will appear here.</p>
-            <button 
-              onClick={handlePostJob}
-              className="rounded-full px-6 py-2 text-blue-600 border border-blue-600 hover:bg-blue-50 transition-colors"
-            >
-              Post a job
-            </button>
-          </div>
-        );
-      case 'inReview':
-        return (
-          <div className="flex flex-col items-center justify-center py-16">
-            <div className="w-64 h-64 mb-6 flex justify-center">
-              <img 
-                src='/src/assets/man_on_chair.svg' 
-                alt="Person working on chair" 
-                className="w-full"
-              />
-            </div>
-            <h2 className="text-2xl font-semibold text-gray-800 mb-2">You don't have jobs in review yet</h2>
-            <p className="text-gray-600 mb-6">Jobs that are in review will appear here.</p>
-            <button 
-              onClick={handlePostJob}
-              className="rounded-full px-6 py-2 text-blue-600 border border-blue-600 hover:bg-blue-50 transition-colors"
-            >
-              Post a job
-            </button>
-          </div>
-        );
-      case 'paused':
-        return (
-          <div className="flex flex-col items-center justify-center py-16">
-            <div className="w-64 h-64 mb-6 flex justify-center">
-              <img 
-                src='/src/assets/man_on_chair.svg' 
-                alt="Person working on chair" 
-                className="w-full"
-              />
-            </div>
-            <h2 className="text-2xl font-semibold text-gray-800 mb-2">You don't have paused jobs yet</h2>
-            <p className="text-gray-600 mb-6">Jobs that are paused will appear here.</p>
-            <button 
-              onClick={handlePostJob}
-              className="rounded-full px-6 py-2 text-blue-600 border border-blue-600 hover:bg-blue-50 transition-colors"
-            >
-              Post a job
-            </button>
-          </div>
-        );
-      case 'closed':
-        return (
-          <div className="flex flex-col items-center justify-center py-16">
-            <div className="w-64 h-64 mb-6 flex justify-center">
-              <img 
-                src='/src/assets/man_on_chair.svg'  
-                alt="Person working on chair" 
-                className="w-full"
-              />
-            </div>
-            <h2 className="text-2xl font-semibold text-gray-800 mb-2">You don't have closed jobs yet</h2>
-            <p className="text-gray-600 mb-6">Jobs that are closed will appear here.</p>
-            <button 
-              onClick={handlePostJob}
-              className="rounded-full px-6 py-2 text-blue-600 border border-blue-600 hover:bg-blue-50 transition-colors"
-            >
-              Post a job
-            </button>
-          </div>
-        );
-      default:
-        return null;
-    }
+    const messages = {
+      open: "You haven't posted any jobs yet",
+      draft: "You don't have draft jobs yet",
+      inReview: "You don't have jobs in review yet",
+      paused: "You don't have paused jobs yet",
+      closed: "You don't have closed jobs yet"
+    };
+
+    const descriptions = {
+      open: "Post a job in minutes and reach qualified candidates you can't find anywhere else.",
+      draft: "Jobs that are in drafts will appear here.",
+      inReview: "Jobs that are in review will appear here.",
+      paused: "Jobs that are paused will appear here.",
+      closed: "Jobs that are closed will appear here."
+    };
+
+    return (
+      <div className="flex flex-col items-center justify-center py-16">
+        <div className="w-64 h-64 mb-6 flex justify-center">
+          <img 
+            src='/src/assets/man_on_chair.svg'  
+            alt="Person working on chair" 
+            className="w-full"
+          />
+        </div>
+        <h2 className="text-2xl font-semibold text-gray-800 mb-2">{messages[activeTab]}</h2>
+        <p className="text-gray-600 mb-6 text-center">{descriptions[activeTab]}</p>
+        <button 
+          onClick={handlePostJob}
+          className="rounded-full px-6 py-2 text-blue-600 border border-blue-600 hover:bg-blue-50 transition-colors"
+        >
+          Post a job
+        </button>
+      </div>
+    );
   };
 
   if (isLoading) {
@@ -194,50 +162,30 @@ const CompanyJobsComponent: React.FC<JobsComponentProps> = ({ companyId, company
         </div>
       </div>
 
-      {/* Job status tabs */}
       <div className="border-t border-gray-200">
         <div className="flex">
-          <button 
-            className={`py-2 px-6 ${activeTab === 'open' ? 'text-green-700 border-b-2 border-green-700 font-medium' : 'text-gray-600'}`}
-            onClick={() => setActiveTab('open')}
-          >
-            Open
-          </button>
-          <button 
-            className={`py-2 px-6 ${activeTab === 'draft' ? 'text-green-700 border-b-2 border-green-700 font-medium' : 'text-gray-600'}`}
-            onClick={() => setActiveTab('draft')}
-          >
-            Draft
-          </button>
-          <button 
-            className={`py-2 px-6 ${activeTab === 'inReview' ? 'text-green-700 border-b-2 border-green-700 font-medium' : 'text-gray-600'}`}
-            onClick={() => setActiveTab('inReview')}
-          >
-            In review
-          </button>
-          <button 
-            className={`py-2 px-6 ${activeTab === 'paused' ? 'text-green-700 border-b-2 border-green-700 font-medium' : 'text-gray-600'}`}
-            onClick={() => setActiveTab('paused')}
-          >
-            Paused
-          </button>
-          <button 
-            className={`py-2 px-6 ${activeTab === 'closed' ? 'text-green-700 border-b-2 border-green-700 font-medium' : 'text-gray-600'}`}
-            onClick={() => setActiveTab('closed')}
-          >
-            Closed
-          </button>
+          {(['open', 'draft', 'inReview', 'paused', 'closed'] as JobStatus[]).map((tab) => (
+            <button 
+              key={tab}
+              className={`py-2 px-6 ${activeTab === tab ? 'text-green-700 border-b-2 border-green-700 font-medium' : 'text-gray-600'}`}
+              onClick={() => setActiveTab(tab)}
+            >
+              {tab === 'inReview' ? 'In review' : tab.charAt(0).toUpperCase() + tab.slice(1)}
+            </button>
+          ))}
         </div>
       </div>
 
-      {/* Job content area */}
       <div className="p-4">
         {jobs[activeTab]?.length > 0 ? (
           <div className="grid gap-4">
-            {/* This would map through your jobs when you have data */}
-            {/* {jobs[activeTab].map(job => (
-              <JobCard key={job.id} job={job} />
-            ))} */}
+            {jobs[activeTab].map(job => (
+              <JobCard 
+                key={job._id} 
+                job={job} 
+                onEdit={handleEditJob}
+              />
+            ))}
           </div>
         ) : (
           renderEmptyState()
