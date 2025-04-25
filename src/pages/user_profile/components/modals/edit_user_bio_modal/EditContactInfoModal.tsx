@@ -59,8 +59,11 @@ const EditContactInfoModal: React.FC<EditContactInfoModalProps> = ({
       birthday: contactInfoData.birthday ?? "",
       website: contactInfoData.website ?? "",
     });
+    console.log(contactInfoData.birthday);
+    // in your initialize effect
     if (contactInfoData.birthday) {
-      const [y, m, d] = contactInfoData.birthday.split("-");
+      const [dateOnly] = contactInfoData.birthday.split("T"); // "2004-10-09"
+      const [y, m, d] = dateOnly.split("-"); // ["2004","10","09"]
       setBirthYear(y);
       setBirthMonth(String(Number(m)));
       setBirthDay(String(Number(d)));
@@ -71,7 +74,6 @@ const EditContactInfoModal: React.FC<EditContactInfoModalProps> = ({
     }
   }, [contactInfoData]);
 
-  // Sync birthday selects to localData.birthday
   useEffect(() => {
     if (birthDay && birthMonth && birthYear) {
       const iso = new Date(

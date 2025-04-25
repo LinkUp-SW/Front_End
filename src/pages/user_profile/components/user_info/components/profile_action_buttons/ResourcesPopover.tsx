@@ -2,7 +2,7 @@ import React from "react";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components";
 import CustomButton from "./CustomButton";
 import { FaUsersSlash, FaUserPlus, FaUserMinus } from "react-icons/fa";
-import { IoCloseCircle } from "react-icons/io5";
+import { IoCloseCircle, IoCheckmarkSharp } from "react-icons/io5";
 import { CiCirclePlus, CiClock2 } from "react-icons/ci";
 import { BsInfoSquareFill } from "react-icons/bs";
 import { ImBlocked } from "react-icons/im";
@@ -27,6 +27,8 @@ export interface ResourcesPopoverProps {
   email: string;
   isConnectByEmail: boolean;
   setOpenEmailDialog(open: boolean): void;
+  isInRecievedConnection?: boolean;
+  onAccept?: () => void;
 }
 
 const ResourcesPopover: React.FC<ResourcesPopoverProps> = (props) => {
@@ -49,6 +51,8 @@ const ResourcesPopover: React.FC<ResourcesPopoverProps> = (props) => {
     email,
     isConnectByEmail,
     setOpenEmailDialog,
+    isInRecievedConnection,
+    onAccept,
   } = props;
 
   return (
@@ -71,6 +75,8 @@ const ResourcesPopover: React.FC<ResourcesPopoverProps> = (props) => {
             isFollowing={isFollowing}
             isPendingConnection={isPendingConnection}
             isInConnection={isInConnection}
+            isInRecievedConnection={isInRecievedConnection}
+            onAccept={onAccept}
             onFollow={onFollow}
             onUnfollow={onUnfollow}
             onConnect={onConnect}
@@ -139,7 +145,8 @@ interface NonOwnerPopoverContentProps {
   onRemoveConnection?: () => void;
   onBlock?: () => void;
   onAboutProfile?: () => void;
-
+  isInRecievedConnection?: boolean;
+  onAccept?: () => void;
   email: string;
   isConnectByEmail: boolean;
   setOpenEmailDialog(open: boolean): void;
@@ -157,7 +164,8 @@ const NonOwnerPopoverContent: React.FC<NonOwnerPopoverContentProps> = ({
   onRemoveConnection,
   onBlock,
   onAboutProfile,
-
+  isInRecievedConnection,
+  onAccept,
   email,
   isConnectByEmail,
   setOpenEmailDialog,
@@ -189,6 +197,8 @@ const NonOwnerPopoverContent: React.FC<NonOwnerPopoverContentProps> = ({
             ? onCancelRequest
             : isInConnection
             ? onRemoveConnection
+            : isInRecievedConnection
+            ? onAccept
             : isConnectByEmail
             ? () => setOpenEmailDialog(true)
             : onConnect
@@ -206,6 +216,11 @@ const NonOwnerPopoverContent: React.FC<NonOwnerPopoverContentProps> = ({
           <>
             <FaUserMinus size={14} />
             <span>Remove Connection</span>
+          </>
+        ) : isInRecievedConnection ? (
+          <>
+            <IoCheckmarkSharp size={14} />
+            <span>Accept Request</span>
           </>
         ) : (
           <>

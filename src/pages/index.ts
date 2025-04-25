@@ -31,7 +31,7 @@ import MyItemsPage from "./my_items/MyItemsPage";
 import PrimaryEmailPage from "./settings/updateEmail/PrimaryEmailPage";
 import OTP from "./settings/updateEmail/OTP";
 import AddEmailPage from "./settings/updateEmail/AddEmailPage";
-
+import AllPeoplePage from "./search/AllPeoplePage";
 //Export the Imported Pages
 export {
   LandingPage,
@@ -66,4 +66,5 @@ export {
   PrimaryEmailPage,
   OTP,
   AddEmailPage,
+  AllPeoplePage,
 };

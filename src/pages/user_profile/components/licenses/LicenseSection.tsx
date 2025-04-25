@@ -1,6 +1,6 @@
 import React, { Fragment, useEffect, useState } from "react";
 import { MdDeleteForever } from "react-icons/md";
-import { License } from "@/types"; // Ensure your Education type is defined here
+import { License } from "@/types";
 import {
   Button,
   Dialog,
@@ -23,6 +23,15 @@ import { LiaCertificateSolid } from "react-icons/lia";
 import LicensesList from "./LicensesList";
 import LicensesSkeletonLoader from "./LicensesSkeletonLoader";
 import LicenseHeaderSection from "./LicenseHeaderSection";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState, AppDispatch } from "@/store";
+import {
+  setLicenses as setGlobalLicense,
+  addLicense as addGlobalLicense,
+  updateLicense as updateGlobalLicense,
+  removeLicense as removeGlobalLicense,
+} from "@/slices/license/licensesSlice";
+import { removeOrganizationFromSkills as removeLicenseFromSkills } from "@/slices/skills/skillsSlice";
 
 interface FetchDataResult {
   licenses: License[];
@@ -32,11 +41,10 @@ interface FetchDataResult {
 const LicenseSection: React.FC = () => {
   const authToken = Cookies.get("linkup_auth_token");
   const { id } = useParams();
-  const [licenses, setLicenses] = useState<License[]>([]);
   const [editOpen, setEditOpen] = useState(false);
   const [licenseToEdit, setLicenseToEdit] = useState<License | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [selectedEducationId, setSelectedEducationId] = useState<string | null>(
+  const [selectedLicenseId, setSelectedLicenseId] = useState<string | null>(
     null
   );
 
@@ -46,27 +54,29 @@ const LicenseSection: React.FC = () => {
     }
     return Promise.resolve(null);
   }, [authToken, id]);
+  const dispatch = useDispatch<AppDispatch>();
+  const licenses = useSelector((state: RootState) => state.license.items);
 
   useEffect(() => {
     if (data?.licenses) {
-      setLicenses(data.licenses);
+      dispatch(setGlobalLicense(data.licenses));
     }
   }, [data]);
 
   const handleConfirmDelete = async () => {
-    if (authToken && selectedEducationId) {
+    if (authToken && selectedLicenseId) {
       try {
-        const response = await removeLicense(authToken, selectedEducationId);
-        setLicenses((prev) =>
-          prev.filter((edu) => edu._id !== selectedEducationId)
-        );
+        const response = await removeLicense(authToken, selectedLicenseId);
+        dispatch(removeGlobalLicense(selectedLicenseId));
+        dispatch(removeLicenseFromSkills({ orgId: selectedLicenseId }));
+
         toast.success(response.message);
       } catch (error) {
-        console.error("Failed to delete education", error);
+        console.error("Failed to delete license", error);
         toast.error(getErrorMessage(error));
       } finally {
         setDeleteDialogOpen(false);
-        setSelectedEducationId(null);
+        setSelectedLicenseId(null);
       }
     }
   };
@@ -89,7 +99,7 @@ const LicenseSection: React.FC = () => {
         className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow"
       >
         <p className="text-red-500">
-          Failed to load educations. Please try again later.
+          Failed to load Licenses. Please try again later.
         </p>
       </section>
     );
@@ -98,16 +108,14 @@ const LicenseSection: React.FC = () => {
   const isMe = data?.is_me ?? false;
   const isEmpty = licenses.length === 0;
 
-  // Handler for adding a new education
+  // Handler for adding a new license
   const handleAddLicense = (newLicense: License) => {
-    setLicenses((prev) => [...prev, newLicense]);
+    dispatch(addGlobalLicense(newLicense));
   };
 
   // Handler for updating an existing Licsense
   const handleEditLicense = (updatedEdu: License) => {
-    setLicenses((prev) =>
-      prev.map((edu) => (edu._id === updatedEdu._id ? updatedEdu : edu))
-    );
+    dispatch(updateGlobalLicense(updatedEdu));
     setEditOpen(false);
     setLicenseToEdit(null);
   };
@@ -116,7 +124,7 @@ const LicenseSection: React.FC = () => {
 
   return (
     <section
-      id="education-section"
+      id="license-section"
       className={`bg-white dark:bg-gray-900 p-6 rounded-lg shadow ${
         isEmpty ? "outline-dotted dark:outline-blue-300 outline-blue-500" : ""
       }`}
@@ -141,7 +149,7 @@ const LicenseSection: React.FC = () => {
             setEditOpen(true);
           }}
           onDeleteClick={(id) => {
-            setSelectedEducationId(id);
+            setSelectedLicenseId(id);
             setDeleteDialogOpen(true);
           }}
         />
@@ -151,12 +159,12 @@ const LicenseSection: React.FC = () => {
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
         <DialogContent
           aria-describedby={undefined}
-          id="edit-education-dialog-content"
+          id="edit-license-dialog-content"
           className="max-h-[45rem] overflow-y-auto dark:bg-gray-900 overflow-x-hidden !max-w-5xl sm:!w-[38.5rem] !w-full"
         >
           <DialogTitle className="hidden"></DialogTitle>
           <DialogHeader>
-            <Header title="Edit Education" />
+            <Header title="Edit License" />
             <DialogDescription className="text-sm text-gray-500 dark:text-gray-300">
               *Indicates required
             </DialogDescription>
@@ -212,7 +220,6 @@ const LicenseSection: React.FC = () => {
   );
 };
 
-/* Education List */
 interface LicenseListContainerProps {
   licenses: License[];
   isMe: boolean;

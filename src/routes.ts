@@ -29,6 +29,7 @@ import {
   SignInAndSecurityPage,
   ChangePasswordPage,
   MyItemsPage,
+  AllPeoplePage,
 } from "./pages";
 
 import PrimaryEmailPage from "./pages/settings/updateEmail/PrimaryEmailPage";
@@ -36,6 +37,7 @@ import AddEmailPage from "./pages/settings/updateEmail/AddEmailPage";
 import OTP from "./pages/settings/updateEmail/OTP";
 
 import React from "react";
+
 
 // Define your routes as an array of RouteObject (compatible with React Router v6)
 const routes: RouteObject[] = [
@@ -131,7 +133,7 @@ const routes: RouteObject[] = [
     element: React.createElement(NotFoundPage),
   },
   {
-    path: "/search/:query",
+    path: "/search",
     element: React.createElement(SearchPage),
   },
   {
@@ -169,6 +171,10 @@ const routes: RouteObject[] = [
   {
     path: "/settings/security/email/add",
     element: React.createElement(AddEmailPage),
+  },
+  {
+    path: "/search/users",
+    element: React.createElement(AllPeoplePage),
   },
 ];
 
