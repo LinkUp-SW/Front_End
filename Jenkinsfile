@@ -5,7 +5,7 @@ pipeline {
         VAULT_SECRET = vault path: 'secret/jenkins/front_env', engineVersion: "2", key: 'value'
         DOCKER_IMAGE = credentials('docker-token')
         IMAGE_NAME = credentials('DockerHub-repo')
-        BRANCH_NAME = env.BRANCH_NAME
+        BRANCH_NAME = "${env.BRANCH_NAME}"
     }
     stages {
         stage('Checkout') {
