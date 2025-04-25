@@ -113,7 +113,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
         content: commentInput,
         media: selectedImage ? [base64Image] : [],
         tagged_users: [],
-        comment_id: parentId,
+        parent_id: parentId,
       };
 
       console.log("New comment created:", newComment);
@@ -137,7 +137,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
         content: commentInput,
         media: [],
         tagged_users: [],
-        comment_id: parentId,
+        parent_id: parentId,
       };
 
       console.log("New comment created:", newComment);
@@ -379,7 +379,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
                 postId={postId}
                 comment={data}
                 stats={stats}
-                replies={data.children}
+                replies={data.children ? Object.values(data.children) : []}
                 handleCreateComment={handleCreateComment}
                 commentId={data._id}
               />
