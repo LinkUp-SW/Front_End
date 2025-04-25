@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import PostHeader from "@/pages/feed/components/PostHeader";
 import { PostType } from "@/types";
-import { getFeedPosts, getSavedPosts, unsavePost } from "@/endpoints/feed";
+import { getSavedPosts, unsavePost } from "@/endpoints/feed";
 import TruncatedText from "../truncate_text/TruncatedText";
 import Cookies from "js-cookie";
 import { toast } from "sonner";
@@ -19,6 +19,7 @@ const SavedPostsDashboard: React.FC = () => {
   const [savedPosts, setSavedPosts] = useState<PostType[]>([]);
   const [nextCursor, setNextCursor] = useState<number | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  const [initialLoading, setInitialLoading] = useState<boolean>(true); // Track initial loading
   const [menuOpenStates, setMenuOpenStates] = useState<Record<string, boolean>>(
     {}
   );
@@ -59,6 +60,7 @@ const SavedPostsDashboard: React.FC = () => {
       setError("Failed to fetch saved posts.");
     } finally {
       setLoading(false);
+      setInitialLoading(false); // Mark initial loading as complete
     }
   };
 
@@ -76,7 +78,7 @@ const SavedPostsDashboard: React.FC = () => {
           fetchSavedPosts(nextCursor); // Fetch next page when the user scrolls to the bottom
         }
       },
-      { threshold: 1.0 }
+      { threshold: 1 }
     );
 
     if (observerRef.current) {
@@ -125,7 +127,28 @@ const SavedPostsDashboard: React.FC = () => {
           Saved Posts
         </h1>
 
-        {savedPosts.length > 0 ? (
+        {initialLoading ? (
+          // Full skeleton loader for initial loading
+          <div className="space-y-4">
+            {Array.from({ length: 5 }).map((_, index) => (
+              <div
+                key={index}
+                className="border-t dark:border-t-gray-600 p-4 flex gap-4 bg-white dark:bg-gray-800 rounded-lg shadow"
+              >
+                <Skeleton className="w-20 h-20 rounded-lg dark:bg-gray-700 bg-gray-300" />{" "}
+                {/* Thumbnail */}
+                <div className="flex flex-col space-y-2 w-full">
+                  <Skeleton className="h-4 w-1/2 dark:bg-gray-700 bg-gray-300" />{" "}
+                  {/* Title */}
+                  <Skeleton className="h-4 w-3/4 dark:bg-gray-700 bg-gray-300" />{" "}
+                  {/* Subtitle */}
+                  <Skeleton className="h-4 w-full dark:bg-gray-700 bg-gray-300" />{" "}
+                  {/* Content */}
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : savedPosts.length > 0 ? (
           <div className="space-y-4">
             {savedPosts.map((post, index) => (
               <div key={index} className="border-t dark:border-t-gray-600 p-4">
@@ -148,7 +171,10 @@ const SavedPostsDashboard: React.FC = () => {
                     />
                   </div>
                   <Link to={`/feed/posts/${post._id}`}>
-                    <div className="flex">
+                    <div
+                      className="flex"
+                      ref={index == savedPosts.length - 2 ? observerRef : null}
+                    >
                       {post.media && post.media.media_type != "none" ? (
                         post.media.media_type === "image" ||
                         post.media.media_type === "images" ? (
@@ -187,14 +213,17 @@ const SavedPostsDashboard: React.FC = () => {
                 {Array.from({ length: 1 }).map((_, index) => (
                   <div
                     key={index}
-                    className="border-t dark:border-t-gray-600 p-4 flex gap-4"
+                    className="border-t dark:border-t-gray-600 p-4 flex gap-4 bg-white dark:bg-gray-800 rounded-lg shadow"
                   >
-                    <Skeleton className="w-20 h-20 rounded-lg" />{" "}
+                    <Skeleton className="w-20 h-20 rounded-lg dark:bg-gray-700 bg-gray-300" />{" "}
                     {/* Thumbnail */}
                     <div className="flex flex-col space-y-2 w-full">
-                      <Skeleton className="h-4 w-1/2" /> {/* Title */}
-                      <Skeleton className="h-4 w-3/4" /> {/* Subtitle */}
-                      <Skeleton className="h-4 w-full" /> {/* Content */}
+                      <Skeleton className="h-4 w-1/2 dark:bg-gray-700 bg-gray-300" />{" "}
+                      {/* Title */}
+                      <Skeleton className="h-4 w-3/4 dark:bg-gray-700 bg-gray-300" />{" "}
+                      {/* Subtitle */}
+                      <Skeleton className="h-4 w-full dark:bg-gray-700 bg-gray-300" />{" "}
+                      {/* Content */}
                     </div>
                   </div>
                 ))}
@@ -219,7 +248,6 @@ const SavedPostsDashboard: React.FC = () => {
         )}
 
         {/* Observer Element */}
-        <div ref={observerRef} className="h-10"></div>
       </div>
     </div>
   );
