@@ -42,6 +42,16 @@ export interface SavedJobsResponse {
   data: JobData[];
 }
 
+// Token helper function
+const getAuthToken = () => {
+  const token = Cookies.get('linkup_auth_token');
+  if (!token) {
+    throw new Error('Authentication required');
+  }
+  return token;
+};
+
+
 // Helper function to add auth header
 const getAuthHeader = (token: string) => ({
   headers: { Authorization: `Bearer ${token}` }
@@ -74,14 +84,7 @@ export const fetchSingleJob = async (token: string, jobId: string): Promise<{ da
   return response.data;
 };
 
-// Token helper function
-const getAuthToken = () => {
-  const token = Cookies.get('linkup_auth_token');
-  if (!token) {
-    throw new Error('Authentication required');
-  }
-  return token;
-};
+
 
 // Saved jobs functions
 export const fetchSavedJobs = async (): Promise<JobData[]> => {

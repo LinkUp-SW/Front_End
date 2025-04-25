@@ -71,7 +71,7 @@ const CreateJobPage: React.FC = () => {
           setJobData(prev => ({
             ...prev,
             company: response.company.name || '',
-            logo: response.company.logo || ''
+            logo: response.company.logo || '/src/assets/company.png'
           }));
         } else {
           console.error('Company data is missing or malformed:', response);
