@@ -32,6 +32,10 @@ import {
   AllPeoplePage,
 } from "./pages";
 
+import PrimaryEmailPage from "./pages/settings/updateEmail/PrimaryEmailPage";
+import AddEmailPage from "./pages/settings/updateEmail/AddEmailPage";
+import OTP from "./pages/settings/updateEmail/OTP";
+
 import React from "react";
 
 
@@ -155,6 +159,18 @@ const routes: RouteObject[] = [
   {
     path: "/settings/security/changepassword",
     element: React.createElement(ChangePasswordPage),
+  },
+  {
+    path: "/settings/security/email",
+    element: React.createElement(PrimaryEmailPage),
+  },
+  {
+    path: "/settings/security/email/verify",
+    element: React.createElement(OTP),
+  },
+  {
+    path: "/settings/security/email/add",
+    element: React.createElement(AddEmailPage),
   },
   {
     path: "/search/users",
