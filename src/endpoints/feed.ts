@@ -2,6 +2,120 @@ import axiosInstance from "@/services/axiosInstance";
 import { CommentDBType, CommentType, PostDBObject, PostType } from "@/types";
 import axios from "axios";
 
+// Add this new interface for link preview data
+export interface LinkPreviewData {
+  title: string;
+  description: string;
+  image: string | null;
+  favicon: string | null;
+  domain: string;
+}
+
+// Add the new fetch link preview function
+export const fetchLinkPreview = async (
+  url: string
+): Promise<LinkPreviewData> => {
+  try {
+    // Extract domain for basic information
+    const domain = new URL(url).hostname.replace("www.", "");
+
+    // Initialize with basic data based on domain
+    let previewData: LinkPreviewData = {
+      title: domain,
+      description: "",
+      image: null,
+      favicon: `https://www.google.com/s2/favicons?domain=${domain}&sz=64`,
+      domain: domain,
+    };
+
+    // Handle special cases for common sites with predictable metadata
+    if (url.includes("youtube.com") || url.includes("youtu.be")) {
+      const videoId = extractYoutubeId(url);
+      if (videoId) {
+        previewData = {
+          ...previewData,
+          title: "YouTube Video",
+          description: "Watch this video on YouTube",
+          image: `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`,
+        };
+      }
+    } else if (url.includes("twitter.com") || url.includes("x.com")) {
+      previewData = {
+        ...previewData,
+        title: "Twitter Post",
+        description: "View this post on Twitter/X",
+        image:
+          "https://abs.twimg.com/responsive-web/web/icon-default.604e2486a34a2f6e.png",
+      };
+    } else if (url.includes("github.com")) {
+      previewData = {
+        ...previewData,
+        title: "GitHub Repository",
+        description: "View this repository on GitHub",
+        image:
+          "https://github.githubassets.com/assets/github-logo-55c5b9a1fe28.png",
+      };
+    } else if (url.includes("linkedin.com")) {
+      previewData = {
+        ...previewData,
+        title: "LinkedIn",
+        description: "View this profile or post on LinkedIn",
+        image: "https://static.licdn.com/sc/h/5bukxbhy9xsil5mb7c2wulfbx",
+      };
+    } else if (url.includes("instagram.com")) {
+      previewData = {
+        ...previewData,
+        title: "Instagram Post",
+        description: "View this post on Instagram",
+        image:
+          "https://www.instagram.com/static/images/ico/favicon-200.png/ab6eff595bb1.png",
+      };
+    } else {
+      // For other domains, try to fetch better data using a CORS proxy or OpenGraph API
+      try {
+        // Option 1: Use an open API service like Microlink (has free tier with limitations)
+        const response = await axios.get(
+          `https://api.microlink.io/?url=${encodeURIComponent(url)}`
+        );
+        if (response.data?.data) {
+          const data = response.data.data;
+          previewData = {
+            title: data.title || previewData.title,
+            description: data.description || previewData.description,
+            image: data.image?.url || previewData.image,
+            favicon: data.logo?.url || previewData.favicon,
+            domain: previewData.domain,
+          };
+        }
+      } catch (proxyError) {
+        console.log("Could not fetch enhanced metadata:", proxyError);
+        // Continue with basic preview data
+      }
+    }
+
+    return previewData;
+  } catch (error) {
+    console.log("Error creating link preview:", error);
+
+    // Return basic fallback for invalid URLs
+    return {
+      title: url,
+      description: "",
+      image: null,
+      favicon: null,
+      domain: "unknown",
+    };
+  }
+};
+
+// Helper function to extract YouTube video ID
+function extractYoutubeId(url: string): string | null {
+  const regExp =
+    /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
+  const match = url.match(regExp);
+  return match && match[7]?.length === 11 ? match[7] : null;
+}
+
 export const getFeedPosts = async (): Promise<PostType[]> => {
   try {
     const response = await axios.get(
@@ -59,7 +173,7 @@ export const getSingleComments = async (
   }
 };
 
-export const getPostReactions = async (): Promise<any> => {
+export const getPostReactions = async (): Promise<string[]> => {
   try {
     const response = await axios.get(
       import.meta.env.VITE_NODE_ENV === "DEV"
@@ -144,7 +258,13 @@ export const createComment = async (
 };
 
 export const getReactions = async (
-  postPayload: any,
+  postPayload: {
+    cursor: number;
+    limit: number;
+    specificReaction: string | null;
+    targetType: string;
+    commentId: string | null;
+  },
   postId: string,
   token: string
 ) => {
@@ -165,7 +285,7 @@ export const getReactions = async (
 };
 
 export const deleteReaction = async (
-  postPayload: any,
+  postPayload: { target_type: string },
   postId: string,
   token: string
 ) => {
@@ -183,7 +303,7 @@ export const deleteReaction = async (
 };
 
 export const createReaction = async (
-  postPayload: any,
+  postPayload: { reaction: string; target_type: string },
   postId: string,
   token: string
 ) => {
