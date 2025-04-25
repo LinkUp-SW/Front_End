@@ -156,7 +156,7 @@ export const updateWorkExperience = async (
   token: string,
   id: string,
   form: Experience
-): Promise<{ message: string,experience:Experience }> => {
+): Promise<{ message: string; experience: Experience }> => {
   const response = await axiosInstance.put(
     `api/v1/user/update-work-experience/${id}`,
     form,
@@ -224,7 +224,7 @@ export const updateEducation = async (
   token: string,
   id: string,
   form: Education
-): Promise<{ message: string;education:Education }> => {
+): Promise<{ message: string; education: Education }> => {
   const response = await axiosInstance.put(
     `/api/v1/user/update-education/${id}`,
     form,
@@ -474,6 +474,21 @@ export const updateUserBio = async (token: string, bio: BioFormData) => {
   const response = await axiosInstance.put(
     "/api/v1/user/update-user-profile",
     { bio: bio },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
+
+export const addUserResume = async (token: string, resume: File) => {
+  const formData = new FormData();
+  formData.append("resume", resume);
+  const response = await axiosInstance.post(
+    `/api/v1/user/profile/resume`,
+    formData,
     {
       headers: {
         Authorization: `Bearer ${token}`,
