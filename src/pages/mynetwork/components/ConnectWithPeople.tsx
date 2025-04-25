@@ -22,9 +22,7 @@ interface PeopleSectionProps {
 }
 
 const PeopleSection = ({ token, context, title }: PeopleSectionProps) => {
-  const [mainViewSuggestions, setMainViewSuggestions] = useState<
-    PeopleYouMayKnow[]
-  >([]);
+  const [mainViewSuggestions, setMainViewSuggestions] = useState<PeopleYouMayKnow[]>([]);
   const [allSuggestions, setAllSuggestions] = useState<PeopleYouMayKnow[]>([]);
   const [loading, setLoading] = useState(false);
   const [dialogLoading, setDialogLoading] = useState(false);
@@ -108,7 +106,6 @@ const PeopleSection = ({ token, context, title }: PeopleSectionProps) => {
       setConnectingIds((prev) => [...prev, userId]);
 
       await connectWithUser(token, userId, email || "");
-
       // Remove from both main view and all suggestions
       setMainViewSuggestions((prev) =>
         prev.filter((p) => p.user_id !== userId)
@@ -178,7 +175,7 @@ const PeopleSection = ({ token, context, title }: PeopleSectionProps) => {
     return (
       <div
         ref={isLast ? lastPersonRef : null}
-        className="relative bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 flex flex-col items-center justify-between w-full max-w-[280px] min-h-[320px] mx-auto"
+        className="relative bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 flex flex-col items-center justify-between w-full max-w-[280px] min-h-[300px] mx-auto" 
       >
         <div
           className="h-20 w-full overflow-hidden rounded-t-lg cursor-pointer"
@@ -229,16 +226,14 @@ const PeopleSection = ({ token, context, title }: PeopleSectionProps) => {
             id="connect-button"
             onClick={() => handleConnect(person.user_id)}
             disabled={isConnecting}
-            className={`w-full border border-blue-600 font-medium py-1 rounded-full flex items-center justify-center gap-2 transition ${
-              isConnecting
-                ? "bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300"
-                : "text-blue-600 hover:bg-blue-100 dark:hover:bg-blue-900"
+            className={`w-full font-medium py-1 rounded-full flex items-center justify-center gap-2 transition affirmativeBtn ${
+              isConnecting ? "opacity-70 cursor-not-allowed" : ""
             }`}
           >
             {isConnecting ? (
               <>
                 <svg
-                  className="animate-spin -ml-1 mr-2 h-4 w-4 text-blue-600"
+                  className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
@@ -297,7 +292,7 @@ const PeopleSection = ({ token, context, title }: PeopleSectionProps) => {
             </button>
           </DialogTrigger>
           <DialogContent
-            className="max-w-6xl w-full max-h-[90vh] overflow-y-auto dark:bg-gray-900 bg-white p-6 rounded-lg"
+            className="max-w-6xl w-full max-h-[70vh] overflow-y-auto dark:bg-gray-900 bg-white p-6 rounded-lg" 
             ref={dialogRef}
           >
             <DialogHeader>
@@ -309,7 +304,7 @@ const PeopleSection = ({ token, context, title }: PeopleSectionProps) => {
               </DialogDescription>
             </DialogHeader>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-6">
               {allSuggestions.map((person, index) => (
                 <PersonCard
                   key={person._id}
@@ -333,7 +328,7 @@ const PeopleSection = ({ token, context, title }: PeopleSectionProps) => {
           {[...Array(6)].map((_, i) => (
             <div
               key={i}
-              className="animate-pulse bg-gray-200 dark:bg-gray-700 rounded-xl h-[320px] w-full"
+              className="animate-pulse bg-gray-200 dark:bg-gray-700 rounded-xl h-[300px] w-full"
             />
           ))}
         </div>
