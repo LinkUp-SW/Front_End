@@ -168,16 +168,16 @@ const CreateJobPage: React.FC = () => {
 
   const renderProgressBar = () => (
     <div className="mb-8">
-      <h1 className="text-2xl font-bold mb-4">
+      <h1 className="text-2xl font-bold mb-4 text-gray-900 dark:text-gray-100">
         {currentStep} of {totalSteps}: {
           currentStep === 1 ? 'Job details' :
           currentStep === 2 ? 'Requirements & benefits' :
           'Review and publish'
         }
       </h1>
-      <div className="w-full bg-gray-200 h-2 rounded-full">
+      <div className="w-full bg-gray-200 dark:bg-gray-700 h-2 rounded-full">
         <div 
-          className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+          className="bg-blue-600 dark:bg-blue-500 h-2 rounded-full transition-all duration-300"
           style={{ width: `${(currentStep / totalSteps) * 100}%` }}
         />
       </div>
@@ -186,41 +186,41 @@ const CreateJobPage: React.FC = () => {
 
   const renderStepOne = () => (
     <>
-      <div className="text-sm text-gray-500 mb-2">* Indicates required</div>
+      <div className="text-sm text-gray-500 dark:text-gray-400 mb-2">* Indicates required</div>
       
       <div className="mb-6">
-        <h2 className="text-lg font-semibold mb-4">Job details*</h2>
+        <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">Job details*</h2>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Job title*</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Job title*</label>
             <input
               type="text"
               name="title"
               value={jobData.title}
               onChange={handleInputChange}
               placeholder="Frontend Developer"
-              className="w-full border border-gray-300 rounded px-3 py-2"
+              className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
               required
             />
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Company</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Company</label>
             <input
               type="text"
               name="company"
               value={jobData.company}
               onChange={handleInputChange}
               placeholder="Your Company"
-              className="w-full border border-gray-300 rounded px-3 py-2"
+              className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-300"
               disabled
             />
           </div>
         </div>
 
         <div className="mt-4">
-          <label className="block text-sm font-medium text-gray-700 mb-1">Work mode*</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Work mode*</label>
           <div className="flex space-x-4 mb-4">
             {(['On-site', 'Remote', 'Hybrid'] as const).map((mode) => (
               <button
@@ -229,8 +229,8 @@ const CreateJobPage: React.FC = () => {
                 onClick={() => handleWorkModeChange(mode)}
                 className={`py-2 px-4 rounded ${
                   jobData.workMode === mode 
-                    ? 'bg-blue-100 border border-blue-500 text-blue-700' 
-                    : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
+                    ? 'bg-blue-100 dark:bg-blue-900 border border-blue-500 dark:border-blue-400 text-blue-700 dark:text-blue-300' 
+                    : 'bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
                 }`}
               >
                 {mode}
@@ -241,26 +241,26 @@ const CreateJobPage: React.FC = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Job location*</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Job location*</label>
             <input
               type="text"
               name="location"
               value={jobData.location}
               onChange={handleInputChange}
               placeholder="Cairo, Egypt"
-              className="w-full border border-gray-300 rounded px-3 py-2"
+              className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
               required
             />
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Experience level*</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Experience level*</label>
             <div className="relative">
               <select
                 name="experience_level"
                 value={jobData.experience_level}
                 onChange={handleInputChange}
-                className="w-full border border-gray-300 rounded px-3 py-2 appearance-none"
+                className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 appearance-none bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
               >
                 <option value="Internship">Internship</option>
                 <option value="Entry Level">Entry Level</option>
@@ -274,14 +274,14 @@ const CreateJobPage: React.FC = () => {
         </div>
 
         <div className="mt-4">
-          <label className="block text-sm font-medium text-gray-700 mb-1">Salary range*</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Salary range*</label>
           <input
             type="text"
             name="salary"
             value={jobData.salary}
             onChange={handleInputChange}
             placeholder="50000"
-            className="w-full border border-gray-300 rounded px-3 py-2"
+            className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
             required
           />
         </div>
@@ -293,23 +293,23 @@ const CreateJobPage: React.FC = () => {
             id="hasEasyApply"
             checked={jobData.hasEasyApply}
             onChange={(e) => setJobData(prev => ({...prev, hasEasyApply: e.target.checked}))}
-            className="h-4 w-4 text-blue-600 border-gray-300 rounded"
+            className="h-4 w-4 text-blue-600 dark:text-blue-500 border-gray-300 dark:border-gray-600 rounded"
           />
-          <label htmlFor="hasEasyApply" className="ml-2 text-sm text-gray-700">
+          <label htmlFor="hasEasyApply" className="ml-2 text-sm text-gray-700 dark:text-gray-300">
             Enable easy apply
           </label>
         </div>
       </div>
 
       <div className="mb-6">
-        <label className="block text-lg font-semibold mb-4">Description*</label>
-        <div className="border border-gray-300 rounded p-2 mb-2">
+        <label className="block text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">Description*</label>
+        <div className="border border-gray-300 dark:border-gray-600 rounded p-2 mb-2 bg-white dark:bg-gray-800">
           <textarea
             name="description"
             value={jobData.description}
             onChange={handleInputChange}
             placeholder="The ideal candidate will be responsible for designing, developing, testing, and debugging responsive web and mobile applications..."
-            className="w-full border-none focus:ring-0 min-h-32"
+            className="w-full border-none focus:ring-0 min-h-32 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
             rows={10}
           />
         </div>
@@ -338,20 +338,20 @@ const CreateJobPage: React.FC = () => {
 
     return (
       <div>
-        <h2 className="text-lg font-semibold mb-4">Requirements & Benefits</h2>
+        <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">Requirements & Benefits</h2>
         
         {textareaFields.map(({ label, field, placeholder }) => (
           <div className="mb-6" key={field}>
-            <label className="block text-md font-medium mb-2">{label}</label>
+            <label className="block text-md font-medium mb-2 text-gray-700 dark:text-gray-300">{label}</label>
             <textarea
               name={field}
               value={textareaValues[field]}
               onChange={(e) => handleArrayFieldChange(e, field)}
               placeholder={placeholder}
-              className="w-full border border-gray-300 rounded px-3 py-2 min-h-32"
+              className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 min-h-32 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
               rows={6}
             />
-            <p className="text-xs text-gray-500 mt-1">Enter each item on a new line</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Enter each item on a new line</p>
           </div>
         ))}
       </div>
@@ -360,20 +360,20 @@ const CreateJobPage: React.FC = () => {
 
   const renderStepThree = () => (
     <div>
-      <h2 className="text-lg font-semibold mb-4">Review and Publish</h2>
-      <div className="bg-gray-50 p-4 rounded mb-6">
-        <h3 className="font-medium text-xl mb-2">{jobData.title}</h3>
-        <div className="flex items-center text-sm text-gray-600 mb-1">
+      <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">Review and Publish</h2>
+      <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded mb-6 border border-gray-200 dark:border-gray-700">
+        <h3 className="font-medium text-xl mb-2 text-gray-900 dark:text-gray-100">{jobData.title}</h3>
+        <div className="flex items-center text-sm text-gray-600 dark:text-gray-400 mb-1">
           <span>{jobData.location}</span>
           <span className="mx-2">•</span>
           <span>{jobData.workMode}</span>
           <span className="mx-2">•</span>
           <span>{jobData.experience_level}</span>
         </div>
-        <p className="text-sm text-gray-600 mb-4">Salary: {jobData.salary}</p>
+        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Salary: {jobData.salary}</p>
         
-        <h4 className="font-medium mb-2">Description</h4>
-        <p className="text-sm mb-4">{jobData.description || "No description provided."}</p>
+        <h4 className="font-medium mb-2 text-gray-800 dark:text-gray-200">Description</h4>
+        <p className="text-sm mb-4 text-gray-700 dark:text-gray-300">{jobData.description || "No description provided."}</p>
         
         {[
           { title: "Responsibilities", items: jobData.responsibilities },
@@ -381,13 +381,13 @@ const CreateJobPage: React.FC = () => {
           { title: "Benefits", items: jobData.benefits }
         ].map(section => (
           <div key={section.title}>
-            <h4 className="font-medium mb-2">{section.title}</h4>
+            <h4 className="font-medium mb-2 text-gray-800 dark:text-gray-200">{section.title}</h4>
             <ul className="list-disc pl-5 mb-4">
               {section.items?.length > 0 
                 ? section.items.map((item, index) => (
-                    <li key={index} className="text-sm mb-1">{item}</li>
+                    <li key={index} className="text-sm mb-1 text-gray-700 dark:text-gray-300">{item}</li>
                   ))
-                : <li className="text-sm">No {section.title.toLowerCase()} provided.</li>
+                : <li className="text-sm text-gray-700 dark:text-gray-300">No {section.title.toLowerCase()} provided.</li>
               }
             </ul>
           </div>
@@ -402,7 +402,7 @@ const CreateJobPage: React.FC = () => {
         {currentStep > 1 && (
           <button
             onClick={handleBack}
-            className="px-6 py-2 border border-gray-300 rounded text-gray-600 hover:bg-gray-50"
+            className="px-6 py-2 border border-gray-300 dark:border-gray-600 rounded text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
             disabled={isLoading}
           >
             Back
@@ -412,7 +412,7 @@ const CreateJobPage: React.FC = () => {
       
       <button
         onClick={handleNext}
-        className={`px-6 py-2 ${isLoading ? 'bg-blue-400' : 'bg-blue-600 hover:bg-blue-700'} text-white rounded`}
+        className={`px-6 py-2 ${isLoading ? 'bg-blue-400 dark:bg-blue-600' : 'bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600'} text-white rounded`}
         disabled={isLoading}
       >
         {isLoading 
@@ -427,9 +427,9 @@ const CreateJobPage: React.FC = () => {
   if (isLoading && !companyData) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-8">
-        <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="bg-white dark:bg-gray-900 rounded-lg shadow-md p-6 border border-gray-200 dark:border-gray-700">
           <div className="flex justify-center items-center h-64">
-            <p className="text-gray-500">Loading job form...</p>
+            <p className="text-gray-500 dark:text-gray-400">Loading job form...</p>
           </div>
         </div>
       </div>
@@ -440,7 +440,7 @@ const CreateJobPage: React.FC = () => {
     <div className="max-w-4xl mx-auto px-4 py-8">
       {renderProgressBar()}
 
-      <div className="bg-white rounded-lg shadow-md p-6">
+      <div className="bg-white dark:bg-gray-900 rounded-lg shadow-md p-6 border border-gray-200 dark:border-gray-700">
         {currentStep === 1 && renderStepOne()}
         {currentStep === 2 && renderStepTwo()}
         {currentStep === 3 && renderStepThree()}

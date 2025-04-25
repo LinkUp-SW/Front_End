@@ -162,8 +162,8 @@ const ManageCompanyPage = () => {
   // Shows loading state while fetching company data
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-xl text-gray-600">Loading company data...</div>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+        <div className="text-xl text-gray-600 dark:text-gray-300">Loading company data...</div>
       </div>
     );
   }
@@ -171,8 +171,8 @@ const ManageCompanyPage = () => {
   // Shows error state if fetching failed
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-xl text-red-600">{error}</div>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+        <div className="text-xl text-red-600 dark:text-red-400">{error}</div>
       </div>
     );
   }
@@ -182,17 +182,17 @@ const ManageCompanyPage = () => {
       <div className="max-w-6xl mx-auto px-4 py-4 flex flex-col lg:flex-row gap-6">
         {/* Left sidebar */}
         <div className="w-full lg:w-64 flex-shrink-0">
-          <div className="bg-white rounded-lg shadow overflow-hidden">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden border border-gray-200 dark:border-gray-700">
             {/* Profile header section */}
             <div className="relative">
               {/* Company banner */}
-              <div className="h-24 bg-gradient-to-r from-blue-300 to-blue-500 relative">
+              <div className="h-24 bg-gradient-to-r from-blue-300 to-blue-500 dark:from-blue-600 dark:to-blue-800 relative">
                 <div className="absolute inset-0 bg-black opacity-10"></div>
               </div>
               
               {/* Company logo */}
-              <div className="absolute bottom-0 left-4 transform translate-y-1/2 bg-white p-1 rounded-lg shadow">
-                <div className="w-16 h-16 flex overflow-hidden rounded-lg bg-gray-200">
+              <div className="absolute bottom-0 left-4 transform translate-y-1/2 bg-white dark:bg-gray-700 p-1 rounded-lg shadow">
+                <div className="w-16 h-16 flex overflow-hidden rounded-lg bg-gray-200 dark:bg-gray-600">
                   <img 
                     src={companyData.logo || "/src/assets/buildings.jpeg"} 
                     alt={`${companyData.name} logo`} 
@@ -206,10 +206,10 @@ const ManageCompanyPage = () => {
             </div>
             
             <div className="p-4 pb-3 mt-8">
-              <h2 className="text-lg font-medium">{companyData.name}</h2>
-              <p className="text-sm text-gray-500 mt-0.5">{companyData.followerCount} followers</p>
+              <h2 className="text-lg font-medium text-gray-900 dark:text-white">{companyData.name}</h2>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{companyData.followerCount} followers</p>
              
-              <button className="mt-4 w-full border border-gray-300 rounded-full py-2 text-sm flex justify-center items-center text-gray-600 hover:bg-gray-50 transition-colors">
+              <button className="mt-4 w-full border border-gray-300 dark:border-gray-600 rounded-full py-2 text-sm flex justify-center items-center text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                 <FaEye className="mr-2" size={16} />
                 View as member
               </button>
@@ -221,7 +221,10 @@ const ManageCompanyPage = () => {
                 <li>
                   <a 
                     href="#" 
-                    className={`block px-4 py-2.5 text-gray-700 hover:bg-gray-50 ${activeTab === 'page-posts' ? 'text-green-700 font-medium bg-gray-100 border-l-4 border-green-700' : ''}`}
+                    className={`block px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-700 
+                      ${activeTab === 'page-posts' 
+                        ? 'text-green-700 dark:text-green-400 font-medium bg-gray-100 dark:bg-gray-700 border-l-4 border-green-700 dark:border-green-400' 
+                        : 'text-gray-700 dark:text-gray-300'}`}
                     onClick={() => handleNavClick('page-posts')}
                   >
                     Page posts
@@ -230,7 +233,10 @@ const ManageCompanyPage = () => {
                 <li>
                   <a 
                     href="#" 
-                    className={`block px-4 py-2.5 text-gray-700 hover:bg-gray-50 ${activeTab === 'analytics' ? 'text-green-700 font-medium bg-gray-100 border-l-4 border-green-700' : ''}`}
+                    className={`block px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-700 
+                      ${activeTab === 'analytics' 
+                        ? 'text-green-700 dark:text-green-400 font-medium bg-gray-100 dark:bg-gray-700 border-l-4 border-green-700 dark:border-green-400' 
+                        : 'text-gray-700 dark:text-gray-300'}`}
                     onClick={() => handleNavClick('analytics')}
                   >
                     Analytics
@@ -239,7 +245,10 @@ const ManageCompanyPage = () => {
                 <li>
                   <a 
                     href="#" 
-                    className={`block px-4 py-2.5 text-gray-700 hover:bg-gray-50 ${activeTab === 'edit-page' ? 'text-green-700 font-medium bg-gray-100 border-l-4 border-green-700' : ''}`}
+                    className={`block px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-700 
+                      ${activeTab === 'edit-page' 
+                        ? 'text-green-700 dark:text-green-400 font-medium bg-gray-100 dark:bg-gray-700 border-l-4 border-green-700 dark:border-green-400' 
+                        : 'text-gray-700 dark:text-gray-300'}`}
                     onClick={() => handleNavClick('edit-page')}
                   >
                     Edit page
@@ -248,19 +257,25 @@ const ManageCompanyPage = () => {
                 <li>
                   <a 
                     href="#" 
-                    className={`block px-4 py-2.5 text-gray-700 hover:bg-gray-50 ${activeTab === 'jobs' ? 'text-green-700 font-medium bg-gray-100 border-l-4 border-green-700' : ''}`}
+                    className={`block px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-700 
+                      ${activeTab === 'jobs' 
+                        ? 'text-green-700 dark:text-green-400 font-medium bg-gray-100 dark:bg-gray-700 border-l-4 border-green-700 dark:border-green-400' 
+                        : 'text-gray-700 dark:text-gray-300'}`}
                     onClick={() => handleNavClick('jobs')}
                   >
                     Jobs
                   </a>
                 </li>
                 
-                <div className="my-1 border-t border-gray-200"></div>
+                <div className="my-1 border-t border-gray-200 dark:border-gray-700"></div>
                 
                 <li>
                   <a 
                     href="#" 
-                    className={`block px-4 py-2.5 text-gray-700 hover:bg-gray-50 ${activeTab === 'settings' ? 'text-green-700 font-medium bg-gray-100 border-l-4 border-green-700' : ''}`}
+                    className={`block px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-700 
+                      ${activeTab === 'settings' 
+                        ? 'text-green-700 dark:text-green-400 font-medium bg-gray-100 dark:bg-gray-700 border-l-4 border-green-700 dark:border-green-400' 
+                        : 'text-gray-700 dark:text-gray-300'}`}
                     onClick={() => handleNavClick('settings')}
                   >
                     Settings
@@ -284,22 +299,22 @@ const ManageCompanyPage = () => {
             companyId={companyId}
           />
         ) : (
-          <div className="bg-white rounded-lg shadow p-6">
-            <h1 className="text-2xl font-bold mb-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 border border-gray-200 dark:border-gray-700">
+            <h1 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">
               {activeTab === 'analytics' ? 'Analytics' : 
               activeTab === 'page-posts' ? 'Page Posts' : 'Dashboard'}
             </h1>
                   
             {/* Content based on active tab would go here */}
             {activeTab === 'analytics' && (
-              <div>
+              <div className="text-gray-700 dark:text-gray-300">
                 <p>Analytics dashboard for {companyData.name}</p>
                 {/* Add your analytics components here */}
               </div>
             )}
                   
             {activeTab === 'page-posts' && (
-              <div>
+              <div className="text-gray-700 dark:text-gray-300">
                 <p>Posts for {companyData.name}</p>
                 {/* Add your posts components here */}
               </div>

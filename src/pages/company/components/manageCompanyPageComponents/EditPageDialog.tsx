@@ -222,13 +222,13 @@ const EditPageDialog = ({ open, onOpenChange, companyData, onSubmit }: EditPageD
       case 'Page info':
         return (
           <div className="py-4">
-            <h3 className="text-lg font-medium mb-4">Page info</h3>
-            <p className="text-sm text-gray-500 mb-4">* indicates required</p>
+            <h3 className="text-lg font-medium mb-4 text-gray-900 dark:text-white">Page info</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">* indicates required</p>
             
             <div className="mb-6">
-              <label className="block text-gray-700 mb-1 text-sm font-medium">Logo</label>
+              <label className="block text-gray-700 dark:text-gray-300 mb-1 text-sm font-medium">Logo</label>
               <div className="flex items-center mb-2">
-                <div className="w-24 h-24 bg-gray-100 mr-4 border rounded overflow-hidden">
+                <div className="w-24 h-24 bg-gray-100 dark:bg-gray-700 mr-4 border dark:border-gray-600 rounded overflow-hidden">
                   <img 
                     src={logoUrl} 
                     alt="Logo" 
@@ -241,10 +241,10 @@ const EditPageDialog = ({ open, onOpenChange, companyData, onSubmit }: EditPageD
                 </div>
                 <button
                   type="button"
-                  className="p-2 bg-white rounded-full border shadow hover:bg-gray-50"
+                  className="p-2 bg-white dark:bg-gray-700 rounded-full border dark:border-gray-600 shadow hover:bg-gray-50 dark:hover:bg-gray-600"
                   onClick={() => toast.info('Logo upload functionality coming soon!')}
                 >
-                  <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                   </svg>
                 </button>
@@ -252,26 +252,26 @@ const EditPageDialog = ({ open, onOpenChange, companyData, onSubmit }: EditPageD
             </div>
             
             <div className="mb-6">
-              <label className="block text-gray-700 mb-1 text-sm font-medium">Name*</label>
+              <label className="block text-gray-700 dark:text-gray-300 mb-1 text-sm font-medium">Name*</label>
               <input
                 type="text"
                 name="name"
                 value={formData.name}
                 onChange={handleInputChange}
                 placeholder={isEducationalInstitution ? "Enter institution name" : "Enter company name"}
-                className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 required
               />
             </div>
             
             <div className="mb-6">
-              <label className="block text-gray-700 mb-1 text-sm font-medium">Tagline</label>
+              <label className="block text-gray-700 dark:text-gray-300 mb-1 text-sm font-medium">Tagline</label>
               <textarea
                 name="tagline"
                 value={formData.tagline}
                 onChange={handleInputChange}
                 placeholder="Add your slogan or mission statement"
-                className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 rows={3}
               />
             </div>
@@ -281,54 +281,54 @@ const EditPageDialog = ({ open, onOpenChange, companyData, onSubmit }: EditPageD
       case 'Details':
         return (
           <div className="py-4">
-            <h3 className="text-lg font-medium mb-4">Provide details to display on your page</h3>
-            <p className="text-sm text-gray-500 mb-4">* indicates required</p>
+            <h3 className="text-lg font-medium mb-4 text-gray-900 dark:text-white">Provide details to display on your page</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">* indicates required</p>
             
             <div className="mb-6">
-              <label className="block text-gray-700 mb-1 text-sm font-medium">Description</label>
+              <label className="block text-gray-700 dark:text-gray-300 mb-1 text-sm font-medium">Description</label>
               <textarea
                 name="description"
                 value={formData.description}
                 onChange={handleInputChange}
                 placeholder={isEducationalInstitution ? "Add an About Us with a brief overview of your institution" : "Add an About Us with a brief overview of your products and services"}
-                className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 rows={3}
               />
             </div>
             
             <div className="mb-6">
-              <label className="block text-gray-700 mb-1 text-sm font-medium">Website URL</label>
+              <label className="block text-gray-700 dark:text-gray-300 mb-1 text-sm font-medium">Website URL</label>
               <input
                 type="text"
                 name="website"
                 value={formData.website}
                 onChange={handleInputChange}
                 placeholder="Add your website homepage (www.example.com)"
-                className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               />
             </div>
             
             <div className="mb-6">
-              <label className="block text-gray-700 mb-1 text-sm font-medium">Industry*</label>
+              <label className="block text-gray-700 dark:text-gray-300 mb-1 text-sm font-medium">Industry*</label>
               <input
                 type="text"
                 name="industry"
                 value={formData.industry}
                 onChange={handleInputChange}
                 placeholder={isEducationalInstitution ? "Education" : "Software Development"}
-                className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 required
               />
             </div>
             
             <div className="mb-6">
-              <label className="block text-gray-700 mb-1 text-sm font-medium">Size*</label>
+              <label className="block text-gray-700 dark:text-gray-300 mb-1 text-sm font-medium">Size*</label>
               <div className="relative">
                 <select
                   name="size"
                   value={formData.size}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded appearance-none focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded appearance-none focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   required
                 >
                   {sizeOptions.map(option => (
@@ -336,7 +336,7 @@ const EditPageDialog = ({ open, onOpenChange, companyData, onSubmit }: EditPageD
                   ))}
                 </select>
                 <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                  <svg className="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                  <svg className="w-5 h-5 text-gray-400 dark:text-gray-500" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M7 10l5 5 5-5H7z"></path>
                   </svg>
                 </div>
@@ -344,13 +344,13 @@ const EditPageDialog = ({ open, onOpenChange, companyData, onSubmit }: EditPageD
             </div>
             
             <div className="mb-6">
-              <label className="block text-gray-700 mb-1 text-sm font-medium">Type*</label>
+              <label className="block text-gray-700 dark:text-gray-300 mb-1 text-sm font-medium">Type*</label>
               <div className="relative">
                 <select
                   name="type"
                   value={formData.type}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded appearance-none focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded appearance-none focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   required
                 >
                   <option value="">Select type</option>
@@ -365,7 +365,7 @@ const EditPageDialog = ({ open, onOpenChange, companyData, onSubmit }: EditPageD
                   )}
                 </select>
                 <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                  <svg className="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                  <svg className="w-5 h-5 text-gray-400 dark:text-gray-500" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M7 10l5 5 5-5H7z"></path>
                   </svg>
                 </div>
@@ -373,14 +373,14 @@ const EditPageDialog = ({ open, onOpenChange, companyData, onSubmit }: EditPageD
             </div>
             
             <div className="mb-6">
-              <label className="block text-gray-700 mb-1 text-sm font-medium">Phone</label>
+              <label className="block text-gray-700 dark:text-gray-300 mb-1 text-sm font-medium">Phone</label>
               <input
                 type="tel"
                 name="phone"
                 value={formData.phone}
                 onChange={handleInputChange}
                 placeholder="Enter a phone number"
-                className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               />
             </div>
           </div>
@@ -389,8 +389,8 @@ const EditPageDialog = ({ open, onOpenChange, companyData, onSubmit }: EditPageD
       case 'Location':
         return (
           <div className="py-4">
-            <h3 className="text-lg font-medium mb-4">Update location to let members know where you're based</h3>
-            <p className="text-gray-500 mb-4">If you don't have a street address, you can exclude it.</p>
+            <h3 className="text-lg font-medium mb-4 text-gray-900 dark:text-white">Update location to let members know where you're based</h3>
+            <p className="text-gray-500 dark:text-gray-400 mb-4">If you don't have a street address, you can exclude it.</p>
             
             <div className="mb-4">
               <label className="inline-flex items-center">
@@ -398,22 +398,22 @@ const EditPageDialog = ({ open, onOpenChange, companyData, onSubmit }: EditPageD
                   type="checkbox"
                   checked={hasLocation}
                   onChange={() => setHasLocation(!hasLocation)}
-                  className="mr-2"
+                  className="mr-2 text-blue-600 dark:text-blue-500 bg-white dark:bg-gray-700"
                 />
-                <span className="text-sm text-gray-700">My {isEducationalInstitution ? 'institution' : 'organization'} has a physical location</span>
+                <span className="text-sm text-gray-700 dark:text-gray-300">My {isEducationalInstitution ? 'institution' : 'organization'} has a physical location</span>
               </label>
             </div>
             
             {hasLocation && (
               <>
                 <div className="mb-6">
-                  <label className="block text-gray-700 mb-1 text-sm font-medium">Country/Region*</label>
+                  <label className="block text-gray-700 dark:text-gray-300 mb-1 text-sm font-medium">Country/Region*</label>
                   <div className="relative">
                     <select
                       name="country"
                       value={locationData.country}
                       onChange={handleLocationInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded appearance-none focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded appearance-none focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                       required={hasLocation}
                     >
                       <option value="">Select a country</option>
@@ -426,7 +426,7 @@ const EditPageDialog = ({ open, onOpenChange, companyData, onSubmit }: EditPageD
                       <option value="Japan">Japan</option>
                     </select>
                     <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                      <svg className="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                      <svg className="w-5 h-5 text-gray-400 dark:text-gray-500" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M7 10l5 5 5-5H7z"></path>
                       </svg>
                     </div>
@@ -439,74 +439,74 @@ const EditPageDialog = ({ open, onOpenChange, companyData, onSubmit }: EditPageD
                       type="checkbox"
                       checked={!hasStreetAddress}
                       onChange={() => setHasStreetAddress(!hasStreetAddress)}
-                      className="mr-2"
+                      className="mr-2 text-blue-600 dark:text-blue-500 bg-white dark:bg-gray-700"
                     />
-                    <span className="text-sm text-gray-700">My {isEducationalInstitution ? 'institution' : 'organization'} doesn't have a street address</span>
+                    <span className="text-sm text-gray-700 dark:text-gray-300">My {isEducationalInstitution ? 'institution' : 'organization'} doesn't have a street address</span>
                   </label>
                 </div>
                 
                 {hasStreetAddress && (
                   <div className="mb-6">
-                    <label className="block text-gray-700 mb-1 text-sm font-medium">Street address*</label>
+                    <label className="block text-gray-700 dark:text-gray-300 mb-1 text-sm font-medium">Street address*</label>
                     <input
                       type="text"
                       name="address"
                       value={locationData.address}
                       onChange={handleLocationInputChange}
                       placeholder="Enter street address"
-                      className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                       required={hasLocation && hasStreetAddress}
                     />
                   </div>
                 )}
                 
                 <div className="mb-6">
-                  <label className="block text-gray-700 mb-1 text-sm font-medium">City*</label>
+                  <label className="block text-gray-700 dark:text-gray-300 mb-1 text-sm font-medium">City*</label>
                   <input
                     type="text"
                     name="city"
                     value={locationData.city}
                     onChange={handleLocationInputChange}
                     placeholder="Enter city"
-                    className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                     required={hasLocation}
                   />
                 </div>
                 
                 <div className="grid grid-cols-2 gap-4 mb-6">
                   <div>
-                    <label className="block text-gray-700 mb-1 text-sm font-medium">State/Province</label>
+                    <label className="block text-gray-700 dark:text-gray-300 mb-1 text-sm font-medium">State/Province</label>
                     <input
                       type="text"
                       name="state"
                       value={locationData.state}
                       onChange={handleLocationInputChange}
                       placeholder="Enter state"
-                      className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                     />
                   </div>
                   <div>
-                    <label className="block text-gray-700 mb-1 text-sm font-medium">Postal code</label>
+                    <label className="block text-gray-700 dark:text-gray-300 mb-1 text-sm font-medium">Postal code</label>
                     <input
                       type="text"
                       name="postal_code"
                       value={locationData.postal_code}
                       onChange={handleLocationInputChange}
                       placeholder="Enter postal code"
-                      className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                     />
                   </div>
                 </div>
                 
                 <div className="mb-6">
-                  <label className="block text-gray-700 mb-1 text-sm font-medium">Location name</label>
+                  <label className="block text-gray-700 dark:text-gray-300 mb-1 text-sm font-medium">Location name</label>
                   <input
                     type="text"
                     name="location_name"
                     value={locationData.location_name}
                     onChange={handleLocationInputChange}
                     placeholder={isEducationalInstitution ? "Optional (e.g. Main Campus, West Wing)" : "Optional (e.g. Headquarters, Branch Office)"}
-                    className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   />
                 </div>
               </>
@@ -522,19 +522,19 @@ const EditPageDialog = ({ open, onOpenChange, companyData, onSubmit }: EditPageD
         onOpenChange(newOpen);
       }
     }}>
-      <DialogContent className="w-full max-w-3xl md:max-w-4xl lg:max-w-6xl xl:max-w-7xl p-0 flex flex-col max-h-[90vh]">
-        <DialogHeader className="px-6 py-4 border-b border-gray-200">
-          <DialogTitle>Edit {isEducationalInstitution ? 'Institution' : 'Company'} Page</DialogTitle>
+      <DialogContent className="w-full max-w-3xl md:max-w-4xl lg:max-w-6xl xl:max-w-7xl p-0 flex flex-col max-h-[90vh] bg-white dark:bg-gray-800 border dark:border-gray-700">
+        <DialogHeader className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+          <DialogTitle className="text-gray-900 dark:text-white">Edit {isEducationalInstitution ? 'Institution' : 'Company'} Page</DialogTitle>
         </DialogHeader>
         
         <div className="flex flex-1 overflow-hidden">
           {/* Navigation sidebar with section groups */}
-          <div className="w-1/4 border-r border-gray-200 overflow-y-auto">
+          <div className="w-1/4 border-r border-gray-200 dark:border-gray-700 overflow-y-auto">
             <nav>
               {navigationStructure.map((group) => (
                 <div key={group.header} className="mb-4">
                   {/* Header - non-clickable title */}
-                  <div className="px-6 py-2 font-medium text-gray-900 bg-gray-100">
+                  <div className="px-6 py-2 font-medium text-gray-900 dark:text-white bg-gray-100 dark:bg-gray-700">
                     {group.header}
                   </div>
                   
@@ -543,8 +543,10 @@ const EditPageDialog = ({ open, onOpenChange, companyData, onSubmit }: EditPageD
                     {group.sections.map((section) => (
                       <li key={section}>
                         <button
-                          className={`w-full text-left px-8 py-2 hover:bg-gray-50 ${
-                            activeSection === section ? 'text-blue-600 font-medium' : 'text-gray-700'
+                          className={`w-full text-left px-8 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 ${
+                            activeSection === section 
+                              ? 'text-blue-600 dark:text-blue-400 font-medium' 
+                              : 'text-gray-700 dark:text-gray-300'
                           }`}
                           onClick={() => setActiveSection(section)}
                           disabled={isSubmitting}
@@ -568,7 +570,7 @@ const EditPageDialog = ({ open, onOpenChange, companyData, onSubmit }: EditPageD
             </div>
             
             {/* Fixed footer with buttons - always visible */}
-            <div className="bg-white py-4 border-t border-gray-200 px-6">
+            <div className="bg-white dark:bg-gray-800 py-4 border-t border-gray-200 dark:border-gray-700 px-6">
               <div className="flex justify-end">
                 <button
                   type="button"
@@ -576,7 +578,7 @@ const EditPageDialog = ({ open, onOpenChange, companyData, onSubmit }: EditPageD
                     onOpenChange(false);
                     toast.info('Changes discarded');
                   }}
-                  className="px-4 py-2 text-gray-700 mr-2 hover:bg-gray-100 rounded"
+                  className="px-4 py-2 text-gray-700 dark:text-gray-300 mr-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
                   disabled={isSubmitting}
                 >
                   Cancel
@@ -584,7 +586,7 @@ const EditPageDialog = ({ open, onOpenChange, companyData, onSubmit }: EditPageD
                 <button
                   type="submit"
                   form="editPageForm"
-                  className={`px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 ${
+                  className={`px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 dark:hover:bg-blue-800 ${
                     isSubmitting ? 'opacity-70 cursor-not-allowed' : ''
                   }`}
                   disabled={isSubmitting}
