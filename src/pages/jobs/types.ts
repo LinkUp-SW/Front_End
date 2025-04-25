@@ -58,7 +58,7 @@ export interface Job {
   title: string;
   company: string;
   location: string;
-  experience_level:'Internship' | 'Entry level' | 'Associate' | 'Mid-Senior level' | 'Director' | 'Executive';
+  experience_level:'Internship' | 'Entry Level' | 'Associate' | 'Mid-Senior' | 'Director' | 'Executive';
   isRemote: boolean;
   isSaved: boolean;
   logo: string;

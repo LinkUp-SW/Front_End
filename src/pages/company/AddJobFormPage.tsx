@@ -5,7 +5,7 @@ import { Job, Company } from '../../pages/jobs/types';
 import { createJobFromCompany, getCompanyAdminView } from "@/endpoints/company";
 
 type WorkMode = 'On-site' | 'Remote' | 'Hybrid';
-type ExperienceLevel = 'Internship' | 'Entry level' | 'Associate' | 'Mid-Senior level' | 'Director' | 'Executive';
+type ExperienceLevel = 'Internship' | 'Entry Level' | 'Associate' | 'Mid-Senior' | 'Director' | 'Executive';
 type ArrayField = 'responsibilities' | 'qualifications' | 'benefits';
 
 interface JobFormData extends Partial<Job> {
@@ -43,7 +43,7 @@ const CreateJobPage: React.FC = () => {
     company: '',
     location: '',
     workMode: 'On-site',
-    experience_level: 'Entry level',
+    experience_level: 'Entry Level',
     isRemote: false,
     description: '',
     responsibilities: [],
@@ -263,9 +263,9 @@ const CreateJobPage: React.FC = () => {
                 className="w-full border border-gray-300 rounded px-3 py-2 appearance-none"
               >
                 <option value="Internship">Internship</option>
-                <option value="Entry level">Entry level</option>
+                <option value="Entry Level">Entry Level</option>
                 <option value="Associate">Associate</option>
-                <option value="Mid-Senior level">Mid-Senior level</option>
+                <option value="Mid-Senior">Mid-Senior</option>
                 <option value="Director">Director</option>
                 <option value="Executive">Executive</option>
               </select>

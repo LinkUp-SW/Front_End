@@ -24,7 +24,7 @@ export interface JobData {
   job_title: string;
   location: string;
   workplace_type: "On-site" | "Remote" | "Hybrid";
-  experience_level: 'Internship' | 'Entry level' | 'Associate' | 'Mid-Senior level' | 'Director' | 'Executive';
+  experience_level: 'Internship' | 'Entry Level' | 'Associate' | 'Mid-Senior' | 'Director' | 'Executive';
   salary: string;
   posted_time: string;
   timeAgo: string;

@@ -23,7 +23,19 @@ const JobCard: React.FC<JobCardProps> = ({ job, onDismiss, onSelect }) => {
       className="p-4 flex items-start gap-4 relative bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 transition-colors cursor-pointer"
       onClick={handleJobClick} 
     >
-      <img src={job.logo} alt={job.company} className="w-12 h-12 rounded" />
+      {job.logo && job.logo.startsWith('http') ? (
+            <img 
+              src={job.logo} 
+              alt={`${job.company} logo`} 
+              className="w-12 h-12 object-contain bg-white dark:bg-gray-800 rounded"
+            />
+          ) : (
+            <div className="w-12 h-12 bg-gray-100 dark:bg-gray-800 flex items-center justify-center rounded">
+              <span className="text-lg font-semibold text-gray-500 dark:text-gray-400">
+                {job.company.substring(0, 2)}
+              </span>
+            </div>
+          )}
       
       <div className="flex-1">
         <div className="flex justify-between">
