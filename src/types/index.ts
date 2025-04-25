@@ -262,6 +262,8 @@ export interface UserProfileBio {
   isInConnections?: boolean;
   isConnectByEmail: boolean;
   isAlreadyFollowing?: boolean;
+  number_of_saved_jobs?: number;
+  number_of_saved_posts?: number;
   is_default_profile_photo: boolean;
   education: Organization | null;
   work_experience: Organization | null;
