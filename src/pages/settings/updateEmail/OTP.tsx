@@ -5,6 +5,7 @@ import styles from './OTP.module.css';
 import { sendEmailVerificationOTP, verifyEmailOTP, getCurrentEmail } from '@/endpoints/settingsEndpoints';
 import { toast } from 'sonner';
 import Cookies from 'js-cookie';
+import { getErrorMessage } from '@/utils/errorHandler';
 
 const OTP: React.FC = () => {
   const navigate = useNavigate();
