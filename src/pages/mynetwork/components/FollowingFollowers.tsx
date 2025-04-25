@@ -251,7 +251,7 @@ const FollowingFollowers: React.FC = () => {
                 <DialogTrigger asChild>
                   <button
                     id="unfollow-button-1"
-                    className="px-2 py-1 sm:px-4 sm:py-2 bg-red-500 text-white rounded-lg flex items-center hover:bg-red-600 transition-colors text-xs sm:text-base whitespace-nowrap"
+                    className="destructiveBtn px-2 py-1 sm:px-4 sm:py-2 rounded-lg flex items-center text-xs sm:text-base whitespace-nowrap"
                     onClick={() => setOpenDialogUserId(user.user_id)}
                   >
                     Unfollow
@@ -285,7 +285,7 @@ const FollowingFollowers: React.FC = () => {
                 <DialogTrigger asChild>
                   <button
                     id="unfollow-button-2"
-                    className="px-2 py-1 sm:px-4 sm:py-2 bg-red-500 text-white rounded-lg flex items-center hover:bg-red-600 transition-colors text-xs sm:text-base whitespace-nowrap"
+                    className="destructiveBtn px-2 py-1 sm:px-4 sm:py-2 rounded-lg flex items-center text-xs sm:text-base whitespace-nowrap"
                     onClick={() => setOpenDialogUserId(user.user_id)}
                   >
                     Unfollow
@@ -312,7 +312,7 @@ const FollowingFollowers: React.FC = () => {
             ) : (
               <button
                 id="follow-button-3"
-                className="px-2 py-1 sm:px-4 sm:py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-xs sm:text-base whitespace-nowrap"
+                className="affirmativeBtn px-2 py-1 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-base whitespace-nowrap"
                 onClick={() => handleFollowUser(user.user_id)}
               >
                 Follow

@@ -175,7 +175,7 @@ const Connections: React.FC = () => {
                 <div className="flex items-center gap-1 sm:gap-2">
                   <button
                     id="message-button"
-                    className="px-2 py-1 sm:px-3 sm:py-1.5 md:px-4 md:py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 shadow-md cursor-pointer text-xs sm:text-sm whitespace-nowrap"
+                    className=" affirmativeBtn  px-2 py-1 sm:px-3 sm:py-1.5 md:px-4 md:py-2  rounded-full   whitespace-nowrap"
                   >
                     Message
                   </button>

@@ -28,15 +28,15 @@ const WithdrawInvitationModal: React.FC<WithdrawInvitationTypeModalProps> = ({
             onClick={() => {
               onConfirm();
             }}
-            className="px-4 py-2 bg-red-600 text-white rounded cursor-pointer hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800"
+            className="affirmativeBtn px-2 py-1 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-base whitespace-nowrap"
           >
             Confirm
           </button>
           <button
             id="cancel-withdraw-invitation-button"
             onClick={onCancel} // Use the passed onCancel handler
-            className="px-4 py-2 bg-gray-300 text-gray-900 rounded cursor-pointer hover:bg-gray-400 
-            dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
+            className="destructiveBtn px-2 py-1 sm:px-4 sm:py-2 rounded-lg flex items-center text-xs sm:text-base whitespace-nowrap"
+          
           >
             Cancel
           </button>
