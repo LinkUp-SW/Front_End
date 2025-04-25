@@ -24,7 +24,7 @@ const PrimaryEmailPage: React.FC = () => {
         const response = await getCurrentEmail(token);
         setCurrentEmail(response.email);
       } catch (error) {
-        toast.error('Failed to fetch email');
+        toast.error(getErrorMessage(error));
       } finally {
         setIsLoading(false);
       }
