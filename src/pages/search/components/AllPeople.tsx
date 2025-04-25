@@ -11,6 +11,9 @@ import withSidebarAd from "@/components/hoc/withSidebarAd";
 import { toast } from "sonner";
 import { getErrorMessage } from "@/utils/errorHandler";
 import manOnChair from "../../../assets/man_on_chair.svg";
+import { FaPaperPlane } from "react-icons/fa";
+
+import { IoPersonAdd } from "react-icons/io5";
 
 const AllPeople: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -44,10 +47,7 @@ const AllPeople: React.FC = () => {
         pagination.limit
       );
       setPeople(response.people);
-      setPagination({
-        ...response.pagination,
-        limit: 5,
-      });
+      setPagination({ ...response.pagination, limit: 5 });
     } catch (error) {
       console.error("Failed to fetch users", error);
     } finally {
@@ -83,7 +83,7 @@ const AllPeople: React.FC = () => {
       );
     } catch (error) {
       console.error("Connection failed", error);
-      toast.error(getErrorMessage(error) || "Failed to sent connection");
+      toast.error(getErrorMessage(error) || "Failed to send connection");
     } finally {
       setConnectingUserIds((prev) => prev.filter((id) => id !== userId));
     }
@@ -201,8 +201,9 @@ const AllPeople: React.FC = () => {
                       {person.connection_degree === "1st" ? (
                         <button
                           id="message-button"
-                          className="w-full sm:w-auto px-4 py-2 border rounded-full text-blue-600 border-blue-600 hover:bg-blue-100 dark:hover:bg-gray-700"
+                          className="w-full sm:w-auto px-4 py-2 border rounded-full text-blue-600 border-blue-600 hover:bg-blue-100 dark:hover:bg-gray-700 flex items-center justify-center gap-2"
                         >
+                          <FaPaperPlane />
                           Message
                         </button>
                       ) : person.is_in_received_connections ? (
@@ -210,7 +211,8 @@ const AllPeople: React.FC = () => {
                           id="accept-invitation-button"
                           onClick={() => handleAccept(person.user_id)}
                           disabled={acceptingUserIds.includes(person.user_id)}
-                          className="w-full sm:w-auto px-4 py-2 border rounded-full  text-blue-600 border-blue-600 hover:bg-green-100 dark:hover:bg-gray-700 disabled:opacity-50"
+                          className="w-full sm:w-auto px-4 py-2 border rounded-full text-green-600 border-green-600 hover:bg-green-100 dark:hover:bg-gray-700 disabled:opacity-50"
+                          style={{ minWidth: "118px" }}
                         >
                           {acceptingUserIds.includes(person.user_id)
                             ? "Accepting..."
@@ -219,7 +221,8 @@ const AllPeople: React.FC = () => {
                       ) : person.is_in_sent_connections ? (
                         <button
                           id="pending-button"
-                          className="w-full sm:w-auto px-4 py-2 border rounded-full text-gray-400 border-gray-400 cursor-not-allowed"
+                          className="w-full sm:w-auto px-4 py-2 border rounded-full text-gray-400 border-gray-400 cursor-not-allowed flex items-center justify-center"
+                          style={{ minWidth: "118px" }}
                         >
                           Pending
                         </button>
@@ -228,8 +231,9 @@ const AllPeople: React.FC = () => {
                           id="connect-button"
                           onClick={() => handleConnect(person.user_id)}
                           disabled={connectingUserIds.includes(person.user_id)}
-                          className="w-full sm:w-auto px-4 py-2 border rounded-full text-gray-600 border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50"
+                          className="w-full sm:w-auto px-4 py-2 border rounded-full text-blue-600 border-blue-600 hover:bg-blue-100 dark:hover:bg-gray-700 disabled:opacity-50 flex items-center justify-center gap-2"
                         >
+                          <IoPersonAdd />
                           {connectingUserIds.includes(person.user_id)
                             ? "Connecting..."
                             : "Connect"}
@@ -250,7 +254,6 @@ const AllPeople: React.FC = () => {
               )}
             </div>
 
-            {/* Pagination */}
             {pagination.pages > 1 && (
               <div className="flex flex-wrap justify-center mt-6 gap-2">
                 <button

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { FaSearch, FaTimes } from "react-icons/fa";
+import { FaPaperPlane, FaSearch, FaTimes } from "react-icons/fa";
 import withSidebarAd from "@/components/hoc/withSidebarAd";
 import {
   Dialog,
@@ -175,10 +175,12 @@ const Connections: React.FC = () => {
                 <div className="flex items-center gap-1 sm:gap-2">
                   <button
                     id="message-button"
-                    className=" affirmativeBtn  px-2 py-1 sm:px-3 sm:py-1.5 md:px-4 md:py-2  rounded-full   whitespace-nowrap"
+                    className="w-full sm:w-auto px-4 py-2 border rounded-full text-blue-600 border-blue-600 hover:bg-blue-100 dark:hover:bg-gray-700 flex items-center justify-center gap-2"
                   >
+                    <FaPaperPlane/>
                     Message
                   </button>
+
                   <Dialog
                     open={openDialogUserId === conn.user_id}
                     onOpenChange={(open) => {

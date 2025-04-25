@@ -28,19 +28,19 @@ const RemoveConnectionModal: React.FC<RemoveConnectionModalProps> = ({
         </p>
         <div className="mt-4 flex justify-center gap-4">
           <button
-            id="confirm-remove-connection-button"
-            onClick={() => {
-              onConfirm();
-              dispatch(closeModal());
-            }}
-            className="affirmativeBtn px-2 py-1 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-base whitespace-nowrap"
-          >
-            Confirm
-          </button>
-          <button
-            id="cancel-remove-connection-button"
+                      id="confirm-unfollow-button"
+                      onClick={() => {
+                        onConfirm();
+                        dispatch(closeModal());
+                      }}
+                      className=" destructiveBtn px-2 py-1 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-base whitespace-nowrap"
+                    >
+                      Confirm
+                    </button>
+                    <button
+            id="cancel-unfollow-button"
             onClick={onCancel}
-            className="destructiveBtn px-2 py-1 sm:px-4 sm:py-2 rounded-lg flex items-center text-xs sm:text-base whitespace-nowrap"
+            className="px-3 py-1 sm:px-4 sm:py-2 text-xs sm:text-base text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white bg-gray-300 dark:bg-gray-700 rounded-lg cursor-pointer"
           >
             Cancel
           </button>

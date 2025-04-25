@@ -19,21 +19,16 @@ import UnfollowUserModal from "./modals/UnfollowUserModal";
 import { DialogDescription, DialogTitle } from "@radix-ui/react-dialog";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import manOnChair from "../../../assets/man_on_chair.svg"; // Import the image
 
 const LIMIT = 100; // Number of items per page
 
 const FollowingFollowers: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<"following" | "followers">(
-    "following"
-  );
+  const [activeTab, setActiveTab] = useState<"following" | "followers">("following");
   const [following, setFollowing] = useState<Following[]>([]);
   const [followers, setFollowers] = useState<Followers[]>([]);
-  const [nextCursorFollowing, setNextCursorFollowing] = useState<string | null>(
-    null
-  );
-  const [nextCursorFollowers, setNextCursorFollowers] = useState<string | null>(
-    null
-  );
+  const [nextCursorFollowing, setNextCursorFollowing] = useState<string | null>(null);
+  const [nextCursorFollowers, setNextCursorFollowers] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [openDialogUserId, setOpenDialogUserId] = useState<string | null>(null);
@@ -184,6 +179,15 @@ const FollowingFollowers: React.FC = () => {
     return <div>Loading...</div>;
   }
 
+  const renderNoContent = () => (
+    <div className="flex flex-col items-center justify-center p-4">
+      <img src={manOnChair} alt="No followers or following" className="w-48 h-48 sm:w-64 sm:h-64 mb-4" />
+      <p className="text-lg sm:text-xl font-semibold text-gray-600 dark:text-gray-300">
+        No users to show yet. 
+      </p>
+    </div>
+  );
+
   return (
     <div className="flex-1 bg-white dark:bg-gray-800 rounded-lg shadow-md p-2 sm:p-4 transition-all flex flex-col h-full overflow-hidden">
       <div className="flex border-b">
@@ -218,108 +222,110 @@ const FollowingFollowers: React.FC = () => {
       </div>
 
       <div className="space-y-3 p-2 sm:p-4 flex-grow overflow-y-auto">
-        {(activeTab === "followers" ? followers : following).map((user) => (
-          <div
-            key={user.user_id}
-            className="flex items-center p-2 sm:p-3 bg-gray-100 dark:bg-gray-700 rounded-lg shadow-sm hover:shadow-md transition-shadow"
-          >
-            <img
-              src={user.profilePicture}
-              alt={user.name}
-              className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border border-gray-300 cursor-pointer"
-              onClick={() => navigateToUser(user.user_id)}
-            />
-            <div className="ml-3 flex-1 min-w-0">
-              <p
-                className="text-sm sm:text-lg font-medium text-gray-900 dark:text-white cursor-pointer truncate"
-                onClick={() => navigateToUser(user.user_id)}
-                id="user-name-link"
+        {(activeTab === "followers" ? followers : following).length === 0
+          ? renderNoContent()
+          : (activeTab === "followers" ? followers : following).map((user) => (
+              <div
+                key={user.user_id}
+                className="flex items-center p-2 sm:p-3 bg-gray-100 dark:bg-gray-700 rounded-lg shadow-sm hover:shadow-md transition-shadow"
               >
-                {user.name}
-              </p>
-              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 truncate">
-                {user.headline}
-              </p>
-            </div>
-            {activeTab === "following" ? (
-              <Dialog
-                open={openDialogUserId === user.user_id}
-                onOpenChange={(open) => {
-                  if (!open) setOpenDialogUserId(null);
-                }}
-              >
-                <DialogTrigger asChild>
-                  <button
-                    id="unfollow-button-1"
-                    className="destructiveBtn px-2 py-1 sm:px-4 sm:py-2 rounded-lg flex items-center text-xs sm:text-base whitespace-nowrap"
-                    onClick={() => setOpenDialogUserId(user.user_id)}
+                <img
+                  src={user.profilePicture}
+                  alt={user.name}
+                  className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border border-gray-300 cursor-pointer"
+                  onClick={() => navigateToUser(user.user_id)}
+                />
+                <div className="ml-3 flex-1 min-w-0">
+                  <p
+                    className="text-sm sm:text-lg font-medium text-gray-900 dark:text-white cursor-pointer truncate"
+                    onClick={() => navigateToUser(user.user_id)}
+                    id="user-name-link"
                   >
-                    Unfollow
-                  </button>
-                </DialogTrigger>
-                <DialogContent
-                  id="unfollow-dialog1-content"
-                  className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg shadow-lg p-4 sm:p-6"
-                >
-                  <UnfollowUserModal
-                    userData={{ userName: user.name, userId: user.user_id }}
-                    onConfirm={() => {
-                      handleUnfollowUser(user.user_id);
-                      setOpenDialogUserId(null);
+                    {user.name}
+                  </p>
+                  <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 truncate">
+                    {user.headline}
+                  </p>
+                </div>
+                {activeTab === "following" ? (
+                  <Dialog
+                    open={openDialogUserId === user.user_id}
+                    onOpenChange={(open) => {
+                      if (!open) setOpenDialogUserId(null);
                     }}
-                    onCancel={() => setOpenDialogUserId(null)}
-                  />
-                  <DialogHeader>
-                    <DialogTitle></DialogTitle>
-                    <DialogDescription></DialogDescription>
-                  </DialogHeader>
-                </DialogContent>
-              </Dialog>
-            ) : (user as Followers).following ? (
-              <Dialog
-                open={openDialogUserId === user.user_id}
-                onOpenChange={(open) => {
-                  if (!open) setOpenDialogUserId(null);
-                }}
-              >
-                <DialogTrigger asChild>
-                  <button
-                    id="unfollow-button-2"
-                    className="destructiveBtn px-2 py-1 sm:px-4 sm:py-2 rounded-lg flex items-center text-xs sm:text-base whitespace-nowrap"
-                    onClick={() => setOpenDialogUserId(user.user_id)}
                   >
-                    Unfollow
-                  </button>
-                </DialogTrigger>
-                <DialogContent
-                  id="unfollow-dialog2-content"
-                  className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg shadow-lg p-4 sm:p-6"
-                >
-                  <UnfollowUserModal
-                    userData={{ userName: user.name, userId: user.user_id }}
-                    onConfirm={() => {
-                      handleUnfollowUser(user.user_id);
-                      setOpenDialogUserId(null);
+                    <DialogTrigger asChild>
+                      <button
+                        id="unfollow-button-1"
+                        className="destructiveBtn px-2 py-1 sm:px-4 sm:py-2 rounded-lg flex items-center text-xs sm:text-base whitespace-nowrap"
+                        onClick={() => setOpenDialogUserId(user.user_id)}
+                      >
+                        Unfollow
+                      </button>
+                    </DialogTrigger>
+                    <DialogContent
+                      id="unfollow-dialog1-content"
+                      className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg shadow-lg p-4 sm:p-6"
+                    >
+                      <UnfollowUserModal
+                        userData={{ userName: user.name, userId: user.user_id }}
+                        onConfirm={() => {
+                          handleUnfollowUser(user.user_id);
+                          setOpenDialogUserId(null);
+                        }}
+                        onCancel={() => setOpenDialogUserId(null)}
+                      />
+                      <DialogHeader>
+                        <DialogTitle></DialogTitle>
+                        <DialogDescription></DialogDescription>
+                      </DialogHeader>
+                    </DialogContent>
+                  </Dialog>
+                ) : (user as Followers).following ? (
+                  <Dialog
+                    open={openDialogUserId === user.user_id}
+                    onOpenChange={(open) => {
+                      if (!open) setOpenDialogUserId(null);
                     }}
-                    onCancel={() => setOpenDialogUserId(null)}
-                  />
-                  <DialogHeader>
-                    <DialogTitle></DialogTitle>
-                    <DialogDescription></DialogDescription>
-                  </DialogHeader>
-                </DialogContent>
-              </Dialog>
-            ) : (
-              <button
-                id="follow-button-3"
-                className="affirmativeBtn px-2 py-1 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-base whitespace-nowrap"
-                onClick={() => handleFollowUser(user.user_id)}
-              >
-                Follow
-              </button>
-            )}
-          </div>
-        ))}
+                  >
+                    <DialogTrigger asChild>
+                      <button
+                        id="unfollow-button-2"
+                        className="destructiveBtn px-2 py-1 sm:px-4 sm:py-2 rounded-lg flex items-center text-xs sm:text-base whitespace-nowrap"
+                        onClick={() => setOpenDialogUserId(user.user_id)}
+                      >
+                        Unfollow
+                      </button>
+                    </DialogTrigger>
+                    <DialogContent
+                      id="unfollow-dialog2-content"
+                      className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg shadow-lg p-4 sm:p-6"
+                    >
+                      <UnfollowUserModal
+                        userData={{ userName: user.name, userId: user.user_id }}
+                        onConfirm={() => {
+                          handleUnfollowUser(user.user_id);
+                          setOpenDialogUserId(null);
+                        }}
+                        onCancel={() => setOpenDialogUserId(null)}
+                      />
+                      <DialogHeader>
+                        <DialogTitle></DialogTitle>
+                        <DialogDescription></DialogDescription>
+                      </DialogHeader>
+                    </DialogContent>
+                  </Dialog>
+                ) : (
+                  <button
+                    id="follow-button-3"
+                    className="affirmativeBtn px-2 py-1 sm:px-4 sm:py-2 rounded-lg flex items-center text-xs sm:text-base whitespace-nowrap"
+                    onClick={() => handleFollowUser(user.user_id)}
+                  >
+                    Follow
+                  </button>
+                )}
+              </div>
+            ))}
         <div ref={observerRef}></div> {/* Infinite Scroll Trigger */}
       </div>
     </div>

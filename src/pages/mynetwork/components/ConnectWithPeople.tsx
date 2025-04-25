@@ -222,18 +222,20 @@ const PeopleSection = ({ token, context, title }: PeopleSectionProps) => {
           </div>
         </div>
         <div className="mt-4 w-full">
-          <button
+        <button
             id="connect-button"
             onClick={() => handleConnect(person.user_id)}
             disabled={isConnecting}
-            className={`w-full font-medium py-1 rounded-full flex items-center justify-center gap-2 transition affirmativeBtn ${
-              isConnecting ? "opacity-70 cursor-not-allowed" : ""
+            className={`w-full border border-cyan-600 font-medium py-1 rounded-full flex items-center justify-center gap-2 transition ${
+              isConnecting
+                ? "bg-blue-100 dark:bg-blue-900 text-cyan-600 dark:text-blue-300"
+                : "text-cyan-600 hover:bg-blue-100 dark:hover:bg-blue-900"
             }`}
           >
             {isConnecting ? (
               <>
                 <svg
-                  className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                  className="animate-spin -ml-1 mr-2 h-4 w-4 text-cyan-600"
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
@@ -286,7 +288,7 @@ const PeopleSection = ({ token, context, title }: PeopleSectionProps) => {
           <DialogTrigger asChild>
             <button
               id="show-all-button"
-              className="text-blue-600 dark:text-blue-400 hover:underline text-sm font-medium"
+              className="text-cyan-600 dark:text-blue-400 hover:underline text-sm font-medium"
             >
               Show all
             </button>
