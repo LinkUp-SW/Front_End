@@ -144,6 +144,7 @@ export interface UserLoginResponse {
     email: string;
     id: string;
     isVerified: boolean;
+    isAdmin:boolean
   };
 }
 
