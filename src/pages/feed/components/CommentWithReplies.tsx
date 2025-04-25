@@ -40,6 +40,10 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
   const [commentInput, setCommentInput] = useState("");
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
 
+  useEffect(() => {
+    setIsReplyActive(false);
+  }, [comment]);
+
   if (!stats) {
     stats = {
       likes: 15,
