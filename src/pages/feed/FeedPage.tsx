@@ -14,8 +14,6 @@ import {
   Post,
 } from "./components";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
-import { useSelector } from "react-redux";
-import { RootState } from "@/store";
 import {
   CommentObjectType,
   CommentType,
@@ -26,25 +24,29 @@ import { fetchSinglePost, getPostReactions } from "@/endpoints/feed";
 import { useParams } from "react-router-dom";
 import Cookies from "js-cookie";
 import SortDown from "./components/SortDown";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "@/store";
+import { setPosts } from "@/slices/feed/postsSlice"; // adjust if needed
+import { setComments } from "@/slices/feed/commentsSlice";
 
 interface FeedPageProps {
   single?: boolean;
 }
 
 const FeedPage: React.FC<FeedPageProps> = ({ single = false }) => {
+  const posts = useSelector((state: RootState) => state.posts.list);
+  const comments = useSelector((state: RootState) => state.comments.list);
+  const dispatch = useDispatch();
   const { id } = useParams<{ id: string }>(); // Extract the 'id' parameter from the URL
   const [viewMore, setViewMore] = useState(true);
   const screenWidth = useSelector((state: RootState) => state.screen.width);
 
-  const [posts, setPosts] = useState<PostType[]>([]);
-  const [comments, setComments] = useState<CommentObjectType[]>([]);
   const [reactions, setReactions] = useState<ReactionType[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const temporary_feed = [
-    "6806a2058db9403282340f23",
-
     "6806b5a2bfb3de42b857be4c",
+    "680a6b3eb57681e1e91b7b52",
   ];
 
   const user_token = Cookies.get("linkup_auth_token");
@@ -74,18 +76,19 @@ const FeedPage: React.FC<FeedPageProps> = ({ single = false }) => {
         const comments: CommentObjectType[] = fetchedData.map(
           (data) => data.comments
         );
+        console.log(fetchedData);
         console.log("Posts:", posts);
         console.log("Comments:", comments);
         comments.forEach((block) => {
           block.comments = Object.values(block.comments).reverse();
         });
 
-        if (posts.length > 0) setPosts(posts);
-        else setPosts([]);
+        if (posts.length > 0) dispatch(setPosts(posts));
+        else dispatch(setPosts([]));
         if (comments.length > 0) {
-          setComments(comments);
+          dispatch(setComments(comments));
         } else {
-          setComments([]);
+          dispatch(setComments([]));
         }
         if (fetchedReactions) setReactions(fetchedReactions);
         else setReactions([]);
@@ -146,22 +149,19 @@ const FeedPage: React.FC<FeedPageProps> = ({ single = false }) => {
           </aside>
           {/* Main Content */}
           <main className="flex flex-col w-full max-w-auto md:max-w-[27.8rem] lg:max-w-[35rem]">
-            {!single && <CreatePost posts={posts} setPosts={setPosts} />}
+            {!single && <CreatePost />}
             <SortDown />
             {posts.length != 0 ? (
               posts.map((post, index) => {
                 return (
                   <Post
-                    key={index}
+                    key={`post-${post._id}`}
                     viewMore={viewMore}
                     postData={post}
                     comments={comments[index]}
-                    reactions={reactions}
                     action={post.action}
                     posts={posts}
-                    setPosts={setPosts}
                     allComments={comments}
-                    setComments={setComments}
                     order={index}
                   />
                 );
