@@ -4,10 +4,9 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import React, { useEffect, useState } from "react";
-import { data, Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { LiaEllipsisHSolid as EllipsisIcon } from "react-icons/lia";
 import { Button } from "@/components/ui/button";
-import { FaEyeSlash, FaFlag, FaLink } from "react-icons/fa";
 import FunnyIcon from "@/assets/Funny.svg";
 import CelebrateIcon from "@/assets/Celebrate.svg";
 import LikeIcon from "@/assets/Like.svg";
@@ -44,7 +43,6 @@ import TransparentButton from "./buttons/TransparentButton";
 import BlueButton from "./buttons/BlueButton";
 import { toast } from "sonner";
 import IconButton from "./buttons/IconButton";
-import { setPosts } from "@/slices/feed/postsSlice"; // adjust if needed
 import { setComments } from "@/slices/feed/commentsSlice";
 
 export interface CommentProps {
@@ -70,7 +68,6 @@ const Comment: React.FC<CommentProps> = ({
     connectionDegree,
     headline,
   } = comment.author;
-  const posts = useSelector((state: RootState) => state.posts.list);
   const comments = useSelector((state: RootState) => state.comments.list);
   const dispatch = useDispatch();
 

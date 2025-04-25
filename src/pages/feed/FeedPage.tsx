@@ -6,24 +6,12 @@ import {
   LinkUpFooter,
   WhosHiringImage,
 } from "../../components";
-import {
-  StatsCard,
-  PremiumBanner,
-  Shortcuts,
-  CreatePost,
-  Post,
-} from "./components";
+import { PremiumBanner, Shortcuts, CreatePost, Post } from "./components";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
-import {
-  CommentObjectType,
-  CommentType,
-  PostType,
-  ReactionType,
-} from "@/types";
+import { CommentObjectType } from "@/types";
 import { fetchSinglePost, getPostReactions } from "@/endpoints/feed";
 import { useParams } from "react-router-dom";
 import Cookies from "js-cookie";
-import SortDown from "./components/SortDown";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { setPosts } from "@/slices/feed/postsSlice"; // adjust if needed
@@ -32,6 +20,7 @@ import { setComments } from "@/slices/feed/commentsSlice";
 interface FeedPageProps {
   single?: boolean;
 }
+import PostSkeleton from "./components/PostSkeleton";
 
 const FeedPage: React.FC<FeedPageProps> = ({ single = false }) => {
   const posts = useSelector((state: RootState) => state.posts.list);
@@ -41,12 +30,21 @@ const FeedPage: React.FC<FeedPageProps> = ({ single = false }) => {
   const [viewMore, setViewMore] = useState(true);
   const screenWidth = useSelector((state: RootState) => state.screen.width);
 
-  const [reactions, setReactions] = useState<ReactionType[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const temporary_feed = [
     "6806b5a2bfb3de42b857be4c",
     "680a6b3eb57681e1e91b7b52",
+    "680ba14b801a855626ece75c",
+    "680ba0a9801a855626ece74d",
+    "680ba090801a855626ece73e",
+    "680b9f26801a855626ece683",
+    "680b70ca2ea9ffaf2afa7c12",
+    "680ace66b57681e1e91b8d39",
+    "680a6fafb57681e1e91b7c0b",
+    "680a6f79b57681e1e91b7bf9",
+    "680a6b3eb57681e1e91b7b52",
+    "680a6702b57681e1e91b7a52",
   ];
 
   const user_token = Cookies.get("linkup_auth_token");
@@ -61,7 +59,7 @@ const FeedPage: React.FC<FeedPageProps> = ({ single = false }) => {
         }
 
         // Call both endpoints concurrently
-        const [fetchedData, fetchedReactions] = await Promise.all([
+        const [fetchedData] = await Promise.all([
           Promise.all(
             (!single || !id
               ? temporary_feed.map((postId) =>
@@ -70,7 +68,6 @@ const FeedPage: React.FC<FeedPageProps> = ({ single = false }) => {
               : [fetchSinglePost(id, user_token ?? "", 0, 10)]
             ).filter(Boolean)
           ),
-          getPostReactions(),
         ]);
         const posts = fetchedData.map((data) => data.post);
         const comments: CommentObjectType[] = fetchedData.map(
@@ -90,15 +87,13 @@ const FeedPage: React.FC<FeedPageProps> = ({ single = false }) => {
         } else {
           dispatch(setComments([]));
         }
-        if (fetchedReactions) setReactions(fetchedReactions);
-        else setReactions([]);
+        setIsLoading(false);
       } catch (error) {
         console.error("Error fetching feed data", error);
       }
     };
 
     fetchData();
-    setIsLoading(false);
   }, []);
 
   useEffect(() => {
@@ -108,10 +103,6 @@ const FeedPage: React.FC<FeedPageProps> = ({ single = false }) => {
       setViewMore(true);
     }
   }, [screenWidth]);
-
-  if (isLoading) {
-    return <>Loading...</>;
-  }
 
   return (
     <>
@@ -141,7 +132,6 @@ const FeedPage: React.FC<FeedPageProps> = ({ single = false }) => {
             </Button>
             {viewMore && (
               <>
-                <StatsCard profileViewers={27} postImpressions={22} />
                 <PremiumBanner />
                 <Shortcuts />
               </>
@@ -150,8 +140,15 @@ const FeedPage: React.FC<FeedPageProps> = ({ single = false }) => {
           {/* Main Content */}
           <main className="flex flex-col w-full max-w-auto md:max-w-[27.8rem] lg:max-w-[35rem]">
             {!single && <CreatePost />}
-            <SortDown />
-            {posts.length != 0 ? (
+            <div className="mt-4"></div>
+            {isLoading ? (
+              // Skeleton loaders while loading
+              <div className="space-y-4">
+                {Array.from({ length: 5 }).map((_, index) => (
+                  <PostSkeleton key={`skeleton-${index}`} />
+                ))}
+              </div>
+            ) : posts.length != 0 ? (
               posts.map((post, index) => {
                 return (
                   <Post
