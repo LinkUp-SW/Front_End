@@ -23,24 +23,25 @@ import { MenuAction } from "@/types";
 import React, { ReactNode } from "react";
 import { EditIcon } from "lucide-react";
 import { FaMessage } from "react-icons/fa6";
+import { toast } from "sonner";
 
 export const getMenuActions: (
   savePost: () => void,
-  copyLink: () => void,
   blockPost: () => void,
   reportPost: () => void,
   unfollow: () => void,
+  _id: string,
   isSaved?: boolean
 ) => MenuAction[] = (
   savePost,
-  copyLink,
   blockPost,
   reportPost,
   unfollow,
+  _id,
   isSaved
 ) => [
   {
-    name: "Save",
+    name: isSaved ? "Unsave" : "Save",
     action: () => savePost(),
     icon: React.createElement(isSaved ? FaBookmark : FaRegBookmark, {
       className: "mr-2",
@@ -48,7 +49,7 @@ export const getMenuActions: (
   },
   {
     name: "Copy Link",
-    action: () => copyLink(),
+    action: () => copyPostLinkToClipboard(_id),
     icon: React.createElement(FaLink, { className: "mr-2" }),
   },
   {
@@ -70,11 +71,11 @@ export const getMenuActions: (
 
 export const getPersonalMenuActions: (
   savePost: () => void,
-  copyLink: () => void,
   editPost: () => void,
   deletePost: () => void,
+  _id: string,
   isSaved?: boolean
-) => MenuAction[] = (savePost, copyLink, editPost, deletePost, isSaved) => [
+) => MenuAction[] = (savePost, editPost, deletePost, _id, isSaved) => [
   {
     name: isSaved ? "Unsave" : "Save",
     action: () => savePost(),
@@ -84,7 +85,7 @@ export const getPersonalMenuActions: (
   },
   {
     name: "Copy Link",
-    action: () => copyLink(),
+    action: () => copyPostLinkToClipboard(_id),
     icon: React.createElement(FaLink, { className: "mr-2" }),
   },
   {
@@ -96,6 +97,51 @@ export const getPersonalMenuActions: (
     name: "Delete Post",
     action: () => deletePost(),
     icon: React.createElement(FaTrash, { className: "mr-2" }),
+  },
+];
+
+const copyPostLinkToClipboard = (postId: string) => {
+  const postLink = `${window.location.origin}/feed/posts/${postId}`; // Construct the full post link
+  navigator.clipboard
+    .writeText(postLink)
+    .then(() => {
+      // Show a toast notification on success
+      toast.success("Post link copied to clipboard!");
+    })
+    .catch((err) => {
+      console.error("Failed to copy post link:", err);
+      // Show a toast notification on failure
+      toast.error("Failed to copy post link. Please try again.");
+    });
+};
+
+export const getSaveMenuActions: (
+  savePost: () => void,
+  sendPost: () => void,
+  reportPost: () => void,
+  _id: string
+) => MenuAction[] = (savePost, sendPost, reportPost, _id) => [
+  {
+    name: "Unsave",
+    action: () => savePost(),
+    icon: React.createElement(FaBookmark, {
+      className: "mr-2",
+    }),
+  },
+  {
+    name: "Copy Link",
+    action: () => copyPostLinkToClipboard(_id),
+    icon: React.createElement(FaLink, { className: "mr-2" }),
+  },
+  {
+    name: "Send Post",
+    action: () => sendPost(),
+    icon: React.createElement(SendIcon, { className: "mr-2" }),
+  },
+  {
+    name: "Report Post",
+    action: () => reportPost(),
+    icon: React.createElement(FaFlag, { className: "mr-2" }),
   },
 ];
 
