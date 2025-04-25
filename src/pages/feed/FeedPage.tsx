@@ -88,6 +88,8 @@ const FeedPage: React.FC<FeedPageProps> = ({ single = false }) => {
         }
         setIsLoading(false);
       } catch (error) {
+        dispatch(setPosts([]));
+        dispatch(setComments([]));
         console.error("Error fetching feed data", error);
       }
     };
