@@ -130,7 +130,7 @@ export const createComment = async (
   token: string
 ) => {
   const response = await axiosInstance.post(
-    "api/v1/post/comment",
+    `api/v1/post/comment/${postPayload.post_id}`,
     postPayload,
     {
       headers: {
@@ -138,6 +138,90 @@ export const createComment = async (
       },
     }
   );
+  console.log("HERE", response);
+
+  return response.data;
+};
+
+export const getReactions = async (
+  postPayload: any,
+  postId: string,
+  token: string
+) => {
+  const response = await axiosInstance.get(`api/v1/post/reaction/${postId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    params: {
+      commentId: postPayload.commentId,
+      cursor: postPayload.cursor,
+      limit: postPayload.limit,
+      targetType: postPayload.targetType,
+      specificReaction: postPayload.specificReaction,
+    },
+  });
+
+  return response.data;
+};
+
+export const deleteReaction = async (
+  postPayload: any,
+  postId: string,
+  token: string
+) => {
+  const response = await axiosInstance.delete(
+    `api/v1/post/reaction/${postId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      data: postPayload,
+    }
+  );
+
+  return response.data;
+};
+
+export const createReaction = async (
+  postPayload: any,
+  postId: string,
+  token: string
+) => {
+  const response = await axiosInstance.post(
+    `api/v1/post/reaction/${postId}`,
+    postPayload,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  return response.data;
+};
+
+export const savePost = async (postId: string, token: string) => {
+  const response = await axiosInstance.post(
+    `api/v1/post/save-post`,
+    { postId: postId },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  return response.data;
+};
+
+export const unsavePost = async (postId: string, token: string) => {
+  const response = await axiosInstance.delete(`api/v1/post/save-post`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    data: { postId: postId },
+  });
+
   return response.data;
 };
 
