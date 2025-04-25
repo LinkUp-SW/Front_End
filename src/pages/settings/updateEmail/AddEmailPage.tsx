@@ -2,66 +2,83 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SettingsLayoutPage from '@/components/hoc/SettingsLayoutPage';
 import styles from './addEmailPage.module.css';
+import { updateEmail } from '@/endpoints/settingsEndpoints';
+import { toast } from 'sonner';
+import Cookies from 'js-cookie';
 
 const AddEmailPage: React.FC = () => {
   const navigate = useNavigate();
   const [newEmail, setNewEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   const handleBack = () => {
     navigate('/settings/security/email');
   };
   
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app, you would submit the new email to the server
-    console.log('Adding new email:', newEmail);
-    // After successful addition, redirect back to the email page
-    navigate('/settings/security/email');
+    setIsSubmitting(true);
+
+    try {
+      const token = Cookies.get('linkup_auth_token');
+      if (!token) {
+        toast.error('Authentication required');
+        navigate('/login');
+        return;
+      }
+
+      await updateEmail(token, newEmail, password);
+      toast.success('Email updated successfully');
+      navigate('/settings/security/email');
+    } catch (error) {
+      toast.error('Failed to update email');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const isFormValid = newEmail && password;
 
   return (
     <SettingsLayoutPage>
-      <div className={styles.addEmailContainer}>
+      <div className={styles.container}>
         <div className={styles.header}>
           <button className={styles.backButton} onClick={handleBack}>
             ← Back
           </button>
-          
           <h2 className={styles.title}>Email addresses</h2>
           <p className={styles.subtitle}>Add a new email</p>
         </div>
         
-        <div className={styles.formSection}>
-          <form onSubmit={handleSubmit}>
-            <div className={styles.inputGroup}>
-              <label htmlFor="newEmail" className={styles.inputLabel}>
+        <div className={styles.content}>
+          <form onSubmit={handleSubmit} className={styles.form}>
+            <div className={styles.formGroup}>
+              <label htmlFor="newEmail" className={styles.label}>
                 Enter new email address
               </label>
               <input
                 id="newEmail"
                 type="email"
-                className={styles.emailInput}
+                className={styles.input}
                 placeholder="Email address"
                 value={newEmail}
                 onChange={(e) => setNewEmail(e.target.value)}
                 required
               />
-              <p className={styles.inputHelperText}>
-                A confirmation will be sent to this account. Click on the confirmation link to verify and add this email.
+              <p className={styles.helpText}>
+                A confirmation will be sent to this account.
               </p>
             </div>
             
-            <div className={styles.inputGroup}>
-              <label htmlFor="password" className={styles.inputLabel}>
+            <div className={styles.formGroup}>
+              <label htmlFor="password" className={styles.label}>
                 Enter your LinkUp password
               </label>
               <input
                 id="password"
                 type="password"
-                className={styles.passwordInput}
+                className={styles.input} 
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -72,9 +89,9 @@ const AddEmailPage: React.FC = () => {
             <button 
               type="submit"
               className={`${styles.submitButton} ${isFormValid ? styles.submitButtonActive : ''}`}
-              disabled={!isFormValid}
+              disabled={!isFormValid || isSubmitting}
             >
-              Submit
+              {isSubmitting ? 'Updating...' : 'Submit'}
             </button>
           </form>
         </div>
