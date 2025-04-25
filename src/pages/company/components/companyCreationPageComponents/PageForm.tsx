@@ -148,17 +148,6 @@ export const PageForm: React.FC<PageFormProps> = ({ type, onSubmit }) => {
         />
       </div>
 
-      <div className="mb-6">
-        <label className="block text-gray-700 dark:text-gray-300 mb-1 font-medium">Location</label>
-        <input 
-          type="text" 
-          name="location"
-          value={formData.location || ''}
-          onChange={handleChange}
-          placeholder="ex: New York, NY" 
-          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-        />
-      </div>
 
       <div className="mb-6">
         <label className="block text-gray-700 dark:text-gray-300 mb-1 font-medium">Organization size*</label>
@@ -211,9 +200,9 @@ export const PageForm: React.FC<PageFormProps> = ({ type, onSubmit }) => {
               <>
                 <option value="University">University</option>
                 <option value="College">College</option>
-                <option value="High School">High School</option>
-                <option value="Middle School">Middle School</option>
-                <option value="Elementary School">Elementary School</option>
+                <option value="High School">High school</option>
+                <option value="Middle School">Middle school</option>
+                <option value="Elementary School">Elementary school</option>
               </>
             )}
           </select>
