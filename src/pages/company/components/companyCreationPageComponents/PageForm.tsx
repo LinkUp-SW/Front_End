@@ -1,6 +1,7 @@
 import { FormEvent, useState } from 'react';
 import { createCompanyProfile } from '@/endpoints/company';
-import {CompanyProfileData} from "../../../jobs/types"
+import { CompanyProfileData } from "../../../jobs/types";
+import { toast } from 'sonner';
 
 interface PageFormProps {
   type: 'company' | 'education';
@@ -22,7 +23,6 @@ export const PageForm: React.FC<PageFormProps> = ({ type, onSubmit }) => {
   });
   
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [charCount, setCharCount] = useState(0);
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -37,22 +37,22 @@ export const PageForm: React.FC<PageFormProps> = ({ type, onSubmit }) => {
   const validateForm = (): boolean => {
     // Basic validation
     if (!formData.name.trim()) {
-      setError('Name is required.');
+      toast.error('Name is required.');
       return false;
     }
     
     if (!formData.industry.trim()) {
-      setError('Industry is required.');
+      toast.error('Industry is required.');
       return false;
     }
     
     if (!formData.size) {
-      setError('Organization size is required.');
+      toast.error('Organization size is required.');
       return false;
     }
     
     if (!formData.type) {
-      setError('Organization type is required.');
+      toast.error('Organization type is required.');
       return false;
     }
     
@@ -67,7 +67,6 @@ export const PageForm: React.FC<PageFormProps> = ({ type, onSubmit }) => {
     }
     
     setIsSubmitting(true);
-    setError(null);
     
     try {
       console.log('Submitting form data:', formData);
@@ -85,15 +84,18 @@ export const PageForm: React.FC<PageFormProps> = ({ type, onSubmit }) => {
       const response = await createCompanyProfile(apiData);
       console.log('API response:', response);
       
+      // Show success toast notification
+      toast.success(`${type === 'company' ? 'Company' : 'Education'} profile created successfully!`);
+      
       onSubmit(e);
     } catch (err: any) {
       console.error('Error creating company profile:', err);
       
-      // More user-friendly error message
+      // More user-friendly error message with toast
       if (err.message) {
-        setError(err.message);
+        toast.error(err.message);
       } else {
-        setError('Failed to create profile. Please try again later.');
+        toast.error('Failed to create profile. Please try again later.');
       }
     } finally {
       setIsSubmitting(false);
@@ -102,12 +104,6 @@ export const PageForm: React.FC<PageFormProps> = ({ type, onSubmit }) => {
 
   return (
     <form onSubmit={handleSubmitForm}>
-      {error && (
-        <div className="mb-4 p-3 bg-red-100 text-red-700 rounded">
-          {error}
-        </div>
-      )}
-      
       <p className="text-xs text-gray-500 mb-4">* indicates required</p>
 
       <div className="mb-6">
