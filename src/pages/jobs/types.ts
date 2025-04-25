@@ -27,6 +27,7 @@ export interface Company {
   industryType: string;
   employeeCount: string;
   phone?: string;
+  followers_count?: number
 }
 
 // API response interfaces

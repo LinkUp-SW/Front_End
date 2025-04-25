@@ -69,17 +69,16 @@ const JobDetail: React.FC<JobDetailProps> = ({ job, isLoading = false }) => {
                 }}
               />
             ) : (
-              <div 
-                className="w-10 h-10 rounded-md flex items-center justify-center text-white"
-                style={{ backgroundColor: `hsl(${job.company.charCodeAt(0) % 360}, 70%, 50%)` }}
-              >
-                <span className="font-semibold">{job.company.substring(0, 2)}</span>
-              </div>
+              <div className="w-12 h-12 bg-gray-100 dark:bg-gray-800 flex items-center justify-center rounded">
+              <span className="text-lg font-semibold text-gray-500 dark:text-gray-400">
+                {job.company.substring(0, 2)}
+              </span>
+            </div>
             )}
             <div>
               <h3 className="font-medium dark:text-white">{job.company}</h3>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                {job.companyInfo?.followers || "10,000+"} followers
+                {job.companyInfo?.followers_count } followers
               </p>
             </div>
           </div>
@@ -93,8 +92,8 @@ const JobDetail: React.FC<JobDetailProps> = ({ job, isLoading = false }) => {
         </div>
         
         <div className="text-sm text-gray-700 dark:text-gray-400 mb-3">
-          {job.companyInfo?.industryType || "Information Technology"} • 
-          {job.companyInfo?.employeeCount || "51-200 employees"} 
+          {job.companyInfo?.industryType } • 
+          {job.companyInfo?.employeeCount } 
         </div>
         
         <p className="text-sm mb-2 text-gray-700 dark:text-gray-400">

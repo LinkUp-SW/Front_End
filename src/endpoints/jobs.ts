@@ -20,6 +20,7 @@ export interface JobData {
     size: string;
     industry: string;
     followers: string;
+    followers_count:number;
   };
   job_title: string;
   location: string;
@@ -136,6 +137,7 @@ export const convertJobDataToJob = (jobData: JobData): Job => {
       industry: jobData.organization.industry,
       size: jobData.organization.size,
       followers: jobData.organization.followers ? [jobData.organization.followers] : [],
+      followers_count: jobData.organization.followers_count,
       industryType: jobData.organization.industry,
       employeeCount: jobData.organization.size
     } : undefined
