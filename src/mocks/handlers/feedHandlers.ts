@@ -1,4 +1,4 @@
-import { CommentType, PostType, ReactionType } from "@/types";
+import { PostType, ReactionType } from "@/types";
 import { createGetHandler } from "../handler_wrapper/getHandler";
 const MOCK_POSTS: PostType[] = [
   {
@@ -66,6 +66,8 @@ Always happy to know your thoughts on this 👇`,
       profileImage:
         "https://gratisography.com/wp-content/uploads/2024/11/gratisography-augmented-reality-800x525.jpg",
     },
+    reactions: [],
+    reactionsCount: 0,
   },
   {
     author: {
@@ -132,6 +134,8 @@ Always happy to know your thoughts on this 👇`,
       profileImage:
         "https://gratisography.com/wp-content/uploads/2024/11/gratisography-augmented-reality-800x525.jpg",
     },
+    reactions: [],
+    reactionsCount: 0,
   },
   {
     author: {
@@ -198,6 +202,8 @@ Always happy to know your thoughts on this 👇`,
       profileImage:
         "https://gratisography.com/wp-content/uploads/2024/11/gratisography-augmented-reality-800x525.jpg",
     },
+    reactions: [],
+    reactionsCount: 0,
   },
 ];
 

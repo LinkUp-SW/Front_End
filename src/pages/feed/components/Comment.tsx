@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import FunnyIcon from "@/assets/Funny.svg";
 import CelebrateIcon from "@/assets/Celebrate.svg";
 import LikeIcon from "@/assets/Like.svg";
+import { AiOutlineLike as LikeEmoji } from "react-icons/ai";
 import LoveIcon from "@/assets/Love.svg";
 import LaughIcon from "@/assets/Funny.svg";
 import InsightfulIcon from "@/assets/Insightful.svg";
@@ -32,8 +33,12 @@ import {
 import { DialogTrigger } from "@radix-ui/react-dialog";
 import ReportCommentModal from "./modals/ReportCommentModal";
 import ReactionsModal from "./modals/ReactionsModal";
-import { deleteComment, getPostReactions } from "@/endpoints/feed";
-import { CommentType, ReactionType } from "@/types";
+import {
+  createReaction,
+  deleteComment,
+  deleteReaction,
+} from "@/endpoints/feed";
+import { CommentType, StatsType } from "@/types";
 import moment from "moment";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
@@ -47,7 +52,7 @@ import { setComments } from "@/slices/feed/commentsSlice";
 
 export interface CommentProps {
   comment: CommentType;
-  stats: any;
+  stats: StatsType;
   setIsReplyActive: React.Dispatch<React.SetStateAction<boolean>>;
   postId: string;
 }
@@ -89,11 +94,9 @@ const Comment: React.FC<CommentProps> = ({
   const sanitizedContent = DOMPurify.sanitize(content);
 
   const [commentMenuOpen, setCommentMenuOpen] = useState(false);
-  const [reactions, setReactions] = useState<ReactionType[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
-  const [liked, setLiked] = useState(false);
-  const [selectedReaction, setSelectedReaction] = useState(""); // Like, Love, etc.
+  const [selectedReaction, setSelectedReaction] = useState("None"); // Like, Love, etc.
   const [reactionsOpen, setReactionsOpen] = useState(false); // for Popover open state
   const [viewMore, setViewMore] = useState(false); // if you want to toggle text next to icons
 
@@ -105,17 +108,11 @@ const Comment: React.FC<CommentProps> = ({
     setReactionsOpen(false);
   };
 
-  const { data } = useSelector((state: RootState) => state.userBio);
-
   useEffect(() => {
     setIsLoading(true);
     const fetchData = async () => {
       try {
         // Call both endpoints concurrently
-        const [fetchedReactions] = await Promise.all([getPostReactions()]);
-
-        if (fetchedReactions) setReactions(fetchedReactions);
-        else setReactions([]);
       } catch (error) {
         console.error("Error fetching feed data", error);
       }
@@ -123,6 +120,7 @@ const Comment: React.FC<CommentProps> = ({
 
     fetchData();
     setIsLoading(false);
+    console.log(isLoading, setViewMore, media);
   }, []);
 
   let countChildren = 0;
@@ -200,6 +198,97 @@ const Comment: React.FC<CommentProps> = ({
   const reportComment = () => {};
   const hideComment = () => {};
 
+  const handleReact = (value: string) => {
+    setSelectedReaction(value);
+
+    if (value != "None") {
+      handleCreateReaction(value);
+    } else {
+      handleDeleteReaction();
+    }
+  };
+
+  const handleCreateReaction = async (selected_reaction: string) => {
+    if (!token) {
+      toast.error("You must be logged in to add a reaction.");
+      navigate("/login", { replace: true });
+      return;
+    }
+    const reaction = {
+      target_type: "Comment",
+      reaction: selected_reaction.toLowerCase(),
+      comment_id: comment._id,
+    };
+    try {
+      const result = await createReaction(reaction, postId, token);
+      const newestComments = [...comments];
+      console.log(newestComments, result);
+
+      // newestComments.forEach((block) => {
+      //   block.comments.forEach((singleComment) => {
+      //     if (singleComment._id === comment._id) {
+      //       // Ensure reacts
+      //       if (!singleComment.reacts) singleComment.reacts = [];
+      //       if (!singleComment.reacts.includes(result.reaction._id)) {
+      //         singleComment.reacts.push(result.reaction);
+      //       }
+
+      //       // Ensure reactions
+      //       if (!singleComment.reactions) singleComment.reactions = [];
+
+      //       if (singleComment.reactions.length < 3) {
+      //         singleComment.reactions.push({ reaction: selectedReaction });
+      //       }
+
+      //       // Always increment reactionsCount
+      //       singleComment.reactionsCount += 1;
+      //     }
+      //   });
+      // });
+
+      // // Dispatch the updated comments to the Redux store
+      // dispatch(setComments(newestComments));
+
+      console.log("New comments", comments);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleDeleteReaction = async () => {
+    console.log("Deleting reaction", selectedReaction);
+    if (!token) {
+      toast.error("You must be logged in to remove a reaction.");
+      navigate("/login", { replace: true });
+      return;
+    }
+
+    try {
+      const result = await deleteReaction(
+        { target_type: "Comment" },
+        comment._id,
+        token
+      );
+      console.log(result);
+      // dispatch(
+      //   setPosts(
+      //     posts.map((post) =>
+      //       post.reacts.includes(result.reaction._id)
+      //         ? {
+      //             ...post,
+
+      //             reacts: post.reacts.filter((r) => r !== result.reaction._id),
+      //           }
+      //         : post
+      //     )
+      //   )
+      // );
+      console.log("New comments", comments);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const handleDeleteComment = async () => {
     if (!token) {
       toast.error("You must be logged in to delete a post.");
@@ -239,8 +328,8 @@ const Comment: React.FC<CommentProps> = ({
                 comment._id
               )
             ) {
-              const { [comment._id]: removed, ...remainingChildren } =
-                parentComment.children;
+              const { ...remainingChildren } = parentComment.children;
+              delete remainingChildren[comment._id];
 
               return {
                 ...parentComment,
@@ -316,13 +405,16 @@ const Comment: React.FC<CommentProps> = ({
                 open={deleteModal}
                 onOpenChange={() => setDeleteModal(!deleteModal)}
               >
-                <DialogContent>
+                <DialogContent className="dark:bg-gray-900 border-0 ">
                   <DialogHeader>
-                    <DialogTitle>Are you absolutely sure?</DialogTitle>
-                    <DialogDescription>
+                    <DialogTitle className="dark:text-white">
+                      Are you absolutely sure?
+                    </DialogTitle>
+                    <DialogDescription className="dark:text-neutral-300">
                       This action cannot be undone. This will permanently delete
-                      this comment from LinkUp. All likes and replies on this
-                      comment will also be removed.
+                      this comment from LinkUp. <br /> <br />
+                      All likes and replies on this comment will also be
+                      removed.
                     </DialogDescription>
                   </DialogHeader>
                   <div className="flex w-full justify-end gap-4">
@@ -411,11 +503,11 @@ const Comment: React.FC<CommentProps> = ({
               variant="ghost"
               size="lg"
               onClick={() => {
-                setLiked(!liked);
-                setSelectedReaction("Like");
+                if (selectedReaction === "None") handleReact("Like");
+                else handleReact("None");
               }}
-              className={`text-gray-400 z-50 text-xs hover:cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-400 p-1 ${
-                liked && selectedReaction === "Like"
+              className={`flex dark:hover:bg-zinc-800 dark:hover:text-neutral-200 ${
+                selectedReaction === "Like"
                   ? "text-blue-700 dark:text-blue-500 hover:text-blue-700 dark:hover:text-blue-400"
                   : selectedReaction === "Insightful"
                   ? "text-yellow-700 dark:text-yellow-500 hover:text-yellow-700 dark:hover:text-yellow-400"
@@ -430,23 +522,26 @@ const Comment: React.FC<CommentProps> = ({
                   : ""
               } items-center hover:cursor-pointer transition-all`}
             >
-              {selectedReaction && liked ? (
-                <div className="flex gap-2">
-                  <img
-                    src={
-                      reactionIcons.find(
-                        (reaction) => reaction.name === selectedReaction
-                      )?.icon
-                    }
-                    alt={selectedReaction}
-                    className="w-4 h-4"
-                  />
-                  {selectedReaction}
-                </div>
+              {selectedReaction != "None" ? (
+                <img
+                  src={
+                    reactionIcons.find(
+                      (reaction) => reaction.name === selectedReaction
+                    )?.icon
+                  }
+                  alt={selectedReaction}
+                  className="w-4 h-4"
+                />
               ) : (
-                "Like"
+                <div className="flex gap-2 items-center">
+                  <LikeEmoji /> Like{" "}
+                </div>
               )}
-              {viewMore && selectedReaction}
+              {selectedReaction == "None"
+                ? viewMore
+                  ? "Like"
+                  : ""
+                : selectedReaction}
             </Button>
           </PopoverTrigger>
           <TooltipProvider>
@@ -465,7 +560,7 @@ const Comment: React.FC<CommentProps> = ({
                   { icon: InsightfulIcon, alt: "Insightful" },
                   { icon: FunnyIcon, alt: "Funny" },
                 ].map((reaction, index) => (
-                  <Tooltip key={reaction.alt}>
+                  <Tooltip key={`reaction-${reaction.alt}`}>
                     <IconButton
                       className={`hover:scale-200 hover:bg-gray-200 w-12 h-12 dark:hover:bg-zinc-800 duration-300 ease-in-out transform transition-all mx-0 hover:mx-7 hover:-translate-y-5`}
                       style={{
@@ -475,8 +570,8 @@ const Comment: React.FC<CommentProps> = ({
                         opacity: 0,
                       }}
                       onClick={() => {
-                        setSelectedReaction(reaction.alt);
-                        setLiked(true);
+                        handleReact(reaction.alt);
+
                         setReactionsOpen(false);
                       }}
                     >

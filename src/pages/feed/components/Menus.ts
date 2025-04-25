@@ -3,7 +3,6 @@ import {
   FaBookmark,
   FaClock,
   FaEdit,
-  FaEye,
   FaFlag,
   FaLink,
   FaRocket,
@@ -20,9 +19,8 @@ import {
 } from "react-icons/ai";
 import { BsFillSendFill as SendIcon } from "react-icons/bs";
 import { MenuAction } from "@/types";
-import React, { ReactNode } from "react";
+import React from "react";
 import { EditIcon } from "lucide-react";
-import { FaMessage } from "react-icons/fa6";
 import { toast } from "sonner";
 
 export const getMenuActions: (

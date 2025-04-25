@@ -1,14 +1,14 @@
 import React, { useState, useRef, useEffect, memo } from "react";
-import Comment, { CommentProps } from "./Comment";
+import Comment from "./Comment";
 import Reply from "./Reply";
 import BlueButton from "./buttons/BlueButton";
 import { Button, Popover, PopoverContent, PopoverTrigger } from "@/components";
 import { MdOutlineEmojiEmotions } from "react-icons/md";
 import { GoFileMedia as MediaIcon } from "react-icons/go";
 import EmojiPicker, { Theme, EmojiClickData } from "emoji-picker-react";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "@/store";
-import { CommentType } from "@/types";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store";
+import { CommentType, StatsType } from "@/types";
 
 interface CommentWithRepliesProps {
   replies: CommentType[];
@@ -19,16 +19,14 @@ interface CommentWithRepliesProps {
     setCommentInput: React.Dispatch<React.SetStateAction<string>>,
     commentId: string
   ) => void;
-  commentId: string;
   comment: CommentType;
   postId: string;
-  stats: any;
+  stats: StatsType;
 }
 
 const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
   replies,
   handleCreateComment,
-  commentId,
   comment,
   postId,
   stats,
@@ -43,6 +41,16 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
   useEffect(() => {
     setIsReplyActive(false);
   }, [comment]);
+
+  useEffect(() => {
+    if (isReplyActive) {
+      inputRef.current?.focus(); // Focus on the comment input
+      inputRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    }
+  }, [isReplyActive]);
 
   if (!stats) {
     stats = {
@@ -206,7 +214,7 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
                       fileInputRef.current.value = ""; // Reset the file input value
                     }
                   }}
-                  className="absolute top-1 left-0 bg-gray-600 text-white rounded-full p-1 hover:bg-gray-600"
+                  className="absolute top-1 left-0 bg-gray-600 text-white rounded-full m-1 p-1 px-2 aspect-square hover:bg-gray-600"
                 >
                   ✕
                 </button>
@@ -222,7 +230,7 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
               >
                 <div className="relative">
                   <Popover>
-                    <PopoverTrigger asChild onClick={() => console.log("hi")}>
+                    <PopoverTrigger asChild onClick={() => {}}>
                       <Button
                         variant="ghost"
                         className="hover:cursor-pointer rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 dark:hover:text-neutral-200"

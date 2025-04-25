@@ -10,16 +10,6 @@ import Comment, { CommentProps } from "./Comment";
 // so when no new properties or attributes TS suggest to just equate the new type with the old type
 type ReplyProps = CommentProps;
 
-const stats = {
-  likes: 15,
-  love: 2,
-  support: 1,
-  celebrate: 1,
-  comments: 2,
-  reposts: 5,
-  person: "Hamada",
-};
-
 const Reply: React.FC<ReplyProps> = ({
   comment,
   setIsReplyActive,

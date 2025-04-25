@@ -9,7 +9,7 @@ import {
 import { PremiumBanner, Shortcuts, CreatePost, Post } from "./components";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { CommentObjectType } from "@/types";
-import { fetchSinglePost, getPostReactions } from "@/endpoints/feed";
+import { fetchSinglePost } from "@/endpoints/feed";
 import { useParams } from "react-router-dom";
 import Cookies from "js-cookie";
 import { useDispatch, useSelector } from "react-redux";
@@ -34,11 +34,10 @@ const FeedPage: React.FC<FeedPageProps> = ({ single = false }) => {
 
   const temporary_feed = [
     "6806b5a2bfb3de42b857be4c",
-    "680a6b3eb57681e1e91b7b52",
+
     "680ba14b801a855626ece75c",
     "680ba0a9801a855626ece74d",
     "680ba090801a855626ece73e",
-    "680b9f26801a855626ece683",
     "680b70ca2ea9ffaf2afa7c12",
     "680ace66b57681e1e91b8d39",
     "680a6fafb57681e1e91b7c0b",

@@ -1,6 +1,6 @@
 import { getReactions } from "@/endpoints/feed";
 import Cookies from "js-cookie";
-import React, { JSX, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import CelebrateIcon from "@/assets/Celebrate.svg";
@@ -62,7 +62,7 @@ const ReactionsModal: React.FC<ReactionsModalProps> = ({
             limit: 50,
             specificReaction: activeTab === "all" ? null : activeTab,
             targetType: commentId ? "Comment" : "Post",
-            ...(commentId && { commentId }),
+            commentId: commentId || null,
           },
           postId,
           token
@@ -101,7 +101,7 @@ const ReactionsModal: React.FC<ReactionsModalProps> = ({
   const tabs = [
     { label: "All", key: "all", count: reactionList.length },
     ...Object.entries(reactionCounts)
-      .filter(([_, count]) => count && count > 0)
+      .filter(([, count]) => count && count > 0)
       .map(([key, count]) => ({
         label: emojiMap[key],
         key,

@@ -1,4 +1,4 @@
-import { CommentObjectType, CommentType } from "@/types";
+import { CommentObjectType } from "@/types";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface CommentsState {

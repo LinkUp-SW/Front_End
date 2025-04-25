@@ -65,14 +65,15 @@ export interface CommentType {
     link: string;
     mediaType: "image" | "video" | "none";
   };
-  reacts: {
-    total: number;
-    mostCommon: Record<string, any>;
-  };
+  reacts: string[];
   tagged_users: string[];
   is_edited: boolean;
   date: number;
-  children?: Record<string, any>;
+  reactions: {
+    reaction: string;
+  }[];
+  reactionsCount: number;
+  children?: Record<string, CommentType>;
   userId?: string;
   parentId: string;
   _id: string;
@@ -97,18 +98,22 @@ export interface PostType {
   content: string;
   media: {
     link: string[];
-    media_type: MediaType;
+    media_type: "image" | "images" | "video" | "link" | "pdf" | "post" | "none";
   };
   commentsDisabled: string;
   publicPost: boolean;
   taggedUsers: string[];
   date: number;
-  reacts: any[];
+  reacts: string[];
   isEdited?: boolean;
   _id: string;
   user_id: string;
   comments: string[];
   isSaved?: boolean;
+  reactions: {
+    reaction: string;
+  }[];
+  reactionsCount: number;
 
   stats?: {
     likes?: number;
@@ -122,11 +127,25 @@ export interface PostType {
     reposts?: number;
   };
 
-  action?: {
-    name?: string;
-    profileImage?: string;
-    action?: "like" | "comment" | "repost" | "love";
-  };
+  action?: ActionType;
+}
+
+export interface StatsType {
+  likes?: number;
+  love?: number;
+  support?: number;
+  celebrate?: number;
+  insightful?: number;
+  funny?: number;
+  comments?: number;
+  reposts?: number;
+  person?: string;
+}
+
+export interface ActionType {
+  name?: string;
+  profileImage?: string;
+  action?: "like" | "comment" | "repost" | "love";
 }
 
 export interface PostUserType {
@@ -149,7 +168,7 @@ export interface PostDataType {
   publicPost: boolean;
   taggedUsers: string[];
   date: number;
-  reacts?: any[];
+  reacts: string[];
   isEdited?: boolean;
   _id: string;
   user_id: string;

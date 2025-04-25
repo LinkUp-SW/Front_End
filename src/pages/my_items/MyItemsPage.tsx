@@ -7,8 +7,8 @@ import {
   Footer,
 } from "@/components";
 import { useEffect, useState } from "react";
-import { AppDispatch, RootState } from "@/store";
-import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch } from "@/store";
+import { useDispatch } from "react-redux";
 import { refetchUserBio } from "@/slices/user_profile/userBioSlice";
 import Cookies from "js-cookie";
 

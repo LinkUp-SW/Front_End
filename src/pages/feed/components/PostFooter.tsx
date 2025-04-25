@@ -8,7 +8,7 @@ import { FaChevronDown, FaRocket, FaClock } from "react-icons/fa";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components";
 import { Link } from "react-router-dom";
-import { CommentObjectType, CommentType, PostUserType } from "@/types";
+import { CommentDBType, CommentObjectType } from "@/types";
 import { GoFileMedia as MediaIcon } from "react-icons/go";
 import CommentWithReplies from "./CommentWithReplies";
 import { MdOutlineEmojiEmotions } from "react-icons/md";
@@ -24,7 +24,6 @@ import {
 } from "@/components/ui/carousel";
 import { toast } from "sonner";
 import BlueButton from "./buttons/BlueButton";
-import Cookies from "js-cookie";
 
 interface SortingMenuItem {
   name: string;
@@ -32,8 +31,6 @@ interface SortingMenuItem {
   action: () => void;
   icon: React.ReactNode;
 }
-
-const userId = Cookies.get("linkup_user_id");
 
 export const COMMENT_SORTING_MENU: SortingMenuItem[] = [
   {
@@ -51,18 +48,17 @@ export const COMMENT_SORTING_MENU: SortingMenuItem[] = [
 ];
 
 interface PostFooterProps {
-  user: PostUserType;
   sortingMenu: boolean;
   setSortingMenu: React.Dispatch<React.SetStateAction<boolean>>;
   sortingState: string;
   handleSortingState: (selectedState: string) => void;
   comments: CommentObjectType;
-  addNewComment: React.Dispatch<React.SetStateAction<any>>;
+  addNewComment: (newComment: CommentDBType) => Promise<void>;
+
   postId: string;
 }
 
 const PostFooter: React.FC<PostFooterProps> = ({
-  user,
   sortingMenu,
   setSortingMenu,
   sortingState,
@@ -72,7 +68,6 @@ const PostFooter: React.FC<PostFooterProps> = ({
   postId,
 }) => {
   // Create a ref for the horizontally scrollable container
-  console.log("This is real", postId);
   const [commentInput, setCommentInput] = useState("");
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   console.log("Comment for post:", comments);
@@ -96,7 +91,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
     commentInput: string,
     setSelectedImage: React.Dispatch<React.SetStateAction<File | null>>,
     setCommentInput: React.Dispatch<React.SetStateAction<string>>,
-    parentId?: string | null
+    parentId: string | null = null
   ) => {
     if (!commentInput.trim() && !selectedImage) {
       toast.error("Cannot create an empty comment");
@@ -111,7 +106,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
       const newComment = {
         post_id: postId,
         content: commentInput,
-        media: selectedImage ? [base64Image] : [],
+        media: selectedImage ? base64Image : "",
         tagged_users: [],
         parent_id: parentId,
       };
@@ -135,7 +130,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
       const newComment = {
         post_id: postId,
         content: commentInput,
-        media: [],
+        media: "",
         tagged_users: [],
         parent_id: parentId,
       };
@@ -174,7 +169,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
   };
 
   return (
-    <section className="flex flex-col w-full gap-4">
+    <section className="flex flex-col w-full gap-4 ">
       {/* Container for text buttons with relative so our scroll button can be absolute */}
       <Carousel className="w-full">
         <CarouselContent className="px-2 ">
@@ -256,7 +251,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
                       fileInputRef.current.value = ""; // Reset the file input value
                     }
                   }}
-                  className="absolute top-1 left-0 bg-gray-600 text-white rounded-full p-1 hover:bg-gray-600"
+                  className="absolute top-1 left-0 bg-gray-600 text-white rounded-full m-1 p-1 px-2 aspect-square hover:bg-gray-600"
                 >
                   ✕
                 </button>
@@ -272,7 +267,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
               >
                 <div className="relative">
                   <Popover>
-                    <PopoverTrigger asChild onClick={() => console.log("hi")}>
+                    <PopoverTrigger asChild onClick={() => {}}>
                       <Button
                         variant="ghost"
                         className="hover:cursor-pointer rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 dark:hover:text-neutral-200"
@@ -381,7 +376,6 @@ const PostFooter: React.FC<PostFooterProps> = ({
                 stats={stats}
                 replies={data.children ? Object.values(data.children) : []}
                 handleCreateComment={handleCreateComment}
-                commentId={data._id}
               />
             ))}
           </div>
