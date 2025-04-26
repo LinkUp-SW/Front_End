@@ -1,4 +1,5 @@
 import axiosInstance from "@/services/axiosInstance";
+import { promises } from "dns";
 
 export interface User {
   userId: string;
@@ -20,10 +21,15 @@ export interface Conversation {
   otherUser: User;
   lastMessage: LastMessage;
   unreadCount: number;
-
 }
 
+export interface unreadMessagesCount {
+  conversationId: string;
+  otherUser: User;
+  lastMessage: LastMessage;
+  unreadCount: number;
 
+}
 export interface MessageChat
   {
     messageId:string
@@ -111,6 +117,25 @@ export const editMessage = async (
   );
   return response.data;
 };
+
+
+
+
+export const getUnseenMessagesCountByConversation = async (
+  token: string
+): Promise<unreadMessagesCount[]> => {
+  const response = await axiosInstance.get(
+    '/api/v1/conversation/unread-messages-count',
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data.formattedUnseenCountByConversation;
+};
+
+
 
 
 
