@@ -18,6 +18,7 @@ import SearchInput from "./SearchInput";
 import UserProfilePopover from "./UserProfilePopover";
 import { defaultProfileImage } from "@/constants";
 import { openCreatePostDialog } from "@/slices/feed/createPostSlice";
+import { CreatePost } from "@/pages/feed/components";
 
 const NavBar = () => {
   // Use the correctly typed dispatch
@@ -78,6 +79,7 @@ const NavBar = () => {
           <img src={linkUpLogo} alt="LinkUp-Logo" className="w-9 dark:invert" />
 
           <SearchInput />
+          <CreatePost className="hidden" />
         </div>
         <div className="lg:flex items-center gap-4 hidden w-full max-w-[35rem]">
           <NavItems />
