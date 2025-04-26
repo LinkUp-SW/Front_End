@@ -196,7 +196,7 @@ export const getJobsFromCompany = async (organizationId: string): Promise<any> =
 export const searchCompanies = async (query: string): Promise<any> => {
   try {
     const token = getAuthToken();
-    const url = `/api/v1/search/company/${query}`;
+    const url = `/api/v1/search/${query}`;
     
     const response = await axiosInstance.get(url, getAuthHeader(token));
     return response.data;
