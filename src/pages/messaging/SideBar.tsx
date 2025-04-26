@@ -4,7 +4,7 @@ import {
   selectMessage,
   selectUserName,
   selectUserStatus,
-  selectUserId
+  selectUserId,
 } from "../../slices/messaging/messagingSlice";
 import { toggleStarred } from "../../slices/messaging/messagingSlice";
 import * as Popover from "@radix-ui/react-popover";
@@ -25,10 +25,15 @@ import {
   DialogTitle,
 } from "@/components";
 
-import { getAllConversations, deleteConversation } from "@/endpoints/messaging";
+import {
+  getAllConversations,
+  deleteConversation,
+  getUnseenMessagesCountByConversation,
+} from "@/endpoints/messaging";
 import Cookies from "js-cookie";
 import { Conversation } from "@/endpoints/messaging";
 import { toast } from "sonner";
+import { socketService } from "@/services/socket";
 
 const SideBar = () => {
   const token = Cookies.get("linkup_auth_token");
@@ -82,6 +87,72 @@ const SideBar = () => {
       }
     });
   }, [dataInfo]);
+
+  // Inside the useEffect hook where you are fetching the conversations
+  useEffect(() => {
+    const fetchUnreadCounts = async () => {
+      try {
+        if (!token) return;
+
+        const unreadCounts = await getUnseenMessagesCountByConversation(token);
+
+        // Update the dataInfo state to include unread counts from the API
+        setDataInfo((prevData) =>
+          prevData.map((conversation) => {
+            const unreadConversation = unreadCounts.find(
+              (count) => count.conversationId === conversation.conversationId
+            );
+            if (unreadConversation && unreadConversation.unreadCount > 0) {
+              return {
+                ...conversation,
+                unreadCount: unreadConversation.unreadCount,
+                conversationType: [...conversation.conversationType, "unread"],
+              };
+            }
+            return conversation;
+          })
+        );
+      } catch (error) {
+        console.error("Failed to fetch unread message counts:", error);
+      }
+    };
+
+    fetchUnreadCounts();
+  }, [token]); // Re-run when the token changes (if applicable)
+
+  // Update your socket listener to handle the correct information
+  useEffect(() => {
+    const unsubscribe = socketService.on(
+      "unread_messages_count",
+      (data: { conversationId: string; count: number }) => {
+        console.log("Unread messages count (live):", data);
+
+        setDataInfo((prevData) =>
+          prevData.map((conversation) => {
+            // Check if this is the conversation with new messages
+            if (data.conversationId === conversation.conversationId) {
+              return {
+                ...conversation,
+                unreadCount: data.count,
+                conversationType:
+                  data.count > 0
+                    ? [...new Set([...conversation.conversationType, "unread"])]
+                    : conversation.conversationType.filter(
+                        (type) => type !== "unread"
+                      ),
+              };
+            }
+            return conversation;
+          })
+        );
+      }
+    );
+
+    return () => {
+      unsubscribe(); // Clean up
+    };
+  }, []);
+
   const filterButtonData = {
     Focused: dataInfo,
     [FILTER_OPTIONS_MESSAGES.UNREAD]: dataInfo.filter((info) =>
@@ -111,12 +182,12 @@ const SideBar = () => {
     dataType: string[],
     user2Name: string,
     userStatus: boolean,
-    user2Id:string
+    user2Id: string
   ) => {
     dispatch(selectMessage(conversationID.toString()));
     dispatch(selectUserName(user2Name));
     dispatch(selectUserStatus(userStatus));
-    dispatch(selectUserId(user2Id))
+    dispatch(selectUserId(user2Id));
     if (dataType.includes("unread")) {
       setDataInfo((prevData) =>
         prevData.map((message) =>
@@ -130,6 +201,7 @@ const SideBar = () => {
       );
     }
     setSelectedConversationStyle(conversationID);
+    socketService.markAsRead(conversationID);
   };
 
   const handleHoverEnter = (conversationID: string) => {
@@ -206,8 +278,7 @@ const SideBar = () => {
         prevData.filter((conv) => conversationID !== conv.conversationId)
       );
       toast.success("Conversation deleted");
-    }
-    catch (err) {
+    } catch (err) {
       console.error("Error deleting:", err);
       toast.error("Failed to delete conversation");
     }
@@ -323,7 +394,7 @@ const SideBar = () => {
                           : "font-medium"
                       }`}
                     >
-                      {data.otherUser.firstName} {data.otherUser.lastName} 
+                      {data.otherUser.firstName} {data.otherUser.lastName}
                     </p>
 
                     {!dotAppearance.includes(data.conversationId) && (
@@ -465,7 +536,7 @@ const SideBar = () => {
 
                 {data.conversationType.includes("unread") && (
                   <span className="flex items-center justify-center text-xs rounded-full text-white w-4 h-4 bg-blue-600 font-medium">
-                    1
+                    {data.unreadCount}
                   </span>
                 )}
               </div>
