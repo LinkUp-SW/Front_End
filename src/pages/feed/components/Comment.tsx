@@ -53,10 +53,10 @@ import BlueButton from "./buttons/BlueButton";
 import { toast } from "sonner";
 import IconButton from "./buttons/IconButton";
 import { setComments } from "@/slices/feed/commentsSlice";
+import { getReactionIcons } from "./Post";
 
 export interface CommentProps {
   comment: CommentType;
-  stats: StatsType;
   setIsReplyActive: React.Dispatch<React.SetStateAction<boolean>>;
   postId: string;
 }
@@ -65,7 +65,6 @@ const token = Cookies.get("linkup_auth_token");
 
 const Comment: React.FC<CommentProps> = ({
   comment,
-  stats,
   setIsReplyActive,
   postId,
 }) => {
@@ -80,17 +79,11 @@ const Comment: React.FC<CommentProps> = ({
   const comments = useSelector((state: RootState) => state.comments.list);
   const dispatch = useDispatch();
 
-  if (!stats) {
-    stats = {
-      likes: 15,
-      love: 2,
-      support: 1,
-      celebrate: 1,
-      comments: 2,
-      reposts: 5,
-      person: "Hamada",
-    };
-  }
+  const stats = {
+    comments: comment.children && comment.children.length,
+    reposts: 5,
+    total: comment.reactionsCount,
+  };
 
   const { content, date, is_edited, media } = comment;
   const myUserId = Cookies.get("linkup_user_id");
@@ -125,7 +118,13 @@ const Comment: React.FC<CommentProps> = ({
     fetchData();
     setIsLoading(false);
     console.log(isLoading, setViewMore, media);
-  }, []);
+
+    if (comment.userReaction)
+      setSelectedReaction(
+        comment.userReaction.charAt(0).toUpperCase() +
+          comment.userReaction.slice(1).toLowerCase()
+      );
+  }, [comments]);
 
   let countChildren = 0;
   if (comment.children) {
@@ -141,58 +140,9 @@ const Comment: React.FC<CommentProps> = ({
     { name: "Support", icon: SupportIcon },
   ];
 
-  const statsArray = [
-    {
-      name: "celebrate",
-      count: stats.celebrate,
-      icon: <img src={CelebrateIcon} alt="Celebrate" width={15} height={15} />,
-    },
-    {
-      name: "love",
-      count: stats.love,
-      icon: <img src={LoveIcon} alt="Love" width={15} height={15} />,
-    },
-    {
-      name: "insightful",
-      count: stats.insightful,
-      icon: (
-        <img src={InsightfulIcon} alt="Insightful" width={15} height={15} />
-      ),
-    },
-    {
-      name: "support",
-      count: stats.support,
-      icon: <img src={SupportIcon} alt="Support" width={15} height={15} />,
-    },
-    {
-      name: "funny",
-      count: stats.funny,
-      icon: <img src={LaughIcon} alt="Funny" width={15} height={15} />,
-    },
-    {
-      name: "like",
-      count: stats.likes,
-      icon: <img src={LikeIcon} alt="Like" width={15} height={15} />,
-    },
-  ];
-
-  const topStats = statsArray
-    .filter((stat) => stat.count)
-    .sort((a, b) => (b.count || 0) - (a.count || 0))
-    .slice(0, 3);
-  if (!topStats.length) {
-    topStats.push(statsArray[5]);
-  }
-
   const navigate = useNavigate();
 
-  const totalStats =
-    (stats.likes || 0) +
-    (stats.celebrate || 0) +
-    (stats.love || 0) +
-    (stats.insightful || 0) +
-    (stats.support || 0) +
-    (stats.funny || 0);
+  const topStats = getReactionIcons(comment.reactions || []);
 
   const copyLink = () => {};
   const editComment = () => {};
@@ -212,55 +162,62 @@ const Comment: React.FC<CommentProps> = ({
     }
   };
 
+  // Replace your handleCreateReaction function with this improved version
   const handleCreateReaction = async (selected_reaction: string) => {
     if (!token) {
       toast.error("You must be logged in to add a reaction.");
       navigate("/login", { replace: true });
       return;
     }
+
     const reaction = {
       target_type: "Comment",
       reaction: selected_reaction.toLowerCase(),
       comment_id: comment._id,
     };
+
     try {
+      // Show loading indicator or toast if needed
       const result = await createReaction(reaction, postId, token);
-      const newestComments = [...comments];
-      console.log(newestComments, result);
 
-      // newestComments.forEach((block) => {
-      //   block.comments.forEach((singleComment) => {
-      //     if (singleComment._id === comment._id) {
-      //       // Ensure reacts
-      //       if (!singleComment.reacts) singleComment.reacts = [];
-      //       if (!singleComment.reacts.includes(result.reaction._id)) {
-      //         singleComment.reacts.push(result.reaction);
-      //       }
+      // Update the comments state with the reaction result
+      const updated_Comments = comments.map((block) => {
+        // Create a deep copy of the comments array to avoid reference issues
+        const newComments = block.comments.map((c) => {
+          // Only update the comment that was reacted to
+          if (c._id === comment._id) {
+            return {
+              ...c,
+              reacts: [
+                ...(c.reacts?.filter((r) => r !== result.deletedReactionId) ||
+                  []),
+                result.newReactionId, // Add the new reaction ID
+              ].filter(Boolean), // Remove any undefined/null values
+              reactions: result.topReactions,
+              reactionsCount: result.totalCount,
+              userReaction: selected_reaction.toLowerCase(), // Important: Update the userReaction field
+            };
+          }
+          return c; // Return unchanged comments
+        });
 
-      //       // Ensure reactions
-      //       if (!singleComment.reactions) singleComment.reactions = [];
+        return {
+          ...block,
+          comments: newComments,
+          count: block.count, // Keep the original count, don't recalculate
+        };
+      });
 
-      //       if (singleComment.reactions.length < 3) {
-      //         singleComment.reactions.push({ reaction: selectedReaction });
-      //       }
-
-      //       // Always increment reactionsCount
-      //       singleComment.reactionsCount += 1;
-      //     }
-      //   });
-      // });
-
-      // // Dispatch the updated comments to the Redux store
-      // dispatch(setComments(newestComments));
-
-      console.log("New comments", comments);
+      // Update Redux state with the new comments
+      dispatch(setComments(updated_Comments));
     } catch (error) {
-      console.log(error);
+      console.error("Error creating reaction:", error);
+      toast.error("Failed to add reaction. Please try again.");
     }
   };
 
+  // Replace your handleDeleteReaction function with this improved version
   const handleDeleteReaction = async () => {
-    console.log("Deleting reaction", selectedReaction);
     if (!token) {
       toast.error("You must be logged in to remove a reaction.");
       navigate("/login", { replace: true });
@@ -269,27 +226,42 @@ const Comment: React.FC<CommentProps> = ({
 
     try {
       const result = await deleteReaction(
-        { target_type: "Comment" },
-        token,
-        comment._id
+        { target_type: "Comment", comment_id: comment._id },
+        postId,
+        token
       );
-      console.log(result);
-      // dispatch(
-      //   setPosts(
-      //     posts.map((post) =>
-      //       post.reacts.includes(result.reaction._id)
-      //         ? {
-      //             ...post,
 
-      //             reacts: post.reacts.filter((r) => r !== result.reaction._id),
-      //           }
-      //         : post
-      //     )
-      //   )
-      // );
-      console.log("New comments", comments);
+      // Update the comments state with the reaction result
+      const updated_Comments = comments.map((block) => {
+        // Create a deep copy of the comments array
+        const newComments = block.comments.map((c) => {
+          // Only update the comment that had the reaction removed
+          if (c._id === comment._id) {
+            return {
+              ...c,
+              reacts: (c.reacts || []).filter(
+                (r) => r !== result.deletedReactionId
+              ),
+              reactions: result.topReactions,
+              reactionsCount: result.totalCount,
+              userReaction: null, // Clear the user's reaction
+            };
+          }
+          return c; // Return unchanged comments
+        });
+
+        return {
+          ...block,
+          comments: newComments,
+          count: block.count, // Keep the original count, don't recalculate
+        };
+      });
+
+      // Update Redux state with the new comments
+      dispatch(setComments(updated_Comments));
     } catch (error) {
-      console.log(error);
+      console.error("Error deleting reaction:", error);
+      toast.error("Failed to remove reaction. Please try again.");
     }
   };
 
@@ -634,33 +606,37 @@ const Comment: React.FC<CommentProps> = ({
           </TooltipProvider>
         </Popover>
 
-        <p className="text-xs text-gray-500 dark:text-neutral-400 font-bold">
-          {" "}
-          ·
-        </p>
-
-        <Dialog>
-          <DialogTrigger asChild>
-            <button className="flex border-r pr-3 relative items-end text-gray-500 dark:text-neutral-400 text-xs hover:underline hover:cursor-pointer hover:text-blue-600 dark:hover:text-blue-400">
-              {topStats.map((stat, index) => (
-                <span
-                  key={index}
-                  className="flex items-center text-black dark:text-neutral-200 text-lg"
-                >
-                  {stat.icon}
-                </span>
-              ))}
-              {totalStats}
-            </button>
-          </DialogTrigger>
-          <DialogContent className="dark:bg-gray-900 min-w-[20rem] sm:min-w-[35rem] w-auto dark:border-gray-700">
-            <DialogTitle className=" px-2 text-xl font-medium">
-              Reactions
-            </DialogTitle>
-            <DialogDescription />
-            <ReactionsModal postId={postId} commentId={comment._id} />
-          </DialogContent>
-        </Dialog>
+        {stats.total != 0 && (
+          <>
+            {" "}
+            <p className="text-xs text-gray-500 dark:text-neutral-400 font-bold">
+              {" "}
+              ·
+            </p>
+            <Dialog>
+              <DialogTrigger asChild>
+                <button className="flex border-r pr-3 relative items-end text-gray-500 dark:text-neutral-400 text-xs hover:underline hover:cursor-pointer hover:text-blue-600 dark:hover:text-blue-400">
+                  {topStats.map((stat, index) => (
+                    <span
+                      key={index}
+                      className="flex items-center text-black dark:text-neutral-200 text-lg"
+                    >
+                      {stat}
+                    </span>
+                  ))}
+                  {stats.total}
+                </button>
+              </DialogTrigger>
+              <DialogContent className="dark:bg-gray-900 min-w-[20rem] sm:min-w-[35rem] w-auto dark:border-gray-700">
+                <DialogTitle className=" px-2 text-xl font-medium">
+                  Reactions
+                </DialogTitle>
+                <DialogDescription />
+                <ReactionsModal postId={postId} commentId={comment._id} />
+              </DialogContent>
+            </Dialog>
+          </>
+        )}
 
         <Button
           variant="ghost"
@@ -670,7 +646,7 @@ const Comment: React.FC<CommentProps> = ({
             setIsReplyActive(true);
           }}
         >
-          Reply
+          | Reply
         </Button>
         {countChildren != 0 && (
           <>

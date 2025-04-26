@@ -62,9 +62,9 @@ const FeedPage: React.FC<FeedPageProps> = ({ single = false }) => {
           Promise.all(
             (!single || !id
               ? temporary_feed.map((postId) =>
-                  fetchSinglePost(postId, user_token ?? "", 0, 10)
+                  fetchSinglePost(postId, user_token ?? "", 0, 5)
                 )
-              : [fetchSinglePost(id, user_token ?? "", 0, 10)]
+              : [fetchSinglePost(id, user_token ?? "", 0, 5)]
             ).filter(Boolean)
           ),
         ]);
@@ -76,7 +76,7 @@ const FeedPage: React.FC<FeedPageProps> = ({ single = false }) => {
         console.log("Posts:", posts);
         console.log("Comments:", comments);
         comments.forEach((block) => {
-          block.comments = Object.values(block.comments).reverse();
+          block.comments = Object.values(block.comments);
         });
 
         if (posts.length > 0) dispatch(setPosts(posts));

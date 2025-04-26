@@ -25,7 +25,7 @@ interface CommentWithRepliesProps {
   comment: CommentType;
   postId: string;
   stats: StatsType;
-  FormattedText?: React.FC<{ text: string }>; // Make it optional for backward compatibility
+  order: number;
 }
 
 const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
@@ -34,7 +34,7 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
   comment,
   postId,
   stats,
-  FormattedText,
+  order,
 }) => {
   const [showReplies] = useState(true);
   const [mainCommentHeight, setMainCommentHeight] = useState(0);
@@ -133,7 +133,6 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
         <Comment
           comment={comment}
           setIsReplyActive={setIsReplyActive}
-          stats={stats}
           postId={postId}
         />
       </div>
@@ -166,7 +165,6 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
                   <div className="w-12 h-full rounded-full absolute bg-white dark:bg-gray-900 left-8" />
                   <Reply
                     comment={reply}
-                    stats={stats}
                     setIsReplyActive={setIsReplyActive}
                     postId={postId}
                   />
