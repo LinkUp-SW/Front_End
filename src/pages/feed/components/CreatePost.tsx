@@ -200,7 +200,7 @@ const CreatePost: React.FC<CreatePostProps> = ({ className }) => {
       mediaType: (media_type as MediaType) || "none",
       media: media,
       commentsDisabled: commentSetting,
-      publicPost: privacySetting === "anyone",
+      publicPost: privacySetting === "Anyone",
       taggedUsers: taggedUsers.map((user) => user.id),
     };
 
