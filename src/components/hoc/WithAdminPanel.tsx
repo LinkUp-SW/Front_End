@@ -12,7 +12,9 @@ import {
 import AuthMiddleware from "./AuthMiddleware";
 import Cookies from "js-cookie";
 
-const WithAdminPanel = <P extends object>(WrappedComponent: ComponentType<P>) => {
+const WithAdminPanel = <P extends object>(
+  WrappedComponent: ComponentType<P>
+) => {
   const AdminPanelLayout = (props: P) => {
     const navigate = useNavigate();
     const location = useLocation();
@@ -25,12 +27,32 @@ const WithAdminPanel = <P extends object>(WrappedComponent: ComponentType<P>) =>
     };
 
     const menuItems = [
-      { name: "Dashboard", icon: <FiHome size={20} />, path: "/admin/dashboard" },
-      { name: "Content Moderation", icon: <FiFlag size={20} />, path: "/admin/content-moderation" },
-      { name: "Job Postings", icon: <FiBriefcase size={20} />, path: "/admin/job-postings" },
-      { name: "Analytics", icon: <FiBarChart2 size={20} />, path: "/admin/analytics" },
+      {
+        name: "Dashboard",
+        icon: <FiHome size={20} />,
+        path: "/admin/dashboard",
+      },
+      {
+        name: "Content Moderation",
+        icon: <FiFlag size={20} />,
+        path: "/admin/content-moderation",
+      },
+      {
+        name: "Job Postings",
+        icon: <FiBriefcase size={20} />,
+        path: "/admin/job-postings",
+      },
+      {
+        name: "Analytics",
+        icon: <FiBarChart2 size={20} />,
+        path: "/admin/analytics",
+      },
       { name: "Users", icon: <FiUsers size={20} />, path: "/admin/users" },
-      { name: "Settings", icon: <FiSettings size={20} />, path: "/admin/settings" },
+      {
+        name: "Settings",
+        icon: <FiSettings size={20} />,
+        path: "/admin/settings",
+      },
     ];
 
     const handleTabClick = (path: string) => {
@@ -55,9 +77,10 @@ const WithAdminPanel = <P extends object>(WrappedComponent: ComponentType<P>) =>
             </h2>
             <nav className="flex flex-col space-y-3">
               {menuItems.map((item) => {
-                const isActive = location.pathname === item.path || 
-                                 (item.path !== "/admin/dashboard" && 
-                                  location.pathname.startsWith(item.path));
+                const isActive =
+                  location.pathname === item.path ||
+                  (item.path !== "/admin/dashboard" &&
+                    location.pathname.startsWith(item.path));
                 return (
                   <button
                     key={item.name}
@@ -89,9 +112,11 @@ const WithAdminPanel = <P extends object>(WrappedComponent: ComponentType<P>) =>
               >
                 ☰
               </button>
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                Dashboard
-              </h1>
+              {location.pathname === "/admin/dashboard" && (
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+                  Dashboard
+                </h1>
+              )}
             </div>
 
             {/* Wrapped Component */}
