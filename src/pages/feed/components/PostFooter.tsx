@@ -8,12 +8,12 @@ import { FaChevronDown, FaRocket, FaClock } from "react-icons/fa";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components";
 import { Link } from "react-router-dom";
-import { CommentDBType, CommentObjectType } from "@/types";
+import { CommentDBType, CommentObjectType, CommentType } from "@/types";
 import { GoFileMedia as MediaIcon } from "react-icons/go";
 import CommentWithReplies from "./CommentWithReplies";
 import { MdOutlineEmojiEmotions } from "react-icons/md";
 import EmojiPicker, { Theme, EmojiClickData } from "emoji-picker-react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
 import UserTagging from "../components/UserTagging";
 import { FormattedContentText } from "./modals/CreatePostModal";
@@ -29,6 +29,10 @@ import {
 import { toast } from "sonner";
 import BlueButton from "./buttons/BlueButton";
 import { extractTaggedUsers } from "./modals/CreatePostModal";
+import Cookies from "js-cookie";
+import { getComments } from "@/endpoints/feed";
+import { setComments } from "@/slices/feed/commentsSlice";
+import { setPosts } from "@/slices/feed/postsSlice";
 
 interface SortingMenuItem {
   name: string;
@@ -37,40 +41,27 @@ interface SortingMenuItem {
   icon: React.ReactNode;
 }
 
-export const COMMENT_SORTING_MENU: SortingMenuItem[] = [
-  {
-    name: "Most relevant",
-    subtext: "See the most relevant comments",
-    action: () => console.log("Most relevant pressed"),
-    icon: <FaRocket className="mr-2" />,
-  },
-  {
-    name: "Most recent",
-    subtext: "See all the comments, the most recent comments are first",
-    action: () => console.log("Most Recent pressed"),
-    icon: <FaClock className="mr-2" />,
-  },
-];
+const token = Cookies.get("linkup_auth_token");
 
 interface PostFooterProps {
   sortingMenu: boolean;
   setSortingMenu: React.Dispatch<React.SetStateAction<boolean>>;
-  sortingState: string;
-  handleSortingState: (selectedState: string) => void;
+
   comments: CommentObjectType;
   addNewComment: (newComment: CommentDBType) => Promise<void>;
 
   postId: string;
+  order: number;
 }
 
 const PostFooter: React.FC<PostFooterProps> = ({
   sortingMenu,
   setSortingMenu,
-  sortingState,
-  handleSortingState,
+
   comments,
   addNewComment,
   postId,
+  order,
 }) => {
   // Create a ref for the horizontally scrollable container
   const [commentInput, setCommentInput] = useState("");
@@ -79,12 +70,59 @@ const PostFooter: React.FC<PostFooterProps> = ({
     { name: string; id: string }[]
   >([]);
   console.log("Comment for post:", comments);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const dispatch = useDispatch();
+  const allComments = useSelector((state: RootState) => state.comments.list);
+  const posts = useSelector((state: RootState) => state.posts.list);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
     setTaggedUsers(extractTaggedUsers(commentInput));
     console.log(taggedUsers);
   }, [commentInput]);
+
+  useEffect(() => {
+    console.log("Cursor:", comments.nextCursor);
+  }, []);
+
+  const loadMoreComments = async () => {
+    if (!comments.nextCursor || isLoadingMore || !token) return;
+
+    setIsLoadingMore(true);
+    try {
+      const payload = {
+        cursor: comments.nextCursor,
+        limit: 5,
+        replyLimit: 5,
+      };
+      const additionalComments = await getComments(payload, postId, token);
+      console.log("HERE", additionalComments);
+      if (additionalComments) {
+        // Update the Redux store with the new comments
+        const newComments = Object.values(additionalComments.comments);
+        const updatedComments: CommentType[] = [
+          ...comments.comments,
+          ...(newComments as CommentType[]),
+        ];
+        const allCommentsCopy: CommentObjectType[] = [
+          {
+            comments: [...updatedComments],
+            nextCursor: additionalComments.nextCursor,
+            count: additionalComments.count,
+          },
+        ];
+
+        console.log("NEW", newComments);
+        console.log("AllCopy", allCommentsCopy);
+        dispatch(setComments(allCommentsCopy));
+      }
+    } catch (error) {
+      console.error("Error loading more comments:", error);
+      toast.error("Failed to load more comments. Please try again.");
+    } finally {
+      setIsLoadingMore(false);
+    }
+  };
 
   const darkMode = useSelector((state: RootState) => state.theme.theme);
 
@@ -383,45 +421,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
       </div>
       {comments.count != 0 && (
         <>
-          <div className="flex relative -left-5">
-            <Popover open={sortingMenu} onOpenChange={setSortingMenu}>
-              <PopoverTrigger
-                asChild
-                className="rounded-full z-10 dark:hover:bg-zinc-700 hover:cursor-pointer dark:hover:text-neutral-200 h-8 gap-1.5 px-3"
-              >
-                <div className="flex items-center gap-1 text-gray-500 text-sm font-medium ">
-                  <p>{sortingState}</p>
-                  <FaChevronDown />
-                </div>
-              </PopoverTrigger>
-              <PopoverContent className="relative  dark:bg-gray-900 bg-white border-neutral-200 dark:border-gray-700 p-0 pt-1">
-                <div className="flex flex-col w-full p-0">
-                  {COMMENT_SORTING_MENU.map((item, index) => (
-                    <Button
-                      key={index}
-                      onClick={() => {
-                        handleSortingState(item.name);
-                        setSortingMenu(false);
-                        item.action();
-                      }}
-                      className="flex justify-start items-center rounded-none bg-transparent w-full h-16 pt-4 py-4 hover:bg-neutral-200 text-gray-900  dark:hover:bg-gray-600 dark:hover:text-white hover:cursor-pointer"
-                    >
-                      <div className="flex justify-start w-full  text-gray-600 dark:text-neutral-200">
-                        <div className="p-4 pl-0 ">{item.icon}</div>
-                        <div className="flex flex-col items-start justify-center">
-                          <span className="font-medium">{item.name}</span>
-                          <span className="text-xs text-wrap text-left font-normal">
-                            {item.subtext}
-                          </span>
-                        </div>
-                      </div>
-                    </Button>
-                  ))}
-                </div>
-              </PopoverContent>
-            </Popover>
-          </div>
-          <div className="flex flex-col relative -left-1 -top-3">
+          <div className="flex flex-col relative -left-1 ">
             {comments.comments.map((data, index: number) => (
               <CommentWithReplies
                 key={index}
@@ -430,9 +430,26 @@ const PostFooter: React.FC<PostFooterProps> = ({
                 stats={stats}
                 replies={data.children ? Object.values(data.children) : []}
                 handleCreateComment={handleCreateComment}
-                FormattedText={FormattedContentText}
+                order={index}
               />
             ))}
+            {comments.nextCursor !== 0 && comments.nextCursor !== null && (
+              <div className="flex justify-center mt-2 mb-4">
+                <button
+                  onClick={loadMoreComments}
+                  disabled={isLoadingMore}
+                  className="text-blue-600 dark:text-blue-400 hover:underline font-medium flex items-center gap-2 py-2 px-4 rounded transition-colors hover:bg-gray-100 dark:hover:bg-gray-800"
+                >
+                  {isLoadingMore ? (
+                    <>
+                      <span>Loading...</span>
+                    </>
+                  ) : (
+                    "Load more comments..."
+                  )}
+                </button>
+              </div>
+            )}
           </div>
         </>
       )}
