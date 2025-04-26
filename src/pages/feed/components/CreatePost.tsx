@@ -30,6 +30,7 @@ import { DialogDescription } from "@radix-ui/react-dialog";
 import { setPosts } from "@/slices/feed/postsSlice";
 import { setComments } from "@/slices/feed/commentsSlice";
 import React from "react";
+import { closeCreatePostDialog } from "@/slices/feed/createPostSlice";
 
 const useDismissModal = () => {
   const dismiss = () => {
@@ -62,6 +63,9 @@ const CreatePost: React.FC = () => {
     { name: string; id: string }[]
   >([]);
   const { dismiss } = useDismissModal();
+  const isDialogOpen = useSelector(
+    (state: RootState) => state.createPost.createPostOpen
+  );
 
   const navigate = useNavigate();
   const user_token = Cookies.get("linkup_auth_token");
@@ -261,12 +265,14 @@ const CreatePost: React.FC = () => {
             <Dialog
               onOpenChange={(isOpen) => {
                 if (!isOpen) {
+                  dispatch(closeCreatePostDialog());
                   setTimeout(() => {
-                    setSelectedMedia([]); // Reset activeModal to "create-post" when the modal is closed
+                    setSelectedMedia([]);
                     setActiveModal("create-post");
                   }, 200);
                 }
               }}
+              open={isDialogOpen}
             >
               <DialogTrigger asChild className="w-full">
                 <Button
