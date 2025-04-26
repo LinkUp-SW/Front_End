@@ -132,29 +132,41 @@ const ManageCompanyPage = () => {
         // Close the dialog first
         setEditDialogOpen(false);
         
-        // Show toast notification instead of alert
+        // Show toast notification
         toast.success("Company information updated successfully!");
         
         // Refresh all company data
         setIsLoading(true);
         
-        // Refresh the main company data
-        const basicDataResponse = await getCompanyAdminView(companyId);
-        if (basicDataResponse && basicDataResponse.company) {
-          setCompanyData(basicDataResponse.company);
-        }
-        
-        // Refresh the full company data
-        const fullDataResponse = await getCompanyAllView(companyId);
-        if (fullDataResponse && fullDataResponse.companyProfile) {
-          setFullCompanyData(fullDataResponse.companyProfile);
+        try {
+          // Refresh the main company data
+          const basicDataResponse = await getCompanyAdminView(companyId);
+          if (basicDataResponse && basicDataResponse.company) {
+            // Make sure we're updating the logo in the state
+            setCompanyData(prevData => ({
+              ...prevData,
+              ...basicDataResponse.company,
+              // Force logo update by adding a timestamp query parameter
+              logo: basicDataResponse.company.logo ? 
+                `${basicDataResponse.company.logo}?t=${new Date().getTime()}` : 
+                ""
+            }));
+          }
+          
+          // Refresh the full company data
+          const fullDataResponse = await getCompanyAllView(companyId);
+          if (fullDataResponse && fullDataResponse.companyProfile) {
+            setFullCompanyData(fullDataResponse.companyProfile);
+          }
+        } catch (refreshError) {
+          console.error("Error refreshing data after update:", refreshError);
+          toast.error("Updated successfully, but couldn't refresh display. Please reload the page.");
         }
         
         setIsLoading(false);
       }
     } catch (err: any) {
       console.error('Failed to update company profile:', err);
-      // Show toast error instead of alert
       toast.error(`Failed to update company profile: ${err.message || "Unknown error"}`);
     }
   };
@@ -192,17 +204,19 @@ const ManageCompanyPage = () => {
               
               {/* Company logo */}
               <div className="absolute bottom-0 left-4 transform translate-y-1/2 bg-white dark:bg-gray-700 p-1 rounded-lg shadow">
-                <div className="w-16 h-16 flex overflow-hidden rounded-lg bg-gray-200 dark:bg-gray-600">
-                  <img 
-                    src={companyData.logo || "/src/assets/buildings.jpeg"} 
-                    alt={`${companyData.name} logo`} 
-                    className="w-full object-cover"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = "/api/placeholder/50/50";
-                    }}
-                  />
-                </div>
+              <div className="w-16 h-16 flex overflow-hidden rounded-lg bg-gray-200 dark:bg-gray-600">
+                <img 
+                  src={companyData.logo || "/src/assets/buildings.jpeg"} 
+                  alt={`${companyData.name} logo`} 
+                  className="w-full object-cover"
+                  onError={(e) => {
+                    console.log("Image failed to load:", companyData.logo);
+                    (e.target as HTMLImageElement).src = "/api/placeholder/50/50";
+                  }}
+                  key={companyData.logo} // Add a key to force re-render when logo changes
+                />
               </div>
+            </div>
             </div>
             
             <div className="p-4 pb-3 mt-8">

@@ -1,4 +1,4 @@
-import { useState, FormEvent, useEffect } from 'react';
+import { useState, FormEvent, useEffect, useRef, ChangeEvent } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components';
 import { toast } from 'sonner';
 
@@ -15,7 +15,8 @@ interface EditPageDialogProps {
     founded?: string;
     description?: string;
     tagline?: string;
-    category_type?: string; // Add this field to check if it's company or educational
+    category_type?: string;
+    logo?: string; // Add logo field to receive existing logo
     location?: {
       country?: string;
       address?: string;
@@ -40,7 +41,8 @@ const EditPageDialog = ({ open, onOpenChange, companyData, onSubmit }: EditPageD
     founded: '',
     description: '',
     tagline: '',
-    category_type: '', 
+    category_type: '',
+    logo: '', // Store logo as base64 string
   });
   const [logoUrl, setLogoUrl] = useState('/src/assets/buildings.jpeg');
   const [hasLocation, setHasLocation] = useState(false);
@@ -54,6 +56,9 @@ const EditPageDialog = ({ open, onOpenChange, companyData, onSubmit }: EditPageD
     postal_code: '',
     location_name: ''
   });
+  
+  // Add a file input ref
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   // Determine if this is an educational institution based on category_type
   const isEducationalInstitution = formData.category_type === 'education';
@@ -92,7 +97,13 @@ const EditPageDialog = ({ open, onOpenChange, companyData, onSubmit }: EditPageD
         description: companyData.description || '',
         tagline: companyData.tagline || '',
         category_type: companyData.category_type || '',
+        logo: companyData.logo || '',
       });
+      
+      // Set logo URL if it exists
+      if (companyData.logo) {
+        setLogoUrl(companyData.logo);
+      }
       
       // Update location data and checkboxes
       const hasLoc = !!companyData.location;
@@ -112,6 +123,46 @@ const EditPageDialog = ({ open, onOpenChange, companyData, onSubmit }: EditPageD
       }
     }
   }, [companyData, open]);
+
+  // Handle file selection for logo upload
+  const handleLogoChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    // Validate file size (limit to 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error("Image size exceeds 2MB limit");
+      return;
+    }
+    
+    // Validate file type
+    const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/svg+xml'];
+    if (!validTypes.includes(file.type)) {
+      toast.error("Please select a valid image file (JPEG, PNG, GIF, or SVG)");
+      return;
+    }
+    
+    // Read file and convert to base64
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const base64String = event.target?.result as string;
+      
+      // Update form data with base64 string
+      setFormData(prev => ({
+        ...prev,
+        logo: base64String
+      }));
+      
+      // Also update the display URL
+      setLogoUrl(base64String);
+    };
+    
+    reader.onerror = () => {
+      toast.error("Failed to read the file");
+    };
+    
+    reader.readAsDataURL(file);
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -242,13 +293,24 @@ const EditPageDialog = ({ open, onOpenChange, companyData, onSubmit }: EditPageD
                 <button
                   type="button"
                   className="p-2 bg-white dark:bg-gray-700 rounded-full border dark:border-gray-600 shadow hover:bg-gray-50 dark:hover:bg-gray-600"
-                  onClick={() => toast.info('Logo upload functionality coming soon!')}
+                  onClick={() => fileInputRef.current?.click()}
                 >
                   <svg className="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                   </svg>
                 </button>
+                {/* Hidden file input */}
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleLogoChange}
+                  accept="image/jpeg,image/png,image/gif,image/svg+xml"
+                  className="hidden"
+                />
               </div>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Upload JPG, PNG, GIF, or SVG (max 2MB)
+              </p>
             </div>
             
             <div className="mb-6">
@@ -278,6 +340,7 @@ const EditPageDialog = ({ open, onOpenChange, companyData, onSubmit }: EditPageD
           </div>
         );
         
+      // Rest of the cases (Details and Location) remain unchanged
       case 'Details':
         return (
           <div className="py-4">
@@ -296,6 +359,7 @@ const EditPageDialog = ({ open, onOpenChange, companyData, onSubmit }: EditPageD
               />
             </div>
             
+            {/* Rest of Details section remains the same */}
             <div className="mb-6">
               <label className="block text-gray-700 dark:text-gray-300 mb-1 text-sm font-medium">Website URL</label>
               <input

@@ -108,14 +108,57 @@ export const updateCompanyProfile = async (companyId: string, companyData: Parti
     const url = `/api/v1/company/update-company-profile/${companyId}`;
     
     // Log the update data for debugging
-    console.log('Updating company with data:', companyData);
+    console.log('Updating company with data:', {
+      ...companyData,
+      logo: companyData.logo ? `${companyData.logo.substring(0, 30)}... (truncated)` : undefined
+    });
     
     // Clean up data before sending - removing undefined values
     const cleanData = Object.fromEntries(
       Object.entries(companyData).filter(([_, v]) => v !== undefined && v !== '')
     );
     
-    const response = await axiosInstance.put(url, cleanData, getAuthHeader(token));
+    // Use multipart/form-data if there's a logo update
+    let response;
+    
+    if (cleanData.logo && cleanData.logo.startsWith('data:image/')) {
+      // The logo is a base64 string, create form data
+      const formData = new FormData();
+      
+      // Add all other fields to form data
+      Object.entries(cleanData).forEach(([key, value]) => {
+        if (key !== 'logo') {
+          // Handle nested objects like location
+          if (typeof value === 'object' && value !== null) {
+            formData.append(key, JSON.stringify(value));
+          } else {
+            formData.append(key, String(value));
+          }
+        }
+      });
+      
+      // Convert base64 to blob and add to form data
+      const base64Response = await fetch(cleanData.logo);
+      const blob = await base64Response.blob();
+      formData.append('logo', blob, 'company-logo.png');
+      
+      // Send the multipart request
+      response = await axiosInstance.put(
+        url, 
+        formData, 
+        {
+          ...getAuthHeader(token),
+          headers: {
+            ...getAuthHeader(token).headers,
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+      );
+    } else {
+      // Regular JSON request if no logo update
+      response = await axiosInstance.put(url, cleanData, getAuthHeader(token));
+    }
+    
     return response.data;
   } catch (error: any) {
     console.error('API Error Details:', error.response?.data || error.message);
