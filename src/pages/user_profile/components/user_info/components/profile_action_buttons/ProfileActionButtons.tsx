@@ -50,6 +50,8 @@ export interface ProfileActionButtonsProps {
   setNumOfConnections: React.Dispatch<React.SetStateAction<number>>;
   setIsInConnections: React.Dispatch<React.SetStateAction<undefined | boolean>>;
   connectionCount: number;
+  isAllowingMessage: boolean;
+  isViewerSubscribed: boolean;
 }
 
 const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
@@ -61,6 +63,8 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
   setIsInConnections,
   connectionCount,
   resume,
+  isAllowingMessage,
+  isViewerSubscribed,
 }) => {
   const { id } = useParams();
   const userBioState = useSelector((state: RootState) => state.userBio);
@@ -275,7 +279,17 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
   //-- If isConnectByEmail true open a Dialog
 
   // --- Other Handlers ---
-  const handleMessage = useCallback(() => alert("Message clicked"), []);
+  const handleMessage = useCallback(() => {
+    if (
+      followStatus.isInConnection ||
+      isAllowingMessage ||
+      isViewerSubscribed
+    ) {
+      alert("You Can Send Message Directly");
+    } else {
+      alert("You Cant Send Message Directly, please subscribe to send");
+    }
+  }, []);
   const handleBlock = useCallback(async () => {
     let resolveDelay: (result: string) => void;
     // Create a promise that resolves after 4000ms or when cancel is clicked
