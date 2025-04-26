@@ -2,6 +2,8 @@ import { JSX } from "react";
 import AddExperienceModal from "./experience_modal/AddExperienceModal";
 import AddEducationModal from "./education_modal/AddEducationModal";
 import AddLicenseModal from "./license_modal/AddLicenseModal";
+import AddSkillModal from "./skill_modal/AddSkillModal";
+import AddResumeModal from "./resume_modal/AddResumeModal";
 
 export const sectionModalMap: {
   [key: string]: { title: string; content: JSX.Element; id: string };
@@ -18,7 +20,7 @@ export const sectionModalMap: {
   },
   skills: {
     title: "Add Skills",
-    content: <></>,
+    content: <AddSkillModal/>,
     id: "add-skills-modal",
   },
   license: {
@@ -28,7 +30,7 @@ export const sectionModalMap: {
   },
   resume: {
     title: "Add Resume",
-    content: <></>,
+    content: <AddResumeModal/>,
     id: "add-resume-modal",
   },
 };

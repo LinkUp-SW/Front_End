@@ -85,6 +85,9 @@ const UserInfo = () => {
           setIsInConnections={setIsInConnections}
           connectionCount={numOfConnections}
           email={data.email}
+          resume={data.resume}
+          isAllowingMessage={data.allow_messaging}
+          isViewerSubscribed={data.viewer_user_is_subscribed}
           followStatus={{
             isFollowing: data.isAlreadyFollowing,
             isPending: data.is_in_sent_connections,

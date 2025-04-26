@@ -10,7 +10,7 @@ import { useFormStatus } from "@/hooks/useFormStatus";
 import { getErrorMessage } from "@/utils/errorHandler";
 import SectionsSkeletonLoader from "./SectionsSkeletonLoader";
 
-interface AddSkillModalProps {
+export interface AddSkillModalProps {
   onClose?: () => void;
   onSuccess?: (newSkill: Skill) => void;
 }

@@ -55,6 +55,7 @@ const NavBar = () => {
   const handleLogout = async () => {
     try {
       await userLogOut();
+      Cookies.remove("linkup_user_type");
       setTimeout(() => {
         window.location.replace("/login");
       }, 1000);
