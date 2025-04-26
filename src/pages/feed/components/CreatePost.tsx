@@ -58,6 +58,9 @@ const CreatePost: React.FC = () => {
   const [commentSetting, setCommentSetting] = useState<string>("Anyone");
   const [selectedMedia, setSelectedMedia] = useState<File[]>([]);
   const [activeModal, setActiveModal] = useState<string>("create-post");
+  const [taggedUsers, setTaggedUsers] = useState<
+    { name: string; id: string }[]
+  >([]);
   const { dismiss } = useDismissModal();
 
   const navigate = useNavigate();
@@ -191,7 +194,7 @@ const CreatePost: React.FC = () => {
       media: media,
       commentsDisabled: commentSetting,
       publicPost: privacySetting === "anyone",
-      taggedUsers: [],
+      taggedUsers: taggedUsers.map((user) => user.id),
     };
 
     try {
@@ -302,6 +305,8 @@ const CreatePost: React.FC = () => {
                     privacySetting={privacySetting}
                     selectedMedia={selectedMedia}
                     setSelectedMedia={setSelectedMedia}
+                    taggedUsers={taggedUsers}
+                    setTaggedUsers={setTaggedUsers}
                   />
                 ) : activeModal == "add-document" ? (
                   <AddDocumentModal

@@ -28,6 +28,7 @@ import DocumentPreview from "./DocumentPreview";
 import LinkPreview from "../LinkPreview"; // Import the LinkPreview component
 import React from "react";
 import UserTagging from "@/pages/feed/components/UserTagging";
+import { processTextFormatting } from "@/components/truncate_text/TruncatedText";
 
 interface CreatePostModalProps {
   profileImageUrl: string;
@@ -38,6 +39,8 @@ interface CreatePostModalProps {
   setSelectedMedia: (images: File[]) => void;
   submitPost: (value?: string) => void;
   privacySetting: string;
+  taggedUsers: { name: string; id: string }[];
+  setTaggedUsers: (users: Array<{ name: string; id: string }>) => void;
 }
 
 const CreatePostModal: React.FC<CreatePostModalProps> = ({
@@ -49,16 +52,14 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
   setSelectedMedia,
   submitPost,
   privacySetting,
+  taggedUsers,
+  setTaggedUsers,
 }) => {
   const { data } = useSelector((state: RootState) => state.userBio);
   const MemoizedEmojiPicker = memo(EmojiPicker);
   const darkMode = useSelector((state: RootState) => state.theme.theme);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-
-  const [taggedUsers, setTaggedUsers] = useState<
-    { name: string; id: string }[]
-  >([]);
 
   // State to track detected URL
   const [detectedUrl, setDetectedUrl] = useState<string | null>(null);
@@ -76,12 +77,14 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
   };
 
   const extractTaggedUsers = (text: string): { name: string; id: string }[] => {
-    const regex = /@([A-Za-z0-9_]+):([A-Za-z0-9_-]+)/g;
+    // Update regex to match the new format with a caret at the end
+    // This will match @Any Name With Spaces:userId^ format
+    const regex = /@([^:]+):([A-Za-z0-9_\-]+)\^/g;
     const users: { name: string; id: string }[] = [];
     let match;
 
     while ((match = regex.exec(text)) !== null) {
-      const name = match[1].replace(/_/g, " "); // Convert back to space format
+      const name = match[1]; // No need to replace underscores anymore
       const id = match[2];
       users.push({ name, id });
     }
@@ -91,6 +94,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
 
   useEffect(() => {
     setTaggedUsers(extractTaggedUsers(postText));
+    console.log(taggedUsers);
   }, [postText]);
 
   // Detect URL when post text changes
@@ -163,9 +167,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
           />
           {taggedUsers.length > 0 && (
             <div className="mt-2 mb-4 p-3 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800">
-              <p className="text-sm mb-1 text-gray-500 dark:text-gray-400">
-                Preview with highlighted tags:
-              </p>
+              <p className="text-sm mb-1 text-gray-500 dark:text-gray-400"></p>
               <FormattedPostText text={postText} />
             </div>
           )}
@@ -353,18 +355,18 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
 export default CreatePostModal;
 
 const FormattedPostText = ({ text }: { text: string }) => {
-  // Split the text by the tag pattern and create an array of text and tags
-  const parts = text.split(/(@[A-Za-z0-9_]+:[A-Za-z0-9_-]+)/g);
+  // Use a regex that matches from @ to ^ (complete tag)
+  const parts = text.split(/(@[^:]+:[A-Za-z0-9_\-]+\^)/g);
 
   return (
     <div className="formatted-text">
       {parts.map((part, index) => {
-        // Check if this part is a tag
-        if (part.match(/^@[A-Za-z0-9_]+:[A-Za-z0-9_-]+$/)) {
-          // Extract just the name part without the ID
-          const nameMatch = part.match(/@([A-Za-z0-9_]+):/);
+        // Check if this part is a tag with the new format
+        if (part.match(/^@[^:]+:[A-Za-z0-9_\-]+\^$/)) {
+          // Extract just the name part without the ID and the caret
+          const nameMatch = part.match(/@([^:]+):/);
           if (nameMatch && nameMatch[1]) {
-            const displayName = nameMatch[1].replace(/_/g, " ");
+            const displayName = nameMatch[1]; // No need to replace underscores
             return (
               <span
                 key={index}
@@ -375,8 +377,12 @@ const FormattedPostText = ({ text }: { text: string }) => {
             );
           }
         }
-        // Regular text
-        return <span key={index}>{part}</span>;
+        // Regular text with rich formatting
+        return (
+          <React.Fragment key={index}>
+            {processTextFormatting(part, index)}
+          </React.Fragment>
+        );
       })}
     </div>
   );

@@ -156,12 +156,20 @@ const UserTagging: React.FC<UserTaggingProps> = ({
     for (let i = cursorPosition - 1; i >= 0; i--) {
       // Find the start of tagging (@ character)
       if (text[i] === "@") {
-        inTaggingContext = true;
-        tagStartPosition = i;
+        // Only consider this @ as a tag start if there's no completed tag between cursor and this @
+        // Check if there's a completed tag format (@Name_Name:id) between this @ and cursor
+        const textBetween = text.substring(i, cursorPosition);
+
+        // If there's a colon in the text between @ and cursor, this means we've already
+        // completed a tag and shouldn't be in tagging context anymore
+        if (!textBetween.includes(":")) {
+          inTaggingContext = true;
+          tagStartPosition = i;
+        }
         break;
       }
 
-      // Only stop if we encounter a new line - CHANGED FROM STOPPING AT SPACES
+      // Only stop if we encounter a new line
       if (text[i] === "\n") {
         break;
       }
@@ -238,28 +246,26 @@ const UserTagging: React.FC<UserTaggingProps> = ({
   const handleSelectUser = (user: UserTagResult) => {
     if (!taggingPosition) return;
 
-    // Replace the @query with @First_Last:user_id format
+    // Replace the @query with @display name:user_id^ format (with spaces intact)
     const beforeTag = text.slice(0, taggingPosition.startPosition);
     const afterTag = text.slice(taggingPosition.currentPosition);
 
-    // Format with underscore and add user_id after a colon
-    const formattedName = user.name.replace(/\s+/g, "_");
-    const newText = `${beforeTag}@${formattedName}:${user.user_id} ${afterTag}`;
+    // Keep the display name with spaces and add the caret at the end
+    const newText = `${beforeTag}@${user.name}:${user.user_id}^ ${afterTag}`;
 
     onTextChange(newText);
     setTaggingPosition(null);
     setUserSuggestions([]);
 
-    // Update cursor position calculation to account for underscores and user_id
+    // Focus back on input and set cursor position after the tag
     setTimeout(() => {
       if (inputRef.current) {
         inputRef.current.focus();
-        // +2 for @ and space, and adjust for :user_id
         const newPosition =
           taggingPosition.startPosition +
-          formattedName.length +
+          user.name.length +
           user.user_id.length +
-          3;
+          4; // +3 for @, : and ^, +1 for the space
         inputRef.current.selectionStart = newPosition;
         inputRef.current.selectionEnd = newPosition;
       }
