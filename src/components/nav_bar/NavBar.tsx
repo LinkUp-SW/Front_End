@@ -67,7 +67,6 @@ const NavBar = () => {
   };
 
   const handleClick = () => {
-    console.log("here");
     dispatch(openCreatePostDialog());
   };
   // Use the profile picture if available; otherwise, fall back to a default image.

@@ -68,6 +68,7 @@ export interface CommentType {
   reacts: string[];
   tagged_users: string[];
   is_edited: boolean;
+  userReaction?: string | null;
   date: number;
   reactions: {
     reaction: string;
@@ -107,6 +108,7 @@ export interface PostType {
   reacts: string[];
   isEdited?: boolean;
   _id: string;
+  userReaction?: string | null;
   user_id: string;
   comments: string[];
   isSaved?: boolean;
