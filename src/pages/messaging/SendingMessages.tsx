@@ -1,5 +1,5 @@
 import { useDispatch } from "react-redux";
-import { setEditingMessageId } from "../../slices/messaging/messagingSlice";
+import { setEditingMessageId,addMessage } from "../../slices/messaging/messagingSlice";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { useState } from "react";
@@ -15,9 +15,12 @@ import Cookies from "js-cookie";
 import {setEditText,clearEditingState} from "../../slices/messaging/messagingSlice";
 import { toast } from "sonner";
 import { socketService } from "@/services/socket";
+import { useParams } from "react-router-dom";
+import {MessageChat,} from "@/endpoints/messaging";
 
 
 const SendingMessages = () => {
+  const { id } = useParams();
   let typingTimeout: NodeJS.Timeout;
   const token = Cookies.get("linkup_auth_token");
   const selectedConvID = useSelector(
@@ -57,6 +60,18 @@ const SendingMessages = () => {
 
   const handleSendMessage = () => {
     if (!text.trim()) return;
+     const newMsg: MessageChat = {
+              messageId: Date.now().toString(), // temp ID
+              senderId: id!,
+              senderName:"YOU",
+              message: text,
+              media:  [],
+              timestamp:new Date().toISOString(),
+              reacted: false,
+              isSeen: false,
+              isOwnMessage: true, // Compare with your user ID
+            };
+    dispatch(addMessage(newMsg)); 
     socketService.sendPrivateMessage(selectedUser2ID, text, []); 
     setText("");
   };
