@@ -30,7 +30,7 @@ import ChangePasswordPage from "./settings/ChangePasswordPage";
 import MyItemsPage from "./my_items/MyItemsPage";
 import CompanyCreationPage from "./company/CompanyCreationPage";
 import ManageCompanyPage from "./company/ManageCompanyPage"
-import AddJobFormPage from "./company/AddJobFormPage"
+import  CreateJobPage from "./company/CreateJobPage"
 
 //Export the Imported Pages
 export {
@@ -65,5 +65,5 @@ export {
   MyItemsPage,
   CompanyCreationPage,
   ManageCompanyPage,
-  AddJobFormPage,
+  CreateJobPage
 };

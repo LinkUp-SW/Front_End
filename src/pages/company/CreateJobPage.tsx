@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { Job, Company } from '../../pages/jobs/types';
+import { Job, Company } from '../jobs/types';
 import { createJobFromCompany, getCompanyAdminView } from "@/endpoints/company";
 import { searchCompanies as searchCompaniesAPI } from "@/endpoints/company";
 
