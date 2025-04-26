@@ -1,10 +1,10 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import SettingsLayoutPage from '../../components/hoc/SettingsLayoutPage';
-import styles from './accountPreferencePage.module.css';
 
 const AccountPreferencePage: React.FC = () => {
   const navigate = useNavigate();
+  
   const handleDisplaySettings = () => {
     navigate('/settings/display');
   };
@@ -15,38 +15,69 @@ const AccountPreferencePage: React.FC = () => {
 
   return (
     <SettingsLayoutPage>
-      <div className={styles.preferencesContent}>
+      {/* Equivalent to .preferencesContent */}
+      <div className="w-full max-w-[800px] mx-auto py-10 px-4">
         {/* Display Settings */}
-        <div className={styles.preferencesSection}>
-          <h2 className={styles.sectionTitle}>Display</h2>
-          <div className={styles.optionItem}>
+        {/* Equivalent to .preferencesSection */}
+        <div className="bg-white rounded-lg mb-4 shadow-[0_0_0_1px_rgba(0,0,0,0.08)] overflow-hidden">
+          {/* Equivalent to .sectionTitle */}
+          <h2 className="py-4 px-6 m-0 text-[18px] font-semibold text-[rgba(0,0,0,0.9)] border-b border-[rgba(0,0,0,0.08)]">
+            Display
+          </h2>
+          {/* Equivalent to .optionItem */}
+          <div className="flex justify-between items-center py-4 px-6 min-h-[48px] text-base text-[rgba(0,0,0,0.9)] border-b border-[rgba(0,0,0,0.08)] cursor-pointer hover:bg-[rgba(0,0,0,0.03)] last:border-b-0">
             <span>Dark mode</span>
+            {/* Equivalent to .arrowButton */}
             <button 
-              className={styles.arrowButton}
+              className="flex items-center justify-center bg-transparent border-0 cursor-pointer p-2 text-[rgba(0,0,0,0.6)]"
               onClick={handleDisplaySettings}
               aria-label="Go to display settings"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" className={styles.arrowIcon}>
-                <path d="M6 12l4-4-4-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+              {/* Equivalent to .arrowIcon */}
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                viewBox="0 0 16 16" 
+                className="w-4 h-4"
+              >
+                <path 
+                  d="M6 12l4-4-4-4" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  strokeWidth="2" 
+                  strokeLinecap="round" 
+                />
               </svg>
             </button>
           </div>
         </div>
 
         {/* Account Management */}
-        <div className={styles.preferencesSection}>
-          <h2 className={styles.sectionTitle}>Account management</h2>
-          <div className={styles.optionItem}>
-            <span>
-              <span className={styles.highlightedText}>Close account</span>
+        <div className="bg-white rounded-lg mb-4 shadow-[0_0_0_1px_rgba(0,0,0,0.08)] overflow-hidden">
+          <h2 className="py-4 px-6 m-0 text-[18px] font-semibold text-[rgba(0,0,0,0.9)] border-b border-[rgba(0,0,0,0.08)]">
+            Account management
+          </h2>
+          <div className="flex justify-between items-center py-4 px-6 min-h-[48px] text-base text-[rgba(0,0,0,0.9)] border-b border-[rgba(0,0,0,0.08)] cursor-pointer hover:bg-[rgba(0,0,0,0.03)] last:border-b-0">
+            {/* Equivalent to .highlightedText */}
+            <span className="text-black font-normal">
+              Close account
             </span>
             <button 
-              className={styles.arrowButton}
+              className="flex items-center justify-center bg-transparent border-0 cursor-pointer p-2 text-[rgba(0,0,0,0.6)]"
               onClick={handleCloseAccount}
               aria-label="Go to close account"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" className={styles.arrowIcon}>
-                <path d="M6 12l4-4-4-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                viewBox="0 0 16 16" 
+                className="w-4 h-4"
+              >
+                <path 
+                  d="M6 12l4-4-4-4" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  strokeWidth="2" 
+                  strokeLinecap="round" 
+                />
               </svg>
             </button>
           </div>
