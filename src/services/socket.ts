@@ -14,6 +14,10 @@ export interface incomingTypingIndicator {
   conversationId: string;
   userId: string;
 }
+export interface incomingMessageRead {
+  conversationId: string;
+  readBy: string;
+}
 
 
 
