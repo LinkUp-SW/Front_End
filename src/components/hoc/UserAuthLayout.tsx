@@ -35,7 +35,7 @@ const UserAuthLayout = <P extends object>(
           if (isMounted) {
             if (response.success && myUserId && userType) {
               if (userType.toLocaleLowerCase() === "admin") {
-                navigate("/admin/dashboard", { replace: true });
+                navigate("/admin-page/dashboard", { replace: true });
               } else {
                 navigate("/feed", { replace: true });
               }

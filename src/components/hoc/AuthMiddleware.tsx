@@ -48,7 +48,7 @@ const AuthMiddleware = ({ children }: AuthMiddlewareProps) => {
             !location.pathname.startsWith("/signup") ||
             !location.pathname.startsWith("/admin")
           ) {
-            navigate("/admin/dashboard", {
+            navigate("/admin-page/dashboard", {
               replace: true,
             });
           }
