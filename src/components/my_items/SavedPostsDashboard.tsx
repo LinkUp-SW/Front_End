@@ -178,7 +178,6 @@ const SavedPostsDashboard: React.FC = () => {
                         post.media.media_type === "pdf" ||
                         (post.media.media_type === "link" ? "flex-col" : "")
                       }`}
-                      ref={index == savedPosts.length - 2 ? observerRef : null}
                     >
                       {post.media && post.media.media_type != "none" ? (
                         post.media.media_type === "image" ||
@@ -287,6 +286,7 @@ const SavedPostsDashboard: React.FC = () => {
         )}
 
         {/* Observer Element */}
+        <div ref={observerRef}></div>
       </div>
     </div>
   );
