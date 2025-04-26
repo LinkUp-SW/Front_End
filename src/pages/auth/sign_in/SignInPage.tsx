@@ -85,8 +85,8 @@ const SignInPage: React.FC = () => {
         return window.location.replace("/email-verification");
       }
       toast.success("Signed in successfully!");
+      Cookies.set("linkup_user_type", data.user.isAdmin ? "admin" : "user");
       if (data.user.isAdmin) {
-        Cookies.set("linkup_user_type", data.user.isAdmin ? "admin" : "user");
         setTimeout(() => {
           window.location.replace("/admin/dashboard");
         }, 2000);
