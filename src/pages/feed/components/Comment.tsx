@@ -270,8 +270,8 @@ const Comment: React.FC<CommentProps> = ({
     try {
       const result = await deleteReaction(
         { target_type: "Comment" },
-        comment._id,
-        token
+        token,
+        comment._id
       );
       console.log(result);
       // dispatch(

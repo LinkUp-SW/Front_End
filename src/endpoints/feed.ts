@@ -287,10 +287,13 @@ export const getReactions = async (
 export const deleteReaction = async (
   postPayload: { target_type: string },
   postId: string,
-  token: string
+  token: string,
+  commentId?: string | null
 ) => {
   const response = await axiosInstance.delete(
-    `api/v1/post/reaction/${postId}`,
+    !commentId
+      ? `api/v1/post/reaction/${postId}/`
+      : `api/v1/post/reaction/${postId}/${commentId}`,
     {
       headers: {
         Authorization: `Bearer ${token}`,
