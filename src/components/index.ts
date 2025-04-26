@@ -75,6 +75,7 @@ import JobsDashboard from "@/components/my_items/JobsDashboard";
 import InterviewTipsPanel from "@/components/my_items/InterviewTipsPanel";
 import Footer from "@/components/my_items/Footer";
 import SavedPostsDashboard from "@/components/my_items/SavedPostsDashboard";
+import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
 
 export {
   UserList,
@@ -148,4 +149,7 @@ export {
   InterviewTipsPanel,
   Footer,
   SavedPostsDashboard,
+  Alert,
+  AlertTitle,
+  AlertDescription,
 };

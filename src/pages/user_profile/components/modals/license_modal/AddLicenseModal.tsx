@@ -34,7 +34,7 @@ interface LicenseFormData {
   media: MediaItem[];
 }
 
-interface AddLicenseModalProps {
+export interface AddLicenseModalProps {
   onClose?: () => void;
   onSuccess?: (newLicense: License) => void;
 }

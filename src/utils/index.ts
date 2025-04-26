@@ -236,3 +236,17 @@ export function isSkillResponse(obj: unknown): obj is SkillResponse {
   }
   return false;
 }
+
+type RelationKey = 'licenses' | 'educations' | 'experiences'
+
+export function buildSkillNamesMap(
+  skills: Array<{ _id: string; name: string } & { [K in RelationKey]: { _id: string }[] }>,
+  relation: RelationKey
+): Record<string, string[]> {
+  return skills.reduce<Record<string, string[]>>((map, skill) => {
+    for (const { _id } of skill[relation]) {
+      (map[_id] ??= []).push(skill.name)
+    }
+    return map
+  }, {})
+}

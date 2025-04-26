@@ -181,9 +181,9 @@ export interface Organization {
   logo: string;
   name: string;
 }
-export interface SkillResponse{
-  _id:string;
-  name:string
+export interface SkillResponse {
+  _id: string;
+  name: string;
 }
 
 export interface Experience {
@@ -222,6 +222,7 @@ export interface UserLoginResponse {
     email: string;
     id: string;
     isVerified: boolean;
+    isAdmin: boolean;
   };
 }
 
@@ -291,8 +292,10 @@ export interface UserProfileBio {
   education: Organization | null;
   work_experience: Organization | null;
   is_defult_cover_photo: boolean;
-  profile_visibility:string;
-
+  profile_visibility: string;
+  allow_messaging: boolean;
+  resume: string | null;
+  viewer_user_is_subscribed: boolean;
 }
 
 // Add to types.ts
@@ -386,7 +389,7 @@ export interface BioFormData {
   first_name: string;
   last_name: string;
   headline: string;
-  website:'';
+  website: "";
   location: {
     country_region: string;
     city: string;

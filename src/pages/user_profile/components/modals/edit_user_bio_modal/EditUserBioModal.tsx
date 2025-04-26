@@ -100,9 +100,32 @@ const EditUserBioModal: React.FC<EditUserBioModalProps> = ({
     }));
   };
 
+  const validateUserBioForm = () => {
+    if (formData.first_name.trim() === "") {
+      return "First Name is required!";
+    }
+    if (formData.last_name.trim() === "") {
+      return "Last Name is required!";
+    }
+    if (formData.headline.trim() === "") {
+      return "Headline is required!";
+    }
+    if (formData.location.city.trim() === "") {
+      return "Please choose a city!";
+    }
+    if (formData.location.country_region.trim() === "") {
+      return "Please choose a country!";
+    }
+
+    return null;
+  };
+
   const handleUpdateUserBio = async () => {
     if (!authToken)
       return toast.error("You are unauthorized to do this action");
+    if (validateUserBioForm()) {
+      return toast.error(validateUserBioForm());
+    }
     try {
       const response = await updateUserBio(authToken, formData);
       setOpenEditDialog(false);
