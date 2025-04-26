@@ -92,7 +92,7 @@ const Post: React.FC<PostProps> = ({
   const [isSaved, setIsSaved] = useState<boolean>(false);
   const [postMenuOpen, setPostMenuOpen] = useState(false);
   const [sortingMenu, setSortingMenu] = useState(false);
-  const [sortingState, setSortingState] = useState("Most relevant");
+
   const [commentsOpen, setCommentsOpen] = useState(false);
   const [reactionsOpen, setReactionsOpen] = useState(false);
   const [willDelete, setWillDelete] = useState(false);
@@ -120,6 +120,7 @@ const Post: React.FC<PostProps> = ({
         oldObject.comments = [createdComment.comment, ...oldObject.comments];
         oldObject.count = oldObject.count + 1;
         updatedComments[order] = oldObject;
+
         dispatch(setComments(updatedComments));
         dispatch(
           setPosts(
@@ -209,10 +210,6 @@ const Post: React.FC<PostProps> = ({
     timeoutId = setTimeout(() => {
       setReactionsOpen(false);
     }, 300);
-  };
-
-  const handleSortingState = (selectedState: string) => {
-    setSortingState(selectedState);
   };
 
   useEffect(() => {
@@ -343,12 +340,14 @@ const Post: React.FC<PostProps> = ({
               ? {
                   ...post,
                   reacts: [...post.reacts, result.reaction.reaction._id],
+                  reactions: result.topReactions,
+                  reactionsCount: result.totalCount,
                 }
               : post
           )
         )
       );
-      console.log("New posts", posts);
+      console.log("Result:", result);
     } catch (error) {
       console.log(error);
     }
@@ -377,6 +376,8 @@ const Post: React.FC<PostProps> = ({
                   ...post,
 
                   reacts: post.reacts.filter((r) => r !== result.reaction._id),
+                  reactions: result.topReactions,
+                  reactionsCount: result.totalCount,
                 }
               : post
           )
@@ -416,13 +417,17 @@ const Post: React.FC<PostProps> = ({
 
   useEffect(() => {
     if (postData.isSaved) setIsSaved(postData.isSaved);
-  }, [postData.isSaved]);
+  }, [postData]);
+
+  useEffect(() => {
+    if (postData.userReaction)
+      setSelectedReaction(
+        postData.userReaction.charAt(0).toUpperCase() +
+          postData.userReaction.slice(1).toLowerCase()
+      );
+  }, []);
 
   const stats = {
-    likes: 15,
-    love: 2,
-    support: 1,
-    celebrate: 1,
     comments: postData.comments.length,
     reposts: 5,
     total: postData.reactionsCount,
@@ -811,11 +816,10 @@ const Post: React.FC<PostProps> = ({
           <PostFooter
             sortingMenu={sortingMenu}
             setSortingMenu={setSortingMenu}
-            sortingState={sortingState}
-            handleSortingState={handleSortingState}
             postId={postData._id}
             addNewComment={addNewComment}
             comments={comments}
+            order={order}
           />
         )}
       </CardFooter>
@@ -825,7 +829,7 @@ const Post: React.FC<PostProps> = ({
 
 export default Post;
 
-function getReactionIcons(reactions: { reaction: string }[]) {
+export function getReactionIcons(reactions: { reaction: string }[]) {
   const reactionIconsMap: Record<string, JSX.Element> = {
     celebrate: <img src={CelebrateIcon} alt="Celebrate" className="w-4 h-4" />,
     love: <img src={LoveIcon} alt="Love" className="w-4 h-4" />,

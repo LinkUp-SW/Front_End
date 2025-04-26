@@ -158,21 +158,6 @@ export const REPOST_MENU = [
   },
 ];
 
-export const COMMENT_SORTING_MENU: MenuAction[] = [
-  {
-    name: "Most relevant",
-    subtext: "See the most relevant comments",
-    action: () => console.log("Most relevant pressed"),
-    icon: React.createElement(FaRocket, { className: "mr-2" }),
-  },
-  {
-    name: "Most recent",
-    subtext: "See all the comments, the most recent comments are first",
-    action: () => console.log("Most Recent pressed"),
-    icon: React.createElement(FaClock, { className: "mr-2" }),
-  },
-];
-
 export const getEngagementButtons = (
   selectedReaction: string,
   toggleLiked: () => void,
