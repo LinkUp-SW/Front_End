@@ -90,6 +90,9 @@ interface MessageState {
   editingMessageId:string;
   editText: string;
   user2Id:string;
+  message:MessageChat;
+
+
 
 }
 
@@ -103,7 +106,20 @@ const initialState: MessageState = {
   userStatus:false,
   editingMessageId: "",
   editText: "",
-  user2Id:""
+  user2Id:"",
+  message: {
+    messageId: '',
+    senderId: '',
+    senderName: '',
+    message: '',
+    media: [],
+    timestamp: new Date(),
+    reacted: false,
+    isSeen: false,
+    isOwnMessage: false,
+  },
+
+
 
 };
 
@@ -117,6 +133,10 @@ const MessagingSlice = createSlice({
     selectMessage: (state, action: PayloadAction<string>) => {
       state.selectedMessages = action.payload; 
     },
+    addMessage: (state, action: PayloadAction<MessageChat>) => {
+      state.message = action.payload;
+    },
+    
 
     toggleStarred(state, action: PayloadAction<string>) {
       const conversationID = action.payload;
@@ -160,12 +180,15 @@ const MessagingSlice = createSlice({
     clearEditingState: (state) => {
       state.editingMessageId = "";
       state.editText = "";
-    }
+    },
+
+ 
+    
     
     
 
   },
 });
 
-export const {toggleStarred, activeButton, searchFiltering, selectMessage,selectUserName,selectUserStatus,setEditingMessageId,setEditText,clearEditingState,selectUserId} = MessagingSlice.actions;
+export const {toggleStarred, activeButton, searchFiltering, selectMessage,selectUserName,selectUserStatus,setEditingMessageId,setEditText,clearEditingState,selectUserId,addMessage} = MessagingSlice.actions;
 export default MessagingSlice.reducer;
