@@ -30,6 +30,15 @@ import {
   ChangePasswordPage,
   MyItemsPage,
   AllPeoplePage,
+
+  DashboardPage,
+  SettingsPage,
+  UsersPage,
+  AnalyticsPage,
+  ContentModerationPage,
+
+  
+
 } from "./pages";
 
 import PrimaryEmailPage from "./pages/settings/updateEmail/PrimaryEmailPage";
@@ -37,6 +46,7 @@ import AddEmailPage from "./pages/settings/updateEmail/AddEmailPage";
 import OTP from "./pages/settings/updateEmail/OTP";
 
 import React from "react";
+import JobPostingsPage from "./pages/admin/JobPostingsPage";
 
 
 // Define your routes as an array of RouteObject (compatible with React Router v6)
@@ -176,6 +186,32 @@ const routes: RouteObject[] = [
     path: "/search/users",
     element: React.createElement(AllPeoplePage),
   },
+  {
+    path:"/admin-page/dashboard",
+    element: React.createElement(DashboardPage)
+  },
+  {
+    path:"/admin-page/dashboard/settings",
+    element: React.createElement(SettingsPage)
+
+  },
+  {
+    path:"/admin-page/dashboard/users",
+    element: React.createElement(UsersPage)
+  },
+  {
+    path:"/admin-page/dashboard/analytics",
+    element: React.createElement(AnalyticsPage)
+  },
+  {
+    path:"/admin-page/dashboard/content-moderation",
+    element: React.createElement(ContentModerationPage)
+  },
+  {
+    path:"/admin-page/dashboard/jobs-postings",
+    element: React.createElement(JobPostingsPage)
+  }
+ 
 ];
 
 export default routes;
