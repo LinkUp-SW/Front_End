@@ -6,6 +6,7 @@ import {
   Experience,
   License,
   Organization,
+  PostType,
   Skill,
   SkillForm,
   SkillUserSections,
@@ -79,6 +80,31 @@ export const getUserSkills = async (
       headers: {
         Authorization: `Bearer ${token}`,
       },
+    }
+  );
+  return response.data;
+};
+
+export const getUserPosts = async (
+  token: string,
+  userId: string,
+  postPayload: {
+    cursor: number;
+    limit: number;
+  }
+): Promise<{
+  message: string;
+  is_me: string;
+  posts: PostType[];
+  nextCursor: number;
+}> => {
+  const response = await axiosInstance.get(
+    `/api/v1/post/posts/user/${userId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      params: postPayload,
     }
   );
   return response.data;
