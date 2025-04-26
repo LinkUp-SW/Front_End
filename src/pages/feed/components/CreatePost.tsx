@@ -48,8 +48,11 @@ const useDismissModal = () => {
     dismiss,
   };
 };
+interface CreatePostProps {
+  className?: string;
+}
 
-const CreatePost: React.FC = () => {
+const CreatePost: React.FC<CreatePostProps> = ({ className }) => {
   const posts = useSelector((state: RootState) => state.posts.list);
   const comments = useSelector((state: RootState) => state.comments.list);
   const dispatch = useDispatch();
@@ -242,7 +245,9 @@ const CreatePost: React.FC = () => {
 
   return (
     <>
-      <Card className="mb-1 w-full bg-white border-0 pr-4 dark:bg-gray-900 ">
+      <Card
+        className={`mb-1 w-full bg-white border-0 pr-4 dark:bg-gray-900 ${className}`}
+      >
         <CardContent>
           <div className="flex space-x-3 justify-start items-start">
             <Link to={"#"}>
