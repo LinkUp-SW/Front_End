@@ -13,6 +13,7 @@ import educationReducer from "./slices/education/educationsSlice";
 import licenseReducer from "./slices/license/licensesSlice";
 import skillReducer from "./slices/skills/skillsSlice";
 import experienceReducer from "./slices/experience/experiencesSlice";
+import dialogSlice from "./slices/feed/createPostSlice";
 // For now, we’ll set up an empty reducer. Later, you can add slices or combine reducers.
 export const store = configureStore({
   reducer: {
@@ -29,6 +30,7 @@ export const store = configureStore({
     license: licenseReducer,
     skill: skillReducer,
     experience: experienceReducer,
+    createPost: dialogSlice,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
