@@ -15,6 +15,7 @@ import { RootState } from "@/store";
 import { getErrorMessage } from "@/utils/errorHandler";
 import { AxiosError } from "axios";
 import { useEffect, useState } from "react";
+import { Dialog, DialogContent, SubscribeNowCard } from "@/components";
 
 const UserInfo = () => {
   const token = Cookies.get("linkup_auth_token");
@@ -44,6 +45,7 @@ const UserInfo = () => {
   const [isInConnections, setIsInConnections] = useState<boolean | undefined>(
     undefined
   );
+  const [openSubscribeNowDialog,setOpenSubscribeNowDialog]=useState(false)
   useEffect(() => {
     if (data) {
       setNumOfConnections(data.number_of_connections);
@@ -86,6 +88,7 @@ const UserInfo = () => {
           connectionCount={numOfConnections}
           email={data.email}
           resume={data.resume}
+          setOpenSubscribeNowDialog={setOpenSubscribeNowDialog}
           isAllowingMessage={data.allow_messaging}
           isViewerSubscribed={data.viewer_user_is_subscribed}
           followStatus={{
@@ -97,6 +100,11 @@ const UserInfo = () => {
           }}
         />
       </div>
+      <Dialog open={openSubscribeNowDialog} onOpenChange={setOpenSubscribeNowDialog}>
+        <DialogContent className="bg-white dark:bg-gray-900 dark:border-gray-500">
+          <SubscribeNowCard/>
+        </DialogContent>
+      </Dialog>
     </section>
   );
 };
