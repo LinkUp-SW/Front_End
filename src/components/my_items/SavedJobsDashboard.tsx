@@ -11,7 +11,7 @@ enum TabState {
   ARCHIVED = 'archived'
 }
 
-const JobsDashboard: React.FC = () => {
+const SavedJobsDashboard: React.FC = () => {
   const [savedJobs, setSavedJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -207,4 +207,4 @@ const JobsDashboard: React.FC = () => {
   );
 };
 
-export default JobsDashboard;
+export default SavedJobsDashboard;
