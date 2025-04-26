@@ -15,6 +15,7 @@ const AuthMiddleware = ({ children }: AuthMiddlewareProps) => {
   const [isVerified, setIsVerified] = useState(false);
   const token = Cookies.get("linkup_auth_token");
   const myUserId = Cookies.get("linkup_user_id");
+  const userType = Cookies.get("linkup_user_type");
 
   useEffect(() => {
     let isMounted = true;
@@ -22,7 +23,8 @@ const AuthMiddleware = ({ children }: AuthMiddlewareProps) => {
 
     const checkAuth = async () => {
       try {
-        if (!token || !myUserId) {
+        if (!token || !myUserId || !userType) {
+          Cookies.remove("linkup_user_type");
           await userLogOut();
           navigate("/login", { replace: true });
           return;
@@ -42,6 +44,7 @@ const AuthMiddleware = ({ children }: AuthMiddlewareProps) => {
         if (isMounted) {
           Cookies.remove("linkup_auth_token");
           Cookies.remove("linkup_user_id");
+          Cookies.remove("linkup_user_type");
 
           let redirectPath = "/login";
           if (error instanceof AxiosError) {
