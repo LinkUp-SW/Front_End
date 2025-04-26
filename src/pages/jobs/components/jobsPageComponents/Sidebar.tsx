@@ -41,6 +41,11 @@ const Sidebar: React.FC = () => {
     navigate(`/company-manage/${companyId}`);
   };
 
+  // Handler for "Post a free job" button
+  const handlePostFreeJob = () => {
+    navigate("/jobs/create");
+  };
+
   return (
     <div className="w-full md:w-1/4 md:sticky md:top-20 md:self-start">
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow dark:shadow-gray-700 p-4 transition-colors">
@@ -66,6 +71,7 @@ const Sidebar: React.FC = () => {
         <div
           id="post-job-btn"
           className="flex items-center gap-2 p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded cursor-pointer transition-colors"
+          onClick={handlePostFreeJob}
           role="button"
         >
           <FaEdit size={20} />

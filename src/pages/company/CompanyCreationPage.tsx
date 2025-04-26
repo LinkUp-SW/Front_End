@@ -11,6 +11,11 @@ const CompanyCreationPage: React.FC = () => {
   const [selectedType, setSelectedType] = useState<'company' | 'education' | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [previewData, setPreviewData] = useState({
+    logoPreview: null as string | null,
+    name: '',
+    description: ''
+  });
 
   // Handle type selection
   const handleTypeSelection = (type: 'company' | 'education') => {
@@ -64,12 +69,21 @@ const CompanyCreationPage: React.FC = () => {
             <div className="flex flex-col md:flex-row gap-6">
               {/* Form Section */}
               <div className="flex-1 bg-white dark:bg-gray-900 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
-                <PageForm type={selectedType} onSubmit={handleSubmit} />
+                <PageForm 
+                  type={selectedType} 
+                  onSubmit={handleSubmit}
+                  setPreviewData={setPreviewData}
+                />
               </div>
 
               {/* Preview Section */}
               <div className="md:w-1/3">
-                <PagePreview type={selectedType} />
+                <PagePreview 
+                  type={selectedType} 
+                  logoPreview={previewData.logoPreview}
+                  name={previewData.name}
+                  description={previewData.description}
+                />
               </div>
             </div>
           </div>

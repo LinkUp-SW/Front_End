@@ -1,4 +1,4 @@
-import { FormEvent, useState } from 'react';
+import { FormEvent, useState, useEffect, ChangeEvent } from 'react';
 import { createCompanyProfile } from '@/endpoints/company';
 import { CompanyProfileData } from "../../../jobs/types";
 import { toast } from 'sonner';
@@ -6,9 +6,14 @@ import { toast } from 'sonner';
 interface PageFormProps {
   type: 'company' | 'education';
   onSubmit: (e: FormEvent) => void;
+  setPreviewData?: (data: {
+    logoPreview: string | null;
+    name: string;
+    description: string;
+  }) => void;
 }
 
-export const PageForm: React.FC<PageFormProps> = ({ type, onSubmit }) => {
+export const PageForm: React.FC<PageFormProps> = ({ type, onSubmit, setPreviewData }) => {
   const [formData, setFormData] = useState<CompanyProfileData>({
     name: '',
     category_type: type,
@@ -24,7 +29,19 @@ export const PageForm: React.FC<PageFormProps> = ({ type, onSubmit }) => {
   
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [charCount, setCharCount] = useState(0);
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
   
+  // Update preview when relevant form data changes
+  useEffect(() => {
+    if (setPreviewData) {
+      setPreviewData({
+        logoPreview,
+        name: formData.name,
+        description: formData.description || ''
+      });
+    }
+  }, [formData.name, formData.description, logoPreview, setPreviewData]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prevData: CompanyProfileData) => ({ ...prevData, [name]: value }));
@@ -32,6 +49,38 @@ export const PageForm: React.FC<PageFormProps> = ({ type, onSubmit }) => {
     if (name === 'description') {
       setCharCount(value.length);
     }
+  };
+  
+  const handleLogoUpload = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    // Validate file type
+    if (!['image/jpeg', 'image/jpg', 'image/png'].includes(file.type)) {
+      toast.error('Please upload a JPG, JPEG, or PNG file only.');
+      return;
+    }
+    
+    // Validate file size (max 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error('Logo image must be less than 2MB.');
+      return;
+    }
+    
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const base64String = event.target?.result as string;
+      setLogoPreview(base64String);
+      setFormData(prevData => ({
+        ...prevData,
+        logo: base64String
+      }));
+    };
+    reader.onerror = () => {
+      toast.error('Error reading file. Please try again.');
+    };
+    
+    reader.readAsDataURL(file);
   };
   
   const validateForm = (): boolean => {
@@ -144,7 +193,6 @@ export const PageForm: React.FC<PageFormProps> = ({ type, onSubmit }) => {
         />
       </div>
 
-
       <div className="mb-6">
         <label className="block text-gray-700 dark:text-gray-300 mb-1 font-medium">Organization size*</label>
         <div className="relative">
@@ -196,9 +244,9 @@ export const PageForm: React.FC<PageFormProps> = ({ type, onSubmit }) => {
               <>
                 <option value="University">University</option>
                 <option value="College">College</option>
-                <option value="High School">High school</option>
-                <option value="Middle School">Middle school</option>
-                <option value="Elementary School">Elementary school</option>
+                <option value="High school">High school</option>
+                <option value="Middle school">Middle school</option>
+                <option value="Elementary school">Elementary school</option>
               </>
             )}
           </select>
@@ -212,16 +260,36 @@ export const PageForm: React.FC<PageFormProps> = ({ type, onSubmit }) => {
 
       <div className="mb-6">
         <label className="block text-gray-700 dark:text-gray-300 mb-1 font-medium">Logo</label>
-        <div className="border border-dashed border-gray-300 dark:border-gray-600 rounded p-6 flex flex-col items-center justify-center text-center">
-          <div className="mb-2">
-            <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-            </svg>
-          </div>
-          <span className="text-blue-600">Choose file</span>
-          <span className="text-sm text-gray-500 mt-1">Upload to see preview</span>
-        </div>
-        <p className="text-xs text-gray-500 mt-1">300 x 300px recommended. JPGs, JPEGs, and PNGs supported.</p>
+        <input 
+          type="file" 
+          accept=".jpg,.jpeg,.png" 
+          onChange={handleLogoUpload}
+          className="hidden" 
+          id="logo-upload"
+        />
+        <label htmlFor="logo-upload" className={`border border-dashed border-gray-300 dark:border-gray-600 rounded p-6 flex flex-col items-center justify-center text-center cursor-pointer ${logoPreview ? 'bg-gray-50 dark:bg-gray-800' : ''}`}>
+          {logoPreview ? (
+            <div className="flex flex-col items-center">
+              <img 
+                src={logoPreview} 
+                alt="Logo preview" 
+                className="max-w-full max-h-40 mb-2"
+              />
+              <span className="text-blue-600">Change logo</span>
+            </div>
+          ) : (
+            <>
+              <div className="mb-2">
+                <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                </svg>
+              </div>
+              <span className="text-blue-600">Choose file</span>
+              <span className="text-sm text-gray-500 mt-1">Upload to see preview</span>
+            </>
+          )}
+        </label>
+        <p className="text-xs text-gray-500 mt-1">300 x 300px recommended. JPGs, JPEGs, and PNGs supported. Max size 2MB.</p>
       </div>
 
       <div className="mb-6">

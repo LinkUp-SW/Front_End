@@ -168,6 +168,10 @@ const routes: RouteObject[] = [
     path: "/company-manage/:companyId/jobs/create",
     element: React.createElement(AddJobFormPage),
   },
+  {
+    path:"/jobs/create",
+    element: React.createElement(AddJobFormPage),
+  },
 ];
 
 export default routes;

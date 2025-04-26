@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Job, Company } from '../../pages/jobs/types';
 import { createJobFromCompany, getCompanyAdminView } from "@/endpoints/company";
+import { searchCompanies as searchCompaniesAPI } from "@/endpoints/company";
 
 type WorkMode = 'On-site' | 'Remote' | 'Hybrid';
 type ExperienceLevel = 'Internship' | 'Entry Level' | 'Associate' | 'Mid-Senior' | 'Director' | 'Executive';
@@ -23,6 +24,12 @@ interface JobFormData extends Partial<Job> {
   hasEasyApply: boolean;
 }
 
+interface CompanySearchResult {
+  _id: string;
+  name: string;
+  logo?: string;
+}
+
 const CreateJobPage: React.FC = () => {
   const { companyId } = useParams<{ companyId: string }>();
   const navigate = useNavigate();
@@ -30,6 +37,14 @@ const CreateJobPage: React.FC = () => {
   const totalSteps = 3;
   const [companyData, setCompanyData] = useState<Company | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isFreeJob, setIsFreeJob] = useState<boolean>(!companyId);
+  
+  // Company search state
+  const [companySearchQuery, setCompanySearchQuery] = useState('');
+  const [companySearchResults, setCompanySearchResults] = useState<CompanySearchResult[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [showCompanyResults, setShowCompanyResults] = useState(false);
+  const [selectedCompanyId, setSelectedCompanyId] = useState<string | null>(null);
   
   // State for text area raw inputs
   const [textareaValues, setTextareaValues] = useState({
@@ -57,9 +72,79 @@ const CreateJobPage: React.FC = () => {
     verified: true
   });
 
-  // Fetch company data
+  // Search for companies
+  const searchCompanies = async (query: string) => {
+    if (!query || query.length < 2) {
+      setCompanySearchResults([]);
+      return;
+    }
+    
+    try {
+      setIsSearching(true);
+      const response = await searchCompaniesAPI(query);
+      
+      if (response && response.data) {
+        setCompanySearchResults(response.data.map((company: any) => ({
+          _id: company._id,
+          name: company.name,
+          logo: company.logo || '/src/assets/company.png'
+        })));
+      } else {
+        setCompanySearchResults([]);
+      }
+    } catch (error) {
+      console.error('Error searching companies:', error);
+      setCompanySearchResults([]);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+  
+
+  // Handle company search input change with debounce
   useEffect(() => {
-    if (!companyId) return;
+    const debounceTimer = setTimeout(() => {
+      if (companySearchQuery) {
+        searchCompanies(companySearchQuery);
+      }
+    }, 300);
+    
+    return () => clearTimeout(debounceTimer);
+  }, [companySearchQuery]);
+
+  // Handle company selection
+  const handleSelectCompany = (company: CompanySearchResult) => {
+    console.log("Selecting company:", company);
+    
+    // First update the company name in form data
+    setJobData(prev => {
+      const updated = {
+        ...prev,
+        company: company.name,
+        logo: company.logo || '/src/assets/company.png'
+      };
+      console.log("Updated job data:", updated);
+      return updated;
+    });
+    
+    // Then set the company ID
+    setSelectedCompanyId(company._id);
+    console.log("Selected company ID:", company._id);
+    
+    // Close the dropdown with a slight delay to ensure state updates
+    setTimeout(() => {
+      setShowCompanyResults(false);
+      // Show feedback to the user
+      toast.success(`Selected company: ${company.name}`);
+    }, 100);
+  };
+  // Fetch company data if companyId is provided
+  useEffect(() => {
+    if (!companyId) {
+      // If no companyId, then it's a free job post
+      setIsFreeJob(true);
+      return;
+    }
 
     const fetchCompanyData = async () => {
       try {
@@ -73,6 +158,7 @@ const CreateJobPage: React.FC = () => {
             company: response.company.name || '',
             logo: response.company.logo || '/src/assets/company.png'
           }));
+          setSelectedCompanyId(companyId);
         } else {
           console.error('Company data is missing or malformed:', response);
           toast.error('Failed to load company data properly');
@@ -92,6 +178,12 @@ const CreateJobPage: React.FC = () => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setJobData(prev => ({ ...prev, [name]: value }));
+    
+    // If company name is being changed, show search results
+    if (name === 'company' && isFreeJob) {
+      setCompanySearchQuery(value);
+      setShowCompanyResults(true);
+    }
   };
 
   const handleWorkModeChange = (mode: WorkMode) => {
@@ -137,30 +229,45 @@ const CreateJobPage: React.FC = () => {
 
   // Form submission
   const handleSubmit = async () => {
-    if (!companyId) {
-      toast.error('Company ID is missing');
-      return;
-    }
-    
     try {
       setIsLoading(true);
+      
+      // Check if company is selected
+      if (!selectedCompanyId && isFreeJob) {
+        toast.error('Please select a company from the search results');
+        setIsLoading(false);
+        return;
+      }
+      
       const jobDataToSubmit = {
         ...jobData,
-        organization_id: companyId,
+        organization_id: selectedCompanyId || companyId,
         job_title: jobData.title,
         workplace_type: jobData.workMode,
         job_type: "Full-time",
+        job_status: "Open",
         receive_applicants_by: "Email",
         receiving_method: "jobs@company.com",
         targettted_skills: []
       };
       
-      await createJobFromCompany(companyId, jobDataToSubmit);
-      toast.success('Job posted successfully!');
-      navigate(`/company-manage/${companyId}`);
-    } catch (err) {
+      console.log("Submitting job with organization ID:", selectedCompanyId || companyId);
+      console.log("Full job submission data:", jobDataToSubmit);
+      
+      if (selectedCompanyId || companyId) {
+        // Use the company ID we have - either selected or from params
+        const orgId = selectedCompanyId || companyId || '';
+        const response = await createJobFromCompany(orgId, jobDataToSubmit);
+        console.log("Job creation response:", response);
+        toast.success('Job posted successfully!');
+        navigate(`/company-manage/${orgId}`);
+      } else {
+        // This should never happen with the validation above
+        toast.error('No company selected');
+      }
+    } catch (err: any) {
       console.error('Failed to create job:', err);
-      toast.error('Failed to create job');
+      toast.error(err.message || 'Failed to create job');
     } finally {
       setIsLoading(false);
     }
@@ -205,17 +312,56 @@ const CreateJobPage: React.FC = () => {
             />
           </div>
           
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Company</label>
+          <div className="relative">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Company*</label>
             <input
               type="text"
               name="company"
               value={jobData.company}
               onChange={handleInputChange}
+              onFocus={() => isFreeJob && setShowCompanyResults(true)}
               placeholder="Your Company"
-              className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-300"
-              disabled
+              className={`w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 ${
+                isFreeJob ? 'bg-white dark:bg-gray-800' : 'bg-gray-100 dark:bg-gray-700'
+              } text-gray-900 dark:text-gray-300`}
+              disabled={!isFreeJob}
+              required
             />
+            
+{/* Company search results dropdown */}
+{isFreeJob && showCompanyResults && (
+  <div className="absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded shadow-lg max-h-60 overflow-y-auto company-dropdown">
+    {isSearching ? (
+      <div className="p-2 text-gray-500 dark:text-gray-400 text-center">Searching...</div>
+    ) : companySearchResults.length > 0 ? (
+      companySearchResults.map(company => (
+        <div 
+          key={company._id}
+          className="p-3 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer flex items-center border-b border-gray-100 dark:border-gray-700"
+          onClick={() => {
+            console.log("Company selected:", company);
+            handleSelectCompany(company);
+          }}
+          onMouseDown={(e) => e.preventDefault()} // Prevent blur event from hiding dropdown
+        >
+          <img 
+            src={company.logo || '/src/assets/company.png'} 
+            alt={company.name} 
+            className="w-8 h-8 mr-3 rounded"
+          />
+          <div>
+            <p className="font-medium text-gray-800 dark:text-gray-200">{company.name}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">Click to select</p>
+          </div>
+        </div>
+      ))
+    ) : companySearchQuery.length >= 2 ? (
+      <div className="p-2 text-gray-500 dark:text-gray-400 text-center">No companies found</div>
+    ) : (
+      <div className="p-2 text-gray-500 dark:text-gray-400 text-center">Type at least 2 characters</div>
+    )}
+  </div>
+)}
           </div>
         </div>
 
@@ -364,6 +510,8 @@ const CreateJobPage: React.FC = () => {
       <div className="bg-gray-50 dark:bg-gray-800 p-3 sm:p-4 rounded mb-6 border border-gray-200 dark:border-gray-700">
         <h3 className="font-medium text-lg sm:text-xl mb-2 text-gray-900 dark:text-gray-100">{jobData.title}</h3>
         <div className="flex flex-wrap text-sm text-gray-600 dark:text-gray-400 mb-1 gap-2">
+          <span>{jobData.company}</span>
+          <span className="hidden sm:inline mx-2">•</span>
           <span>{jobData.location}</span>
           <span className="hidden sm:inline mx-2">•</span>
           <span>{jobData.workMode}</span>
@@ -424,7 +572,25 @@ const CreateJobPage: React.FC = () => {
     </div>
   );
 
-  if (isLoading && !companyData) {
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      const target = event.target as HTMLElement;
+      // Don't close if clicking on the dropdown itself
+      if (!target.closest('input[name="company"]') && 
+          !target.closest('.company-dropdown') && 
+          showCompanyResults) {
+        setShowCompanyResults(false);
+      }
+    }
+    
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showCompanyResults]);
+
+  if (isLoading && companyId && !companyData) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-6 sm:py-8">
         <div className="bg-white dark:bg-gray-900 rounded-lg shadow-md p-4 sm:p-6 border border-gray-200 dark:border-gray-700">

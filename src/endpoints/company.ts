@@ -1,7 +1,6 @@
 import axiosInstance from "@/services/axiosInstance";
 import Cookies from 'js-cookie';
 import { 
-  Company, 
   CompanyProfileData, 
   CompanyProfileResponse, 
   UserCompaniesResponse,
@@ -159,14 +158,21 @@ export const createJobFromCompany = async (organizationId: string, jobData: Part
       Object.entries(jobData).filter(([_, v]) => v !== undefined && v !== '')
     );
     
+    console.log('Creating job with data:', cleanData);
+    
     const response = await axiosInstance.post(url, cleanData, getAuthHeader(token));
     return response.data;
   } catch (error: any) {
     console.error('API Error Details:', error.response?.data || error.message);
-    if (error.response?.data?.message) {
+    
+    // Enhanced error handling
+    if (error.response?.status === 401) {
+      throw new Error('Authentication error. Please log in again.');
+    } else if (error.response?.data?.message) {
       throw new Error(error.response.data.message);
+    } else {
+      throw new Error('Failed to create job. Please try again.');
     }
-    throw error;
   }
 };
 
@@ -184,5 +190,21 @@ export const getJobsFromCompany = async (organizationId: string): Promise<any> =
       throw new Error(error.response.data.message);
     }
     throw new Error('Failed to load company jobs');
+  }
+};
+
+export const searchCompanies = async (query: string): Promise<any> => {
+  try {
+    const token = getAuthToken();
+    const url = `/api/v1/search/company/${query}`;
+    
+    const response = await axiosInstance.get(url, getAuthHeader(token));
+    return response.data;
+  } catch (error: any) {
+    console.error('Failed to search companies:', error.response?.data || error.message);
+    if (error.response?.data?.message) {
+      throw new Error(error.response.data.message);
+    }
+    throw new Error('Failed to search companies');
   }
 };
