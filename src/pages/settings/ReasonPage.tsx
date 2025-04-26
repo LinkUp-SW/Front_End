@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SettingsLayoutPage from '@/components/hoc/SettingsLayoutPage';
-import styles from './reasonPage.module.css';
 
 const ReasonPage: React.FC = () => {
   const navigate = useNavigate();
@@ -30,38 +29,47 @@ const ReasonPage: React.FC = () => {
 
   return (
     <SettingsLayoutPage>
-      <div className={styles.container}>
-        <div className={styles.header}>
-          <button onClick={() => navigate(-1)} className={styles.backButton}>
+      <div className="bg-white rounded-lg shadow-[0_1px_3px_rgba(0,0,0,0.1)] p-6 mx-auto w-[800px]">
+        <div className="mb-6">
+          <button 
+            onClick={() => navigate(-1)} 
+            className="bg-transparent border-0 text-[#666666] cursor-pointer text-sm p-0 mb-4 flex items-center hover:text-[#0891b2]"
+          >
             ← Back
           </button>
-          <h1 className={styles.title}>Close account</h1>
-          <p className={styles.subtitle}>Malak, we're sorry to see you go</p>
+          <h1 className="text-xl font-semibold m-0 text-black">
+            Close account
+          </h1>
+          <p className="text-base text-[#666666] mt-2 mb-0">
+            Malak, we're sorry to see you go
+          </p>
         </div>
 
-        <div className={styles.content}>
-          <p className={styles.label}>Tell us the reason for closing your account:</p>
+        <div className="mt-4">
+          <p className="text-sm text-[#333333] mb-4">
+            Tell us the reason for closing your account:
+          </p>
 
-          <div className={styles.radioGroup}>
+          <div className="flex flex-col gap-4 mb-6">
             {reasons.map((reason) => (
-              <label key={reason} className={styles.radioOption}>
+              <label key={reason} className="flex items-center cursor-pointer">
                 <input
                   type="radio"
                   name="closeReason"
                   value={reason}
                   checked={selectedReason === reason}
                   onChange={() => handleReasonChange(reason)}
-                  className={styles.radioInput}
+                  className="mr-3 cursor-pointer"
                 />
-                <span className={styles.radioLabel}>{reason}</span>
+                <span className="text-sm text-[#333333]">{reason}</span>
               </label>
             ))}
           </div>
 
           <button 
             onClick={handleNext} 
-            className={styles.nextButton}
             disabled={!selectedReason}
+            className="bg-[#0891b2] text-white border-0 rounded-[25px] px-6 py-3 text-base font-medium cursor-pointer transition-colors duration-200 hover:bg-[#067a99] disabled:bg-[#cccccc] disabled:cursor-not-allowed"
           >
             Next
           </button>
