@@ -1,3 +1,4 @@
+// components/Dashboard.tsx
 const SmallStatCard = ({
     title,
     value,
@@ -16,7 +17,6 @@ const SmallStatCard = ({
     );
   };
   
- 
   const LargeInfoCard = ({
     title,
     description,
@@ -51,8 +51,9 @@ const SmallStatCard = ({
   
   const Dashboard = () => {
     return (
-      <div className="flex-1 p-4 md:p-8 bg-gradient-to-b from-gray-100 via-white to-gray-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 min-h-screen transition-all duration-500 overflow-auto">
-        <div className="mb-8">
+      <div>
+        {/* Only for large screens title */}
+        <div className="hidden md:block mb-8">
           <h1 className="text-4xl font-extrabold text-gray-900 dark:text-white mb-2 tracking-tight">
             Dashboard
           </h1>

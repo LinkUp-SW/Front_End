@@ -1,20 +1,9 @@
-import React, { useState } from "react";
-import AdminPanelSidebar from "./components/AdminPanel";
+import React from "react";
 import Dashboard from "./components/Dashboard";
+import WithAdminPanel from "@/components/hoc/WithAdminPanel";
 
 const DashboardPage: React.FC = () => {
-  const [isOpen, setIsOpen] = useState(false);
-
-  const toggleSidebar = () => {
-    setIsOpen(!isOpen);
-  };
-
-  return (
-    <div className="flex h-screen">
-      <AdminPanelSidebar isOpen={isOpen} toggleSidebar={toggleSidebar} />
-      <Dashboard />
-    </div>
-  );
+  return <Dashboard />;
 };
 
-export default DashboardPage;
+export default WithAdminPanel(DashboardPage);

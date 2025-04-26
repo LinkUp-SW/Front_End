@@ -1,10 +1,10 @@
-const ContentMOderation: React.FC = () => {
+const ContentModeration: React.FC = () => {
     return (
       <div className="flex h-screen">
-        ContentMOderation
+        ContentModeration
   
       </div>
     );
   };
   
-  export default ContentMOderation
+  export default ContentModeration

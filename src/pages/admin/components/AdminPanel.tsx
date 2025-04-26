@@ -21,7 +21,7 @@ const AdminPanelSidebar = ({ isOpen, toggleSidebar }: AdminPanelSidebarProps) =>
     { name: "Dashboard", icon: <FiHome size={20} />, path: "/admin/dashboard" },
     { name: "Content Moderation", icon: <FiFlag size={20} />, path: "/admin/dashboard/content-moderation" },
     { name: "Job Postings", icon: <FiBriefcase size={20} />, path: "/admin/dashboard/jobs-postings" },
-    { name: "Analytics", icon: <FiBarChart2 size={20} />, path: "/admin/dashboard/analytics" },
+    { name: "Analytics", icon: <FiBarChart2 size={20} />, path: "/admin/analytics" },
     { name: "Users", icon: <FiUsers size={20} />, path: "/admin/dashboard/users" },
     { name: "Settings", icon: <FiSettings size={20} />, path: "/admin/dashboard/settings" },
   ];

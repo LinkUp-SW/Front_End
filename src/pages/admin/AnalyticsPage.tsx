@@ -1,20 +1,15 @@
-import React, { useState }  from "react";
-import AdminPanelSidebar from "./components/AdminPanel";
+// pages/admin/AnalyticsPage.tsx
+import React from "react";
+import WithAdminPanel from "@/components/hoc/WithAdminPanel";
 import Analytics from "./components/Analytics";
 
-
 const AnalyticsPage: React.FC = () => {
-    const [isOpen, setIsOpen] = useState(false);
-    
-      const toggleSidebar = () => {
-        setIsOpen(!isOpen);
-      };
-  return (
-    <div className="flex h-screen">
-       <AdminPanelSidebar isOpen={isOpen} toggleSidebar={toggleSidebar} />
-      <Analytics/>
-    </div>
-  );
+    return (
+        <div className="flex h-screen">
+          
+          <Analytics/>
+        </div>
+      );
 };
 
-export default AnalyticsPage;
+export default WithAdminPanel(AnalyticsPage);

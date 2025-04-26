@@ -1,11 +1,13 @@
+// components/admin/Analytics.tsx
+import React from "react";
 
 const Analytics: React.FC = () => {
   return (
-    <div className="flex h-screen">
-      Analytics 
-
+    <div>
+      <h1 className="text-2xl font-bold mb-4">Analytics Page</h1>
+      {/* Your analytics content here */}
     </div>
   );
 };
 
-export default Analytics
+export default Analytics;
