@@ -88,7 +88,7 @@ const SignInPage: React.FC = () => {
       Cookies.set("linkup_user_type", data.user.isAdmin ? "admin" : "user");
       if (data.user.isAdmin) {
         setTimeout(() => {
-          window.location.replace("/admin-page/dashboard");
+          window.location.replace("/admin/dashboard");
         }, 2000);
       } else {
         setTimeout(() => {

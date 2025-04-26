@@ -191,28 +191,28 @@ const routes: RouteObject[] = [
     element: React.createElement(AllPeoplePage),
   },
   {
-    path:"/admin-page/dashboard",
+    path:"/admin/dashboard",
     element: React.createElement(DashboardPage)
   },
   {
-    path:"/admin-page/dashboard/settings",
+    path:"/admin/dashboard/settings",
     element: React.createElement(SettingsPage)
 
   },
   {
-    path:"/admin-page/dashboard/users",
+    path:"/admin/dashboard/users",
     element: React.createElement(UsersPage)
   },
   {
-    path:"/admin-page/dashboard/analytics",
+    path:"/admin/dashboard/analytics",
     element: React.createElement(AnalyticsPage)
   },
   {
-    path:"/admin-page/dashboard/content-moderation",
+    path:"/admin/dashboard/content-moderation",
     element: React.createElement(ContentModerationPage)
   },
   {
-    path:"/admin-page/dashboard/jobs-postings",
+    path:"/admin/dashboard/jobs-postings",
     element: React.createElement(JobPostingsPage)
   }
  

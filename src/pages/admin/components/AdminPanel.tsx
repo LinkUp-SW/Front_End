@@ -18,12 +18,12 @@ const AdminPanelSidebar = ({ isOpen, toggleSidebar }: AdminPanelSidebarProps) =>
   const location = useLocation();
 
   const menuItems = [
-    { name: "Dashboard", icon: <FiHome size={20} />, path: "/admin-page/dashboard" },
-    { name: "Content Moderation", icon: <FiFlag size={20} />, path: "/admin-page/dashboard/content-moderation" },
-    { name: "Job Postings", icon: <FiBriefcase size={20} />, path: "/admin-page/dashboard/jobs-postings" },
-    { name: "Analytics", icon: <FiBarChart2 size={20} />, path: "/admin-page/dashboard/analytics" },
-    { name: "Users", icon: <FiUsers size={20} />, path: "/admin-page/dashboard/users" },
-    { name: "Settings", icon: <FiSettings size={20} />, path: "/admin-page/dashboard/settings" },
+    { name: "Dashboard", icon: <FiHome size={20} />, path: "/admin/dashboard" },
+    { name: "Content Moderation", icon: <FiFlag size={20} />, path: "/admin/dashboard/content-moderation" },
+    { name: "Job Postings", icon: <FiBriefcase size={20} />, path: "/admin/dashboard/jobs-postings" },
+    { name: "Analytics", icon: <FiBarChart2 size={20} />, path: "/admin/dashboard/analytics" },
+    { name: "Users", icon: <FiUsers size={20} />, path: "/admin/dashboard/users" },
+    { name: "Settings", icon: <FiSettings size={20} />, path: "/admin/dashboard/settings" },
   ];
 
   const handleTabClick = (path: string) => {
