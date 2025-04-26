@@ -4,7 +4,7 @@ import { BsChatDotsFill, BsFillGrid3X3GapFill } from "react-icons/bs";
 import NavItems from "./NavItems";
 import { FaPlusSquare } from "react-icons/fa";
 import { MdArrowDropDown } from "react-icons/md";
-import ThemeToggle from "../theme_toggle/ThemeToggle";
+import { CiLogout } from "react-icons/ci";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { getErrorMessage } from "@/utils/errorHandler";
 import { toast } from "sonner";
@@ -17,6 +17,7 @@ import { useDispatch, useSelector } from "react-redux";
 import SearchInput from "./SearchInput";
 import UserProfilePopover from "./UserProfilePopover";
 import { defaultProfileImage } from "@/constants";
+import { Link } from "react-router-dom";
 
 const NavBar = () => {
   // Use the correctly typed dispatch
@@ -118,10 +119,13 @@ const NavBar = () => {
           <i>
             <FaPlusSquare size={30} />
           </i>
-          <i className="scale-x-[-1]">
+          <Link to={"/messaging"} className="scale-x-[-1]">
             <BsChatDotsFill size={30} />
-          </i>
-          <ThemeToggle />
+          </Link>
+
+          <button onClick={handleLogout}>
+            <CiLogout size={30} />
+          </button>
         </div>
       </nav>
     </header>
