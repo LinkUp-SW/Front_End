@@ -15,6 +15,10 @@ import { MdOutlineEmojiEmotions } from "react-icons/md";
 import EmojiPicker, { Theme, EmojiClickData } from "emoji-picker-react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
+import UserTagging from "../components/UserTagging";
+import { FormattedContentText } from "./modals/CreatePostModal";
+import { useEffect } from "react";
+import { processTextFormatting } from "@/components/truncate_text/TruncatedText";
 import {
   Carousel,
   CarouselContent,
@@ -24,6 +28,7 @@ import {
 } from "@/components/ui/carousel";
 import { toast } from "sonner";
 import BlueButton from "./buttons/BlueButton";
+import { extractTaggedUsers } from "./modals/CreatePostModal";
 
 interface SortingMenuItem {
   name: string;
@@ -70,14 +75,26 @@ const PostFooter: React.FC<PostFooterProps> = ({
   // Create a ref for the horizontally scrollable container
   const [commentInput, setCommentInput] = useState("");
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [taggedUsers, setTaggedUsers] = useState<
+    { name: string; id: string }[]
+  >([]);
   console.log("Comment for post:", comments);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    setTaggedUsers(extractTaggedUsers(commentInput));
+    console.log(taggedUsers);
+  }, [commentInput]);
 
   const darkMode = useSelector((state: RootState) => state.theme.theme);
 
   const { data } = useSelector((state: RootState) => state.userBio);
-
+  // Add this function to check if text contains any rich formatting
+  const hasRichFormatting = (text: string): boolean => {
+    const richFormatRegex =
+      /(\*[^*]+\*)|(-[^-]+-)|(\~[^\~]+\~)|(@[^:]+:[A-Za-z0-9_\-]+\^)/;
+    return richFormatRegex.test(text);
+  };
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -100,6 +117,8 @@ const PostFooter: React.FC<PostFooterProps> = ({
 
     const reader = new FileReader();
 
+    const extractedTaggedUsers = extractTaggedUsers(commentInput);
+
     reader.onload = () => {
       const base64Image = reader.result as string;
 
@@ -107,7 +126,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
         post_id: postId,
         content: commentInput,
         media: selectedImage ? base64Image : "",
-        tagged_users: [],
+        tagged_users: extractedTaggedUsers.map((user) => user.id),
         parent_id: parentId,
       };
 
@@ -131,7 +150,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
         post_id: postId,
         content: commentInput,
         media: "",
-        tagged_users: [],
+        tagged_users: extractedTaggedUsers.map((user) => user.id),
         parent_id: parentId,
       };
 
@@ -220,23 +239,58 @@ const PostFooter: React.FC<PostFooterProps> = ({
             onClick={() => {
               inputRef.current?.focus();
             }}
-            className="w-full relative flex-col flex dark:focus:ring-0 dark:focus:border-0 border p-2 focus:ring-black focus:ring-2 transition-colors dark:hover:bg-gray-800 hover:text-gray-950 dark:hover:text-neutral-300 rounded-xl border-gray-400 font-normal text-sm text-black  text-left dark:text-neutral-300"
+            className="w-full relative flex-col flex dark:focus:ring-0 dark:focus:border-0 border p-2 focus:ring-black focus:ring-2 transition-colors dark:hover:bg-gray-800 hover:text-gray-950 dark:hover:text-neutral-300 rounded-xl border-gray-400 font-normal text-sm text-black text-left dark:text-neutral-300"
           >
-            <textarea
-              ref={inputRef}
-              id="comment-input"
-              placeholder="Add a comment..."
-              value={commentInput}
-              autoFocus
-              onFocus={() => {
-                inputRef.current?.scrollIntoView({
-                  behavior: "smooth",
-                  block: "center",
-                });
-              }}
-              onChange={(e) => setCommentInput(e.target.value)}
-              className="w-full h- resize-none py-0 placeholder:text-neutral-500 dark:placeholder:text-neutral-300 focus:ring-0 focus:border-0 active:border-0"
-            />
+            <div className="relative w-full">
+              {/* Actual input field */}
+              <textarea
+                ref={inputRef}
+                id="comment-input"
+                placeholder="Add a comment..."
+                value={commentInput}
+                autoFocus
+                onFocus={() => {
+                  inputRef.current?.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center",
+                  });
+                }}
+                onChange={(e) => setCommentInput(e.target.value)}
+                onKeyDown={(e) => {
+                  // This ensures keyboard events are captured by the input
+                  if (
+                    ["ArrowDown", "ArrowUp", "Enter", "Tab"].includes(e.key) &&
+                    commentInput.includes("@")
+                  ) {
+                    console.log("wo");
+                    e.preventDefault(); // Prevent default for navigation keys
+                  }
+                }}
+                className="w-full h-auto resize-none py-0 placeholder:text-neutral-500 dark:placeholder:text-neutral-300 focus:ring-0 focus:border-0 active:border-0"
+              />
+
+              {/* User tagging component */}
+              <UserTagging
+                text={commentInput}
+                onTextChange={setCommentInput}
+                inputRef={inputRef}
+                className="absolute inset-0 z-20" // Remove pointer-events-none
+              />
+            </div>
+
+            {/* Rich text preview - only show if there's rich formatting */}
+            {hasRichFormatting(commentInput) &&
+              commentInput.trim().length > 0 && (
+                <div className="mt-3 p-3 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                    Preview:
+                  </p>
+                  <div className="text-sm text-gray-900 dark:text-gray-100">
+                    <FormattedContentText text={commentInput} />
+                  </div>
+                </div>
+              )}
+
             {selectedImage && (
               <div className="relative mt-2">
                 <img
@@ -376,6 +430,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
                 stats={stats}
                 replies={data.children ? Object.values(data.children) : []}
                 handleCreateComment={handleCreateComment}
+                FormattedText={FormattedContentText}
               />
             ))}
           </div>
@@ -386,3 +441,9 @@ const PostFooter: React.FC<PostFooterProps> = ({
 };
 
 export default PostFooter;
+
+export const hasRichFormatting = (text: string): boolean => {
+  const richFormatRegex =
+    /(\*[^*]+\*)|(-[^-]+-)|(\~[^\~]+\~)|(@[^:]+:[A-Za-z0-9_\-]+\^)/;
+  return richFormatRegex.test(text);
+};

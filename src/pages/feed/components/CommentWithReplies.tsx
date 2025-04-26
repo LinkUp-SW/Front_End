@@ -9,6 +9,9 @@ import EmojiPicker, { Theme, EmojiClickData } from "emoji-picker-react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { CommentType, StatsType } from "@/types";
+import { hasRichFormatting } from "./PostFooter";
+import { FormattedContentText } from "./modals/CreatePostModal";
+import UserTagging from "./UserTagging";
 
 interface CommentWithRepliesProps {
   replies: CommentType[];
@@ -22,6 +25,7 @@ interface CommentWithRepliesProps {
   comment: CommentType;
   postId: string;
   stats: StatsType;
+  FormattedText?: React.FC<{ text: string }>; // Make it optional for backward compatibility
 }
 
 const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
@@ -30,6 +34,7 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
   comment,
   postId,
   stats,
+  FormattedText,
 }) => {
   const [showReplies] = useState(true);
   const [mainCommentHeight, setMainCommentHeight] = useState(0);
@@ -183,23 +188,66 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
             onClick={() => {
               inputRef.current?.focus();
             }}
-            className="w-full relative flex-col flex dark:focus:ring-0 dark:focus:border-0 border p-2 focus:ring-black focus:ring-2 transition-colors dark:hover:bg-gray-800 hover:text-gray-950 dark:hover:text-neutral-300 rounded-xl border-gray-400 font-normal text-sm text-black  text-left dark:text-neutral-300"
+            className="w-full relative flex-col flex dark:focus:ring-0 dark:focus:border-0 border p-2 focus:ring-black focus:ring-2 transition-colors dark:hover:bg-gray-800 hover:text-gray-950 dark:hover:text-neutral-300 rounded-xl border-gray-400 font-normal text-sm text-black text-left dark:text-neutral-300"
           >
-            <textarea
-              ref={inputRef}
-              id="comment-input"
-              placeholder="Add a comment..."
-              value={commentInput}
-              autoFocus
-              onFocus={() => {
-                inputRef.current?.scrollIntoView({
-                  behavior: "smooth",
-                  block: "center",
-                });
+            <div
+              onClick={() => {
+                inputRef.current?.focus();
               }}
-              onChange={(e) => setCommentInput(e.target.value)}
-              className="w-full h- resize-none py-0 placeholder:text-neutral-500 dark:placeholder:text-neutral-300 focus:ring-0 focus:border-0 active:border-0"
-            />
+              className="w-full relative flex-col flex dark:focus:ring-0 dark:focus:border-0 border p-2 focus:ring-black focus:ring-2 transition-colors dark:hover:bg-gray-800 hover:text-gray-950 dark:hover:text-neutral-300 rounded-xl border-gray-400 font-normal text-sm text-black text-left dark:text-neutral-300"
+            >
+              <div className="relative w-full">
+                {/* Actual input field */}
+                <textarea
+                  ref={inputRef}
+                  id="comment-input"
+                  placeholder="Add a comment..."
+                  value={commentInput}
+                  autoFocus
+                  onFocus={() => {
+                    inputRef.current?.scrollIntoView({
+                      behavior: "smooth",
+                      block: "center",
+                    });
+                  }}
+                  onChange={(e) => setCommentInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    // This ensures keyboard events are captured by the input
+                    if (
+                      ["ArrowDown", "ArrowUp", "Enter", "Tab"].includes(
+                        e.key
+                      ) &&
+                      commentInput.includes("@")
+                    ) {
+                      console.log("wo");
+                      e.preventDefault(); // Prevent default for navigation keys
+                    }
+                  }}
+                  className="w-full h-auto resize-none py-0 placeholder:text-neutral-500 dark:placeholder:text-neutral-300 focus:ring-0 focus:border-0 active:border-0"
+                />
+
+                {/* User tagging component */}
+                <UserTagging
+                  text={commentInput}
+                  onTextChange={setCommentInput}
+                  inputRef={inputRef}
+                  className="absolute inset-0 z-20" // Remove pointer-events-none
+                />
+              </div>
+
+              {/* Rich text preview - only show if there's rich formatting */}
+              {hasRichFormatting(commentInput) &&
+                commentInput.trim().length > 0 && (
+                  <div className="mt-3 p-3 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800">
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                      Preview:
+                    </p>
+                    <div className="text-sm text-gray-900 dark:text-gray-100">
+                      <FormattedContentText text={commentInput} />
+                    </div>
+                  </div>
+                )}
+            </div>
             {selectedImage && (
               <div className="relative mt-2">
                 <img

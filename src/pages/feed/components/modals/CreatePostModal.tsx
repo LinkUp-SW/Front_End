@@ -76,22 +76,6 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
     return matches && matches.length > 0 ? matches[0] : null;
   };
 
-  const extractTaggedUsers = (text: string): { name: string; id: string }[] => {
-    // Update regex to match the new format with a caret at the end
-    // This will match @Any Name With Spaces:userId^ format
-    const regex = /@([^:]+):([A-Za-z0-9_\-]+)\^/g;
-    const users: { name: string; id: string }[] = [];
-    let match;
-
-    while ((match = regex.exec(text)) !== null) {
-      const name = match[1]; // No need to replace underscores anymore
-      const id = match[2];
-      users.push({ name, id });
-    }
-
-    return users;
-  };
-
   useEffect(() => {
     setTaggedUsers(extractTaggedUsers(postText));
     console.log(taggedUsers);
@@ -168,7 +152,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
           {taggedUsers.length > 0 && (
             <div className="mt-2 mb-4 p-3 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800">
               <p className="text-sm mb-1 text-gray-500 dark:text-gray-400"></p>
-              <FormattedPostText text={postText} />
+              <FormattedContentText text={postText} />
             </div>
           )}
         </UserTagging>
@@ -354,7 +338,8 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
 
 export default CreatePostModal;
 
-const FormattedPostText = ({ text }: { text: string }) => {
+// Update the FormattedContentText component
+export const FormattedContentText = ({ text }: { text: string }) => {
   // Use a regex that matches from @ to ^ (complete tag)
   const parts = text.split(/(@[^:]+:[A-Za-z0-9_\-]+\^)/g);
 
@@ -363,20 +348,26 @@ const FormattedPostText = ({ text }: { text: string }) => {
       {parts.map((part, index) => {
         // Check if this part is a tag with the new format
         if (part.match(/^@[^:]+:[A-Za-z0-9_\-]+\^$/)) {
-          // Extract just the name part without the ID and the caret
+          // Extract both the name and ID parts
           const nameMatch = part.match(/@([^:]+):/);
-          if (nameMatch && nameMatch[1]) {
-            const displayName = nameMatch[1]; // No need to replace underscores
+          const idMatch = part.match(/:([A-Za-z0-9_\-]+)\^/);
+
+          if (nameMatch && nameMatch[1] && idMatch && idMatch[1]) {
+            const displayName = nameMatch[1];
+            const userId = idMatch[1];
+
             return (
-              <span
+              <a
                 key={index}
-                className="bg-blue-100 text-blue-700 rounded px-1 py-0.5 dark:bg-blue-900 dark:text-blue-300"
+                href={`/user-profile/${userId}`}
+                className="bg-blue-100 text-blue-700 rounded px-1 py-0.5 dark:bg-blue-900 dark:text-blue-300 hover:underline cursor-pointer"
               >
-                @{displayName}
-              </span>
+                {displayName}
+              </a>
             );
           }
         }
+
         // Regular text with rich formatting
         return (
           <React.Fragment key={index}>
@@ -386,4 +377,22 @@ const FormattedPostText = ({ text }: { text: string }) => {
       })}
     </div>
   );
+};
+
+export const extractTaggedUsers = (
+  text: string
+): { name: string; id: string }[] => {
+  // Update regex to match the new format with a caret at the end
+  // This will match @Any Name With Spaces:userId^ format
+  const regex = /@([^:]+):([A-Za-z0-9_\-]+)\^/g;
+  const users: { name: string; id: string }[] = [];
+  let match;
+
+  while ((match = regex.exec(text)) !== null) {
+    const name = match[1]; // No need to replace underscores anymore
+    const id = match[2];
+    users.push({ name, id });
+  }
+
+  return users;
 };

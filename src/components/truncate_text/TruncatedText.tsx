@@ -1,15 +1,18 @@
 import React, { JSX, useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 
 interface TruncatedTextProps {
   content: string;
   lineCount?: number;
   id: string;
+  className?: string;
 }
 
 const TruncatedText: React.FC<TruncatedTextProps> = ({
   content,
   lineCount = 3,
   id,
+  className,
 }) => {
   const textRef = useRef<HTMLParagraphElement>(null);
   const [truncatedText, setTruncatedText] = useState<string>(content);
@@ -110,6 +113,7 @@ const TruncatedText: React.FC<TruncatedTextProps> = ({
   };
 
   // Format mentions into blue, bold text
+  // Update the formatText function to make mentions interactive
   const formatText = (text: string): JSX.Element[] => {
     // First handle mentions
     const mentionRegex = /@([^:]+):([A-Za-z0-9_\-]+)\^/g;
@@ -119,14 +123,18 @@ const TruncatedText: React.FC<TruncatedTextProps> = ({
     // Process each mention part
     for (let i = 0; i < parts.length; i++) {
       if (i % 3 === 1) {
-        // This is the name part of a mention
+        // This is the name part of a mention (index 1)
+        const displayName = parts[i];
+        const userId = parts[i + 1]; // The ID is the next part (index 2)
+
         elements.push(
-          <span
+          <Link
             key={`mention-${i}`}
-            className="text-blue-600 dark:text-blue-400 font-medium"
+            to={`/user-profile/${userId}`}
+            className="text-blue-600 dark:text-blue-400 font-medium hover:underline cursor-pointer"
           >
-            {parts[i]}
-          </span>
+            {displayName}
+          </Link>
         );
       } else if (i % 3 === 0) {
         // This is regular text, look for markdown-style formatting
@@ -136,7 +144,7 @@ const TruncatedText: React.FC<TruncatedTextProps> = ({
         const formattedText = processTextFormatting(textContent, i);
         elements.push(...formattedText);
       }
-      // Skip the ID part (i % 3 === 2)
+      // Skip the ID part (i % 3 === 2) since we're using it in the name part
     }
 
     return elements;
@@ -194,7 +202,7 @@ const TruncatedText: React.FC<TruncatedTextProps> = ({
   }, [content, expanded, lineCount]);
 
   return (
-    <div className="pl-4">
+    <div className={`pl-4 ${className}`}>
       {/* Hidden element for measurement (off-screen) */}
       <p
         ref={textRef}
