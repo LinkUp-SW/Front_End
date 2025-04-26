@@ -15,17 +15,20 @@ import {
 import {
   setEditingMessageId,
   setEditText,
+  addMessage,
 } from "../../slices/messaging/messagingSlice";
 import { toast } from "sonner";
 import { socketService } from "@/services/socket";
 import {
   SocketIncomingMessage,
   incomingTypingIndicator,
+  incomingMessageRead,
 } from "@/services/socket";
 import { useParams } from "react-router-dom";
 
 const ChatingScreen = () => {
   const { id } = useParams();
+
   const dispatch = useDispatch();
   const token = Cookies.get("linkup_auth_token");
   const selectedConvID = useSelector(
@@ -49,6 +52,7 @@ const ChatingScreen = () => {
     )
   );*/
 
+  const userBioState = useSelector((state: RootState) => state.userBio.data);
   const starredConversations = useSelector(
     (state: RootState) => state.messaging.starredConversations
   );
@@ -56,12 +60,17 @@ const ChatingScreen = () => {
   const isCurrentConversationStarred =
     starredConversations.includes(selectedConvID);
 
+  const msg = useSelector((state: RootState) => state.messaging.message);
+
   /*const messages = conversation ? conversation.user1_sent_messages : [];*/
   const [dataChat, setChatData] = useState<chattingMessages>();
   const [loading, setLoading] = useState<boolean>(true);
   const [msgDeleted, setMsgDeleted] = useState<boolean>(false);
   const [isTyping, setIsTyping] =
-    useState(false); /*related to typing indicator (sockets) */
+    useState<boolean>(false); /*related to typing indicator (sockets) */
+  const [readByUserId, setReadByUserId] = useState<string | null>(
+    null
+  ); /*related to read messages (sockets) */
 
   useEffect(() => {
     const fetchChatting = async () => {
@@ -120,6 +129,61 @@ const ChatingScreen = () => {
   }, [selectedConvID, id]);
 
   useEffect(() => {
+    const unsubscribeRead = socketService.on<incomingMessageRead>(
+      "messages_read",
+      (data) => {
+        if (data.conversationId === selectedConvID && data.readBy !== id) {
+          setReadByUserId(data.readBy);
+          setChatData((prev) => {
+            if (!prev) return prev;
+
+            return {
+              ...prev,
+              messages: prev.messages.map((msg) => ({
+                ...msg,
+                isSeen: true,
+              })),
+            };
+          });
+        }
+      }
+    );
+
+    return () => {
+      unsubscribeRead();
+    };
+  }, [selectedConvID, id]);
+  // Replace the useEffect for marking messages as read with this improved version
+  useEffect(() => {
+    // Only run if we have data and a selected conversation
+    if (!dataChat || !selectedConvID || !dataChat.messages) return;
+
+    // Check if there are unread messages from the other user
+    const hasUnreadMessages = dataChat.messages.some(
+      (msg) => !msg.isSeen && !msg.isOwnMessage
+    );
+
+    // If there are unread messages, mark them as read
+    if (hasUnreadMessages) {
+      // Send read status to socket
+      socketService.markAsRead(selectedConvID);
+
+      // Update local state
+      setChatData((prev) => {
+        if (!prev) return prev;
+
+        return {
+          ...prev,
+          messages: prev.messages.map((msg) => ({
+            ...msg,
+            isSeen: msg.isOwnMessage ? msg.isSeen : true, // Only mark the other user's messages as seen
+          })),
+        };
+      });
+    }
+  }, [dataChat, selectedConvID]);
+
+  useEffect(() => {
     const unsubscribe = socketService.on<SocketIncomingMessage>(
       "new_message",
       (incoming) => {
@@ -156,6 +220,21 @@ const ChatingScreen = () => {
       unsubscribe();
     };
   }, [selectedConvID, dataChat, id]);
+
+  useEffect(() => {
+    if (msg && msg.messageId && selectedConvID) {
+      // Only update if this is a valid message and relates to current conversation
+      setChatData((prev) =>
+        prev
+          ? {
+              ...prev,
+              messages: [...prev.messages, msg],
+            }
+          : prev
+      );
+    }
+  }, [msg]);
+
   if (loading) return <div>Loading...</div>;
 
   const shouldShowProfile = (index: number) => {
@@ -262,7 +341,6 @@ const ChatingScreen = () => {
                       </p>
                     </div>
                     <div>
-                      
                       {msgDeleted ? (
                         <div>This message has been deleted.</div>
                       ) : (
@@ -325,11 +403,25 @@ const ChatingScreen = () => {
                                 </Popover.Content>
                               </Popover.Portal>
                             </Popover.Root>
-
                           </div>
                         </div>
                       )}
                     </div>
+                    {/* Replace your existing "Seen" indicator with this */}
+                    {index === dataChat.messages.length - 1 &&
+                      msg.isOwnMessage &&
+                      msg.isSeen && (
+                        <div className="pl-14 mt-1 flex items-center gap-2">
+                          <div className="w-5 h-5 rounded-full overflow-hidden border border-gray-300">
+                            <img
+                              src={dataChat.otherUser.profilePhoto}
+                              alt="Read by"
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          <span className="text-xs text-gray-500">Seen</span>
+                        </div>
+                      )}
                   </div>
                 ) : (
                   <div className="w-full hover:bg-gray-200 pl-14 hover:cursor-pointer ">
@@ -342,8 +434,14 @@ const ChatingScreen = () => {
         </div>
         {/* Typing Indicator */}
         {isTyping && (
-          <span className="p-2 text-gray-500 italic w-full pl-14 border-0  "> Typing...</span>
+          <span className="p-2 text-gray-500 italic w-full pl-14 border-0  ">
+            {" "}
+            Typing...
+          </span>
         )}
+        {/* {chatRead && (
+          <span className="p-2 text-gray-500 italic w-full pl-14 border-0  "> seen</span>
+        )} */}
       </div>
     </>
   );
