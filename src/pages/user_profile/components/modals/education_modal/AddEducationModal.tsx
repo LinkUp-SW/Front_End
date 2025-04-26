@@ -16,7 +16,9 @@ import MediaManager from "../components/MediaManager";
 import SkillsManager from "../components/SkillsManager";
 import { MediaItem } from "../components/types";
 import { getErrorMessage } from "@/utils/errorHandler";
-
+import { useDispatch } from "react-redux";
+import { addEducationToSkill } from "@/slices/skills/skillsSlice";
+import { isSkillResponse } from "@/utils";
 const generateTempId = () =>
   crypto.randomUUID?.() || Math.random().toString(36).substr(2, 9);
 
@@ -35,7 +37,7 @@ interface EducationFormData {
   media: MediaItem[];
 }
 
-interface AddEducationModalProps {
+export interface AddEducationModalProps {
   onClose?: () => void;
   onSuccess?: (newEducation: Education) => void;
 }
@@ -44,6 +46,7 @@ const AddEducationModal: React.FC<AddEducationModalProps> = ({
   onClose,
   onSuccess,
 }) => {
+  const dispatch = useDispatch();
   const authToken = Cookies.get("linkup_auth_token");
   const { isSubmitting, startSubmitting, stopSubmitting } = useFormStatus();
 
@@ -142,6 +145,21 @@ const AddEducationModal: React.FC<AddEducationModalProps> = ({
       const response = await addEducation(authToken, newEducation);
       toast.success(response.message);
       onSuccess?.({ ...newEducation, _id: response.education._id });
+      response.education.skills.forEach((skill) => {
+        if (isSkillResponse(skill)) {
+          dispatch(
+            addEducationToSkill({
+              skillId: skill._id,
+              skillName: skill.name,
+              education: {
+                _id: response.education._id as string,
+                logo: response.education.school.logo,
+                name: response.education.school.name,
+              },
+            })
+          );
+        }
+      });
       onClose?.();
     } catch (error) {
       toast.error(getErrorMessage(error));

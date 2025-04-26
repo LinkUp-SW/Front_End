@@ -15,18 +15,21 @@ import {
 } from "@/components";
 import { Link, useNavigate } from "react-router-dom";
 import CreatePostModal from "./modals/CreatePostModal";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { useState } from "react";
 import PostSettingsModal from "./modals/PostSettingsModal";
 import UploadMediaModal from "./modals/UploadMediaModal";
 import AddDocumentModal from "./modals/AddDocumentModal";
 import CommentControlModal from "./modals/CommentControlModal";
-import { MediaType, PostDBObject } from "@/types";
+import { CommentObjectType, MediaType, PostDBObject } from "@/types";
 import Cookies from "js-cookie";
 import { toast } from "sonner";
-import { createPost } from "@/endpoints/feed";
+import { createPost, fetchSinglePost } from "@/endpoints/feed";
 import { DialogDescription } from "@radix-ui/react-dialog";
+import { setPosts } from "@/slices/feed/postsSlice";
+import { setComments } from "@/slices/feed/commentsSlice";
+import React from "react";
 
 const useDismissModal = () => {
   const dismiss = () => {
@@ -46,6 +49,9 @@ const useDismissModal = () => {
 };
 
 const CreatePost: React.FC = () => {
+  const posts = useSelector((state: RootState) => state.posts.list);
+  const comments = useSelector((state: RootState) => state.comments.list);
+  const dispatch = useDispatch();
   const { data, loading } = useSelector((state: RootState) => state.userBio);
   const [privacySetting, setPrivacySetting] = useState<string>("Anyone");
   const [postText, setPostText] = useState<string>("");
@@ -55,7 +61,7 @@ const CreatePost: React.FC = () => {
   const { dismiss } = useDismissModal();
 
   const navigate = useNavigate();
-  const userID = Cookies.get("linkup_auth_token");
+  const user_token = Cookies.get("linkup_auth_token");
 
   const clearFields = () => {
     setPrivacySetting("Anyone");
@@ -64,7 +70,9 @@ const CreatePost: React.FC = () => {
     setSelectedMedia([]);
   };
 
-  const submitPost = async () => {
+  // Add a useMemo for handling text changes
+
+  const submitPost = async (link?: string) => {
     let media_type: string | undefined;
     const media: string[] = [];
 
@@ -129,9 +137,38 @@ const CreatePost: React.FC = () => {
           fileReaders.push(imagePromise);
         });
       }
+      const pdfs = selectedMedia.filter(
+        (file) => file.type === "application/pdf"
+      );
+
+      if (pdfs.length > 0) {
+        media_type = "pdf";
+        pdfs.forEach((pdf) => {
+          const reader = new FileReader();
+
+          const pdfPromise = new Promise<void>((resolve, reject) => {
+            reader.onload = () => {
+              const result = reader.result as string; // Convert to Base64 string
+              media.push(result);
+              resolve();
+            };
+            reader.onerror = (error) => {
+              console.error(`Error reading file ${pdf.name}:`, error);
+              reject(error);
+            };
+          });
+
+          reader.readAsDataURL(pdf);
+          fileReaders.push(pdfPromise);
+        });
+      }
 
       // Wait for all FileReader operations to complete
       await Promise.all(fileReaders);
+    } else if (link) {
+      console.log("here", link);
+      media_type = "link";
+      media.push(link);
     } else {
       media_type = "none";
     }
@@ -140,7 +177,7 @@ const CreatePost: React.FC = () => {
       toast.error("The post must have either content or media.");
       return;
     }
-    if (!userID) {
+    if (!user_token) {
       toast.error("Please sign in again.");
       setTimeout(() => {
         navigate("/login");
@@ -157,13 +194,40 @@ const CreatePost: React.FC = () => {
       taggedUsers: [],
     };
 
-    //console.log("Post Object:", postObject);
     try {
       dismiss();
       clearFields();
       const toastId = toast.loading("Submitting your post...");
-      await createPost(postObject, userID);
-      toast.success("Post created successfully!", { id: toastId });
+      const response = await createPost(postObject, user_token);
+      console.log(response);
+      toast.success(
+        <span>
+          {response.message}{" "}
+          <a
+            href={`/feed/posts/${response.postId}`}
+            className="text-blue-600 dark:text-blue-300 hover:underline"
+            onClick={() => toast.dismiss(toastId)}
+          >
+            View post
+          </a>
+        </span>,
+        {
+          id: toastId,
+          duration: 15000,
+        }
+      );
+      const post = await fetchSinglePost(response.postId, user_token, 0, 1);
+      const comment: CommentObjectType = {
+        comments: [],
+        count: 0,
+        nextCursor: 0,
+      };
+      if (post) {
+        const newPosts = [post.post, ...posts];
+        dispatch(setPosts(newPosts));
+        const newComments = [comment, ...comments];
+        dispatch(setComments(newComments));
+      }
     } catch {
       toast.error("Error creating post. Please try again.");
     }
@@ -171,7 +235,7 @@ const CreatePost: React.FC = () => {
 
   return (
     <>
-      <Card className="mb-4 w-full bg-white border-0 pr-4 dark:bg-gray-900 ">
+      <Card className="mb-1 w-full bg-white border-0 pr-4 dark:bg-gray-900 ">
         <CardContent>
           <div className="flex space-x-3 justify-start items-start">
             <Link to={"#"}>
@@ -240,7 +304,11 @@ const CreatePost: React.FC = () => {
                     setSelectedMedia={setSelectedMedia}
                   />
                 ) : activeModal == "add-document" ? (
-                  <AddDocumentModal setActiveModal={setActiveModal} />
+                  <AddDocumentModal
+                    setActiveModal={setActiveModal}
+                    selectedMedia={selectedMedia}
+                    setSelectedMedia={setSelectedMedia}
+                  />
                 ) : activeModal == "comment-control" ? (
                   <CommentControlModal
                     commentSetting={commentSetting}

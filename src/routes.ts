@@ -34,9 +34,15 @@ import {
   ReasonPage,
   OtherOptionPage,
   LastPage,
+  AllPeoplePage,
 } from "./pages";
 
+import PrimaryEmailPage from "./pages/settings/updateEmail/PrimaryEmailPage";
+import AddEmailPage from "./pages/settings/updateEmail/AddEmailPage";
+import OTP from "./pages/settings/updateEmail/OTP";
+
 import React from "react";
+
 
 // Define your routes as an array of RouteObject (compatible with React Router v6)
 const routes: RouteObject[] = [
@@ -80,6 +86,10 @@ const routes: RouteObject[] = [
   },
 
   { path: "/connections/:id", element: React.createElement(ConnectionsPage) },
+  {
+    path: "/feed/posts/:id",
+    element: React.createElement(FeedPage, { single: true }),
+  },
 
   {
     path: "/manage-invitations",
@@ -132,7 +142,7 @@ const routes: RouteObject[] = [
     element: React.createElement(NotFoundPage),
   },
   {
-    path: "/search/:query",
+    path: "/search",
     element: React.createElement(SearchPage),
   },
   {
@@ -179,6 +189,22 @@ const routes: RouteObject[] = [
   {
     path: "/settings/close-account/confirm",
     element: React.createElement(LastPage),
+  },
+  {
+    path: "/settings/security/email",
+    element: React.createElement(PrimaryEmailPage),
+  },
+  {
+    path: "/settings/security/email/verify",
+    element: React.createElement(OTP),
+  },
+  {
+    path: "/settings/security/email/add",
+    element: React.createElement(AddEmailPage),
+  },
+  {
+    path: "/search/users",
+    element: React.createElement(AllPeoplePage),
   },
 ];
 

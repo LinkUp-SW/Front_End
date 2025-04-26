@@ -16,6 +16,13 @@ import { Bio, BioFormData, Organization } from "@/types";
 import { Dialog } from "@radix-ui/react-dialog";
 import { useState, ChangeEvent } from "react";
 import EditContactInfoModal from "./EditContactInfoModal";
+import { updateUserBio } from "@/endpoints/userProfile";
+import Cookies from "js-cookie";
+import { toast } from "sonner";
+import { getErrorMessage } from "@/utils/errorHandler";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "@/store";
+import { editUserBio } from "@/slices/user_profile/userBioSlice";
 
 type EditUserBioModalProps = {
   userId: string;
@@ -24,9 +31,14 @@ type EditUserBioModalProps = {
     work_experience: Organization | null;
     education: Organization | null;
   };
+  setOpenEditDialog: (open: boolean) => void;
 };
 
-const EditUserBioModal: React.FC<EditUserBioModalProps> = ({ userData }) => {
+const EditUserBioModal: React.FC<EditUserBioModalProps> = ({
+  userData,
+  setOpenEditDialog,
+}) => {
+  const authToken = Cookies.get("linkup_auth_token");
   const [formData, setFormData] = useState<BioFormData>({
     first_name: userData.first_name,
     last_name: userData.last_name,
@@ -40,11 +52,13 @@ const EditUserBioModal: React.FC<EditUserBioModalProps> = ({ userData }) => {
       address: userData.contact_info.address ?? "",
       birthday: userData.contact_info.birthday ?? "",
       website: userData.contact_info.website ?? "",
-      country_code:userData.contact_info.country_code??''
+      country_code: userData.contact_info.country_code ?? "",
     },
+    website: "",
   });
   const [openContactInfoModal, setOpenContactInfoModal] = useState(false);
-
+  const userBio = useSelector((state: RootState) => state.userBio.data);
+  const dispatch = useDispatch();
   // Generic input/textarea change
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -86,6 +100,43 @@ const EditUserBioModal: React.FC<EditUserBioModalProps> = ({ userData }) => {
     }));
   };
 
+  const validateUserBioForm = () => {
+    if (formData.first_name.trim() === "") {
+      return "First Name is required!";
+    }
+    if (formData.last_name.trim() === "") {
+      return "Last Name is required!";
+    }
+    if (formData.headline.trim() === "") {
+      return "Headline is required!";
+    }
+    if (formData.location.city.trim() === "") {
+      return "Please choose a city!";
+    }
+    if (formData.location.country_region.trim() === "") {
+      return "Please choose a country!";
+    }
+
+    return null;
+  };
+
+  const handleUpdateUserBio = async () => {
+    if (!authToken)
+      return toast.error("You are unauthorized to do this action");
+    if (validateUserBioForm()) {
+      return toast.error(validateUserBioForm());
+    }
+    try {
+      const response = await updateUserBio(authToken, formData);
+      setOpenEditDialog(false);
+      console.log(response);
+      dispatch(editUserBio({ ...userBio, bio: response.user }));
+      toast.success(response.message);
+    } catch (error) {
+      toast.error(getErrorMessage(error));
+    }
+  };
+
   return (
     <div>
       <FormInput
@@ -114,7 +165,7 @@ const EditUserBioModal: React.FC<EditUserBioModalProps> = ({ userData }) => {
         onChange={handleInputChange}
       />
 
-      <h2 className="text-xl font-bold">Location</h2>
+      <h2 className="text-xl font-bold">Location*</h2>
       <section className="flex py-5 sm:flex-row flex-col gap-2">
         <Select
           value={formData.location.country_region}
@@ -175,7 +226,7 @@ const EditUserBioModal: React.FC<EditUserBioModalProps> = ({ userData }) => {
       <div>
         <h2 className="text-xl font-bold">Website</h2>
         <p className="text-xs font-semibold mb-[-1rem]">
-          Add a link that will appear at the top of your profile
+          Add a link that will help people know you better
         </p>
         <FormInput
           placeholder="Ex: portfolio"
@@ -186,6 +237,24 @@ const EditUserBioModal: React.FC<EditUserBioModalProps> = ({ userData }) => {
           onChange={(e) => handleContactInfoChange("website", e.target.value)}
         />
       </div>
+      <footer className="w-full flex gap-2 mt-4 justify-end">
+        <button
+          type="button"
+          id="close-edit-bio-btn"
+          onClick={() => setOpenEditDialog(false)}
+          className="destructiveBtn px-2 py-1.5 rounded-xl font-semibold"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          id="update-bio-btn"
+          onClick={handleUpdateUserBio}
+          className="affirmativeBtn px-4 font-semibold text-white py-1.5 rounded-xl"
+        >
+          Update
+        </button>
+      </footer>
     </div>
   );
 };

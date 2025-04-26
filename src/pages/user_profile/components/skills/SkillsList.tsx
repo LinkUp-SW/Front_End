@@ -20,7 +20,7 @@ interface SkillListProps {
   skill: Skill;
   isMe: boolean;
   setDeleteDialogOpen: (open: boolean) => void;
-  setSelectedSkill: (id: string) => void;
+  setSelectedSkill: (skill:Skill) => void;
   setEditOpen: (open: boolean) => void;
   setSkillToEdit: (skill: Skill) => void;
   idx: number;
@@ -193,7 +193,7 @@ const SkillsList: React.FC<SkillListProps> = ({
             aria-label="Delete Skill"
             className="bg-red-100 w-fit h-9 dark:bg-red-200 dark:text-gray-700 hover:bg-red-500 hover:text-white p-2 rounded-full transition-all duration-200 ease-in-out"
             onClick={() => {
-              setSelectedSkill(skill._id as string);
+              setSelectedSkill(skill);
               setDeleteDialogOpen(true);
             }}
           >

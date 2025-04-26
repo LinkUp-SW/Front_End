@@ -34,7 +34,10 @@ import InstructionPage from "./settings/InstructionPage";
 import ReasonPage from "./settings/ReasonPage";
 import OtherOptionPage from "./settings/OtherOptionPage";
 import LastPage from "./settings/LastPage";
-
+import PrimaryEmailPage from "./settings/updateEmail/PrimaryEmailPage";
+import OTP from "./settings/updateEmail/OTP";
+import AddEmailPage from "./settings/updateEmail/AddEmailPage";
+import AllPeoplePage from "./search/AllPeoplePage";
 //Export the Imported Pages
 export {
   LandingPage,
@@ -72,4 +75,8 @@ export {
   ReasonPage,
   OtherOptionPage,
   LastPage,
+  PrimaryEmailPage,
+  OTP,
+  AddEmailPage,
+  AllPeoplePage,
 };
