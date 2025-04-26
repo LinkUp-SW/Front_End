@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Play } from "lucide-react";
 import { openCreatePostDialog } from "@/slices/feed/createPostSlice";
@@ -21,7 +21,8 @@ const Activity: React.FC = () => {
   );
   const [posts, setPosts] = useState<PostType[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-
+  const { id } = useParams<{ id: string }>(); // Extract the 'id' parameter from the URL
+  console.log("id", id);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
@@ -42,7 +43,7 @@ const Activity: React.FC = () => {
         };
 
         // Call the getUserPosts API function
-        const response = await getUserPosts(token, userId, payload);
+        const response = await getUserPosts(token, id || "", payload);
         console.log("response", response);
         if (response && response.posts) {
           setPosts(response.posts);

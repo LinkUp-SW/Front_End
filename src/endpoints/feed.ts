@@ -285,11 +285,16 @@ export const getReactions = async (
 };
 
 export const deleteReaction = async (
-  postPayload: { target_type: string },
+  postPayload: { target_type: string; comment_id?: string },
   postId: string,
   token: string,
   commentId?: string | null
 ) => {
+  console.log(
+    !commentId
+      ? `api/v1/post/reaction/${postId}/`
+      : `api/v1/post/reaction/${postId}/${commentId}`
+  );
   const response = await axiosInstance.delete(
     !commentId
       ? `api/v1/post/reaction/${postId}/`
@@ -301,6 +306,29 @@ export const deleteReaction = async (
       data: postPayload,
     }
   );
+
+  return response.data;
+};
+
+export const getComments = async (
+  postPayload: {
+    cursor: number;
+    limit: number;
+    replyLimit: number;
+  },
+  postId: string,
+  token: string
+) => {
+  const response = await axiosInstance.get(`api/v1/post/comment/${postId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    params: {
+      cursor: postPayload.cursor,
+      limit: postPayload.limit,
+      replyLimit: postPayload.replyLimit,
+    },
+  });
 
   return response.data;
 };

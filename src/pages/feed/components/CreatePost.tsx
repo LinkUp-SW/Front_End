@@ -31,6 +31,7 @@ import { setPosts } from "@/slices/feed/postsSlice";
 import { setComments } from "@/slices/feed/commentsSlice";
 import React from "react";
 import { closeCreatePostDialog } from "@/slices/feed/createPostSlice";
+import { openCreatePostDialog } from "@/slices/feed/createPostSlice";
 
 const useDismissModal = () => {
   const dismiss = () => {
@@ -283,6 +284,7 @@ const CreatePost: React.FC<CreatePostProps> = ({ className }) => {
                 <Button
                   variant="ghost"
                   id="create-post-button"
+                  onClick={() => dispatch(openCreatePostDialog())}
                   className="w-[90%] h-11 border p-4 hover:bg-gray-200 dark:hover:bg-zinc-800 transition-colors hover:cursor-pointer hover:text-gray-950 dark:hover:text-neutral-200 rounded-full border-gray-400 font-medium text-black focus:outline-none text-left dark:text-neutral-300"
                 >
                   <p className="w-full">Start a post</p>
