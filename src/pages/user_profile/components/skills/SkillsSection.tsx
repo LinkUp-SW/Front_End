@@ -1,5 +1,12 @@
 import { Fragment, useEffect, useState } from "react";
-
+import { useSelector, useDispatch } from "react-redux";
+import {
+  setSkills as setGlobalSkills,
+  addSkill as addGlobalSkill,
+  updateSkill as updateGlobalSkill,
+  removeSkill as removeGlobalSkill,
+} from "@/slices/skills/skillsSlice";
+import { RootState, AppDispatch } from "@/store";
 import {
   Dialog,
   DialogTrigger,
@@ -25,6 +32,9 @@ import { getErrorMessage } from "@/utils/errorHandler";
 import SkillsList from "./SkillsList";
 import SkillsSkeleton from "./SkillsSkeleton";
 import SkillsActionButtons from "./SkillsActionButtons";
+import { updateLicense as updateGlobalLicense } from "@/slices/license/licensesSlice";
+import { updateExperience as updateGlobalExperience } from "@/slices/experience/experiencesSlice";
+import { updateEducation as updateGlobalEducation } from "@/slices/education/educationsSlice";
 
 interface FetchDataResult {
   skills: Skill[];
@@ -37,54 +47,166 @@ const SkillsSection = () => {
   const { data, loading, error } = useFetchData<FetchDataResult | null>(
     () =>
       authToken && id ? getUserSkills(authToken, id) : Promise.resolve(null),
-    [id] // add id as a dependency so that when it changes, the effect runs again
+    [id]
   );
-  const [skills, setSkills] = useState<Skill[]>([]);
-  const [selectedSkill, setSelectedSkill] = useState<string | null>(null);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [skillToEdit, setSkillToEdit] = useState<Skill | null>(null);
-  const [editOpen, setEditOpen] = useState(false);
+
+  const dispatch = useDispatch<AppDispatch>();
+  const licenses = useSelector((state: RootState) => state.license.items);
+  const experiences = useSelector((state: RootState) => state.experience.items);
+  const educations = useSelector((state: RootState) => state.education.items);
+  const skills = useSelector((state: RootState) => state.skill.items);
   const isMe = data?.is_me ?? false;
   const isEmpty = skills.length === 0;
   const { isSubmitting, startSubmitting, stopSubmitting } = useFormStatus();
 
+  // Load server data into Redux
+  useEffect(() => {
+    if (data?.skills) {
+      dispatch(setGlobalSkills(data.skills));
+    }
+  }, [data, dispatch]);
+
+  // Handler for adding
   const handleAddSkill = (newSkill: Skill) => {
-    setSkills((prev) => [...prev, newSkill]);
+    dispatch(addGlobalSkill(newSkill));
   };
 
-  // Handler for updating an existing skill
+  // Handler for editing
   const handleEditSkill = (updatedSkill: Skill) => {
-    setSkills((prev) =>
-      prev.map((skill) =>
-        skill._id === updatedSkill._id ? updatedSkill : skill
-      )
-    );
+    dispatch(updateGlobalSkill(updatedSkill));
+
     setEditOpen(false);
     setSkillToEdit(null);
   };
 
-  useEffect(() => {
-    if (data?.skills) {
-      setSkills(data.skills);
-    }
-  }, [data]);
-
+  // Handler for deleting
   const handleConfirmDelete = async () => {
+    if (!selectedSkill) return;
     startSubmitting();
     try {
       const response = await deleteUserSkills(
         authToken as string,
-        selectedSkill as string
+        selectedSkill._id as string
       );
-      setSkills(skills.filter((skill) => skill._id !== selectedSkill));
+      dispatch(removeGlobalSkill(selectedSkill._id as string));
+      educations.forEach((education) => {
+        dispatch(
+          updateGlobalEducation({
+            ...education,
+            skills: education.skills.filter(
+              (skill) => skill !== selectedSkill.name
+            ),
+          })
+        );
+      });
+      experiences.forEach((experience) => {
+        dispatch(
+          updateGlobalExperience({
+            ...experience,
+            skills: experience.skills.filter(
+              (skill) => skill !== selectedSkill.name
+            ),
+          })
+        );
+      });
+      licenses.forEach((license) => {
+        dispatch(
+          updateGlobalLicense({
+            ...license,
+            skills: license.skills.filter(
+              (skill) => skill !== selectedSkill.name
+            ),
+          })
+        );
+      });
       setDeleteDialogOpen(false);
       toast.success(response.message);
-    } catch (error) {
-      toast.error(getErrorMessage(error));
+    } catch (err) {
+      toast.error(getErrorMessage(err));
     } finally {
       stopSubmitting();
     }
   };
+
+  // Local UI state
+  const [selectedSkill, setSelectedSkill] = useState<Skill | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [skillToEdit, setSkillToEdit] = useState<Skill | null>(null);
+  const [editOpen, setEditOpen] = useState(false);
+
+  const skillNamesByLicenseId = skills.reduce<Record<string, string[]>>(
+    (map, skill) => {
+      skill.licenses.forEach((lic) => {
+        if (!map[lic._id]) {
+          map[lic._id] = [];
+        }
+        map[lic._id].push(skill.name);
+      });
+      return map;
+    },
+    {}
+  );
+  const skillNamesByEducationId = skills.reduce<Record<string, string[]>>(
+    (map, skill) => {
+      skill.educations.forEach((edu) => {
+        if (!map[edu._id]) {
+          map[edu._id] = [];
+        }
+        map[edu._id].push(skill.name);
+      });
+      return map;
+    },
+    {}
+  );
+
+  const skillNamesByExperienceId = skills.reduce<Record<string, string[]>>(
+    (map, skill) => {
+      skill.experiences.forEach((exp) => {
+        if (!map[exp._id]) {
+          map[exp._id] = [];
+        }
+        map[exp._id].push(skill.name);
+      });
+      return map;
+    },
+    {}
+  );
+
+  useEffect(() => {
+    licenses.forEach((license) => {
+      const skillNames = license._id
+        ? skillNamesByLicenseId[license._id] || []
+        : [];
+      dispatch(
+        updateGlobalLicense({
+          ...license,
+          skills: skillNames,
+        })
+      );
+    });
+    experiences.forEach((experience) => {
+      const skillNames = experience._id
+        ? skillNamesByExperienceId[experience._id] || []
+        : [];
+      dispatch(
+        updateGlobalExperience({
+          ...experience,
+          skills: skillNames,
+        })
+      );
+    });
+    educations.forEach((education) => {
+      const skillNames = education._id
+        ? skillNamesByEducationId[education._id] || []
+        : [];
+      dispatch(
+        updateGlobalEducation({
+          ...education,
+          skills: skillNames,
+        })
+      );
+    });
+  }, [skills]);
 
   if (error) {
     return (
@@ -99,20 +221,24 @@ const SkillsSection = () => {
     );
   }
 
+  // Hide entirely if not the owner and no skills
   if (!isMe && isEmpty) return null;
 
-  if (loading)
+  if (loading) {
     return (
       <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow outline-dotted dark:outline-blue-300 outline-blue-500">
         <SkillsSkeleton />
       </div>
     );
-  if (isMe && isEmpty)
+  }
+
+  if (isMe && isEmpty) {
     return (
       <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow outline-dotted dark:outline-blue-300 outline-blue-500">
         <EmptySkills onAddSkill={handleAddSkill} />
       </div>
     );
+  }
 
   return (
     <section
@@ -127,10 +253,9 @@ const SkillsSection = () => {
           <SkillsActionButtons onAddSkill={handleAddSkill} />
         )}
       </header>
-      {/* Use divide-y to place horizontal lines between skills */}
       <div className="mt-2 divide-y divide-gray-200 dark:divide-gray-700">
         {skills.slice(0, 2).map((skill, idx) => (
-          <Fragment key={skill._id}>
+          <Fragment key={skill._id ?? idx}>
             <SkillsList
               skill={skill}
               setDeleteDialogOpen={setDeleteDialogOpen}
@@ -160,7 +285,6 @@ const SkillsSection = () => {
           id="edit-skill-dialog-content"
           className="max-h-[45rem] overflow-y-auto dark:bg-gray-900 overflow-x-hidden !max-w-5xl sm:!w-[38.5rem] !w-full"
         >
-          <DialogTitle className="hidden"></DialogTitle>
           <DialogHeader>
             <Header title={`Edit ${skillToEdit?.name}`} />
           </DialogHeader>
@@ -198,7 +322,6 @@ const SkillsSection = () => {
               variant="outline"
               disabled={isSubmitting}
               onClick={() => setDeleteDialogOpen(false)}
-              className="border-gray-300 hover:bg-gray-100 dark:text-black dark:hover:bg-gray-700 dark:hover:text-white dark:border-gray-700 transition-all duration-300 ease-in-out"
             >
               Cancel
             </Button>
@@ -206,7 +329,6 @@ const SkillsSection = () => {
               variant="destructive"
               disabled={isSubmitting}
               onClick={handleConfirmDelete}
-              className="destructiveBtn"
             >
               Delete
             </Button>

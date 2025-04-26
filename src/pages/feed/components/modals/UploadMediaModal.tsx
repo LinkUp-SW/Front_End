@@ -13,6 +13,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components";
+import uploadMediaDarkImg from "@/assets/feed_upload_dark.svg";
+import uploadMediaLightImg from "@/assets/feed_upload_light.svg";
 
 interface UploadMediaModalProps {
   setActiveModal: (value: string) => void;
@@ -140,7 +142,11 @@ const UploadMediaModal: React.FC<UploadMediaModalProps> = ({
             <div className="flex flex-col items-center justify-center gap-2">
               <div>
                 <img
-                  src={`../../../../public/feed_upload_media_${darkMode}.svg`}
+                  src={
+                    darkMode === "light"
+                      ? uploadMediaLightImg
+                      : uploadMediaDarkImg
+                  }
                   alt="Upload Media"
                   className=""
                 />

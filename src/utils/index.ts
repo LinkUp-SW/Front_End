@@ -1,7 +1,7 @@
 //utils/index.ts
 
 import { openModal } from "@/slices/modal/modalSlice";
-import { UserStarterInterface } from "@/types";
+import { SkillResponse, UserStarterInterface } from "@/types";
 import type { Area } from "react-easy-crop";
 
 // Example utility function to convert an array of strings to lowercase
@@ -225,4 +225,28 @@ export async function getCroppedImg(
       }
     }, "image/jpeg");
   });
+}
+
+export function isSkillResponse(obj: unknown): obj is SkillResponse {
+  if (typeof obj === "object" && obj !== null) {
+    const record = obj as Record<string, unknown>;
+    return (
+      typeof record["_id"] === "string" && typeof record["name"] === "string"
+    );
+  }
+  return false;
+}
+
+type RelationKey = 'licenses' | 'educations' | 'experiences'
+
+export function buildSkillNamesMap(
+  skills: Array<{ _id: string; name: string } & { [K in RelationKey]: { _id: string }[] }>,
+  relation: RelationKey
+): Record<string, string[]> {
+  return skills.reduce<Record<string, string[]>>((map, skill) => {
+    for (const { _id } of skill[relation]) {
+      (map[_id] ??= []).push(skill.name)
+    }
+    return map
+  }, {})
 }

@@ -29,6 +29,17 @@ import { IoIosBriefcase } from "react-icons/io";
 import AddExperienceModal from "../components/modals/experience_modal/AddExperienceModal";
 import ExperiencesList from "../components/experiences/ExperiencesList";
 
+// Redux
+import { useSelector, useDispatch } from "react-redux";
+import { RootState, AppDispatch } from "@/store";
+import {
+  setExperiences as setGlobalExperiences,
+  addExperience as addGlobalExperience,
+  updateExperience as updateGlobalExperience,
+  removeExperience as removeGlobalExperience,
+} from "@/slices/experience/experiencesSlice";
+import { removeOrganizationFromSkills as removeExperienceFromSkills } from "@/slices/skills/skillsSlice";
+
 interface FetchDataResult {
   work_experience: Experience[];
   is_me: boolean;
@@ -37,7 +48,6 @@ interface FetchDataResult {
 const UserExperiencesPage = () => {
   const authToken = Cookies.get("linkup_auth_token");
   const { id } = useParams();
-  const [experiences, setExperiences] = useState<Experience[]>([]);
   const [editOpen, setEditOpen] = useState(false);
   const [experienceToEdit, setExperienceToEdit] = useState<Experience | null>(
     null
@@ -53,10 +63,12 @@ const UserExperiencesPage = () => {
     }
     return Promise.resolve(null);
   }, [authToken, id]);
+  const dispatch = useDispatch<AppDispatch>();
+  const experiences = useSelector((state: RootState) => state.experience.items);
 
   useEffect(() => {
     if (data?.work_experience) {
-      setExperiences(data.work_experience);
+      dispatch(setGlobalExperiences(data.work_experience));
     }
   }, [data]);
 
@@ -67,9 +79,9 @@ const UserExperiencesPage = () => {
           authToken,
           selectedExperienceId
         );
-        setExperiences((prev) =>
-          prev.filter((exp) => exp._id !== selectedExperienceId)
-        );
+        dispatch(removeGlobalExperience(selectedExperienceId));
+        dispatch(removeExperienceFromSkills({ orgId: selectedExperienceId }));
+
         toast.success(response.message);
       } catch (error) {
         console.error("Failed to delete experience", error);
@@ -99,14 +111,12 @@ const UserExperiencesPage = () => {
 
   // Handler for adding a new experience
   const handleAddExperience = (newExperience: Experience) => {
-    setExperiences((prev) => [...prev, newExperience]);
+    dispatch(addGlobalExperience(newExperience));
   };
 
   // Handler for updating an existing experience
   const handleEditExperience = (updatedExp: Experience) => {
-    setExperiences((prev) =>
-      prev.map((exp) => (exp._id === updatedExp._id ? updatedExp : exp))
-    );
+    dispatch(updateGlobalExperience(updatedExp));
     setEditOpen(false);
     setExperienceToEdit(null);
   };

@@ -28,7 +28,10 @@ import UserExperiencesPage from "./user_profile/user_experiences/UserExperiences
 import SignInAndSecurityPage from "./settings/SignInAndSecurityPage";
 import ChangePasswordPage from "./settings/ChangePasswordPage";
 import MyItemsPage from "./my_items/MyItemsPage";
-import CompanyCreationPage from "./company/CompanyCreationPage";
+import PrimaryEmailPage from "./settings/updateEmail/PrimaryEmailPage";
+import OTP from "./settings/updateEmail/OTP";
+import AddEmailPage from "./settings/updateEmail/AddEmailPage";
+import AllPeoplePage from "./search/AllPeoplePage";import CompanyCreationPage from "./company/CompanyCreationPage";
 import ManageCompanyPage from "./company/ManageCompanyPage"
 import  CreateJobPage from "./company/CreateJobPage"
 
@@ -63,6 +66,10 @@ export {
   SignInAndSecurityPage,
   ChangePasswordPage,
   MyItemsPage,
+  PrimaryEmailPage,
+  OTP,
+  AddEmailPage,
+  AllPeoplePage,
   CompanyCreationPage,
   ManageCompanyPage,
   CreateJobPage

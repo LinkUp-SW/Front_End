@@ -90,6 +90,7 @@ const CoverPictureModal: React.FC<CoverPictureModalProps> = ({
         if (!isEditing) {
           setIsEditing(true);
         }
+        e.target.value = "";
       };
       reader.readAsDataURL(file);
     }

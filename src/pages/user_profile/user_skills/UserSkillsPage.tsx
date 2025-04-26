@@ -26,6 +26,19 @@ import { useFormStatus } from "@/hooks/useFormStatus";
 import { FaRegLightbulb } from "react-icons/fa";
 import SkillsSkeleton from "../components/skills/SkillsSkeleton";
 import SkillsActionButtons from "../components/skills/SkillsActionButtons";
+
+// Redux
+import { useSelector, useDispatch } from "react-redux";
+import { RootState, AppDispatch } from "@/store";
+import {
+  setSkills as setGlobalSkills,
+  addSkill as addGlobalSkill,
+  updateSkill as updateGlobalSkill,
+  removeSkill as removeGlobalSkill,
+} from "@/slices/skills/skillsSlice";
+import { updateLicense as updateGlobalLicense } from "@/slices/license/licensesSlice";
+import { updateExperience as updateGlobalExperience } from "@/slices/experience/experiencesSlice";
+import { updateEducation as updateGlobalEducation } from "@/slices/education/educationsSlice";
 interface FetchDataResult {
   skills: Skill[];
   is_me: boolean;
@@ -37,54 +50,166 @@ const UserSkillsPage = () => {
   const { data, loading, error } = useFetchData<FetchDataResult | null>(
     () =>
       authToken && id ? getUserSkills(authToken, id) : Promise.resolve(null),
-    [id] // add id as a dependency so that when it changes, the effect runs again
+    [id]
   );
-  const [skills, setSkills] = useState<Skill[]>([]);
-  const [selectedSkill, setSelectedSkill] = useState<string | null>(null);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [skillToEdit, setSkillToEdit] = useState<Skill | null>(null);
-  const [editOpen, setEditOpen] = useState(false);
+
+  const dispatch = useDispatch<AppDispatch>();
+  const licenses = useSelector((state: RootState) => state.license.items);
+  const experiences = useSelector((state: RootState) => state.experience.items);
+  const educations = useSelector((state: RootState) => state.education.items);
+  const skills = useSelector((state: RootState) => state.skill.items);
   const isMe = data?.is_me ?? false;
   const isEmpty = skills.length === 0;
   const { isSubmitting, startSubmitting, stopSubmitting } = useFormStatus();
 
+  // Load from server into Redux on fetch
+  useEffect(() => {
+    if (data?.skills) {
+      dispatch(setGlobalSkills(data.skills));
+    }
+  }, [data, dispatch]);
+
+  // Handlers now dispatch to Redux slice
   const handleAddSkill = (newSkill: Skill) => {
-    setSkills((prev) => [...prev, newSkill]);
+    dispatch(addGlobalSkill(newSkill));
   };
 
-  // Handler for updating an existing skill
   const handleEditSkill = (updatedSkill: Skill) => {
-    setSkills((prev) =>
-      prev.map((skill) =>
-        skill._id === updatedSkill._id ? updatedSkill : skill
-      )
-    );
+    dispatch(updateGlobalSkill(updatedSkill));
+
     setEditOpen(false);
     setSkillToEdit(null);
   };
 
-  useEffect(() => {
-    if (data?.skills) {
-      setSkills(data.skills);
-    }
-  }, [data]);
-
+  // Handler for deleting
   const handleConfirmDelete = async () => {
+    if (!selectedSkill) return;
     startSubmitting();
     try {
       const response = await deleteUserSkills(
         authToken as string,
-        selectedSkill as string
+        selectedSkill._id as string
       );
-      setSkills(skills.filter((skill) => skill._id !== selectedSkill));
+      dispatch(removeGlobalSkill(selectedSkill._id as string));
+      educations.forEach((education) => {
+        dispatch(
+          updateGlobalEducation({
+            ...education,
+            skills: education.skills.filter(
+              (skill) => skill !== selectedSkill.name
+            ),
+          })
+        );
+      });
+      experiences.forEach((experience) => {
+        dispatch(
+          updateGlobalExperience({
+            ...experience,
+            skills: experience.skills.filter(
+              (skill) => skill !== selectedSkill.name
+            ),
+          })
+        );
+      });
+      licenses.forEach((license) => {
+        dispatch(
+          updateGlobalLicense({
+            ...license,
+            skills: license.skills.filter(
+              (skill) => skill !== selectedSkill.name
+            ),
+          })
+        );
+      });
       setDeleteDialogOpen(false);
       toast.success(response.message);
-    } catch (error) {
-      toast.error(getErrorMessage(error));
+    } catch (err) {
+      toast.error(getErrorMessage(err));
     } finally {
       stopSubmitting();
     }
   };
+
+  const skillNamesByLicenseId = skills.reduce<Record<string, string[]>>(
+    (map, skill) => {
+      skill.licenses.forEach((lic) => {
+        if (!map[lic._id]) {
+          map[lic._id] = [];
+        }
+        map[lic._id].push(skill.name);
+      });
+      return map;
+    },
+    {}
+  );
+  const skillNamesByEducationId = skills.reduce<Record<string, string[]>>(
+    (map, skill) => {
+      skill.educations.forEach((edu) => {
+        if (!map[edu._id]) {
+          map[edu._id] = [];
+        }
+        map[edu._id].push(skill.name);
+      });
+      return map;
+    },
+    {}
+  );
+
+  const skillNamesByExperienceId = skills.reduce<Record<string, string[]>>(
+    (map, skill) => {
+      skill.experiences.forEach((exp) => {
+        if (!map[exp._id]) {
+          map[exp._id] = [];
+        }
+        map[exp._id].push(skill.name);
+      });
+      return map;
+    },
+    {}
+  );
+
+  useEffect(() => {
+    licenses.forEach((license) => {
+      const skillNames = license._id
+        ? skillNamesByLicenseId[license._id] || []
+        : [];
+      dispatch(
+        updateGlobalLicense({
+          ...license,
+          skills: skillNames,
+        })
+      );
+    });
+    experiences.forEach((experience) => {
+      const skillNames = experience._id
+        ? skillNamesByExperienceId[experience._id] || []
+        : [];
+      dispatch(
+        updateGlobalExperience({
+          ...experience,
+          skills: skillNames,
+        })
+      );
+    });
+    educations.forEach((education) => {
+      const skillNames = education._id
+        ? skillNamesByEducationId[education._id] || []
+        : [];
+      dispatch(
+        updateGlobalEducation({
+          ...education,
+          skills: skillNames,
+        })
+      );
+    });
+  }, [skills]);
+
+  // Local UI state
+  const [selectedSkill, setSelectedSkill] = useState<Skill | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [skillToEdit, setSkillToEdit] = useState<Skill | null>(null);
+  const [editOpen, setEditOpen] = useState(false);
+
   if (error) {
     return (
       <section
@@ -119,34 +244,27 @@ const UserSkillsPage = () => {
             <div className="mt-2 divide-y divide-gray-200 dark:divide-gray-700">
               {loading ? (
                 <SkillsSkeleton />
+              ) : isEmpty ? (
+                <EmptySkills onAddSkill={handleAddSkill} isMe={isMe} />
               ) : (
-                <>
-                  {isEmpty ? (
-                    <EmptySkills onAddSkill={handleAddSkill} isMe={isMe} />
-                  ) : (
-                    <>
-                      {skills.map((skill, idx) => (
-                        <Fragment key={idx}>
-                          <SkillsList
-                            skill={skill}
-                            setDeleteDialogOpen={setDeleteDialogOpen}
-                            setEditOpen={setEditOpen}
-                            setSkillToEdit={setSkillToEdit}
-                            setSelectedSkill={setSelectedSkill}
-                            idx={idx}
-                            isMe={isMe}
-                          />
-                        </Fragment>
-                      ))}
-                    </>
-                  )}
-                </>
+                skills.map((skill, idx) => (
+                  <Fragment key={skill._id || idx}>
+                    <SkillsList
+                      skill={skill}
+                      setDeleteDialogOpen={setDeleteDialogOpen}
+                      setEditOpen={setEditOpen}
+                      setSkillToEdit={setSkillToEdit}
+                      setSelectedSkill={setSelectedSkill}
+                      idx={idx}
+                      isMe={isMe}
+                    />
+                  </Fragment>
+                ))
               )}
             </div>
           </section>
         </div>
 
-        {/* Right Sidebar */}
         <div className="lg:col-span-1 space-y-4">
           <ViewedSection />
           <ResourcesSection />
@@ -160,7 +278,6 @@ const UserSkillsPage = () => {
           id="edit-skill-dialog-content"
           className="max-h-[45rem] overflow-y-auto dark:bg-gray-900 overflow-x-hidden !max-w-5xl sm:!w-[38.5rem] !w-full"
         >
-          <DialogTitle className="hidden"></DialogTitle>
           <DialogHeader>
             <Header title={`Edit ${skillToEdit?.name}`} />
           </DialogHeader>
@@ -198,7 +315,6 @@ const UserSkillsPage = () => {
               variant="outline"
               disabled={isSubmitting}
               onClick={() => setDeleteDialogOpen(false)}
-              className="border-gray-300 hover:bg-gray-100 dark:text-black dark:hover:bg-gray-700 dark:hover:text-white dark:border-gray-700 transition-all duration-300 ease-in-out"
             >
               Cancel
             </Button>
@@ -206,7 +322,6 @@ const UserSkillsPage = () => {
               variant="destructive"
               disabled={isSubmitting}
               onClick={handleConfirmDelete}
-              className="destructiveBtn"
             >
               Delete
             </Button>
@@ -238,7 +353,7 @@ const EmptySkills: React.FC<{
           </div>
         ) : (
           <div className="flex flex-col justify-center">
-            <p className="text-sm">This user does not have skills yet :{"("}</p>
+            <p className="text-sm">This user does not have skills yet :(</p>
           </div>
         )}
       </div>
@@ -247,7 +362,7 @@ const EmptySkills: React.FC<{
           <DialogTrigger asChild>
             <button
               id="add-skill-button"
-              className="w-fit py-1.5 px-4 border-2 rounded-full dark:border-blue-400 font-semibold text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-600 dark:hover:bg-blue-400 hover:text-white transition-all duration-300 ease-in-out border-blue-600 cursor-pointer"
+              className="w-fit py-1.5 px-4 border-2 rounded-full dark:border-blue-400 font-semibold text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-600 dark:hover:bg-blue-400 hover:text-white transition-all duration-300 ease-in-out cursor-pointer"
             >
               Add Skill
             </button>

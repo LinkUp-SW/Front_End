@@ -1,3 +1,4 @@
+import manOnChair from "../../../assets/man_on_chair.svg";
 import { useState, useEffect, useCallback, useRef } from "react";
 import withSidebarAd from "@/components/hoc/withSidebarAd";
 import {
@@ -20,20 +21,27 @@ import {
 } from "@/components";
 import WithdrawInvitationModal from "./modals/WithdrawInvitationModal";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 const LIMIT = 10;
 
 const ManageInvitations: React.FC = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<"received" | "sent">("received");
-  const [receivedInvitations, setReceivedInvitations] = useState<ReceivedConnections[]>([]);
+  const [receivedInvitations, setReceivedInvitations] = useState<
+    ReceivedConnections[]
+  >([]);
   const [sentInvitations, setSentInvitations] = useState<SentConnections[]>([]);
-  const [receivedNextCursor, setReceivedNextCursor] = useState<string | null>(null);
+  const [receivedNextCursor, setReceivedNextCursor] = useState<string | null>(
+    null
+  );
   const [sentNextCursor, setSentNextCursor] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [allReceivedFetched, setAllReceivedFetched] = useState(false);
   const [allSentFetched, setAllSentFetched] = useState(false);
-  const [isDialogOpen, setIsDialogOpen] = useState(false); // Added dialog state
+  const [openWithdrawDialogId, setOpenWithdrawDialogId] = useState<
+    string | null
+  >(null);
 
   const token = Cookies.get("linkup_auth_token");
 
@@ -60,12 +68,20 @@ const ManageInvitations: React.FC = () => {
           if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
 
           debounceTimeout.current = setTimeout(() => {
-            if (activeTab === "received" && receivedNextCursor && !allReceivedFetched) {
+            if (
+              activeTab === "received" &&
+              receivedNextCursor &&
+              !allReceivedFetched
+            ) {
               if (receivedNextCursor !== lastCursorRef.current.received) {
                 lastCursorRef.current.received = receivedNextCursor;
                 loadMoreReceived();
               }
-            } else if (activeTab === "sent" && sentNextCursor && !allSentFetched) {
+            } else if (
+              activeTab === "sent" &&
+              sentNextCursor &&
+              !allSentFetched
+            ) {
               if (sentNextCursor !== lastCursorRef.current.sent) {
                 lastCursorRef.current.sent = sentNextCursor;
                 loadMoreSent();
@@ -78,7 +94,14 @@ const ManageInvitations: React.FC = () => {
 
       if (node) observerRef.current.observe(node);
     },
-    [loading, activeTab, receivedNextCursor, sentNextCursor, allReceivedFetched, allSentFetched]
+    [
+      loading,
+      activeTab,
+      receivedNextCursor,
+      sentNextCursor,
+      allReceivedFetched,
+      allSentFetched,
+    ]
   );
 
   const fetchInitialData = async () => {
@@ -110,7 +133,8 @@ const ManageInvitations: React.FC = () => {
     }
   };
 
-  const navigateToUser = (user_id: string) => navigate(`/user-profile/${user_id}`);
+  const navigateToUser = (user_id: string) =>
+    navigate(`/user-profile/${user_id}`);
 
   useEffect(() => {
     fetchInitialData();
@@ -120,7 +144,11 @@ const ManageInvitations: React.FC = () => {
     if (!token || !receivedNextCursor) return;
     setLoading(true);
     try {
-      const data = await fetchRecievedConnections(token, receivedNextCursor, LIMIT);
+      const data = await fetchRecievedConnections(
+        token,
+        receivedNextCursor,
+        LIMIT
+      );
       setReceivedInvitations((prev) => [...prev, ...data.receivedConnections]);
       setReceivedNextCursor(data.nextCursor);
       if (!data.nextCursor) setAllReceivedFetched(true);
@@ -148,9 +176,13 @@ const ManageInvitations: React.FC = () => {
     if (!token) return;
     try {
       await acceptInvitation(token, userId);
-      setReceivedInvitations((prev) => prev.filter((c) => c.user_id !== userId));
+      setReceivedInvitations((prev) =>
+        prev.filter((c) => c.user_id !== userId)
+      );
+      toast.success("Invitation accepted!");
     } catch (error) {
       console.error("Error accepting invitation", error);
+      toast.error("Failed to accept invitation.");
     }
   };
 
@@ -158,9 +190,13 @@ const ManageInvitations: React.FC = () => {
     if (!token) return;
     try {
       await ignoreInvitation(token, userId);
-      setReceivedInvitations((prev) => prev.filter((c) => c.user_id !== userId));
+      setReceivedInvitations((prev) =>
+        prev.filter((c) => c.user_id !== userId)
+      );
+      toast("Invitation ignored.");
     } catch (error) {
       console.error("Error ignoring invitation", error);
+      toast.error("Failed to ignore invitation.");
     }
   };
 
@@ -169,11 +205,16 @@ const ManageInvitations: React.FC = () => {
     try {
       await withdrawInvitation(token, userId);
       setSentInvitations((prev) => prev.filter((c) => c.user_id !== userId));
-      setIsDialogOpen(false); // Close dialog after successful withdrawal
+      setOpenWithdrawDialogId(null);
+      toast.success("Invitation withdrawn.");
     } catch (error) {
       console.error("Error withdrawing invitation", error);
+      toast.error("Failed to withdraw invitation.");
     }
   };
+
+  const invitationsToShow =
+    activeTab === "received" ? receivedInvitations : sentInvitations;
 
   return (
     <div className="flex-1 bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 flex flex-col">
@@ -206,12 +247,18 @@ const ManageInvitations: React.FC = () => {
       </div>
 
       <div className="space-y-4 py-4 flex-grow overflow-y-auto">
-        {(activeTab === "received" ? receivedInvitations : sentInvitations).map(
-          (invite, index) => {
-            const isLast =
-              activeTab === "received"
-                ? index === receivedInvitations.length - 1
-                : index === sentInvitations.length - 1;
+        {invitationsToShow.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-full text-center text-gray-500 dark:text-gray-400">
+            <img src={manOnChair} alt="No invitations" className="w-64 h-64" />
+            <p className="mt-4 text-lg">
+              {activeTab === "received"
+                ? "No received invitations"
+                : "No sent invitations"}
+            </p>
+          </div>
+        ) : (
+          invitationsToShow.map((invite, index) => {
+            const isLast = index === invitationsToShow.length - 1;
 
             return (
               <div
@@ -232,32 +279,43 @@ const ManageInvitations: React.FC = () => {
                   >
                     {invite.name}
                   </p>
-                  <p className="text-sm text-gray-600 truncate">{invite.headline}</p>
+                  <p className="text-sm text-gray-600 truncate">
+                    {invite.headline}
+                  </p>
                 </div>
                 {activeTab === "received" ? (
                   <div className="flex-shrink-0 flex gap-2">
                     <button
                       id="ignore-invitation-button"
                       onClick={() => ignoreInvitations(invite.user_id)}
-                      className="text-gray-600 text-sm"
+                      className="px-3 py-1 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white cursor-pointer"
                     >
                       Ignore
                     </button>
                     <button
                       id="accept-invitation-button"
                       onClick={() => acceptInvitations(invite.user_id)}
-                      className="bg-blue-600 text-white px-3 py-1 text-sm rounded"
+                      className="affirmativeBtn px-4 py-1 rounded-lg cursor-pointer"
                     >
                       Accept
                     </button>
                   </div>
                 ) : (
-                  <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                  <Dialog
+                    open={openWithdrawDialogId === invite.user_id}
+                    onOpenChange={(open) => {
+                      if (!open) {
+                        setOpenWithdrawDialogId(null);
+                      } else {
+                        setOpenWithdrawDialogId(invite.user_id);
+                      }
+                    }}
+                  >
                     <DialogTrigger asChild>
                       <button
                         id="withdraw-invitation-button"
-                        className="bg-gray-500 text-white px-3 py-1 text-sm rounded"
-                        onClick={() => setIsDialogOpen(true)}
+                        className="destructiveBtn px-4 py-1 rounded-lg cursor-pointer"
+                        onClick={() => setOpenWithdrawDialogId(invite.user_id)}
                       >
                         Withdraw
                       </button>
@@ -273,14 +331,14 @@ const ManageInvitations: React.FC = () => {
                           userId: invite.user_id,
                         }}
                         onConfirm={() => withdrawInvitations(invite.user_id)}
-                        onCancel={() => setIsDialogOpen(false)} // Pass the close handler
+                        onCancel={() => setOpenWithdrawDialogId(null)}
                       />
                     </DialogContent>
                   </Dialog>
                 )}
               </div>
             );
-          }
+          })
         )}
       </div>
     </div>

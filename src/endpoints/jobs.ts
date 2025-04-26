@@ -43,6 +43,32 @@ export interface SavedJobsResponse {
   data: JobData[];
 }
 
+interface Organization {
+  _id: string;
+  name: string;
+  logo: string;
+}
+
+export interface SearchJobs {
+  _id: string;
+  job_title: string;
+  location: string;
+  workplace_type: string;
+  experience_level: string;
+  salary: number;
+  timeAgo: string;
+  organization: Organization;
+}
+
+interface JobSearchResponse {
+  message: string;
+  query: string;
+  count: number;
+  total: number;
+  data: SearchJobs[];
+  nextCursor: string;
+}
+
 // Token helper function
 const getAuthToken = () => {
   const token = Cookies.get('linkup_auth_token');
@@ -143,3 +169,22 @@ export const convertJobDataToJob = (jobData: JobData): Job => {
     } : undefined
   };
 };
+
+
+export const getSearchJobs = async (
+  
+  query:string,
+  cursor:string | null,
+  limit:number |null
+): Promise<JobSearchResponse > => {
+  const response = await axiosInstance.get(
+    "/api/v1/jobs/search-jobs",
+    {
+      headers: {
+      
+      },
+      params: { query, cursor, limit },
+    }
+  );
+  return response.data;
+}

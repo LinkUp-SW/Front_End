@@ -17,7 +17,12 @@ import SkillsManager from "../components/SkillsManager";
 import MediaManager from "../components/MediaManager";
 import { MediaItem } from "../components/types";
 import { v4 as uuid } from "uuid";
-import { extractMonthAndYear } from "@/utils";
+import { extractMonthAndYear, isSkillResponse } from "@/utils";
+import { useDispatch } from "react-redux";
+import {
+  removeOrganizationFromSkills,
+  updateEducationSkills,
+} from "@/slices/skills/skillsSlice";
 
 interface EditEducationModalProps {
   education: Education;
@@ -53,6 +58,8 @@ const EditEducationModal: React.FC<EditEducationModalProps> = ({
   );
 
   const authToken = Cookies.get("linkup_auth_token");
+  const dispatch = useDispatch();
+
   const [schoolSearch, setSchoolSearch] = useState("");
   const [isSchoolsLoading, setIsSchoolsLoading] = useState(false);
   const { isSubmitting, startSubmitting, stopSubmitting } = useFormStatus();
@@ -156,6 +163,29 @@ const EditEducationModal: React.FC<EditEducationModalProps> = ({
       );
       toast.success(res.message || "Education updated successfully!");
       onSuccess?.(updatedEducation);
+      if (res.education.skills.length === 0) {
+        dispatch(
+          removeOrganizationFromSkills({ orgId: res.education._id as string })
+        );
+      } else {
+        res.education.skills.forEach((skill) => {
+          if (isSkillResponse(skill)) {
+            dispatch(
+              updateEducationSkills({
+                education: {
+                  _id: res.education._id as string,
+                  name: res.education.school.name,
+                  logo: res.education.school.logo,
+                },
+                newSkills: res.education.skills as unknown as {
+                  _id: string;
+                  name: string;
+                }[],
+              })
+            );
+          }
+        });
+      }
       onClose?.();
     } catch (err) {
       console.error(err);

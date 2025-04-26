@@ -1,18 +1,14 @@
 import { Card, CardContent } from "../../../components/ui/card";
-import {
-  FaBookmark,
-  FaCalendarAlt,
-  FaNewspaper,
-  FaUsers,
-} from "react-icons/fa";
+import { FaBookmark } from "react-icons/fa";
 import { Link } from "react-router-dom";
 
 const Shortcuts = () => {
   const listItems = [
-    { title: "Saved items", icon: <FaBookmark className="mr-2" />, link: "#" },
-    { title: "Groups", icon: <FaUsers className="mr-2" />, link: "#" },
-    { title: "Newsletters", icon: <FaNewspaper className="mr-2" />, link: "#" },
-    { title: "Events", icon: <FaCalendarAlt className="mr-2" />, link: "#" },
+    {
+      title: "Saved items",
+      icon: <FaBookmark className="mr-2" />,
+      link: "/my-items",
+    },
   ];
   return (
     <Card className="py-2 my-2 dark:bg-gray-900 border-0">

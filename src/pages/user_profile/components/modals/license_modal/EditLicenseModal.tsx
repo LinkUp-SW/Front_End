@@ -14,7 +14,12 @@ import MediaManager from "../components/MediaManager";
 import SkillsManager from "../components/SkillsManager";
 import { MediaItem } from "../components/types";
 import { getErrorMessage } from "@/utils/errorHandler";
-import { extractMonthAndYear } from "@/utils";
+import { extractMonthAndYear, isSkillResponse } from "@/utils";
+import { useDispatch } from "react-redux";
+import {
+  removeOrganizationFromSkills,
+  updateLicenseSkills,
+} from "@/slices/skills/skillsSlice";
 
 const generateTempId = () =>
   crypto.randomUUID?.() || Math.random().toString(36).substr(2, 9);
@@ -51,7 +56,7 @@ const EditLicenseModal: React.FC<AddLicenseModalProps> = ({
   );
   const authToken = Cookies.get("linkup_auth_token");
   const { isSubmitting, startSubmitting, stopSubmitting } = useFormStatus();
-
+  const dispatch = useDispatch();
   const [formData, setFormData] = useState<LicenseFormData>({
     issuing_organization: license.issuing_organization || {
       _id: "",
@@ -133,7 +138,33 @@ const EditLicenseModal: React.FC<AddLicenseModalProps> = ({
         newLicense
       );
       toast.success(response.message);
-      onSuccess?.({ ...newLicense, _id: response.license._id });
+      console.log(response.license);
+      onSuccess?.(newLicense);
+      if (response.license.skills.length === 0) {
+        dispatch(
+          removeOrganizationFromSkills({
+            orgId: response.license._id as string,
+          })
+        );
+      } else {
+        response.license.skills.forEach((skill) => {
+          if (isSkillResponse(skill)) {
+            dispatch(
+              updateLicenseSkills({
+                license: {
+                  _id: response.license._id as string,
+                  name: response.license.issuing_organization.name,
+                  logo: response.license.issuing_organization.logo,
+                },
+                newSkills: response.license.skills as unknown as {
+                  _id: string;
+                  name: string;
+                }[],
+              })
+            );
+          }
+        });
+      }
       onClose?.();
     } catch (error) {
       toast.error(getErrorMessage(error));
@@ -228,7 +259,7 @@ const EditLicenseModal: React.FC<AddLicenseModalProps> = ({
           disabled={isSubmitting}
           className="bg-purple-600 hover:bg-purple-700 w-full disabled:opacity-60 disabled:hover:bg-purple-600 disabled:cursor-not-allowed cursor-pointer text-white py-2 px-4 rounded-full transition-all duration-300"
         >
-          {isSubmitting ? <FormSpinner /> : "Save Education"}
+          {isSubmitting ? <FormSpinner /> : "Save Changes"}
         </button>
       </form>
     </div>
