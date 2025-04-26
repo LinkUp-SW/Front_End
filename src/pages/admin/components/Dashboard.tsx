@@ -16,7 +16,7 @@ const SmallStatCard = ({
     );
   };
   
-  // Reusable Large Card
+ 
   const LargeInfoCard = ({
     title,
     description,
