@@ -3,13 +3,13 @@ import React, { useEffect, useRef, useState } from "react";
 interface TruncatedTextProps {
   content: string;
   lineCount?: number;
-  id:string;
+  id: string;
 }
 
 const TruncatedText: React.FC<TruncatedTextProps> = ({
   content,
   lineCount = 3,
-  id
+  id,
 }) => {
   const textRef = useRef<HTMLParagraphElement>(null);
   const [truncatedText, setTruncatedText] = useState<string>(content);
@@ -69,7 +69,7 @@ const TruncatedText: React.FC<TruncatedTextProps> = ({
         {content}
       </p>
 
-      <p className="text-sm whitespace-pre-wrap break-words">
+      <p className="text-sm whitespace-pre-wrap break-all">
         {expanded || !isTruncated ? content : truncatedText}
         {isTruncated && (
           <button

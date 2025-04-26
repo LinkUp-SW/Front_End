@@ -82,9 +82,15 @@ const SignInPage: React.FC = () => {
         return window.location.replace("/email-verification");
       }
       toast.success("Signed in successfully!");
-      setTimeout(() => {
-        window.location.replace("/feed");
-      }, 2000);
+      if (data.user.isAdmin) {
+        setTimeout(() => {
+          window.location.replace("/admin/dashboard");
+        }, 2000);
+      } else {
+        setTimeout(() => {
+          window.location.replace("/feed");
+        }, 2000);
+      }
     } catch (error) {
       const err = getErrorMessage(error);
       setTimeout(() => {

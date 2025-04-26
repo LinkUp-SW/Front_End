@@ -1,3 +1,4 @@
+import manOnChair from "../../../assets/man_on_chair.svg";
 import { useState, useEffect, useCallback, useRef } from "react";
 import withSidebarAd from "@/components/hoc/withSidebarAd";
 import {
@@ -40,7 +41,7 @@ const ManageInvitations: React.FC = () => {
   const [allSentFetched, setAllSentFetched] = useState(false);
   const [openWithdrawDialogId, setOpenWithdrawDialogId] = useState<
     string | null
-  >(null); // Track which dialog is open
+  >(null);
 
   const token = Cookies.get("linkup_auth_token");
 
@@ -204,13 +205,16 @@ const ManageInvitations: React.FC = () => {
     try {
       await withdrawInvitation(token, userId);
       setSentInvitations((prev) => prev.filter((c) => c.user_id !== userId));
-      setOpenWithdrawDialogId(null); // Close dialog after successful withdrawal
+      setOpenWithdrawDialogId(null);
       toast.success("Invitation withdrawn.");
     } catch (error) {
       console.error("Error withdrawing invitation", error);
       toast.error("Failed to withdraw invitation.");
     }
   };
+
+  const invitationsToShow =
+    activeTab === "received" ? receivedInvitations : sentInvitations;
 
   return (
     <div className="flex-1 bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 flex flex-col">
@@ -243,12 +247,18 @@ const ManageInvitations: React.FC = () => {
       </div>
 
       <div className="space-y-4 py-4 flex-grow overflow-y-auto">
-        {(activeTab === "received" ? receivedInvitations : sentInvitations).map(
-          (invite, index) => {
-            const isLast =
-              activeTab === "received"
-                ? index === receivedInvitations.length - 1
-                : index === sentInvitations.length - 1;
+        {invitationsToShow.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-full text-center text-gray-500 dark:text-gray-400">
+            <img src={manOnChair} alt="No invitations" className="w-64 h-64" />
+            <p className="mt-4 text-lg">
+              {activeTab === "received"
+                ? "No received invitations"
+                : "No sent invitations"}
+            </p>
+          </div>
+        ) : (
+          invitationsToShow.map((invite, index) => {
+            const isLast = index === invitationsToShow.length - 1;
 
             return (
               <div
@@ -278,14 +288,14 @@ const ManageInvitations: React.FC = () => {
                     <button
                       id="ignore-invitation-button"
                       onClick={() => ignoreInvitations(invite.user_id)}
-                      className="text-gray-600 text-sm"
+                      className="px-3 py-1 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white cursor-pointer"
                     >
                       Ignore
                     </button>
                     <button
                       id="accept-invitation-button"
                       onClick={() => acceptInvitations(invite.user_id)}
-                      className="bg-blue-600 text-white px-3 py-1 text-sm rounded"
+                      className="affirmativeBtn px-4 py-1 rounded-lg cursor-pointer"
                     >
                       Accept
                     </button>
@@ -304,7 +314,7 @@ const ManageInvitations: React.FC = () => {
                     <DialogTrigger asChild>
                       <button
                         id="withdraw-invitation-button"
-                        className="bg-gray-500 text-white px-3 py-1 text-sm rounded"
+                        className="destructiveBtn px-4 py-1 rounded-lg cursor-pointer"
                         onClick={() => setOpenWithdrawDialogId(invite.user_id)}
                       >
                         Withdraw
@@ -328,7 +338,7 @@ const ManageInvitations: React.FC = () => {
                 )}
               </div>
             );
-          }
+          })
         )}
       </div>
     </div>

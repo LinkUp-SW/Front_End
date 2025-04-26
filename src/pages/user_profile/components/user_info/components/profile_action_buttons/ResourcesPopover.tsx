@@ -7,6 +7,9 @@ import { CiCirclePlus, CiClock2 } from "react-icons/ci";
 import { BsInfoSquareFill } from "react-icons/bs";
 import { ImBlocked } from "react-icons/im";
 import { PiNewspaperBold } from "react-icons/pi";
+import { TbFileCv } from "react-icons/tb";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store";
 
 export interface ResourcesPopoverProps {
   title: string;
@@ -29,6 +32,7 @@ export interface ResourcesPopoverProps {
   setOpenEmailDialog(open: boolean): void;
   isInRecievedConnection?: boolean;
   onAccept?: () => void;
+  resume?: string | null;
 }
 
 const ResourcesPopover: React.FC<ResourcesPopoverProps> = (props) => {
@@ -53,6 +57,7 @@ const ResourcesPopover: React.FC<ResourcesPopoverProps> = (props) => {
     setOpenEmailDialog,
     isInRecievedConnection,
     onAccept,
+    resume,
   } = props;
 
   return (
@@ -87,6 +92,7 @@ const ResourcesPopover: React.FC<ResourcesPopoverProps> = (props) => {
             isConnectByEmail={isConnectByEmail}
             email={email}
             setOpenEmailDialog={setOpenEmailDialog}
+            resume={resume}
           />
         )}
       </PopoverContent>
@@ -104,34 +110,50 @@ const OwnerPopoverContent: React.FC<OwnerPopoverContentProps> = ({
   onViewBlockedUsers,
   onViewActivity,
   onAboutProfile,
-}) => (
-  <div className="grid gap-2">
-    <button
-      id="owner-popover-blocked-users-button"
-      onClick={onViewBlockedUsers}
-      className="w-full dark:hover:bg-gray-700 inline-flex text-xs font-semibold cursor-pointer transition-all duration-300 ease-in-out hover:bg-gray-200 p-2 rounded items-center gap-2"
-    >
-      <FaUsersSlash size={16} />
-      <span>Blocked users</span>
-    </button>
-    <button
-      id="owner-popover-activity"
-      onClick={onViewActivity}
-      className="w-full dark:hover:bg-gray-700 inline-flex text-xs font-semibold cursor-pointer transition-all duration-300 ease-in-out hover:bg-gray-200 p-2 rounded items-center gap-2"
-    >
-      <PiNewspaperBold size={16} />
-      <span>Activity</span>
-    </button>
-    <button
-      id="owner-popover-about-profile-button"
-      onClick={onAboutProfile}
-      className="w-full dark:hover:bg-gray-700 inline-flex text-xs font-semibold cursor-pointer transition-all duration-300 ease-in-out hover:bg-gray-200 p-2 rounded items-center gap-2"
-    >
-      <BsInfoSquareFill size={16} />
-      <span>About this profile</span>
-    </button>
-  </div>
-);
+}) => {
+  const userBio = useSelector((state: RootState) => state.userBio.data);
+  console.log(userBio);
+  return (
+    <div className="grid gap-2">
+      <button
+        id="owner-popover-blocked-users-button"
+        onClick={onViewBlockedUsers}
+        className="w-full dark:hover:bg-gray-700 inline-flex text-xs font-semibold cursor-pointer transition-all duration-300 ease-in-out hover:bg-gray-200 p-2 rounded items-center gap-2"
+      >
+        <FaUsersSlash size={16} />
+        <span>Blocked users</span>
+      </button>
+      <button
+        id="owner-popover-activity"
+        onClick={onViewActivity}
+        className="w-full dark:hover:bg-gray-700 inline-flex text-xs font-semibold cursor-pointer transition-all duration-300 ease-in-out hover:bg-gray-200 p-2 rounded items-center gap-2"
+      >
+        <PiNewspaperBold size={16} />
+        <span>Activity</span>
+      </button>
+      {userBio?.resume && (
+        <a
+          href={userBio.resume}
+          target="_blank"
+          id="view-resume"
+          className="w-full dark:hover:bg-gray-700 inline-flex text-xs font-semibold cursor-pointer transition-all duration-300 ease-in-out hover:bg-gray-200 p-2 rounded items-center gap-2"
+        >
+          <TbFileCv size={16} />
+          <span>View Resume</span>
+        </a>
+      )}
+
+      <button
+        id="owner-popover-about-profile-button"
+        onClick={onAboutProfile}
+        className="w-full dark:hover:bg-gray-700 inline-flex text-xs font-semibold cursor-pointer transition-all duration-300 ease-in-out hover:bg-gray-200 p-2 rounded items-center gap-2"
+      >
+        <BsInfoSquareFill size={16} />
+        <span>About this profile</span>
+      </button>
+    </div>
+  );
+};
 
 interface NonOwnerPopoverContentProps {
   followPrimary?: boolean;
@@ -150,6 +172,7 @@ interface NonOwnerPopoverContentProps {
   email: string;
   isConnectByEmail: boolean;
   setOpenEmailDialog(open: boolean): void;
+  resume?: string | null;
 }
 
 const NonOwnerPopoverContent: React.FC<NonOwnerPopoverContentProps> = ({
@@ -169,6 +192,7 @@ const NonOwnerPopoverContent: React.FC<NonOwnerPopoverContentProps> = ({
   email,
   isConnectByEmail,
   setOpenEmailDialog,
+  resume,
 }) => (
   <div className="grid gap-2">
     {!followPrimary ? (
@@ -238,6 +262,17 @@ const NonOwnerPopoverContent: React.FC<NonOwnerPopoverContentProps> = ({
       <ImBlocked size={14} />
       <span>Report/Block</span>
     </button>
+    {resume && (
+      <a
+        href={resume}
+        target="_blank"
+        id="view-resume"
+        className="w-full dark:hover:bg-gray-700 inline-flex text-xs font-semibold cursor-pointer transition-all duration-300 ease-in-out hover:bg-gray-200 p-2 rounded items-center gap-2"
+      >
+        <TbFileCv size={16} />
+        <span>View Resume</span>
+      </a>
+    )}
     <button
       id="non-owner-about-button"
       onClick={onAboutProfile}
