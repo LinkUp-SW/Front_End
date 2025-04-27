@@ -8,13 +8,12 @@ import {
 } from "../../components";
 import { PremiumBanner, Shortcuts, CreatePost, Post } from "./components";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
-import { fetchSinglePost } from "@/endpoints/feed";
+import { fetchSinglePost, getPostsFeed } from "@/endpoints/feed";
 import { useNavigate, useParams } from "react-router-dom";
 import Cookies from "js-cookie";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { setPosts } from "@/slices/feed/postsSlice"; // adjust if needed
-import { setComments } from "@/slices/feed/commentsSlice";
 
 interface FeedPageProps {
   single?: boolean;
@@ -29,7 +28,6 @@ const FeedPage: React.FC<FeedPageProps> = ({
   profile = false,
 }) => {
   const posts = useSelector((state: RootState) => state.posts.list);
-  const comments = useSelector((state: RootState) => state.comments.list);
   const dispatch = useDispatch();
   const { id } = useParams<{ id: string }>(); // Extract the 'id' parameter from the URL
   const [viewMore, setViewMore] = useState(true);
@@ -67,41 +65,36 @@ const FeedPage: React.FC<FeedPageProps> = ({
         limit: 5,
       };
 
-      const fetchedData = await Promise.all(
-        profile && id
-          ? [getUserPosts(user_token, id, postPayload)]
-          : !single || !id
-          ? temporary_feed
-              .slice(nextCursor, nextCursor + 5)
-              .map((postId) =>
-                fetchSinglePost(postId, user_token ?? "", nextCursor, 5)
-              )
-          : [fetchSinglePost(id, user_token ?? "", nextCursor, 5)]
-      );
-
-      const newPosts = profile
-        ? fetchedData[0].posts
-        : fetchedData.map((data) => data.post);
-      const newComments = fetchedData.map((data) => data.comments);
-
-      if (!profile) {
-        newComments.forEach((block) => {
-          block.comments = Object.values(block.comments);
-        });
-      }
-
-      if (newPosts.length > 0) {
-        dispatch(setPosts([...posts, ...newPosts]));
-        dispatch(setComments([...comments, ...newComments]));
-        setNextCursor(nextCursor + 5);
+      // Updated logic to use getFeedPosts
+      if (profile && id) {
+        // Profile posts
+        const response = await getUserPosts(user_token, id, postPayload);
+        if (response && response.posts && response.posts.length > 0) {
+          dispatch(setPosts([...posts, ...response.posts]));
+          setNextCursor(nextCursor + response.posts.length);
+          setHasMore(response.posts.length === 5);
+        } else {
+          setHasMore(false);
+        }
+      } else if (single && id) {
+        // Single post
+        const post = await fetchSinglePost(id, user_token);
+        dispatch(setPosts([post]));
+        setHasMore(false);
       } else {
-        setHasMore(false);
-      }
-      if (single) {
-        setHasMore(false);
+        // Feed posts - now using getPostsFeed
+        const response = await getPostsFeed(user_token, postPayload);
+        if (response && response.posts && response.posts.length > 0) {
+          dispatch(setPosts([...posts, ...response.posts]));
+          setNextCursor(nextCursor + response.posts.length);
+          setHasMore(response.posts.length === 5);
+        } else {
+          setHasMore(false);
+        }
       }
     } catch (error) {
-      console.error("Error loading more posts", error);
+      console.error("Error loading posts:", error);
+      toast.error("Failed to load posts");
     } finally {
       setIsLoading(false);
       setInitialLoading(false);
@@ -199,10 +192,7 @@ const FeedPage: React.FC<FeedPageProps> = ({
                     key={`post-${post._id}`}
                     viewMore={viewMore}
                     postData={post}
-                    comments={comments[index]}
-                    action={post.action}
-                    posts={posts}
-                    allComments={comments}
+                    action={post.activityContext}
                     order={index}
                   />
                 ))}
