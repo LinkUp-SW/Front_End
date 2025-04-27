@@ -13,7 +13,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import CreatePostModal from "./modals/CreatePostModal";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
@@ -70,6 +70,7 @@ const CreatePost: React.FC<CreatePostProps> = ({ className }) => {
   const isDialogOpen = useSelector(
     (state: RootState) => state.createPost.createPostOpen
   );
+  const { id } = useParams<{ id: string }>(); // Extract the 'id' parameter from the URL
 
   const navigate = useNavigate();
   const user_token = Cookies.get("linkup_auth_token");
@@ -233,7 +234,7 @@ const CreatePost: React.FC<CreatePostProps> = ({ className }) => {
         count: 0,
         nextCursor: 0,
       };
-      if (post) {
+      if (post && !id) {
         const newPosts = [post.post, ...posts];
         dispatch(setPosts(newPosts));
         const newComments = [comment, ...comments];
