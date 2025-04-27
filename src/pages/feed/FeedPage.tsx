@@ -49,10 +49,6 @@ const FeedPage: React.FC<FeedPageProps> = ({
     "680ba090801a855626ece73e",
     "680b70ca2ea9ffaf2afa7c12",
     "680ace66b57681e1e91b8d39",
-    "680a6fafb57681e1e91b7c0b",
-    "680a6f79b57681e1e91b7bf9",
-    "680a6b3eb57681e1e91b7b52",
-    "680a6702b57681e1e91b7a52",
   ];
 
   const user_token = Cookies.get("linkup_auth_token");
@@ -103,6 +99,9 @@ const FeedPage: React.FC<FeedPageProps> = ({
       } else {
         setHasMore(false);
       }
+      if (single) {
+        setHasMore(false);
+      }
     } catch (error) {
       console.error("Error loading more posts", error);
     } finally {
@@ -137,10 +136,12 @@ const FeedPage: React.FC<FeedPageProps> = ({
   // After successful initial fetch, add:
 
   useEffect(() => {
+    dispatch(setPosts([]));
     const initialFetch = async () => {
       await loadMorePosts();
     };
     initialFetch();
+    console.log("Initial");
   }, []);
 
   useEffect(() => {
