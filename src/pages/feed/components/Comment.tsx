@@ -156,7 +156,7 @@ const Comment: React.FC<CommentProps> = ({
     if (value != "None") {
       handleCreateReaction(value);
     } else {
-      handleDeleteReaction();
+      handleDeleteReaction(value);
     }
   };
 
@@ -197,7 +197,7 @@ const Comment: React.FC<CommentProps> = ({
   };
 
   // Replace your handleDeleteReaction function with this improved version
-  const handleDeleteReaction = async () => {
+  const handleDeleteReaction = async (selected_reaction: string) => {
     if (!token) {
       toast.error("You must be logged in to remove a reaction.");
       navigate("/login", { replace: true });
@@ -212,7 +212,15 @@ const Comment: React.FC<CommentProps> = ({
       );
       setTopStats(getReactionIcons(result.topReactions || []));
 
-      // Update the comments state with the reaction result
+      dispatch(
+        updateCommentReaction({
+          postId: postId,
+          commentId: comment._id,
+          reactions: result.topReactions,
+          reactionsCount: result.totalCount,
+          userReaction: selected_reaction.toLowerCase(),
+        })
+      );
 
       // Update Redux state with the new comments
     } catch (error) {
@@ -552,7 +560,7 @@ const Comment: React.FC<CommentProps> = ({
             </p>
             <Dialog>
               <DialogTrigger asChild>
-                <button className="flex border-r pr-3 relative items-end text-gray-500 dark:text-neutral-400 text-xs hover:underline hover:cursor-pointer hover:text-blue-600 dark:hover:text-blue-400">
+                <button className="flex pr-3 relative items-end text-gray-500 dark:text-neutral-400 text-xs hover:underline hover:cursor-pointer hover:text-blue-600 dark:hover:text-blue-400">
                   {topStats.map((stat, index) => (
                     <span
                       key={index}
