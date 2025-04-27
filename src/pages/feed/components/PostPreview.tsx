@@ -47,9 +47,13 @@ const PostPreview: React.FC<PostPreviewProps> = ({
     <div
       className={`border-t dark:border-t-gray-600 shrink-0 p-4 ${
         compact ? "" : "mb-4"
-      }`}
+      } h-[320px]`}
+      style={{
+        display: "flex",
+        flexDirection: "column",
+      }}
     >
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-3 h-full">
         {showHeader && (
           <div className="relative -left-7">
             <PostHeader
@@ -63,14 +67,17 @@ const PostPreview: React.FC<PostPreviewProps> = ({
           </div>
         )}
 
-        <Link to={`/feed/posts/${post._id}`}>
+        <Link
+          to={`/feed/posts/${post._id}`}
+          className="flex-grow overflow-hidden"
+        >
           <div
             className={`flex ${
               post.media.media_type === "pdf" ||
               post.media.media_type === "link"
                 ? "flex-col"
                 : "gap-4"
-            }`}
+            } h-full`}
           >
             {post.media && post.media.media_type !== "none" && (
               <>
@@ -143,8 +150,8 @@ const PostPreview: React.FC<PostPreviewProps> = ({
         </Link>
 
         {showFooter && (
-          <div className="flex justify-between mt-3 pt-2 border-t dark:border-gray-700">
-            <button className="flex items-center gap-1 text-gray-500 hover:text-blue-600 dark:hover:text-blue-400">
+          <div className="flex justify-between mt-3 pt-2 border-t cursor-default dark:border-gray-700">
+            <div className="flex items-center gap-1 text-gray-500  hover:cursor-default">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
@@ -154,9 +161,9 @@ const PostPreview: React.FC<PostPreviewProps> = ({
                 <path d="M7.493 18.75c-.425 0-.82-.236-.975-.632A7.48 7.48 0 016 15.375c0-1.75.599-3.358 1.602-4.634.151-.192.373-.309.6-.397.473-.183.89-.514 1.212-.924a9.042 9.042 0 012.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 00.322-1.672V3a.75.75 0 01.75-.75 2.25 2.25 0 012.25 2.25c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 01-2.649 7.521c-.388.482-.987.729-1.605.729H14.23c-.483 0-.964-.078-1.423-.23l-3.114-1.04a4.501 4.501 0 00-1.423-.23h-.777zM2.331 10.977a11.969 11.969 0 00-.831 4.398 12 12 0 00.52 3.507c.26.85 1.084 1.368 1.973 1.368H4.9c.445 0 .72-.498.523-.898a8.963 8.963 0 01-.924-3.977c0-1.708.476-3.305 1.302-4.666.245-.403-.028-.959-.5-.959H4.25c-.832 0-1.612.453-1.918 1.227z" />
               </svg>
               <span>{post.reactions?.length || 0}</span>
-            </button>
+            </div>
 
-            <button className="flex items-center gap-1 text-gray-500 hover:text-blue-600 dark:hover:text-blue-400">
+            <div className="flex items-center gap-1 text-gray-500 hover:cursor- ">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
@@ -170,7 +177,7 @@ const PostPreview: React.FC<PostPreviewProps> = ({
                 />
               </svg>
               <span>{post.comments.length || 0}</span>
-            </button>
+            </div>
           </div>
         )}
       </div>
