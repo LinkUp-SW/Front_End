@@ -1,20 +1,18 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { PostType } from "@/types";
+import { MenuAction, PostType } from "@/types";
 import PostHeader from "@/pages/feed/components/PostHeader";
 import TruncatedText from "@/components/truncate_text/TruncatedText";
 import DocumentPreview from "@/pages/feed/components/modals/DocumentPreview";
-import LinkPreview from "@/pages/feed/components/LinkPreview";
 import CompactLinkPreview from "./CompactLinkPreview";
 
 interface PostPreviewProps {
   post: PostType;
-  menuActions: any[];
+  menuActions: MenuAction[];
   onMenuOpenChange?: (isOpen: boolean) => void;
   compact?: boolean;
   showHeader?: boolean;
   showFooter?: boolean;
-  onUnsave?: (postId: string) => Promise<void>;
 }
 
 const PostPreview: React.FC<PostPreviewProps> = ({
@@ -24,7 +22,6 @@ const PostPreview: React.FC<PostPreviewProps> = ({
   compact = false,
   showHeader = true,
   showFooter = false,
-  onUnsave,
 }) => {
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -37,11 +34,6 @@ const PostPreview: React.FC<PostPreviewProps> = ({
   };
 
   // Handle unsave directly if the function is provided
-  const handleUnsave = async () => {
-    if (onUnsave) {
-      await onUnsave(post._id);
-    }
-  };
 
   return (
     <div

@@ -1,11 +1,9 @@
 import {
   FaBan,
   FaBookmark,
-  FaClock,
   FaEdit,
   FaFlag,
   FaLink,
-  FaRocket,
   FaTrash,
   FaUserSlash,
   FaEyeSlash,

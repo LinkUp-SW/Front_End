@@ -307,12 +307,6 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
               console.log("Tagged user IDs:", taggedUserIds);
 
               // Format the content for display (remove the :user_id parts)
-              const formattedContent = postText.replace(
-                /@([A-Za-z0-9_]+):[A-Za-z0-9_-]+/g,
-                (match, name) => {
-                  return "@" + name.replace(/_/g, " ");
-                }
-              );
 
               if (detectedUrl && selectedMedia.length === 0) {
                 submitPost(detectedUrl);
@@ -341,16 +335,16 @@ export default CreatePostModal;
 // Update the FormattedContentText component
 export const FormattedContentText = ({ text }: { text: string }) => {
   // Use a regex that matches from @ to ^ (complete tag)
-  const parts = text.split(/(@[^:]+:[A-Za-z0-9_\-]+\^)/g);
+  const parts = text.split(/(@[^:]+:[A-Za-z0-9_-]+\^)/g);
 
   return (
     <div className="formatted-text">
       {parts.map((part, index) => {
         // Check if this part is a tag with the new format
-        if (part.match(/^@[^:]+:[A-Za-z0-9_\-]+\^$/)) {
+        if (part.match(/^@[^:]+:[A-Za-z0-9_-]+\^$/)) {
           // Extract both the name and ID parts
           const nameMatch = part.match(/@([^:]+):/);
-          const idMatch = part.match(/:([A-Za-z0-9_\-]+)\^/);
+          const idMatch = part.match(/:([A-Za-z0-9_-]+)\^/);
 
           if (nameMatch && nameMatch[1] && idMatch && idMatch[1]) {
             const displayName = nameMatch[1];
@@ -384,7 +378,8 @@ export const extractTaggedUsers = (
 ): { name: string; id: string }[] => {
   // Update regex to match the new format with a caret at the end
   // This will match @Any Name With Spaces:userId^ format
-  const regex = /@([^:]+):([A-Za-z0-9_\-]+)\^/g;
+  const regex = /@([^:]+):([A-Za-z0-9_-]+)\^/g;
+
   const users: { name: string; id: string }[] = [];
   let match;
 

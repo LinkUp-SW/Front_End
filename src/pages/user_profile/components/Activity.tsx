@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, Play } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { openCreatePostDialog } from "@/slices/feed/createPostSlice";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/store";
@@ -9,10 +9,12 @@ import Cookies from "js-cookie";
 import { PostType } from "@/types";
 import { toast } from "sonner";
 import { getUserPosts } from "@/endpoints/userProfile";
-import moment from "moment";
 import TransparentButton from "@/pages/feed/components/buttons/TransparentButton";
 import PostPreview from "@/pages/feed/components/PostPreview";
-import { getMenuActions } from "@/pages/feed/components/Menus";
+import {
+  getMenuActions,
+  getPersonalMenuActions,
+} from "@/pages/feed/components/Menus";
 import BlueButton from "@/pages/feed/components/buttons/BlueButton";
 
 const token = Cookies.get("linkup_auth_token");
@@ -27,13 +29,14 @@ const Activity: React.FC = () => {
     {}
   );
   const setMenuOpen = (postId: string, isOpen: boolean) => {
-    setMenuOpenStates((prev) => ({ ...prev, [postId]: isOpen }));
+    setMenuOpenStates(() => ({ ...menuOpenStates, [postId]: isOpen }));
   };
+  const [isSaved, setIsSaved] = useState(false);
+
   const [isLoading, setIsLoading] = useState(false);
   const { id } = useParams<{ id: string }>(); // Extract the 'id' parameter from the URL
   console.log("id", id);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
@@ -90,6 +93,15 @@ const Activity: React.FC = () => {
     console.log("here");
     dispatch(openCreatePostDialog());
   };
+
+  const handleSaveButton = () => {
+    setIsSaved(!isSaved);
+  };
+  const handleEditPostButton = () => {};
+  const deleteModal = () => {};
+  const blockPost = () => {};
+  const reportPost = () => {};
+  const unfollow = () => {};
 
   return (
     <section className="bg-white p-4 dark:bg-gray-900 rounded-lg shadow-md overflow-hidden">
@@ -190,16 +202,26 @@ const Activity: React.FC = () => {
                 >
                   <PostPreview
                     post={post}
-                    menuActions={getMenuActions(
-                      () => {},
-                      () => {},
-                      () => {},
-                      () => {},
-                      post._id
-                    )}
+                    menuActions={
+                      id === userId
+                        ? getPersonalMenuActions(
+                            handleSaveButton,
+                            handleEditPostButton,
+                            deleteModal,
+                            post._id,
+                            isSaved
+                          )
+                        : getMenuActions(
+                            handleSaveButton,
+                            blockPost,
+                            reportPost,
+                            unfollow,
+                            post._id,
+                            isSaved
+                          )
+                    }
                     onMenuOpenChange={(isOpen) => setMenuOpen(post._id, isOpen)}
                     showFooter={true}
-                    onUnsave={async (postId: string) => {}}
                   />
                 </div>
               ))}

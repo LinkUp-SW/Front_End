@@ -91,7 +91,6 @@ const Post: React.FC<PostProps> = ({
   const [isLandscape, setIsLandscape] = useState<boolean>(false);
   const [isSaved, setIsSaved] = useState<boolean>(false);
   const [postMenuOpen, setPostMenuOpen] = useState(false);
-  const [sortingMenu, setSortingMenu] = useState(false);
 
   const [commentsOpen, setCommentsOpen] = useState(false);
   const [reactionsOpen, setReactionsOpen] = useState(false);
@@ -814,12 +813,9 @@ const Post: React.FC<PostProps> = ({
       <CardFooter>
         {commentsOpen && (
           <PostFooter
-            sortingMenu={sortingMenu}
-            setSortingMenu={setSortingMenu}
             postId={postData._id}
             addNewComment={addNewComment}
             comments={comments}
-            order={order}
           />
         )}
       </CardFooter>

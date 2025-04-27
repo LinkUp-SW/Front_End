@@ -38,7 +38,8 @@ const TruncatedText: React.FC<TruncatedTextProps> = ({
           return "U".repeat(url.length);
         })
         // Replace mentions
-        .replace(/@([^:]+):([A-Za-z0-9_\-]+)\^/g, "@$1")
+        .replace(/@([^:]+):([A-Za-z0-9_-]+)\^/g, "@$1")
+
         // Remove formatting markers
         .replace(/\*([^*]+)\*/g, "$1") // Bold
         .replace(/-([^-]+)-/g, "$1") // Underline
@@ -112,7 +113,7 @@ const TruncatedText: React.FC<TruncatedTextProps> = ({
 
         if (shouldPreserveWords) {
           // Try to find the last space before our cutoff
-          let lastSpaceIndex = content.lastIndexOf(" ", maxFitLength);
+          const lastSpaceIndex = content.lastIndexOf(" ", maxFitLength);
 
           // If we found a space within a reasonable distance
           if (lastSpaceIndex !== -1 && maxFitLength - lastSpaceIndex < 15) {
@@ -146,7 +147,7 @@ const TruncatedText: React.FC<TruncatedTextProps> = ({
     });
 
     // Step 2: Process mentions
-    const mentionRegex = /@([^:]+):([A-Za-z0-9_\-]+)\^/g;
+    const mentionRegex = /@([^:]+):([A-Za-z0-9_-]+)\^/g;
     const segments: {
       type: "text" | "mention" | "url";
       content: string;
@@ -189,7 +190,7 @@ const TruncatedText: React.FC<TruncatedTextProps> = ({
 
     segments.forEach((segment) => {
       if (segment.type === "text") {
-        let textWithUrls = segment.content;
+        const textWithUrls = segment.content;
         let lastTextIndex = 0;
 
         // Check for URL placeholders

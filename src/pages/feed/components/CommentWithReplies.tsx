@@ -9,7 +9,7 @@ import EmojiPicker, { Theme, EmojiClickData } from "emoji-picker-react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { CommentType, StatsType } from "@/types";
-import { hasRichFormatting } from "./PostFooter";
+import { hasRichFormatting } from "@/utils/index";
 import { FormattedContentText } from "./modals/CreatePostModal";
 import UserTagging from "./UserTagging";
 
@@ -25,7 +25,6 @@ interface CommentWithRepliesProps {
   comment: CommentType;
   postId: string;
   stats: StatsType;
-  order: number;
 }
 
 const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
@@ -34,7 +33,6 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
   comment,
   postId,
   stats,
-  order,
 }) => {
   const [showReplies] = useState(true);
   const [mainCommentHeight, setMainCommentHeight] = useState(0);

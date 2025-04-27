@@ -30,7 +30,7 @@ const SavedPostsDashboard: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
 
   const setMenuOpen = (postId: string, isOpen: boolean) => {
-    setMenuOpenStates((prev) => ({ ...prev, [postId]: isOpen }));
+    setMenuOpenStates(() => ({ ...menuOpenStates, [postId]: isOpen }));
   };
 
   const fetchSavedPosts = async (cursor: number) => {
@@ -141,7 +141,6 @@ const SavedPostsDashboard: React.FC = () => {
                 )}
                 onMenuOpenChange={(isOpen) => setMenuOpen(post._id, isOpen)}
                 showFooter={true}
-                onUnsave={handleUnsavePost}
               />
             ))}
 

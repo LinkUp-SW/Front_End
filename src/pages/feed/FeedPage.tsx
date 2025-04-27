@@ -8,7 +8,6 @@ import {
 } from "../../components";
 import { PremiumBanner, Shortcuts, CreatePost, Post } from "./components";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
-import { CommentObjectType } from "@/types";
 import { fetchSinglePost } from "@/endpoints/feed";
 import { useNavigate, useParams } from "react-router-dom";
 import Cookies from "js-cookie";

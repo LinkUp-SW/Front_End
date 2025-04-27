@@ -12,12 +12,9 @@ import CelebrateIcon from "@/assets/Celebrate.svg";
 import LikeIcon from "@/assets/Like.svg";
 import { AiOutlineLike as LikeEmoji } from "react-icons/ai";
 import LoveIcon from "@/assets/Love.svg";
-import LaughIcon from "@/assets/Funny.svg";
 import InsightfulIcon from "@/assets/Insightful.svg";
 import SupportIcon from "@/assets/Support.svg";
-import TruncatedText, {
-  processTextFormatting,
-} from "@/components/truncate_text/TruncatedText";
+import TruncatedText from "@/components/truncate_text/TruncatedText";
 
 import {
   getCommentActions,
@@ -42,11 +39,10 @@ import {
   deleteComment,
   deleteReaction,
 } from "@/endpoints/feed";
-import { CommentType, StatsType } from "@/types";
+import { CommentType } from "@/types";
 import moment from "moment";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
-import DOMPurify from "dompurify";
 import Cookies from "js-cookie";
 import TransparentButton from "./buttons/TransparentButton";
 import BlueButton from "./buttons/BlueButton";
@@ -87,8 +83,6 @@ const Comment: React.FC<CommentProps> = ({
 
   const { content, date, is_edited, media } = comment;
   const myUserId = Cookies.get("linkup_user_id");
-
-  const sanitizedContent = DOMPurify.sanitize(content);
 
   const [commentMenuOpen, setCommentMenuOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);

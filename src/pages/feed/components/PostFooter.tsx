@@ -4,7 +4,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { FaChevronDown, FaRocket, FaClock } from "react-icons/fa";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components";
 import { Link } from "react-router-dom";
@@ -18,7 +17,6 @@ import { RootState } from "@/store";
 import UserTagging from "../components/UserTagging";
 import { FormattedContentText } from "./modals/CreatePostModal";
 import { useEffect } from "react";
-import { processTextFormatting } from "@/components/truncate_text/TruncatedText";
 import {
   Carousel,
   CarouselContent,
@@ -32,36 +30,19 @@ import { extractTaggedUsers } from "./modals/CreatePostModal";
 import Cookies from "js-cookie";
 import { getComments } from "@/endpoints/feed";
 import { setComments } from "@/slices/feed/commentsSlice";
-import { setPosts } from "@/slices/feed/postsSlice";
-
-interface SortingMenuItem {
-  name: string;
-  subtext: string;
-  action: () => void;
-  icon: React.ReactNode;
-}
 
 const token = Cookies.get("linkup_auth_token");
 
 interface PostFooterProps {
-  sortingMenu: boolean;
-  setSortingMenu: React.Dispatch<React.SetStateAction<boolean>>;
-
   comments: CommentObjectType;
   addNewComment: (newComment: CommentDBType) => Promise<void>;
-
   postId: string;
-  order: number;
 }
 
 const PostFooter: React.FC<PostFooterProps> = ({
-  sortingMenu,
-  setSortingMenu,
-
   comments,
   addNewComment,
   postId,
-  order,
 }) => {
   // Create a ref for the horizontally scrollable container
   const [commentInput, setCommentInput] = useState("");
@@ -72,8 +53,6 @@ const PostFooter: React.FC<PostFooterProps> = ({
   console.log("Comment for post:", comments);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const dispatch = useDispatch();
-  const allComments = useSelector((state: RootState) => state.comments.list);
-  const posts = useSelector((state: RootState) => state.posts.list);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
@@ -130,7 +109,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
   // Add this function to check if text contains any rich formatting
   const hasRichFormatting = (text: string): boolean => {
     const richFormatRegex =
-      /(\*[^*]+\*)|(-[^-]+-)|(\~[^\~]+\~)|(@[^:]+:[A-Za-z0-9_\-]+\^)/;
+      /(\*[^*]+\*)|(-[^-]+-)|(~[^~]+~)|(@[^:]+:[A-Za-z0-9_-]+\^)/;
     return richFormatRegex.test(text);
   };
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -430,7 +409,6 @@ const PostFooter: React.FC<PostFooterProps> = ({
                 stats={stats}
                 replies={data.children ? Object.values(data.children) : []}
                 handleCreateComment={handleCreateComment}
-                order={index}
               />
             ))}
             {comments.nextCursor !== 0 && comments.nextCursor !== null && (
@@ -458,9 +436,3 @@ const PostFooter: React.FC<PostFooterProps> = ({
 };
 
 export default PostFooter;
-
-export const hasRichFormatting = (text: string): boolean => {
-  const richFormatRegex =
-    /(\*[^*]+\*)|(-[^-]+-)|(\~[^\~]+\~)|(@[^:]+:[A-Za-z0-9_\-]+\^)/;
-  return richFormatRegex.test(text);
-};
