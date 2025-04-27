@@ -141,7 +141,6 @@ const FeedPage: React.FC<FeedPageProps> = ({
       await loadMorePosts();
     };
     initialFetch();
-    console.log("Initial");
   }, []);
 
   useEffect(() => {
