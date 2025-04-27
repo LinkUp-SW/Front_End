@@ -1,4 +1,4 @@
-import React, { useRef, useState, memo } from "react";
+import React, { useRef, useState, memo, useEffect } from "react";
 import {
   Popover,
   PopoverContent,
@@ -7,7 +7,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components";
 import { Link } from "react-router-dom";
-import { CommentDBType, CommentObjectType, CommentType } from "@/types";
+import { CommentDBType, CommentType } from "@/types";
 import { GoFileMedia as MediaIcon } from "react-icons/go";
 import CommentWithReplies from "./CommentWithReplies";
 import { MdOutlineEmojiEmotions } from "react-icons/md";
@@ -16,7 +16,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
 import UserTagging from "../components/UserTagging";
 import { FormattedContentText } from "./modals/CreatePostModal";
-import { useEffect } from "react";
 import {
   Carousel,
   CarouselContent,
@@ -28,21 +27,28 @@ import { toast } from "sonner";
 import BlueButton from "./buttons/BlueButton";
 import { extractTaggedUsers } from "./modals/CreatePostModal";
 import Cookies from "js-cookie";
-import { getComments } from "@/endpoints/feed";
-import { setComments } from "@/slices/feed/commentsSlice";
 
 const token = Cookies.get("linkup_auth_token");
 
+// Updated interface to match the structure shown in the screenshot
 interface PostFooterProps {
-  comments: CommentObjectType;
+  comments: {
+    comments: CommentType[];
+    count: number;
+    nextCursor: number | null;
+    hasInitiallyLoaded: boolean;
+    isLoading: boolean;
+  };
   addNewComment: (newComment: CommentDBType) => Promise<void>;
   postId: string;
+  loadMoreComments?: () => Promise<void>;
 }
 
 const PostFooter: React.FC<PostFooterProps> = ({
   comments,
   addNewComment,
   postId,
+  loadMoreComments,
 }) => {
   // Create a ref for the horizontally scrollable container
   const [commentInput, setCommentInput] = useState("");
@@ -50,51 +56,25 @@ const PostFooter: React.FC<PostFooterProps> = ({
   const [taggedUsers, setTaggedUsers] = useState<
     { name: string; id: string }[]
   >([]);
-  console.log("Comment for post:", comments);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const dispatch = useDispatch();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const dispatch = useDispatch();
+  const darkMode = useSelector((state: RootState) => state.theme.theme);
+  const { data } = useSelector((state: RootState) => state.userBio);
+
   useEffect(() => {
     setTaggedUsers(extractTaggedUsers(commentInput));
-    console.log(taggedUsers);
   }, [commentInput]);
 
-  useEffect(() => {
-    console.log("Cursor:", comments.nextCursor);
-  }, []);
-
-  const loadMoreComments = async () => {
-    if (!comments.nextCursor || isLoadingMore || !token) return;
+  // Function to handle loading more comments using the provided callback
+  const handleLoadMoreComments = async () => {
+    if (!loadMoreComments || isLoadingMore || comments.isLoading) return;
 
     setIsLoadingMore(true);
     try {
-      const payload = {
-        cursor: comments.nextCursor,
-        limit: 5,
-        replyLimit: 5,
-      };
-      const additionalComments = await getComments(payload, postId, token);
-      console.log("HERE", additionalComments);
-      if (additionalComments) {
-        // Update the Redux store with the new comments
-        const newComments = Object.values(additionalComments.comments);
-        const updatedComments: CommentType[] = [
-          ...comments.comments,
-          ...(newComments as CommentType[]),
-        ];
-        const allCommentsCopy: CommentObjectType[] = [
-          {
-            comments: [...updatedComments],
-            nextCursor: additionalComments.nextCursor,
-            count: additionalComments.count,
-          },
-        ];
-
-        console.log("NEW", newComments);
-        console.log("AllCopy", allCommentsCopy);
-        dispatch(setComments(allCommentsCopy));
-      }
+      await loadMoreComments();
     } catch (error) {
       console.error("Error loading more comments:", error);
       toast.error("Failed to load more comments. Please try again.");
@@ -103,19 +83,16 @@ const PostFooter: React.FC<PostFooterProps> = ({
     }
   };
 
-  const darkMode = useSelector((state: RootState) => state.theme.theme);
-
-  const { data } = useSelector((state: RootState) => state.userBio);
-  // Add this function to check if text contains any rich formatting
+  // Check if text contains any rich formatting
   const hasRichFormatting = (text: string): boolean => {
     const richFormatRegex =
       /(\*[^*]+\*)|(-[^-]+-)|(~[^~]+~)|(@[^:]+:[A-Za-z0-9_-]+\^)/;
     return richFormatRegex.test(text);
   };
+
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      console.log(selectedImage);
       setSelectedImage(file);
     }
   };
@@ -133,7 +110,6 @@ const PostFooter: React.FC<PostFooterProps> = ({
     }
 
     const reader = new FileReader();
-
     const extractedTaggedUsers = extractTaggedUsers(commentInput);
 
     reader.onload = () => {
@@ -146,8 +122,6 @@ const PostFooter: React.FC<PostFooterProps> = ({
         tagged_users: extractedTaggedUsers.map((user) => user.id),
         parent_id: parentId,
       };
-
-      console.log("New comment created:", newComment);
 
       // Reset input and selected image
       setCommentInput("");
@@ -171,8 +145,6 @@ const PostFooter: React.FC<PostFooterProps> = ({
         parent_id: parentId,
       };
 
-      console.log("New comment created:", newComment);
-
       // Reset input and selected image
       setCommentInput("");
       setSelectedImage(null);
@@ -185,30 +157,17 @@ const PostFooter: React.FC<PostFooterProps> = ({
     }
   };
 
-  const stats = {
-    likes: 15,
-    love: 2,
-    support: 1,
-    celebrate: 1,
-    comments: comments.count,
-    reposts: 5,
-    person: "Hamada",
-  };
-
   const MemoizedEmojiPicker = memo(EmojiPicker);
-  console.log("Footer comments", comments);
-
-  const inputRef = useRef<HTMLTextAreaElement>(null);
 
   const handleEmojiRequest = (emoji: EmojiClickData) => {
     setCommentInput((prevMessage) => prevMessage + emoji.emoji);
   };
 
   return (
-    <section className="flex flex-col w-full gap-4 ">
-      {/* Container for text buttons with relative so our scroll button can be absolute */}
+    <section className="flex flex-col w-full gap-4">
+      {/* Container for text buttons with relative positioning */}
       <Carousel className="w-full">
-        <CarouselContent className="px-2 ">
+        <CarouselContent className="px-2">
           {[
             "I appreciate this!",
             "Congratulations!",
@@ -221,9 +180,9 @@ const PostFooter: React.FC<PostFooterProps> = ({
           ].map((text, index) => (
             <CarouselItem
               key={index}
-              className=" basis-1/2 sm:basis-1/3 lg:basis-1/4 px-6"
+              className="basis-1/2 sm:basis-1/3 lg:basis-1/4 px-6"
             >
-              <div className="">
+              <div>
                 <Button
                   variant="outline"
                   size="sm"
@@ -279,7 +238,6 @@ const PostFooter: React.FC<PostFooterProps> = ({
                     ["ArrowDown", "ArrowUp", "Enter", "Tab"].includes(e.key) &&
                     commentInput.includes("@")
                   ) {
-                    console.log("wo");
                     e.preventDefault(); // Prevent default for navigation keys
                   }
                 }}
@@ -291,7 +249,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
                 text={commentInput}
                 onTextChange={setCommentInput}
                 inputRef={inputRef}
-                className="absolute inset-0 z-20" // Remove pointer-events-none
+                className="absolute inset-0 z-20"
               />
             </div>
 
@@ -328,108 +286,134 @@ const PostFooter: React.FC<PostFooterProps> = ({
                 </button>
               </div>
             )}
-            {
-              <div
-                className={`flex  ${
-                  selectedImage || commentInput.trim().length != 0
-                    ? "justify-between "
-                    : "absolute right-0 "
-                }`}
-              >
-                <div className="relative">
-                  <Popover>
-                    <PopoverTrigger asChild onClick={() => {}}>
-                      <Button
-                        variant="ghost"
-                        className="hover:cursor-pointer rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 dark:hover:text-neutral-200"
-                      >
-                        <MdOutlineEmojiEmotions />
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent
-                      forceMount
-                      className="dark:bg-gray-900 w-fit p-0 dark:border-gray-600"
+            <div
+              className={`flex ${
+                selectedImage || commentInput.trim().length !== 0
+                  ? "justify-between"
+                  : "absolute right-0"
+              }`}
+            >
+              <div className="relative">
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      className="hover:cursor-pointer rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 dark:hover:text-neutral-200"
                     >
-                      <MemoizedEmojiPicker
-                        className="dark:bg-gray-900 w-full p-0"
-                        theme={darkMode === "dark" ? Theme.DARK : Theme.LIGHT}
-                        width={"full"}
-                        onEmojiClick={handleEmojiRequest}
-                      />
-                    </PopoverContent>
-                  </Popover>
-
-                  <input
-                    type="file"
-                    accept="image/*"
-                    ref={fileInputRef}
-                    onChange={handleFileUpload}
-                    className="hidden"
-                  />
-                  <Button
-                    variant="ghost"
-                    onClick={() => fileInputRef.current?.click()}
-                    className="hover:cursor-pointer rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 dark:hover:text-neutral-200"
+                      <MdOutlineEmojiEmotions />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent
+                    forceMount
+                    className="dark:bg-gray-900 w-fit p-0 dark:border-gray-600"
                   >
-                    <MediaIcon />
-                  </Button>
-                </div>
-                <BlueButton
-                  className={`${
-                    selectedImage || commentInput.trim().length != 0
-                      ? ""
-                      : "hidden"
-                  }`}
-                  onClick={() =>
-                    handleCreateComment(
-                      selectedImage,
-                      commentInput,
-                      setSelectedImage,
-                      setCommentInput,
-                      null
-                    )
-                  }
-                  disabled={commentInput.trim().length == 0 && !selectedImage}
+                    <MemoizedEmojiPicker
+                      className="dark:bg-gray-900 w-full p-0"
+                      theme={darkMode === "dark" ? Theme.DARK : Theme.LIGHT}
+                      width={"full"}
+                      onEmojiClick={handleEmojiRequest}
+                    />
+                  </PopoverContent>
+                </Popover>
+
+                <input
+                  type="file"
+                  accept="image/*"
+                  ref={fileInputRef}
+                  onChange={handleFileUpload}
+                  className="hidden"
+                />
+                <Button
+                  variant="ghost"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="hover:cursor-pointer rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 dark:hover:text-neutral-200"
                 >
-                  Comment
-                </BlueButton>
+                  <MediaIcon />
+                </Button>
               </div>
-            }
+              <BlueButton
+                className={`${
+                  selectedImage || commentInput.trim().length !== 0
+                    ? ""
+                    : "hidden"
+                }`}
+                onClick={() =>
+                  handleCreateComment(
+                    selectedImage,
+                    commentInput,
+                    setSelectedImage,
+                    setCommentInput,
+                    null
+                  )
+                }
+                disabled={commentInput.trim().length === 0 && !selectedImage}
+              >
+                Comment
+              </BlueButton>
+            </div>
           </div>
         </div>
       </div>
-      {comments.count != 0 && (
-        <>
-          <div className="flex flex-col relative -left-1 ">
-            {comments.comments.map((data, index: number) => (
+
+      {/* Comments Section - only show if there are comments or they've been loaded */}
+      {comments.hasInitiallyLoaded && (
+        <div className="flex flex-col relative -left-1">
+          {/* Show comments if available */}
+          {comments.comments.length > 0 ? (
+            comments.comments.map((comment, index) => (
               <CommentWithReplies
-                key={index}
+                key={`comment-${comment._id || index}`}
                 postId={postId}
-                comment={data}
-                stats={stats}
-                replies={data.children ? Object.values(data.children) : []}
+                comment={comment}
+                replies={comment.children || []}
                 handleCreateComment={handleCreateComment}
               />
-            ))}
-            {comments.nextCursor !== 0 && comments.nextCursor !== null && (
+            ))
+          ) : (
+            <p className="text-center text-gray-500 dark:text-gray-400 py-4">
+              No comments yet. Be the first to comment!
+            </p>
+          )}
+
+          {/* Loading state */}
+          {comments.isLoading && (
+            <div className="flex justify-center py-4">
+              <div className="animate-pulse flex space-x-2">
+                <div className="h-2 w-2 bg-blue-500 rounded-full"></div>
+                <div className="h-2 w-2 bg-blue-500 rounded-full"></div>
+                <div className="h-2 w-2 bg-blue-500 rounded-full"></div>
+              </div>
+            </div>
+          )}
+
+          {/* Load More Comments Button */}
+          {comments.nextCursor !== null &&
+            comments.nextCursor !== 0 &&
+            !comments.isLoading && (
               <div className="flex justify-center mt-2 mb-4">
                 <button
-                  onClick={loadMoreComments}
-                  disabled={isLoadingMore}
+                  onClick={handleLoadMoreComments}
+                  disabled={
+                    isLoadingMore || comments.isLoading || !loadMoreComments
+                  }
                   className="text-blue-600 dark:text-blue-400 hover:underline font-medium flex items-center gap-2 py-2 px-4 rounded transition-colors hover:bg-gray-100 dark:hover:bg-gray-800"
                 >
-                  {isLoadingMore ? (
-                    <>
-                      <span>Loading...</span>
-                    </>
-                  ) : (
-                    "Load more comments..."
-                  )}
+                  {isLoadingMore ? "Loading..." : "Load more comments..."}
                 </button>
               </div>
             )}
+        </div>
+      )}
+
+      {/* Conditionally render loading state for initial comment load */}
+      {!comments.hasInitiallyLoaded && comments.isLoading && (
+        <div className="flex justify-center py-4">
+          <div className="animate-pulse flex space-x-2">
+            <div className="h-2 w-2 bg-blue-500 rounded-full"></div>
+            <div className="h-2 w-2 bg-blue-500 rounded-full"></div>
+            <div className="h-2 w-2 bg-blue-500 rounded-full"></div>
           </div>
-        </>
+        </div>
       )}
     </section>
   );

@@ -12,7 +12,7 @@ import { useNavigate } from "react-router-dom";
 import {
   ActivityContextType,
   CommentDBType,
-  CommentObjectType,
+  CommentType,
   PostType,
   PostUserType,
 } from "@/types";
@@ -50,53 +50,196 @@ import {
   createReaction,
   deletePost,
   deleteReaction,
+  loadPostComments,
   savePost,
   unsavePost,
 } from "@/endpoints/feed";
 import { toast } from "sonner";
 import TransparentButton from "./buttons/TransparentButton";
 import BlueButton from "./buttons/BlueButton";
-import { setPosts } from "@/slices/feed/postsSlice"; // adjust if needed
-import { setComments } from "@/slices/feed/commentsSlice";
-import { useDispatch } from "react-redux";
+import {
+  setPosts,
+  updatePost,
+  addNewCommentToPost,
+  addCommentsToPost,
+} from "@/slices/feed/postsSlice";
+import { useDispatch, useSelector } from "react-redux";
 import DocumentPreview from "./modals/DocumentPreview";
 import LinkPreview from "./LinkPreview";
+import PostSkeleton from "./PostSkeleton";
 
 interface PostProps {
   postData: PostType;
-  comments: CommentObjectType;
   viewMore: boolean; // used to hide certain elements for responsive design
-  action?: ActionType; // used if the post is an action
-  posts: PostType[];
-  allComments: CommentObjectType[];
+  action?: ActivityContextType; // used if the post is an action
   order: number;
+  className?: string;
 }
 
 const userId = Cookies.get("linkup_user_id");
 const token = Cookies.get("linkup_auth_token");
-// console.log()
 
 const Post: React.FC<PostProps> = ({
   postData,
-  comments,
   viewMore,
   action,
-  posts,
-  allComments,
   order,
+  className,
 }) => {
+  // All hooks at the top level
   const navigate = useNavigate();
-  const { author }: { author: PostUserType } = postData;
-  const { date, media, reacts, taggedUsers } = postData;
-  const [isLandscape, setIsLandscape] = useState<boolean>(false);
-  const [isSaved, setIsSaved] = useState<boolean>(false);
-  const [postMenuOpen, setPostMenuOpen] = useState(false);
+  const dispatch = useDispatch();
+  const posts = useSelector((state: any) => state.posts.list);
+  if (!postData || !postData._id) {
+    return (
+      <div className={className}>
+        <PostSkeleton />
+      </div>
+    );
+  }
 
+  // Extract data needed for early hooks
+
+  // State hooks
+  const [isLandscape, setIsLandscape] = useState<boolean>(false);
+  const [isSaved, setIsSaved] = useState<boolean>(postData?.isSaved || false);
+  const [postMenuOpen, setPostMenuOpen] = useState(false);
   const [commentsOpen, setCommentsOpen] = useState(false);
   const [reactionsOpen, setReactionsOpen] = useState(false);
   const [willDelete, setWillDelete] = useState(false);
-  const dispatch = useDispatch();
-  const [selectedReaction, setSelectedReaction] = useState<string>("None");
+  const [selectedReaction, setSelectedReaction] = useState<string>(
+    postData?.userReaction
+      ? postData.userReaction.charAt(0).toUpperCase() +
+          postData.userReaction.slice(1).toLowerCase()
+      : "None"
+  );
+  const [loadingComments, setLoadingComments] = useState(false);
+
+  // Extract all other data after hooks
+  const { author }: { author: PostUserType } = postData;
+  const { date, reacts, taggedUsers } = postData;
+  const commentsData = {
+    comments: postData.commentsData?.comments || [],
+    count: postData.commentsData?.count || 0,
+    nextCursor: postData.commentsData?.nextCursor || 0,
+    isLoading: postData.commentsData?.isLoading || false,
+    hasInitiallyLoaded: postData.commentsData?.hasInitiallyLoaded || false,
+  };
+
+  // useEffect hooks
+  const { media } = postData;
+  useEffect(() => {
+    if (
+      media &&
+      (media.media_type === "image" || media.media_type === "images")
+    ) {
+      const img = new Image();
+      img.src = media.link[0];
+      img.onload = () => {
+        setIsLandscape(img.width > img.height);
+      };
+    }
+  }, [media]);
+
+  useEffect(() => {
+    if (postData.isSaved) setIsSaved(postData.isSaved);
+  }, [postData.isSaved]);
+
+  useEffect(() => {
+    if (postData.userReaction)
+      setSelectedReaction(
+        postData.userReaction.charAt(0).toUpperCase() +
+          postData.userReaction.slice(1).toLowerCase()
+      );
+  }, [postData.userReaction]);
+
+  // Comment handling functions
+  const handleToggleComments = async () => {
+    if (commentsOpen) return;
+    setCommentsOpen(!commentsOpen);
+
+    // Load comments if they haven't been loaded yet
+    if (
+      !commentsOpen &&
+      !commentsData.hasInitiallyLoaded &&
+      commentsData.count > 0
+    ) {
+      await handleLoadComments();
+    }
+  };
+
+  const handleLoadComments = async () => {
+    if (!token) {
+      toast.error("You must be logged in to view comments.");
+      navigate("/login", { replace: true });
+      return;
+    }
+
+    setLoadingComments(true);
+
+    try {
+      // Update loading state
+      dispatch(
+        updatePost({
+          postId: postData._id,
+          updatedPost: {
+            commentsData: {
+              ...commentsData,
+              isLoading: true,
+            },
+          },
+        })
+      );
+
+      // Fetch comments
+      const response = await loadPostComments(
+        postData._id,
+        token,
+        commentsData.nextCursor || 0
+      );
+
+      // Update post with comments
+      dispatch(
+        addCommentsToPost({
+          postId: postData._id,
+          comments: response.comments,
+          nextCursor: response.nextCursor,
+        })
+      );
+
+      // Update loading state
+      dispatch(
+        updatePost({
+          postId: postData._id,
+          updatedPost: {
+            commentsData: {
+              ...commentsData,
+              isLoading: false,
+              hasInitiallyLoaded: true,
+            },
+          },
+        })
+      );
+    } catch (error) {
+      console.error("Failed to load comments:", error);
+      toast.error("Failed to load comments");
+
+      // Reset loading state
+      dispatch(
+        updatePost({
+          postId: postData._id,
+          updatedPost: {
+            commentsData: {
+              ...commentsData,
+              isLoading: false,
+            },
+          },
+        })
+      );
+    } finally {
+      setLoadingComments(false);
+    }
+  };
 
   const addNewComment = async (newComment: CommentDBType) => {
     if (!token) {
@@ -106,57 +249,42 @@ const Post: React.FC<PostProps> = ({
     }
 
     const loadingToastId = toast.loading("Adding your comment...");
-    console.log("New comment:", newComment);
 
     try {
       // Call the API to create the comment
       const createdComment = await createComment(newComment, token);
-      console.log("Created comment:", createdComment);
 
       if (!newComment.parent_id) {
-        const updatedComments = [...allComments];
-        const oldObject = { ...updatedComments[order] };
-        oldObject.comments = [createdComment.comment, ...oldObject.comments];
-        oldObject.count = oldObject.count + 1;
-        updatedComments[order] = oldObject;
-
-        dispatch(setComments(updatedComments));
+        // Add top-level comment
         dispatch(
-          setPosts(
-            posts.map((post, index) =>
-              index === order
-                ? { ...post, comments: [...post.comments, createdComment._id] }
-                : post
-            )
-          )
+          addNewCommentToPost({
+            postId: postData._id,
+            comment: createdComment.comment,
+          })
         );
-        console.log(reacts, taggedUsers);
       } else {
-        const updatedComments = allComments.map((block) => ({
-          ...block,
-          comments: block.comments.map((comment) => {
-            if (comment._id === newComment.parent_id) {
-              return {
-                ...comment,
-                children: {
-                  ...(comment.children || {}),
-                  [createdComment.comment._id]: createdComment.comment,
-                },
-              };
-            }
-            return comment;
-          }),
-        }));
-
-        dispatch(setComments(updatedComments));
+        // Add reply to existing comment
         dispatch(
-          setPosts(
-            posts.map((post, index) =>
-              index === order
-                ? { ...post, comments: [...post.comments, createdComment._id] }
-                : post
-            )
-          )
+          updatePost({
+            postId: postData._id,
+            updatedPost: {
+              commentsData: {
+                ...commentsData,
+                comments: commentsData.comments.map((comment) => {
+                  if (comment._id === newComment.parent_id) {
+                    return {
+                      ...comment,
+                      children: Array.isArray(comment.children)
+                        ? [...comment.children, createdComment.comment]
+                        : [createdComment.comment],
+                    };
+                  }
+                  return comment;
+                }),
+                count: commentsData.count + 1,
+              },
+            },
+          })
         );
       }
 
@@ -166,39 +294,16 @@ const Post: React.FC<PostProps> = ({
       } else {
         toast.success("Comment added successfully!");
       }
-      toast.dismiss(loadingToastId); // Dismiss the loading toast
     } catch (error) {
       console.error("Error creating comment:", error);
-
-      // Update the toast to error
       toast.error("Failed to add comment. Please try again.");
-      toast.dismiss(loadingToastId); // Dismiss the loading toast
+    } finally {
+      toast.dismiss(loadingToastId);
     }
   };
 
-  const reactionIcons = [
-    { name: "Celebrate", icon: CelebrateIcon },
-    { name: "Like", icon: LikeIcon },
-    { name: "Love", icon: LoveIcon },
-    { name: "Funny", icon: FunnyIcon },
-    { name: "Insightful", icon: InsightfulIcon },
-    { name: "Support", icon: SupportIcon },
-  ];
-
+  // Reaction handling functions
   let timeoutId: NodeJS.Timeout;
-
-  const handleToggleComments = () => {
-    if (!commentsOpen) {
-      setCommentsOpen(true);
-    } else {
-      const commentInput = document.getElementById(
-        "comment-input"
-      ) as HTMLInputElement;
-      if (commentInput) {
-        commentInput.focus();
-      }
-    }
-  };
 
   const handleMouseEnter = () => {
     clearTimeout(timeoutId);
@@ -211,38 +316,99 @@ const Post: React.FC<PostProps> = ({
     }, 300);
   };
 
-  useEffect(() => {
-    if (
-      media &&
-      (media.media_type === "image" || media.media_type === "images")
-    ) {
-      const img = new Image();
-      img.src = media.link[0];
-      img.onload = () => {
-        setIsLandscape(img.width > img.height); // Check if the image is landscape
-      };
-    }
-  }, [media]);
-
   const handleReact = (value: string) => {
-    console.log(value);
-
     setSelectedReaction(value);
 
-    if (value != "None") {
+    if (value !== "None") {
       handleCreateReaction(value);
     } else {
       handleDeleteReaction();
     }
   };
 
-  const handleEditPostButton = () => {};
+  const handleCreateReaction = async (selected_reaction: string) => {
+    if (!token) {
+      toast.error("You must be logged in to add a reaction.");
+      navigate("/login", { replace: true });
+      return;
+    }
+
+    const reaction = {
+      target_type: "Post",
+      reaction: selected_reaction.toLowerCase(),
+    };
+
+    try {
+      const result = await createReaction(reaction, postData._id, token);
+
+      dispatch(
+        updatePost({
+          postId: postData._id,
+          updatedPost: {
+            reacts: [...postData.reacts, result.reaction.reaction._id],
+            reactions: result.topReactions,
+            reactionsCount: result.totalCount,
+            userReaction: selected_reaction.toLowerCase(),
+          },
+        })
+      );
+    } catch (error) {
+      console.error("Error creating reaction:", error);
+      toast.error("Failed to add reaction");
+    }
+  };
+
+  const handleDeleteReaction = async () => {
+    if (!token) {
+      toast.error("You must be logged in to remove a reaction.");
+      navigate("/login", { replace: true });
+      return;
+    }
+
+    try {
+      const result = await deleteReaction(
+        { target_type: "Post" },
+        postData._id,
+        token
+      );
+
+      dispatch(
+        updatePost({
+          postId: postData._id,
+          updatedPost: {
+            reacts: postData.reacts.filter((r) => r !== result.reaction._id),
+            reactions: result.topReactions,
+            reactionsCount: result.totalCount,
+            userReaction: null,
+          },
+        })
+      );
+    } catch (error) {
+      console.error("Error deleting reaction:", error);
+      toast.error("Failed to remove reaction");
+    }
+  };
+
+  // Post action functions
+  const handleEditPostButton = () => {
+    // To be implemented
+  };
+
   const deleteModal = () => {
     setWillDelete(true);
   };
-  const blockPost = () => {};
-  const reportPost = () => {};
-  const unfollow = () => {};
+
+  const blockPost = () => {
+    // To be implemented
+  };
+
+  const reportPost = () => {
+    // To be implemented
+  };
+
+  const unfollow = () => {
+    // To be implemented
+  };
 
   const handleDeletePost = async () => {
     if (!token) {
@@ -254,25 +420,18 @@ const Post: React.FC<PostProps> = ({
     const loadingToastId = toast.loading("Deleting your post...");
 
     try {
-      // Call the API to delete the post
       setWillDelete(false);
       await deletePost(postData._id, token);
 
-      // Show success toast
-      toast.success("Post deleted successfully!");
-      toast.dismiss(loadingToastId); // Dismiss the loading toast
-      dispatch(setPosts(posts.filter((post) => post._id !== postData._id)));
       dispatch(
-        setComments(
-          allComments.filter((_, index) => index !== order) // remove the one at "order"
-        )
+        setPosts(posts.filter((post: PostType) => post._id !== postData._id))
       );
+      toast.success("Post deleted successfully!");
     } catch (error) {
       console.error("Error deleting post:", error);
-
-      // Show error toast
       toast.error("Failed to delete the post. Please try again.");
-      toast.dismiss(loadingToastId); // Dismiss the loading toast
+    } finally {
+      toast.dismiss(loadingToastId);
       setWillDelete(false);
     }
   };
@@ -284,15 +443,26 @@ const Post: React.FC<PostProps> = ({
       return;
     }
 
-    setIsSaved((prevState) => !prevState);
+    const newSavedState = !isSaved;
+    setIsSaved(newSavedState);
 
     try {
       const loading = toast.loading(
         isSaved ? "Unsaving post..." : "Saving post..."
       );
+
       await (isSaved
         ? unsavePost(postData._id, token)
         : savePost(postData._id, token));
+
+      dispatch(
+        updatePost({
+          postId: postData._id,
+          updatedPost: {
+            isSaved: newSavedState,
+          },
+        })
+      );
 
       toast.success(
         isSaved ? (
@@ -317,77 +487,11 @@ const Post: React.FC<PostProps> = ({
       toast.error(
         `Failed to ${isSaved ? "unsave" : "save"} the post. Please try again.`
       );
+      setIsSaved(!newSavedState); // Revert on error
     }
   };
 
-  const handleCreateReaction = async (selected_reaction: string) => {
-    if (!token) {
-      toast.error("You must be logged in to add a reaction.");
-      navigate("/login", { replace: true });
-      return;
-    }
-    const reaction = {
-      target_type: "Post",
-      reaction: selected_reaction.toLowerCase(),
-    };
-    try {
-      const result = await createReaction(reaction, postData._id, token);
-      dispatch(
-        setPosts(
-          posts.map((post, index) =>
-            index === order
-              ? {
-                  ...post,
-                  reacts: [...post.reacts, result.reaction.reaction._id],
-                  reactions: result.topReactions,
-                  reactionsCount: result.totalCount,
-                }
-              : post
-          )
-        )
-      );
-      console.log("Result:", result);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const handleDeleteReaction = async () => {
-    console.log("Deleting reaction", selectedReaction);
-    if (!token) {
-      toast.error("You must be logged in to remove a reaction.");
-      navigate("/login", { replace: true });
-      return;
-    }
-
-    try {
-      const result = await deleteReaction(
-        { target_type: "Post" },
-        postData._id,
-        token
-      );
-      console.log(result);
-      dispatch(
-        setPosts(
-          posts.map((post) =>
-            post.reacts.includes(result.reaction._id)
-              ? {
-                  ...post,
-
-                  reacts: post.reacts.filter((r) => r !== result.reaction._id),
-                  reactions: result.topReactions,
-                  reactionsCount: result.totalCount,
-                }
-              : post
-          )
-        )
-      );
-      console.log("New posts", posts);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
+  // UI helpers
   const menuActions =
     userId === author.username
       ? getPersonalMenuActions(
@@ -414,18 +518,6 @@ const Post: React.FC<PostProps> = ({
     () => handleToggleComments()
   );
 
-  useEffect(() => {
-    if (postData.isSaved) setIsSaved(postData.isSaved);
-  }, [postData]);
-
-  useEffect(() => {
-    if (postData.userReaction)
-      setSelectedReaction(
-        postData.userReaction.charAt(0).toUpperCase() +
-          postData.userReaction.slice(1).toLowerCase()
-      );
-  }, []);
-
   const stats = {
     comments: postData.comments.length,
     reposts: 5,
@@ -434,25 +526,29 @@ const Post: React.FC<PostProps> = ({
 
   const topStats = getReactionIcons(postData.reactions || []);
 
+  // Component rendering
+  const reactionIcons = [
+    { name: "Celebrate", icon: CelebrateIcon },
+    { name: "Like", icon: LikeIcon },
+    { name: "Love", icon: LoveIcon },
+    { name: "Funny", icon: FunnyIcon },
+    { name: "Insightful", icon: InsightfulIcon },
+    { name: "Support", icon: SupportIcon },
+  ];
+
   return (
     <Card className="p-2 bg-white border-0 mb-4 pl-0 dark:bg-gray-900 dark:text-neutral-200">
       <CardContent className="flex flex-col items-start pl-0 w-full">
         {action && (
           <header className="flex pl-4 justify-start items-center w-full border-b gap-2 pb-2 dark:border-neutral-700">
-            <img
-              src={action.profileImage}
-              alt={action.name}
-              className="w-7 h-7 rounded-full"
-            />
-
             <span className="text-gray-500 text-xs dark:text-neutral-400">
               <Link
                 to="#"
                 className="text-xs font-medium text-black dark:text-neutral-200 hover:cursor-pointer hover:underline hover:text-blue-600 dark:hover:text-blue-400"
               >
-                {action.name}
+                {action.actorName}
               </Link>{" "}
-              {POST_ACTIONS[action?.action || "error"]}
+              {POST_ACTIONS[action?.type || "error"]}
             </span>
           </header>
         )}
@@ -474,7 +570,7 @@ const Post: React.FC<PostProps> = ({
 
         {/* Post Image(s) */}
         {((media && media.media_type === "image") ||
-          media.media_type === "images") && (
+          media?.media_type === "images") && (
           <PostImages images={media.link || []} isLandscape={isLandscape} />
         )}
 
@@ -516,7 +612,7 @@ const Post: React.FC<PostProps> = ({
             })()}
           </div>
         )}
-        {media && media.media_type == "link" && (
+        {media && media.media_type === "link" && (
           <div className="w-full pl-4 pt-4">
             <LinkPreview url={media.link[0]} className="w-full" />
           </div>
@@ -560,11 +656,7 @@ const Post: React.FC<PostProps> = ({
                     {stat}
                   </span>
                 ))}
-                {
-                  /* {stats.person
-                  ? stats.person + " and " + (totalStats - 1) + " others"
-                  : totalStats} */ stats.total > 0 && stats.total
-                }
+                {stats.total > 0 && stats.total}
               </button>
             </DialogTrigger>
             <DialogContent className="dark:bg-gray-900 min-w-[20rem] sm:min-w-[35rem] w-auto dark:border-gray-700">
@@ -577,7 +669,7 @@ const Post: React.FC<PostProps> = ({
             </DialogContent>
           </Dialog>
           <div className="flex text-gray-500 dark:text-neutral-400 gap-2 text-sm items-center ">
-            {stats.comments != 0 && (
+            {stats.comments !== 0 && (
               <p
                 onClick={() => {
                   setCommentsOpen(true);
@@ -587,7 +679,7 @@ const Post: React.FC<PostProps> = ({
                 {stats.comments} comments
               </p>
             )}
-            {stats.reposts != 0 && stats.comments != 0 && (
+            {stats.reposts !== 0 && stats.comments !== 0 && (
               <p className="text-xs text-gray-500 dark:text-neutral-400 font-bold">
                 {" "}
                 ·
@@ -650,7 +742,7 @@ const Post: React.FC<PostProps> = ({
                               : ""
                           } items-center hover:cursor-pointer transition-all`}
                         >
-                          {selectedReaction != "None" ? (
+                          {selectedReaction !== "None" ? (
                             <img
                               src={
                                 reactionIcons.find(
@@ -664,7 +756,7 @@ const Post: React.FC<PostProps> = ({
                           ) : (
                             button.icon
                           )}
-                          {selectedReaction == "None"
+                          {selectedReaction === "None"
                             ? viewMore
                               ? "Like"
                               : ""
@@ -685,7 +777,7 @@ const Post: React.FC<PostProps> = ({
                             {viewMore && button.name}
                           </Button>
                         </PopoverTrigger>
-                        <PopoverContent className="relative  dark:bg-gray-900 bg-white border-neutral-200 dark:border-gray-700 p-0 pt-1">
+                        <PopoverContent className="relative dark:bg-gray-900 bg-white border-neutral-200 dark:border-gray-700 p-0 pt-1">
                           <div className="flex flex-col w-full p-2 gap-4">
                             {REPOST_MENU.map((item, index) => (
                               <Button
@@ -695,7 +787,7 @@ const Post: React.FC<PostProps> = ({
                                 onClick={button.callback}
                                 className={`flex w-fit h-fit dark:hover:bg-zinc-800 dark:hover:text-neutral-200 items-center gap-2 hover:cursor-pointer transition-all`}
                               >
-                                <div className="flex justify-start w-full  text-gray-600 dark:text-neutral-200">
+                                <div className="flex justify-start w-full text-gray-600 dark:text-neutral-200">
                                   <div className="p-4 pl-0 ">{item.icon}</div>
                                   <div className="flex flex-col items-start justify-center">
                                     <span className="font-medium">
@@ -754,7 +846,6 @@ const Post: React.FC<PostProps> = ({
                         }}
                         onClick={() => {
                           handleReact(reaction.alt);
-
                           setReactionsOpen(false);
                         }}
                       >
@@ -812,11 +903,22 @@ const Post: React.FC<PostProps> = ({
       </CardContent>
       <CardFooter>
         {commentsOpen && (
-          <PostFooter
-            postId={postData._id}
-            addNewComment={addNewComment}
-            comments={comments}
-          />
+          <>
+            {commentsData.isLoading || loadingComments ? (
+              <div className="w-full space-y-4">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <PostSkeleton key={i} />
+                ))}
+              </div>
+            ) : (
+              <PostFooter
+                postId={postData._id}
+                addNewComment={addNewComment}
+                comments={commentsData}
+                loadMoreComments={handleLoadComments}
+              />
+            )}
+          </>
         )}
       </CardFooter>
     </Card>
