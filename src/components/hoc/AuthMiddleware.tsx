@@ -44,14 +44,15 @@ const AuthMiddleware = ({ children }: AuthMiddlewareProps) => {
 
         if (userType === "admin") {
           if (
-            location.pathname !== "/login" ||
-            !location.pathname.startsWith("/signup") ||
+            location.pathname === "/login" ||
+            location.pathname.startsWith("/signup") ||
             !location.pathname.startsWith("/admin")
           ) {
             navigate("/admin/dashboard", {
               replace: true,
             });
           }
+        
         } else {
           if (location.pathname.startsWith("/admin")) {
             navigate("/feed", {
