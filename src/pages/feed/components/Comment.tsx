@@ -15,6 +15,11 @@ import LoveIcon from "@/assets/Love.svg";
 import InsightfulIcon from "@/assets/Insightful.svg";
 import SupportIcon from "@/assets/Support.svg";
 import TruncatedText from "@/components/truncate_text/TruncatedText";
+import {
+  removeComment,
+  removeReply,
+  updateCommentReaction,
+} from "@/slices/feed/postsSlice";
 
 import {
   getCommentActions,
@@ -88,6 +93,9 @@ const Comment: React.FC<CommentProps> = ({
   const [selectedReaction, setSelectedReaction] = useState("None"); // Like, Love, etc.
   const [reactionsOpen, setReactionsOpen] = useState(false); // for Popover open state
   const [viewMore, setViewMore] = useState(false); // if you want to toggle text next to icons
+  const [topStats, setTopStats] = useState(
+    getReactionIcons(comment.topReactions || comment.reactions || [])
+  );
 
   const handleMouseEnter = () => {
     setReactionsOpen(true);
@@ -120,7 +128,7 @@ const Comment: React.FC<CommentProps> = ({
 
   let countChildren = 0;
   if (comment.children) {
-    countChildren = Object.keys(comment.children).length;
+    countChildren = comment.childrenCount || 0;
   }
 
   const reactionIcons = [
@@ -133,8 +141,6 @@ const Comment: React.FC<CommentProps> = ({
   ];
 
   const navigate = useNavigate();
-
-  const topStats = getReactionIcons(comment.reactions || []);
 
   const copyLink = () => {};
   const editComment = () => {};
@@ -171,8 +177,17 @@ const Comment: React.FC<CommentProps> = ({
     try {
       // Show loading indicator or toast if needed
       const result = await createReaction(reaction, postId, token);
-
-      // Update the comments state with the reaction result
+      console.log("Adding reaction", result);
+      setTopStats(getReactionIcons(result.topReactions || []));
+      dispatch(
+        updateCommentReaction({
+          postId: postId,
+          commentId: comment._id,
+          reactions: result.topReactions,
+          reactionsCount: result.totalCount,
+          userReaction: selected_reaction.toLowerCase(),
+        })
+      );
 
       // Update Redux state with the new comments
     } catch (error) {
@@ -195,6 +210,7 @@ const Comment: React.FC<CommentProps> = ({
         postId,
         token
       );
+      setTopStats(getReactionIcons(result.topReactions || []));
 
       // Update the comments state with the reaction result
 
@@ -212,7 +228,7 @@ const Comment: React.FC<CommentProps> = ({
       return;
     }
 
-    const loadingToastId = toast.loading("Deleting your post...");
+    const loadingToastId = toast.loading("Deleting your comment...");
 
     try {
       // Call the API to delete the post
@@ -225,11 +241,24 @@ const Comment: React.FC<CommentProps> = ({
 
       console.log("Comment:", comment);
       if (comment.parentId) {
+        console.log(
+          `Removing reply ${comment._id} from parent ${comment.parentId}`
+        );
+        dispatch(
+          removeReply({
+            postId,
+            commentId: comment.parentId, // Parent comment ID
+            replyId: comment._id, // This reply's ID
+          })
+        );
+      } else {
+        dispatch(removeComment({ postId: postId, commentId: comment._id }));
       }
 
       // Show success toast
       toast.success("Comment deleted successfully!");
       toast.dismiss(loadingToastId); // Dismiss the loading toast
+      // Update the state to remove the deleted comment
       setDeleteModal(false);
     } catch (error) {
       console.error("Error deleting Comment:", error);

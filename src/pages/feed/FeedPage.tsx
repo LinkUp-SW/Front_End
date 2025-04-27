@@ -39,14 +39,6 @@ const FeedPage: React.FC<FeedPageProps> = ({
   const [initialLoading, setInitialLoading] = useState(true);
   const observerRef = useRef<HTMLDivElement | null>(null);
 
-  const temporary_feed = [
-    "6806b5a2bfb3de42b857be4c",
-
-    "680ba14b801a855626ece75c",
-    "680ba0a9801a855626ece74d",
-    "680ba090801a855626ece73e",
-  ];
-
   const user_token = Cookies.get("linkup_auth_token");
 
   const loadMorePosts = async () => {

@@ -67,6 +67,7 @@ import { useDispatch, useSelector } from "react-redux";
 import DocumentPreview from "./modals/DocumentPreview";
 import LinkPreview from "./LinkPreview";
 import PostSkeleton from "./PostSkeleton";
+import CommentSkeleton from "./CommentSkeleton";
 
 interface PostProps {
   postData: PostType;
@@ -107,6 +108,9 @@ const Post: React.FC<PostProps> = ({
   const [commentsOpen, setCommentsOpen] = useState(false);
   const [reactionsOpen, setReactionsOpen] = useState(false);
   const [willDelete, setWillDelete] = useState(false);
+  const [topStats, setTopStats] = useState(
+    getReactionIcons(postData.topReactions || postData.reactions || [])
+  );
   const [selectedReaction, setSelectedReaction] = useState<string>(
     postData?.userReaction
       ? postData.userReaction.charAt(0).toUpperCase() +
@@ -155,15 +159,21 @@ const Post: React.FC<PostProps> = ({
 
   // Comment handling functions
   const handleToggleComments = async () => {
-    if (commentsOpen) return;
-    setCommentsOpen(!commentsOpen);
+    if (!token) {
+      toast.error("You must be logged in to view comments.");
+      navigate("/login", { replace: true });
+      return;
+    }
+
+    if (commentsOpen) {
+      setCommentsOpen(false);
+      return;
+    }
+
+    setCommentsOpen(true);
 
     // Load comments if they haven't been loaded yet
-    if (
-      !commentsOpen &&
-      !commentsData.hasInitiallyLoaded &&
-      commentsData.count > 0
-    ) {
+    if (!commentsData.hasInitiallyLoaded) {
       await handleLoadComments();
     }
   };
@@ -198,24 +208,37 @@ const Post: React.FC<PostProps> = ({
         commentsData.nextCursor || 0
       );
 
-      // Update post with comments
+      console.log("Comments response:", response);
+
+      // Process response properly based on structure
+      const newComments = Array.isArray(response.comments)
+        ? response.comments
+        : Object.values(response.comments || {});
+
+      // Update post with comments - adding to existing comments
       dispatch(
         addCommentsToPost({
           postId: postData._id,
-          comments: response.comments,
-          nextCursor: response.nextCursor,
+          comments: newComments as CommentType[],
+          nextCursor: response.nextCursor || 0,
         })
       );
 
-      // Update loading state
+      // Update loading state - APPEND the comments instead of replacing
+      const updatedComments = commentsData.hasInitiallyLoaded
+        ? [...commentsData.comments, ...newComments] // Append if already loaded
+        : newComments; // Replace if first load
+
       dispatch(
         updatePost({
           postId: postData._id,
           updatedPost: {
             commentsData: {
-              ...commentsData,
-              isLoading: false,
+              comments: updatedComments as CommentType[],
+              count: response.count || 0,
+              nextCursor: response.nextCursor || 0,
               hasInitiallyLoaded: true,
+              isLoading: false,
             },
           },
         })
@@ -340,12 +363,12 @@ const Post: React.FC<PostProps> = ({
 
     try {
       const result = await createReaction(reaction, postData._id, token);
+      setTopStats(getReactionIcons(result.topReactions || []));
 
       dispatch(
         updatePost({
           postId: postData._id,
           updatedPost: {
-            reacts: [...postData.reacts, result.reaction.reaction._id],
             reactions: result.topReactions,
             reactionsCount: result.totalCount,
             userReaction: selected_reaction.toLowerCase(),
@@ -372,11 +395,12 @@ const Post: React.FC<PostProps> = ({
         token
       );
 
+      setTopStats(getReactionIcons(result.topReactions || []));
+
       dispatch(
         updatePost({
           postId: postData._id,
           updatedPost: {
-            reacts: postData.reacts.filter((r) => r !== result.reaction._id),
             reactions: result.topReactions,
             reactionsCount: result.totalCount,
             userReaction: null,
@@ -519,12 +543,10 @@ const Post: React.FC<PostProps> = ({
   );
 
   const stats = {
-    comments: postData.comments.length,
+    comments: postData.commentsCount,
     reposts: 5,
     total: postData.reactionsCount,
   };
-
-  const topStats = getReactionIcons(postData.reactions || []);
 
   // Component rendering
   const reactionIcons = [
@@ -901,22 +923,29 @@ const Post: React.FC<PostProps> = ({
           </Popover>
         </footer>
       </CardContent>
-      <CardFooter>
+
+      <CardFooter className="flex flex-col w-full">
         {commentsOpen && (
           <>
-            {commentsData.isLoading || loadingComments ? (
-              <div className="w-full space-y-4">
-                {Array.from({ length: 3 }).map((_, i) => (
-                  <PostSkeleton key={i} />
-                ))}
+            {/* Always show PostFooter with comment input */}
+            <PostFooter
+              postId={postData._id}
+              addNewComment={addNewComment}
+              comments={{
+                ...commentsData,
+                // Only show existing comments if they've been loaded
+                comments: commentsData.hasInitiallyLoaded
+                  ? commentsData.comments
+                  : [],
+              }}
+              loadMoreComments={handleLoadComments}
+            />
+
+            {/* Show skeletons below the existing content when loading more */}
+            {(commentsData.isLoading || loadingComments) && (
+              <div className="w-full mt-3">
+                <CommentSkeleton />
               </div>
-            ) : (
-              <PostFooter
-                postId={postData._id}
-                addNewComment={addNewComment}
-                comments={commentsData}
-                loadMoreComments={handleLoadComments}
-              />
             )}
           </>
         )}
