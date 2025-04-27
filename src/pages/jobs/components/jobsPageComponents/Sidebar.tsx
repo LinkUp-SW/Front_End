@@ -100,6 +100,7 @@ const Sidebar: React.FC = () => {
               userCompanies.map(company => (
                 <div 
                   key={company._id} 
+                  id={`company-page-item-${company._id}`}
                   className="flex items-center justify-between py-3 border-b border-gray-100 dark:border-gray-700 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                   onClick={() => handleCompanyClick(company._id)}
                 >

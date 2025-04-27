@@ -8,6 +8,7 @@ interface PageHeaderProps {
       <div className="w-full border-b border-gray-400 dark:border-gray-700 bg-white dark:bg-gray-900 fixed top-14 left-0 z-13">
         <div className="max-w-6xl mx-auto px-6">
           <button 
+            id="back-button"
             onClick={onBack}
             className="flex items-center space-x-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-colors duration-200 my-4 group"
           >

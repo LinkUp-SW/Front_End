@@ -142,6 +142,7 @@ const DeactivatePageDialog: React.FC<DeactivatePageDialogProps> = ({
           
           <div className="flex justify-end space-x-3 border-t border-gray-200 dark:border-gray-700 pt-4">
             <button
+              id= "cancel-deactivate-page"
               type="button"
               onClick={() => onOpenChange(false)}
               className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded"
@@ -150,6 +151,7 @@ const DeactivatePageDialog: React.FC<DeactivatePageDialogProps> = ({
               Cancel
             </button>
             <button
+              id= "cancel-deactivate-page"
               type="button"
               onClick={handleDeactivate}
               disabled={isSubmitting || !confirmChecked}

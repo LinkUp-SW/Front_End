@@ -320,6 +320,7 @@ export const PageForm: React.FC<PageFormProps> = ({ type, onSubmit, setPreviewDa
 
       <div className="flex justify-center mt-6">
         <button 
+          id="create-company-education-button"
           type="submit"
           disabled={isSubmitting}
           className={`px-6 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors duration-300 ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}

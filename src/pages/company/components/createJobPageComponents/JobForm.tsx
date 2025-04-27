@@ -353,6 +353,7 @@ const JobForm: React.FC = () => {
       <div>
         {currentStep > 1 && (
           <button
+           id="job-form-back-button"
             onClick={handleBack}
             className="w-full sm:w-auto px-4 sm:px-6 py-2 border border-gray-300 dark:border-gray-600 rounded text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
             disabled={isLoading}
@@ -363,6 +364,7 @@ const JobForm: React.FC = () => {
       </div>
       
       <button
+       id={currentStep < totalSteps ? "job-form-next-button" : "job-form-submit-button"}
         onClick={handleNext}
         className={`w-full sm:w-auto px-4 sm:px-6 py-2 ${isLoading ? 'bg-blue-400 dark:bg-blue-600' : 'bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600'} text-white rounded`}
         disabled={isLoading}

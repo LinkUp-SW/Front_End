@@ -652,6 +652,7 @@ const EditPageDialog = ({ open, onOpenChange, companyData, onSubmit }: EditPageD
             <div className="bg-white dark:bg-gray-800 py-4 border-t border-gray-200 dark:border-gray-700 px-6">
               <div className="flex justify-end">
                 <button
+                  id="cancel-changes-button"
                   type="button"
                   onClick={() => {
                     onOpenChange(false);
@@ -663,6 +664,7 @@ const EditPageDialog = ({ open, onOpenChange, companyData, onSubmit }: EditPageD
                   Cancel
                 </button>
                 <button
+                  id="save-changes-button"
                   type="submit"
                   form="editPageForm"
                   className={`px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 dark:hover:bg-blue-800 ${

@@ -370,6 +370,7 @@ const ManageCompanyPage = () => {
                 <li>
                   <a 
                     href="#" 
+                    id="nav-link-page-posts"
                     className={`block px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-700 
                       ${activeTab === 'page-posts' 
                         ? 'text-green-700 dark:text-green-400 font-medium bg-gray-100 dark:bg-gray-700 border-l-4 border-green-700 dark:border-green-400' 
@@ -382,6 +383,7 @@ const ManageCompanyPage = () => {
                 <li>
                   <a 
                     href="#" 
+                    id="nav-link-analytics"
                     className={`block px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-700 
                       ${activeTab === 'analytics' 
                         ? 'text-green-700 dark:text-green-400 font-medium bg-gray-100 dark:bg-gray-700 border-l-4 border-green-700 dark:border-green-400' 
@@ -394,6 +396,7 @@ const ManageCompanyPage = () => {
                 <li>
                   <a 
                     href="#" 
+                    id="nav-link-edit-page"
                     className={`block px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-700 
                       ${activeTab === 'edit-page' 
                         ? 'text-green-700 dark:text-green-400 font-medium bg-gray-100 dark:bg-gray-700 border-l-4 border-green-700 dark:border-green-400' 
@@ -406,6 +409,7 @@ const ManageCompanyPage = () => {
                 <li>
                   <a 
                     href="#" 
+                    id="nav-link-jobs"
                     className={`block px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-700 
                       ${activeTab === 'jobs' 
                         ? 'text-green-700 dark:text-green-400 font-medium bg-gray-100 dark:bg-gray-700 border-l-4 border-green-700 dark:border-green-400' 
@@ -421,6 +425,7 @@ const ManageCompanyPage = () => {
                 <li>
                   <a 
                     href="#" 
+                    id="nav-link-settings"
                     className={`block px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-700 
                       ${activeTab === 'settings' 
                         ? 'text-green-700 dark:text-green-400 font-medium bg-gray-100 dark:bg-gray-700 border-l-4 border-green-700 dark:border-green-400' 

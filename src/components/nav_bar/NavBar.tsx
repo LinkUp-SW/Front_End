@@ -134,6 +134,7 @@ const NavBar = () => {
                   Business Option
                 </h3>
                 <button 
+                  id="create-company-button"
                   onClick={handleCreateCompany}
                   className="w-full text-left px-3 py-3 hover:bg-blue-50 dark:hover:bg-gray-700 rounded-md transition-colors duration-200 flex items-center gap-3 group"
                 >

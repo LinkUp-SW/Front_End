@@ -13,16 +13,19 @@ const SettingsComponent: React.FC<SettingsComponentProps> = ({ companyName = "Yo
   // Array of settings items for easier maintenance and consistent styling
   const settingsItems = [
     {
+      id: "manage-admins",
       title: "Manage admins",
       description: "Control who manages your page",
       onClick: () => console.log("Manage amin members clicked")
     },
     {
+      id: "manage-restricted-members",
       title: "Manage restricted members",
       description: "See all the restricted members",
       onClick: () => console.log("Manage restricted members clicked")
     },
     {
+      id: "deactivate-page",
       title: "Deactivate page",
       description: "Take your page down",
       onClick: () => setDeactivateDialogOpen(true)
@@ -39,6 +42,7 @@ const SettingsComponent: React.FC<SettingsComponentProps> = ({ companyName = "Yo
           {settingsItems.map((item, index) => (
             <div 
               key={index}
+              id={item.id}
               onClick={item.onClick}
               className="border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors duration-200"
             >
