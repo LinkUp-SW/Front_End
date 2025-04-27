@@ -13,6 +13,7 @@ import moment from "moment";
 import TransparentButton from "@/pages/feed/components/buttons/TransparentButton";
 import PostPreview from "@/pages/feed/components/PostPreview";
 import { getMenuActions } from "@/pages/feed/components/Menus";
+import BlueButton from "@/pages/feed/components/buttons/BlueButton";
 
 const token = Cookies.get("linkup_auth_token");
 const userId = Cookies.get("linkup_user_id");
@@ -105,28 +106,22 @@ const Activity: React.FC = () => {
 
         {/* Tabs */}
         <div className="flex gap-4 mb-6">
-          <Button
-            variant={activeTab === "post" ? "secondary" : "ghost"}
-            className={`rounded-full ${
-              activeTab === "post"
-                ? "bg-blue-100 text-blue-600 hover:bg-blue-200"
-                : "text-gray-600 hover:text-blue-600"
-            }`}
-            onClick={() => setActiveTab("post")}
-          >
-            Posts
-          </Button>
-          <Button
-            variant={activeTab === "comment" ? "secondary" : "ghost"}
-            className={`rounded-full ${
-              activeTab === "comment"
-                ? "bg-blue-100 text-blue-600 hover:bg-blue-200"
-                : "text-gray-600 hover:text-blue-600"
-            }`}
-            onClick={() => setActiveTab("comment")}
-          >
-            Comments
-          </Button>
+          {activeTab === "post" ? (
+            <BlueButton onClick={() => setActiveTab("post")}>Posts</BlueButton>
+          ) : (
+            <TransparentButton onClick={() => setActiveTab("post")}>
+              Posts
+            </TransparentButton>
+          )}
+          {activeTab === "comment" ? (
+            <BlueButton onClick={() => setActiveTab("comment")}>
+              Comments
+            </BlueButton>
+          ) : (
+            <TransparentButton onClick={() => setActiveTab("comment")}>
+              Comments
+            </TransparentButton>
+          )}
         </div>
 
         {/* Scrollable Posts Container */}
@@ -220,7 +215,7 @@ const Activity: React.FC = () => {
         <div className="flex justify-center mt-8">
           <Link
             to={`/user-profile/${userId}/posts`}
-            className="text-blue-600 hover:underline flex items-center"
+            className="text-blue-600 dark:text-blue-300 hover:underline flex items-center"
           >
             Show all posts →
           </Link>
