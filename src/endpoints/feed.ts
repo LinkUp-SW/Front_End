@@ -174,12 +174,17 @@ export const fetchSinglePost = async (
     console.log("FetchSinglePost response:", response.data);
 
     // Extract comments from the response
-    const commentsArray = Object.values(response.data.comments?.comments) || [];
+    const commentsArray = Object.values(
+      response.data.comments?.comments || {}
+    ).map((comment: any) => ({
+      ...comment,
+      children: Object.values(comment.children || {}),
+    }));
     const commentsCount = response.data.comments?.count || 0;
     const commentsCursor = response.data.comments?.nextCursor || null;
 
     // Return post with embedded comments
-    console.log({
+    console.log("Here:", {
       ...response.data.post,
       commentsData: {
         comments: commentsArray, // Include comments from API response
@@ -240,9 +245,10 @@ export const loadPostComments = async (
       replyLimit: 3, // Get a few replies for each comment
     },
   });
+  console.log("API response:", response);
 
   return {
-    comments: response.data.comments,
+    comments: Object.values(response.data.comments),
     count: response.data.count,
     nextCursor: response.data.nextCursor,
   };

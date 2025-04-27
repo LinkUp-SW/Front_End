@@ -66,6 +66,8 @@ export interface PostType {
     isLoading?: boolean;
     hasInitiallyLoaded?: boolean;
   };
+  commentsCount?: number;
+  topReactions?: { reaction: string }[];
   commentsDisabled: string;
   publicPost: boolean;
   taggedUsers: string[];
@@ -115,6 +117,8 @@ export interface CommentType {
   tagged_users: string[];
   is_edited: boolean;
   userReaction?: string | null;
+  childrenCount?: number;
+  topReactions?: { reaction: string }[];
   date: number;
   reactions: {
     reaction: string;
