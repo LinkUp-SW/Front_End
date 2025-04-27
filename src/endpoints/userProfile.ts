@@ -92,12 +92,7 @@ export const getUserPosts = async (
     cursor: number;
     limit: number;
   }
-): Promise<{
-  message: string;
-  is_me: string;
-  posts: PostType[];
-  nextCursor: number;
-}> => {
+): Promise<{ posts: PostType[]; nextCursor: number | null }> => {
   const response = await axiosInstance.get(
     `/api/v1/post/posts/user/${userId}`,
     {
@@ -107,7 +102,33 @@ export const getUserPosts = async (
       params: postPayload,
     }
   );
-  return response.data;
+  console.log("GetUserPosts:", response.data);
+  console.log("Returned:", {
+    posts: response.data.posts.map((post: any) => ({
+      ...post,
+      commentsData: {
+        comments: [], // Empty initially
+        count: post.commentCount || 0,
+        nextCursor: 0,
+        isLoading: false,
+        hasInitiallyLoaded: false,
+      },
+    })),
+    nextCursor: response.data.nextCursor,
+  });
+  return {
+    posts: response.data.posts.map((post: any) => ({
+      ...post,
+      commentsData: {
+        comments: [], // Empty initially
+        count: post.commentCount || 0,
+        nextCursor: 0,
+        isLoading: false,
+        hasInitiallyLoaded: false,
+      },
+    })),
+    nextCursor: response.data.nextCursor,
+  };
 };
 
 export const addUserSkills = async (
