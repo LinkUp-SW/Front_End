@@ -463,14 +463,14 @@ const Comment: React.FC<CommentProps> = ({
           </div>
         </div>
       </header>
-      <p className="p-1 pl-11 text-xs md:text-sm whitespace-pre-wrap">
+      <div className="p-1 pl-11 text-xs md:text-sm whitespace-pre-wrap">
         <TruncatedText
           content={content}
           lineCount={3}
           id={`comment-${comment._id}`}
           className="  ml-0 relative -left-5"
         />
-      </p>
+      </div>
       <footer className="flex pl-10 justify-start items-center gap-0.5 ">
         {/* <div className="flex justify-start w-full items-center pt-4 gap-0"> */}
         <Popover open={reactionsOpen} onOpenChange={setReactionsOpen}>
