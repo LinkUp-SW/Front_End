@@ -134,6 +134,69 @@ const postsSlice = createSlice({
         );
       }
     },
+    addRepliesToComment: (
+      state,
+      action: PayloadAction<{
+        postId: string;
+        parentCommentId: string;
+        replies: CommentType[];
+        nextCursor: number | null;
+      }>
+    ) => {
+      const { postId, parentCommentId, replies, nextCursor } = action.payload;
+      const postIndex = state.list.findIndex((post) => post._id === postId);
+
+      if (postIndex === -1 || !state.list[postIndex].commentsData) {
+        return;
+      }
+
+      // Function to find the parent comment and add replies to it
+      const updateCommentsWithNewReplies = (
+        comments: CommentType[]
+      ): CommentType[] => {
+        return comments.map((comment) => {
+          if (comment._id === parentCommentId) {
+            // Found the parent comment, add the new replies
+            const existingChildren = comment.children || [];
+            const existingChildrenArray = Array.isArray(existingChildren)
+              ? existingChildren
+              : Object.values(existingChildren);
+
+            // Create a new array with existing and new replies
+            // Filter out any duplicates by ID
+            const existingIds = new Set(
+              existingChildrenArray.map((r: any) => r._id)
+            );
+            const uniqueNewReplies = replies.filter(
+              (r) => !existingIds.has(r._id)
+            );
+
+            return {
+              ...comment,
+              children: [...existingChildrenArray, ...uniqueNewReplies],
+              replyNextCursor: nextCursor,
+            } as CommentType;
+          }
+
+          // If this comment has children, check them recursively
+          if (comment.children && comment.children.length > 0) {
+            return {
+              ...comment,
+              children: updateCommentsWithNewReplies(comment.children),
+            };
+          }
+
+          // Not the parent comment, return unchanged
+          return comment;
+        });
+      };
+
+      // Update the comments array
+      state.list[postIndex].commentsData.comments =
+        updateCommentsWithNewReplies(
+          state.list[postIndex].commentsData.comments
+        );
+    },
     removeReply: (
       state,
       action: PayloadAction<{
@@ -336,6 +399,8 @@ export const {
   addCommentsToPost,
   addNewCommentToPost,
   addReplyToComment,
+  addRepliesToComment, // Add this export
+
   setNextCursor,
   setHasMore,
   setLoading,
