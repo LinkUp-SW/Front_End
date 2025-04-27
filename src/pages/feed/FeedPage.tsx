@@ -47,8 +47,6 @@ const FeedPage: React.FC<FeedPageProps> = ({
     "680ba14b801a855626ece75c",
     "680ba0a9801a855626ece74d",
     "680ba090801a855626ece73e",
-    "680b70ca2ea9ffaf2afa7c12",
-    "680ace66b57681e1e91b8d39",
   ];
 
   const user_token = Cookies.get("linkup_auth_token");
