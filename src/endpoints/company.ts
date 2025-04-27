@@ -123,3 +123,53 @@ export const searchCompanies = async (query: string): Promise<{ companies: Compa
   const response = await axiosInstance.get(url, getAuthHeader(token));
   return response.data;
 };
+
+// Admin Management API Functions
+export interface Admin {
+  _id: string;
+  user_id: string;
+  first_name: string;
+  last_name: string;
+  headline?: string;
+  profile_picture?: string;
+}
+
+export interface User {
+  _id: string;
+  first_name: string;
+  last_name: string;
+  headline?: string;
+  profile_photo?: string;
+}
+
+export const getCompanyAdmins = async (companyId: string): Promise<{ admins: Admin[] }> => {
+  const token = getAuthToken();
+  const url = `/api/v1/company/get-admins/${companyId}`;
+  
+  const response = await axiosInstance.get(url, getAuthHeader(token));
+  return response.data;
+};
+
+export const searchUsers = async (query: string): Promise<{ results: User[] }> => {
+  const token = getAuthToken();
+  const url = `/api/v1/search/users/${query}`;
+  
+  const response = await axiosInstance.get(url, getAuthHeader(token));
+  return response.data;
+};
+
+export const makeUserAdmin = async (companyId: string, userId: string): Promise<{ success: boolean; message: string }> => {
+  const token = getAuthToken();
+  const url = `/api/v1/company/make-admin/${companyId}/${userId}`;
+  
+  const response = await axiosInstance.post(url, {}, getAuthHeader(token));
+  return response.data;
+};
+
+export const removeAdmin = async (companyId: string, adminId: string): Promise<{ success: boolean; message: string }> => {
+  const token = getAuthToken();
+  const url = `/api/v1/company/remove-admin/${companyId}/${adminId}`;
+  
+  const response = await axiosInstance.delete(url, getAuthHeader(token));
+  return response.data;
+};

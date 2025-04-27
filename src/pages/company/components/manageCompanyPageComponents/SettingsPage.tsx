@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { MdOutlineKeyboardArrowRight } from 'react-icons/md';
 import DeactivatePageDialog from './DeactivateDialog';
+import AdminManagement from '../manageCompanyPageComponents/AdminsManagement';
 
 interface SettingsComponentProps {
   companyName?: string;
@@ -9,14 +10,14 @@ interface SettingsComponentProps {
 
 const SettingsComponent: React.FC<SettingsComponentProps> = ({ companyName = "Your Company", companyId = "" }) => {
   const [deactivateDialogOpen, setDeactivateDialogOpen] = useState(false);
+  const [currentView, setCurrentView] = useState<'settings' | 'admins'>('settings');
 
-  // Array of settings items for easier maintenance and consistent styling
   const settingsItems = [
     {
       id: "manage-admins",
       title: "Manage admins",
       description: "Control who manages your page",
-      onClick: () => console.log("Manage amin members clicked")
+      onClick: () => setCurrentView('admins')
     },
     {
       id: "manage-restricted-members",
@@ -32,6 +33,15 @@ const SettingsComponent: React.FC<SettingsComponentProps> = ({ companyName = "Yo
     }
   ];
 
+  if (currentView === 'admins') {
+    return (
+      <AdminManagement 
+        companyId={companyId} 
+        companyName={companyName}
+        onBack={() => setCurrentView('settings')}
+      />
+    );
+  }
 
   return (
     <div className="bg-white dark:bg-gray-900 rounded-lg shadow p-4 sm:p-6 dark:shadow-gray-800 w-full max-w-4xl mx-auto">
