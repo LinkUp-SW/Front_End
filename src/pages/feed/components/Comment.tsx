@@ -48,7 +48,6 @@ import TransparentButton from "./buttons/TransparentButton";
 import BlueButton from "./buttons/BlueButton";
 import { toast } from "sonner";
 import IconButton from "./buttons/IconButton";
-import { setComments } from "@/slices/feed/commentsSlice";
 import { getReactionIcons } from "./Post";
 
 export interface CommentProps {
@@ -72,7 +71,6 @@ const Comment: React.FC<CommentProps> = ({
     connectionDegree,
     headline,
   } = comment.author;
-  const comments = useSelector((state: RootState) => state.comments.list);
   const dispatch = useDispatch();
 
   const stats = {
@@ -118,7 +116,7 @@ const Comment: React.FC<CommentProps> = ({
         comment.userReaction.charAt(0).toUpperCase() +
           comment.userReaction.slice(1).toLowerCase()
       );
-  }, [comments]);
+  }, [comment]);
 
   let countChildren = 0;
   if (comment.children) {
@@ -175,35 +173,8 @@ const Comment: React.FC<CommentProps> = ({
       const result = await createReaction(reaction, postId, token);
 
       // Update the comments state with the reaction result
-      const updated_Comments = comments.map((block) => {
-        // Create a deep copy of the comments array to avoid reference issues
-        const newComments = block.comments.map((c) => {
-          // Only update the comment that was reacted to
-          if (c._id === comment._id) {
-            return {
-              ...c,
-              reacts: [
-                ...(c.reacts?.filter((r) => r !== result.deletedReactionId) ||
-                  []),
-                result.newReactionId, // Add the new reaction ID
-              ].filter(Boolean), // Remove any undefined/null values
-              reactions: result.topReactions,
-              reactionsCount: result.totalCount,
-              userReaction: selected_reaction.toLowerCase(), // Important: Update the userReaction field
-            };
-          }
-          return c; // Return unchanged comments
-        });
-
-        return {
-          ...block,
-          comments: newComments,
-          count: block.count, // Keep the original count, don't recalculate
-        };
-      });
 
       // Update Redux state with the new comments
-      dispatch(setComments(updated_Comments));
     } catch (error) {
       console.error("Error creating reaction:", error);
       toast.error("Failed to add reaction. Please try again.");
@@ -226,33 +197,8 @@ const Comment: React.FC<CommentProps> = ({
       );
 
       // Update the comments state with the reaction result
-      const updated_Comments = comments.map((block) => {
-        // Create a deep copy of the comments array
-        const newComments = block.comments.map((c) => {
-          // Only update the comment that had the reaction removed
-          if (c._id === comment._id) {
-            return {
-              ...c,
-              reacts: (c.reacts || []).filter(
-                (r) => r !== result.deletedReactionId
-              ),
-              reactions: result.topReactions,
-              reactionsCount: result.totalCount,
-              userReaction: null, // Clear the user's reaction
-            };
-          }
-          return c; // Return unchanged comments
-        });
-
-        return {
-          ...block,
-          comments: newComments,
-          count: block.count, // Keep the original count, don't recalculate
-        };
-      });
 
       // Update Redux state with the new comments
-      dispatch(setComments(updated_Comments));
     } catch (error) {
       console.error("Error deleting reaction:", error);
       toast.error("Failed to remove reaction. Please try again.");
@@ -276,41 +222,9 @@ const Comment: React.FC<CommentProps> = ({
         token
       );
       console.log("Deleted:", result);
-      const updated_Comments = comments.map((block) => {
-        const newComments = block.comments.filter((c) => c._id !== comment._id);
-        return {
-          ...block,
-          comments: newComments,
-          count: newComments.length, // 👈 update count
-        };
-      });
-      console.log("Updated comments:", updated_Comments);
-      dispatch(setComments(updated_Comments));
+
       console.log("Comment:", comment);
       if (comment.parentId) {
-        const updatedComments = comments.map((block) => ({
-          ...block,
-          comments: block.comments.map((parentComment) => {
-            if (
-              parentComment.children &&
-              Object.prototype.hasOwnProperty.call(
-                parentComment.children,
-                comment._id
-              )
-            ) {
-              const { ...remainingChildren } = parentComment.children;
-              delete remainingChildren[comment._id];
-
-              return {
-                ...parentComment,
-                children: remainingChildren,
-              };
-            }
-
-            return parentComment;
-          }),
-        }));
-        dispatch(setComments(updatedComments));
       }
 
       // Show success toast

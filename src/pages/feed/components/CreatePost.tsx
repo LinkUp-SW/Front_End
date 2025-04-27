@@ -28,7 +28,6 @@ import { toast } from "sonner";
 import { createPost, fetchSinglePost } from "@/endpoints/feed";
 import { DialogDescription } from "@radix-ui/react-dialog";
 import { setPosts } from "@/slices/feed/postsSlice";
-import { setComments } from "@/slices/feed/commentsSlice";
 import React from "react";
 import { closeCreatePostDialog } from "@/slices/feed/createPostSlice";
 import { openCreatePostDialog } from "@/slices/feed/createPostSlice";
@@ -55,7 +54,6 @@ interface CreatePostProps {
 
 const CreatePost: React.FC<CreatePostProps> = ({ className }) => {
   const posts = useSelector((state: RootState) => state.posts.list);
-  const comments = useSelector((state: RootState) => state.comments.list);
   const dispatch = useDispatch();
   const { data, loading } = useSelector((state: RootState) => state.userBio);
   const [privacySetting, setPrivacySetting] = useState<string>("Anyone");
@@ -228,17 +226,16 @@ const CreatePost: React.FC<CreatePostProps> = ({ className }) => {
           duration: 15000,
         }
       );
-      const post = await fetchSinglePost(response.postId, user_token, 0, 1);
+      const post = await fetchSinglePost(response.postId, user_token);
       const comment: CommentObjectType = {
         comments: [],
         count: 0,
         nextCursor: 0,
       };
       if (post && !id) {
-        const newPosts = [post.post, ...posts];
-        dispatch(setPosts(newPosts));
-        const newComments = [comment, ...comments];
-        dispatch(setComments(newComments));
+        // const newPosts = [post.post, ...posts];
+        // dispatch(setPosts(newPosts));
+        // const newComments = [comment, ...comments];
       }
     } catch {
       toast.error("Error creating post. Please try again.");

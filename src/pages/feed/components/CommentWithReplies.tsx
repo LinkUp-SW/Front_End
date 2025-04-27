@@ -8,13 +8,16 @@ import { GoFileMedia as MediaIcon } from "react-icons/go";
 import EmojiPicker, { Theme, EmojiClickData } from "emoji-picker-react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
-import { CommentType, StatsType } from "@/types";
+import { CommentType, CommentDBType } from "@/types";
 import { hasRichFormatting } from "@/utils/index";
-import { FormattedContentText } from "./modals/CreatePostModal";
+import {
+  FormattedContentText,
+  extractTaggedUsers,
+} from "./modals/CreatePostModal";
 import UserTagging from "./UserTagging";
 
 interface CommentWithRepliesProps {
-  replies: CommentType[];
+  replies?: CommentType[]; // Now optional as replies might be in comment.children
   handleCreateComment: (
     selectedImage: File | null,
     commentInput: string,
@@ -24,7 +27,6 @@ interface CommentWithRepliesProps {
   ) => void;
   comment: CommentType;
   postId: string;
-  stats: StatsType;
 }
 
 const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
@@ -32,22 +34,41 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
   handleCreateComment,
   comment,
   postId,
-  stats,
 }) => {
-  const [showReplies] = useState(true);
+  console.log("Comment:", comment);
+  console.log("Replies:", replies);
+  // State hooks
+  const [showReplies, setShowReplies] = useState(true);
   const [mainCommentHeight, setMainCommentHeight] = useState(0);
   const [replyHeights, setReplyHeights] = useState(0);
   const [isReplyActive, setIsReplyActive] = useState(false);
   const [commentInput, setCommentInput] = useState("");
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [taggedUsers, setTaggedUsers] = useState<
+    { name: string; id: string }[]
+  >([]);
 
+  // Refs
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const commentRef = useRef<HTMLDivElement>(null);
+  const replyRefs = useRef<Array<HTMLDivElement | null>>([]);
+
+  // Selectors
+  const darkMode = useSelector((state: RootState) => state.theme.theme);
+  const { data } = useSelector((state: RootState) => state.userBio);
+
+  // Get comments from the comment.children property if replies not provided
+  const commentReplies = replies || comment.children || [];
+
+  // Effects
   useEffect(() => {
     setIsReplyActive(false);
   }, [comment]);
 
   useEffect(() => {
     if (isReplyActive) {
-      inputRef.current?.focus(); // Focus on the comment input
+      inputRef.current?.focus();
       inputRef.current?.scrollIntoView({
         behavior: "smooth",
         block: "center",
@@ -55,29 +76,32 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
     }
   }, [isReplyActive]);
 
-  if (!stats) {
-    stats = {
-      likes: 15,
-      love: 2,
-      support: 1,
-      celebrate: 1,
-      comments: 2,
-      reposts: 5,
-      person: "Hamada",
-    };
-  }
-  if (replies) {
-    replies = Object.values(replies);
-  }
+  useEffect(() => {
+    setTaggedUsers(extractTaggedUsers(commentInput));
+  }, [commentInput]);
 
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const inputRef = useRef<HTMLTextAreaElement>(null);
+  // Measure comment heights for UI
+  useEffect(() => {
+    if (commentRef.current) {
+      setMainCommentHeight(commentRef.current.offsetHeight / 16);
+    }
+  }, [comment]);
 
-  const { data } = useSelector((state: RootState) => state.userBio);
+  useEffect(() => {
+    if (commentReplies && replyRefs.current.length > 0) {
+      const total = replyRefs.current.reduce((acc, ref) => {
+        return ref ? acc + ref.offsetHeight / 16 : acc;
+      }, 0);
+      setReplyHeights(total);
+    } else {
+      setReplyHeights(0);
+    }
+  }, [commentReplies, showReplies]);
 
-  const commentRef = useRef<HTMLDivElement>(null);
-
-  const MemoizedEmojiPicker = memo(EmojiPicker);
+  // Event handlers
+  const handleEmojiRequest = (emoji: EmojiClickData) => {
+    setCommentInput((prevMessage) => prevMessage + emoji.emoji);
+  };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -86,35 +110,7 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
     }
   };
 
-  // Create a ref array for replies
-  const replyRefs = useRef<Array<HTMLDivElement | null>>([]);
-
-  const handleEmojiRequest = (emoji: EmojiClickData) => {
-    setCommentInput((prevMessage) => prevMessage + emoji.emoji);
-  };
-
-  const darkMode = useSelector((state: RootState) => state.theme.theme);
-
-  // Measure main comment height
-
-  useEffect(() => {
-    if (commentRef.current) {
-      // Divide by 16 if you want rem conversion
-      setMainCommentHeight(commentRef.current.offsetHeight / 16);
-    }
-  }, [comment]);
-
-  // Measure replies heights and sum them
-  useEffect(() => {
-    if (replies && replyRefs.current.length > 0) {
-      const total = replyRefs.current.reduce((acc, ref) => {
-        return ref ? acc + ref.offsetHeight / 16 : acc;
-      }, 0);
-      setReplyHeights(total);
-    } else {
-      setReplyHeights(0);
-    }
-  }, [replies, showReplies]);
+  const MemoizedEmojiPicker = memo(EmojiPicker);
 
   return (
     <div className="flex flex-col relative">
@@ -122,7 +118,7 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
       <div
         className="border-b-2 border-l-2 dark:border-gray-700 rounded-lg absolute w-10 left-4"
         style={{
-          height: (mainCommentHeight + replyHeights) * 16 - 90, // converting back to px if needed
+          height: (mainCommentHeight + replyHeights) * 16 - 90,
         }}
       ></div>
 
@@ -136,30 +132,29 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
       </div>
 
       {/* Replies toggle and list */}
-      {replies && replies.length > 0 && (
+      {commentReplies && commentReplies.length > 0 && (
         <>
-          {/* {replies.length > 1 && (
+          {commentReplies.length > 3 && (
             <button
               onClick={() => setShowReplies(!showReplies)}
-              className="text-sm text-blue-600 hover:underline mt-2"
+              className="text-sm text-blue-600 hover:underline mt-2 ml-14"
             >
               {showReplies
                 ? "Hide Replies"
-                : `Show Replies (${replies.length})`}
+                : `Show Replies (${commentReplies.length})`}
             </button>
-          )} */}
+          )}
 
           {showReplies && (
             <div className="mt-2 space-y-2">
-              {replies.map((reply: CommentType, idx: number) => (
+              {commentReplies.map((reply, idx) => (
                 <div
-                  key={idx}
+                  key={`reply-${reply._id || idx}`}
                   ref={(el) => {
                     replyRefs.current[idx] = el;
                   }}
                   className="relative"
                 >
-                  {/* You can adjust or add your border for each reply if needed */}
                   <div className="w-12 h-full rounded-full absolute bg-white dark:bg-gray-900 left-8" />
                   <Reply
                     comment={reply}
@@ -172,13 +167,16 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
           )}
         </>
       )}
+
+      {/* Reply input */}
       {isReplyActive ? (
         <div className="flex gap-2 pl-10 pt-2">
           <div>
             <img
               src={data?.profile_photo}
               className="w-8 h-8 rounded-full"
-            ></img>
+              alt="User avatar"
+            />
           </div>
           <div
             onClick={() => {
@@ -186,64 +184,55 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
             }}
             className="w-full relative flex-col flex dark:focus:ring-0 dark:focus:border-0 border p-2 focus:ring-black focus:ring-2 transition-colors dark:hover:bg-gray-800 hover:text-gray-950 dark:hover:text-neutral-300 rounded-xl border-gray-400 font-normal text-sm text-black text-left dark:text-neutral-300"
           >
-            <div
-              onClick={() => {
-                inputRef.current?.focus();
-              }}
-              className="w-full relative flex-col flex dark:focus:ring-0 dark:focus:border-0 border p-2 focus:ring-black focus:ring-2 transition-colors dark:hover:bg-gray-800 hover:text-gray-950 dark:hover:text-neutral-300 rounded-xl border-gray-400 font-normal text-sm text-black text-left dark:text-neutral-300"
-            >
-              <div className="relative w-full">
-                {/* Actual input field */}
-                <textarea
-                  ref={inputRef}
-                  id="comment-input"
-                  placeholder="Add a comment..."
-                  value={commentInput}
-                  autoFocus
-                  onFocus={() => {
-                    inputRef.current?.scrollIntoView({
-                      behavior: "smooth",
-                      block: "center",
-                    });
-                  }}
-                  onChange={(e) => setCommentInput(e.target.value)}
-                  onKeyDown={(e) => {
-                    // This ensures keyboard events are captured by the input
-                    if (
-                      ["ArrowDown", "ArrowUp", "Enter", "Tab"].includes(
-                        e.key
-                      ) &&
-                      commentInput.includes("@")
-                    ) {
-                      console.log("wo");
-                      e.preventDefault(); // Prevent default for navigation keys
-                    }
-                  }}
-                  className="w-full h-auto resize-none py-0 placeholder:text-neutral-500 dark:placeholder:text-neutral-300 focus:ring-0 focus:border-0 active:border-0"
-                />
+            <div className="relative w-full">
+              {/* Actual input field */}
+              <textarea
+                ref={inputRef}
+                id="comment-input"
+                placeholder="Add a reply..."
+                value={commentInput}
+                autoFocus
+                onFocus={() => {
+                  inputRef.current?.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center",
+                  });
+                }}
+                onChange={(e) => setCommentInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (
+                    ["ArrowDown", "ArrowUp", "Enter", "Tab"].includes(e.key) &&
+                    commentInput.includes("@")
+                  ) {
+                    e.preventDefault();
+                  }
+                }}
+                className="w-full h-auto resize-none py-0 placeholder:text-neutral-500 dark:placeholder:text-neutral-300 focus:ring-0 focus:border-0 active:border-0"
+              />
 
-                {/* User tagging component */}
-                <UserTagging
-                  text={commentInput}
-                  onTextChange={setCommentInput}
-                  inputRef={inputRef}
-                  className="absolute inset-0 z-20" // Remove pointer-events-none
-                />
-              </div>
-
-              {/* Rich text preview - only show if there's rich formatting */}
-              {hasRichFormatting(commentInput) &&
-                commentInput.trim().length > 0 && (
-                  <div className="mt-3 p-3 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800">
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                      Preview:
-                    </p>
-                    <div className="text-sm text-gray-900 dark:text-gray-100">
-                      <FormattedContentText text={commentInput} />
-                    </div>
-                  </div>
-                )}
+              {/* User tagging component */}
+              <UserTagging
+                text={commentInput}
+                onTextChange={setCommentInput}
+                inputRef={inputRef}
+                className="absolute inset-0 z-20"
+              />
             </div>
+
+            {/* Rich text preview */}
+            {hasRichFormatting(commentInput) &&
+              commentInput.trim().length > 0 && (
+                <div className="mt-3 p-3 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                    Preview:
+                  </p>
+                  <div className="text-sm text-gray-900 dark:text-gray-100">
+                    <FormattedContentText text={commentInput} />
+                  </div>
+                </div>
+              )}
+
+            {/* Selected image preview */}
             {selectedImage && (
               <div className="relative mt-2">
                 <img
@@ -255,7 +244,7 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
                   onClick={() => {
                     setSelectedImage(null);
                     if (fileInputRef.current) {
-                      fileInputRef.current.value = ""; // Reset the file input value
+                      fileInputRef.current.value = "";
                     }
                   }}
                   className="absolute top-1 left-0 bg-gray-600 text-white rounded-full m-1 p-1 px-2 aspect-square hover:bg-gray-600"
@@ -264,78 +253,80 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
                 </button>
               </div>
             )}
-            {
-              <div
-                className={`flex  ${
-                  selectedImage || commentInput.trim().length != 0
-                    ? "justify-between "
-                    : "absolute right-0"
-                }`}
-              >
-                <div className="relative">
-                  <Popover>
-                    <PopoverTrigger asChild onClick={() => {}}>
-                      <Button
-                        variant="ghost"
-                        className="hover:cursor-pointer rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 dark:hover:text-neutral-200"
-                      >
-                        <MdOutlineEmojiEmotions />
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent
-                      forceMount
-                      className="dark:bg-gray-900 w-fit p-0 dark:border-gray-600"
-                    >
-                      <MemoizedEmojiPicker
-                        className="dark:bg-gray-900 w-full p-0"
-                        theme={darkMode === "dark" ? Theme.DARK : Theme.LIGHT}
-                        width={"full"}
-                        onEmojiClick={handleEmojiRequest}
-                      />
-                    </PopoverContent>
-                  </Popover>
 
-                  <input
-                    type="file"
-                    accept="image/*"
-                    ref={fileInputRef}
-                    onChange={handleFileUpload}
-                    className="hidden"
-                  />
-                  <Button
-                    variant="ghost"
-                    onClick={() => fileInputRef.current?.click()}
-                    className="hover:cursor-pointer rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 dark:hover:text-neutral-200"
+            {/* Comment input actions */}
+            <div
+              className={`flex ${
+                selectedImage || commentInput.trim().length !== 0
+                  ? "justify-between"
+                  : "absolute right-0"
+              }`}
+            >
+              <div className="relative">
+                {/* Emoji picker */}
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      className="hover:cursor-pointer rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 dark:hover:text-neutral-200"
+                    >
+                      <MdOutlineEmojiEmotions />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent
+                    forceMount
+                    className="dark:bg-gray-900 w-fit p-0 dark:border-gray-600"
                   >
-                    <MediaIcon />
-                  </Button>
-                </div>
-                <BlueButton
-                  className={`${
-                    selectedImage || commentInput.trim().length != 0
-                      ? ""
-                      : "hidden"
-                  }`}
-                  onClick={() =>
-                    handleCreateComment(
-                      selectedImage,
-                      commentInput,
-                      setSelectedImage,
-                      setCommentInput,
-                      comment._id
-                    )
-                  }
-                  disabled={commentInput.trim().length == 0 && !selectedImage}
+                    <MemoizedEmojiPicker
+                      className="dark:bg-gray-900 w-full p-0"
+                      theme={darkMode === "dark" ? Theme.DARK : Theme.LIGHT}
+                      width={"full"}
+                      onEmojiClick={handleEmojiRequest}
+                    />
+                  </PopoverContent>
+                </Popover>
+
+                {/* Media upload */}
+                <input
+                  type="file"
+                  accept="image/*"
+                  ref={fileInputRef}
+                  onChange={handleFileUpload}
+                  className="hidden"
+                />
+                <Button
+                  variant="ghost"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="hover:cursor-pointer rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 dark:hover:text-neutral-200"
                 >
-                  Comment
-                </BlueButton>
+                  <MediaIcon />
+                </Button>
               </div>
-            }
+
+              {/* Submit button */}
+              <BlueButton
+                className={`${
+                  selectedImage || commentInput.trim().length !== 0
+                    ? ""
+                    : "hidden"
+                }`}
+                onClick={() =>
+                  handleCreateComment(
+                    selectedImage,
+                    commentInput,
+                    setSelectedImage,
+                    setCommentInput,
+                    comment._id
+                  )
+                }
+                disabled={commentInput.trim().length === 0 && !selectedImage}
+              >
+                Reply
+              </BlueButton>
+            </div>
           </div>
         </div>
-      ) : (
-        <></>
-      )}
+      ) : null}
     </div>
   );
 };
