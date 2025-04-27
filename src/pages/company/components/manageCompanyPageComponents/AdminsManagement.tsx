@@ -155,6 +155,7 @@ const AdminManagement: React.FC<AdminManagementProps> = ({ companyId, companyNam
       <div className="bg-white dark:bg-gray-900 rounded-lg shadow p-4 sm:p-6 dark:shadow-gray-800 w-full max-w-4xl mx-auto">
         <div className="flex items-center mb-6">
           <button 
+            id="back-to-admins-list"
             onClick={() => setShowAddAdmin(false)}
             className="mr-4 p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
             <FiArrowLeft className="w-5 h-5" />
@@ -188,6 +189,7 @@ const AdminManagement: React.FC<AdminManagementProps> = ({ companyId, companyNam
                 {searchResults.map((user) => (
                   <div 
                     key={user._id}
+                    id={`user-result-${user._id}`}
                     className={`flex items-center p-3 border rounded-lg cursor-pointer ${
                       selectedUser?._id === user._id 
                         ? 'border-blue-500 bg-blue-50 dark:bg-blue-900 dark:border-blue-700' 
@@ -234,12 +236,14 @@ const AdminManagement: React.FC<AdminManagementProps> = ({ companyId, companyNam
 
           <div className="mt-6 flex justify-end">
             <button
+              id="cancel-add-admin"
               onClick={() => setShowAddAdmin(false)}
               className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 mr-2"
             >
               Cancel
             </button>
             <button
+              id="confirm-add-admin"
               onClick={handleAddAdmin}
               disabled={!selectedUser || submitting}
               className={`px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md shadow-sm hover:bg-blue-700 ${
@@ -259,7 +263,11 @@ const AdminManagement: React.FC<AdminManagementProps> = ({ companyId, companyNam
       <div className="border-b border-gray-200 dark:border-gray-800">
         <div className="px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center">
-            <button onClick={onBack} className="mr-4 p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+            <button 
+              id="back-to-company"
+              onClick={onBack} 
+              className="mr-4 p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+            >
               <FiArrowLeft className="w-5 h-5" />
             </button>
             <h1 className="text-xl font-semibold text-gray-900 dark:text-white">
@@ -268,6 +276,7 @@ const AdminManagement: React.FC<AdminManagementProps> = ({ companyId, companyNam
           </div>
           <div className="flex space-x-2">
             <button
+              id="open-add-admin"
               onClick={() => setShowAddAdmin(true)}
               className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md shadow-sm hover:bg-blue-700 flex items-center"
             >
@@ -340,6 +349,7 @@ const AdminManagement: React.FC<AdminManagementProps> = ({ companyId, companyNam
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <button
+                          id={`remove-admin-${admin._id}`}
                           onClick={() => openRemoveDialog(admin)}
                           className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
                         >
@@ -411,6 +421,7 @@ const AdminManagement: React.FC<AdminManagementProps> = ({ companyId, companyNam
                 
                 <div className="flex justify-end space-x-3 border-t border-gray-200 dark:border-gray-700 pt-4">
                   <button
+                    id="cancel-remove-admin"
                     type="button"
                     onClick={() => setRemoveDialogOpen(false)}
                     className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded"
@@ -419,6 +430,7 @@ const AdminManagement: React.FC<AdminManagementProps> = ({ companyId, companyNam
                     Cancel
                   </button>
                   <button
+                    id="confirm-remove-admin"
                     type="button"
                     onClick={handleRemoveAdmin}
                     disabled={submitting}
