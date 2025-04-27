@@ -10,18 +10,12 @@ import { LiaEllipsisHSolid as EllipsisIcon } from "react-icons/lia";
 import { IoMdClose as CloseIcon } from "react-icons/io";
 import { Button, Dialog, DialogTrigger, DialogContent } from "@/components";
 import ReportPostModal from "./modals/ReportPostModal";
-import { MenuAction, PostUserType } from "@/types";
+import { ActivityContextType, MenuAction, PostUserType } from "@/types";
 import moment from "moment";
-
-interface Action {
-  name?: string;
-  profileImage?: string;
-  action?: "like" | "comment" | "repost" | "love";
-}
 
 interface PostHeaderProps {
   user: PostUserType;
-  action?: Action;
+  action?: ActivityContextType;
   postMenuOpen: boolean;
   setPostMenuOpen: (isOpen: boolean) => void;
   menuActions: MenuAction[]; // You can replace `any` with a more specific type if available
@@ -136,7 +130,7 @@ const PostHeader: React.FC<PostHeaderProps> = ({
             )}
           </nav>
         </div>
-        {action && (
+        {/* {action && (
           <Button
             variant="ghost"
             className="absolute -right-3 top-1 pl-2 hover:cursor-pointer hover:bg-blue-50 dark:hover:bg-slate-800"
@@ -146,7 +140,7 @@ const PostHeader: React.FC<PostHeaderProps> = ({
               <p>Follow</p>
             </div>
           </Button>
-        )}
+        )} */}
         <div className="text-xs text-gray-500 dark:text-neutral-400">
           <Link
             to="#"

@@ -96,6 +96,7 @@ export interface CommentDBType {
 
 export interface PostType {
   author: PostUserType;
+
   content: string;
   media: {
     link: string[];
@@ -129,7 +130,7 @@ export interface PostType {
     reposts?: number;
   };
 
-  action?: ActionType;
+  activityContext?: ActivityContextType;
 }
 
 export interface StatsType {
@@ -144,10 +145,11 @@ export interface StatsType {
   person?: string;
 }
 
-export interface ActionType {
-  name?: string;
-  profileImage?: string;
-  action?: "like" | "comment" | "repost" | "love";
+export interface ActivityContextType {
+  actorId: string;
+  actorName: string;
+  actorUsername: string;
+  type: "reaction" | "comment" | "repost";
 }
 
 export interface PostUserType {

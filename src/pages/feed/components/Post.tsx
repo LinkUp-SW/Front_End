@@ -10,7 +10,7 @@ import SupportIcon from "@/assets/Support.svg";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import {
-  ActionType,
+  ActivityContextType,
   CommentDBType,
   CommentObjectType,
   PostType,

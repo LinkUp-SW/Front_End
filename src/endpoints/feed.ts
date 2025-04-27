@@ -157,6 +157,22 @@ export const getSinglePost = async (postId: string): Promise<PostType> => {
   }
 };
 
+export const getPostsFeed = async (
+  token: string,
+  postPayload: {
+    cursor: number;
+    limit: number;
+  }
+): Promise<{ message: string; posts: PostType[] }> => {
+  const response = await axiosInstance.get(`/api/v1/post/posts/feed`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    params: postPayload,
+  });
+  return response.data;
+};
+
 export const getSingleComments = async (
   postId: string
 ): Promise<CommentType[]> => {
