@@ -11,6 +11,8 @@ import { toast } from "sonner";
 import { getUserPosts } from "@/endpoints/userProfile";
 import moment from "moment";
 import TransparentButton from "@/pages/feed/components/buttons/TransparentButton";
+import PostPreview from "@/pages/feed/components/PostPreview";
+import { getMenuActions } from "@/pages/feed/components/Menus";
 
 const token = Cookies.get("linkup_auth_token");
 const userId = Cookies.get("linkup_user_id");
@@ -20,6 +22,12 @@ const Activity: React.FC = () => {
     "post"
   );
   const [posts, setPosts] = useState<PostType[]>([]);
+  const [menuOpenStates, setMenuOpenStates] = useState<Record<string, boolean>>(
+    {}
+  );
+  const setMenuOpen = (postId: string, isOpen: boolean) => {
+    setMenuOpenStates((prev) => ({ ...prev, [postId]: isOpen }));
+  };
   const [isLoading, setIsLoading] = useState(false);
   const { id } = useParams<{ id: string }>(); // Extract the 'id' parameter from the URL
   console.log("id", id);
@@ -83,7 +91,7 @@ const Activity: React.FC = () => {
   };
 
   return (
-    <section className="bg-white dark:bg-gray-900 rounded-lg shadow-md overflow-hidden">
+    <section className="bg-white p-4 dark:bg-gray-900 rounded-lg shadow-md overflow-hidden">
       <div className="w-full mx-auto">
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
@@ -119,22 +127,11 @@ const Activity: React.FC = () => {
           >
             Comments
           </Button>
-          <Button
-            variant={activeTab === "video" ? "secondary" : "ghost"}
-            className={`rounded-full ${
-              activeTab === "video"
-                ? "bg-blue-100 text-blue-600 hover:bg-blue-200"
-                : "text-gray-600 hover:text-blue-600"
-            }`}
-            onClick={() => setActiveTab("video")}
-          >
-            Videos
-          </Button>
         </div>
 
         {/* Scrollable Posts Container */}
-        <div className="relative w-full">
-          {filteredPosts.length > 1 && (
+        <div className="relative w-full overflow-hidden">
+          {filteredPosts.length > 2 && (
             <>
               <Button
                 onClick={() => scroll("left")}
@@ -155,91 +152,60 @@ const Activity: React.FC = () => {
             </>
           )}
 
-          {filteredPosts.length > 0 ? (
+          {isLoading ? (
+            // Show loading skeleton for posts - exactly 2 columns
+            <div className="grid grid-cols-2 gap-4 w-full">
+              {[1, 2].map((index) => (
+                <div
+                  key={`skeleton-${index}`}
+                  className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 h-[320px] animate-pulse"
+                >
+                  {/* Skeleton content stays the same */}
+                  <div className="flex items-center mb-4">
+                    <div className="w-10 h-10 bg-gray-200 dark:bg-gray-700 rounded-full mr-3" />
+                    <div>
+                      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-32 mb-2" />
+                      <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-24" />
+                    </div>
+                  </div>
+                  <div className="h-36 bg-gray-200 dark:bg-gray-700 rounded mb-4" />
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded mb-2" />
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4" />
+                </div>
+              ))}
+            </div>
+          ) : filteredPosts.length > 0 ? (
             <div
               ref={scrollContainerRef}
-              className="flex overflow-x-auto gap-6 pb-4 hide-scrollbar w-full min-w-[280px] max-w-7xl"
-              style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+              className="flex gap-4 overflow-x-auto hide-scrollbar snap-x snap-mandatory"
+              style={{
+                scrollbarWidth: "none",
+                msOverflowStyle: "none",
+              }}
             >
               {filteredPosts.map((post) => (
                 <div
-                  key={post._id}
-                  className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 min-w-[320px] max-w-[400px] flex-shrink-0 cursor-pointer"
-                  onClick={() => navigate(`/feed/posts/${post._id}`)}
+                  key={`post-${post._id}`}
+                  className="snap-start"
+                  style={{
+                    minWidth: "calc(50% - 8px)",
+                    maxWidth: "calc(50% - 8px)",
+                    flexBasis: "calc(50% - 8px)",
+                  }}
                 >
-                  <div className="flex items-center mb-2">
-                    <div className="w-10 h-10 bg-gray-300 rounded-full mr-3" />
-                    <div>
-                      <p className="font-semibold text-gray-800 dark:text-gray-100">
-                        {post.author.firstName} {post.author.lastName || ""}
-                      </p>
-                      <div className="flex items-center gap-1 text-sm text-gray-500">
-                        <span>{moment(post.date * 1000).fromNow()}</span>
-                        {post.isEdited && (
-                          <>
-                            <span>•</span>
-                            <span>Edited</span>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Content */}
-                  <div className="text-gray-700 dark:text-gray-200 mb-2 break-words line-clamp-3">
-                    {post.content}
-                  </div>
-
-                  {/* Media */}
-                  {post.media.link && post.media.link.length > 0 && (
-                    <div className="mt-4 border rounded overflow-hidden">
-                      {post.media.media_type.includes("image") && (
-                        <img
-                          src={post.media.link[0]}
-                          alt="Media preview"
-                          className="w-full h-40 object-cover"
-                        />
-                      )}
-
-                      {post.media.media_type.includes("video") && (
-                        <div className="relative h-40 bg-gray-900 flex items-center justify-center">
-                          <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
-                            <div className="bg-white/80 rounded-full p-2">
-                              <Play className="h-6 w-6 text-gray-900" />
-                            </div>
-                          </div>
-                          <video
-                            className="w-full h-full object-cover"
-                            poster={post.media.link[0]}
-                          />
-                        </div>
-                      )}
-
-                      {post.media.link.length > 1 && (
-                        <div className="absolute bottom-2 right-2 bg-black/50 text-white px-2 py-1 rounded text-xs">
-                          +{post.media.link.length - 1}
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Comments count */}
-                  <div className="mt-4 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      {post.reacts && post.reacts.length > 0 && (
-                        <span className="text-sm text-gray-500">
-                          {post.reacts.length} reactions
-                        </span>
-                      )}
-                    </div>
-                    <div>
-                      {post.comments !== undefined && (
-                        <span className="text-sm text-gray-500">
-                          {post.comments} comments
-                        </span>
-                      )}
-                    </div>
-                  </div>
+                  <PostPreview
+                    post={post}
+                    menuActions={getMenuActions(
+                      () => {},
+                      () => {},
+                      () => {},
+                      () => {},
+                      post._id
+                    )}
+                    onMenuOpenChange={(isOpen) => setMenuOpen(post._id, isOpen)}
+                    showFooter={true}
+                    onUnsave={async (postId: string) => {}}
+                  />
                 </div>
               ))}
             </div>
