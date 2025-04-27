@@ -212,7 +212,7 @@ const FeedPage: React.FC<FeedPageProps> = ({
                 <div ref={observerRef} className="h-10" />
               </>
             ) : (
-              <p className="text-center text-2xl bg-white border rounded-lg p-4">
+              <p className="text-center text-2xl bg-white dark:bg-gray-900 border-0 rounded-lg p-4">
                 No posts to display. Start connecting to people!
               </p>
             )}
