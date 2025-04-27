@@ -138,6 +138,7 @@ export const removeFromSaved = async (jobId: string): Promise<{ message: string 
 // Helper to convert JobData to Job interface
 export const convertJobDataToJob = (jobData: JobData): Job => {
   return {
+    _id: jobData._id, 
     id: jobData._id,
     title: jobData.job_title,
     company: jobData.organization?.name || '',
@@ -166,7 +167,8 @@ export const convertJobDataToJob = (jobData: JobData): Job => {
       followers_count: jobData.organization.followers_count,
       industryType: jobData.organization.industry,
       employeeCount: jobData.organization.size
-    } : undefined
+    } : undefined,
+    job_status: 'open',  
   };
 };
 

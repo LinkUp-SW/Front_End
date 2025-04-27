@@ -33,16 +33,12 @@ const CompanyCreationPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Form data will be handled in the PageForm component
-    // This just handles the navigation after successful submission
     try {
       setIsSubmitting(true);
-      // The actual API call is now handled within the PageForm component
-      // Here we just handle navigation upon successful form submission
       navigate('/jobs');
-    } catch (error: any) {
-      console.error('Error creating company:', error);
-      setErrorMessage(error.message || 'Failed to create company. Please try again.');
+    } catch  {
+      console.error('Error creating company');
+      setErrorMessage('Failed to create company. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -73,6 +69,7 @@ const CompanyCreationPage: React.FC = () => {
                   type={selectedType} 
                   onSubmit={handleSubmit}
                   setPreviewData={setPreviewData}
+                  isSubmitting={isSubmitting}
                 />
               </div>
 
@@ -88,6 +85,18 @@ const CompanyCreationPage: React.FC = () => {
             </div>
           </div>
         </>
+      )}
+      
+      {/* Optional loading overlay when submitting */}
+      {isSubmitting && (
+        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg">
+            <div className="flex items-center space-x-3">
+              <div className="w-6 h-6 border-2 border-t-transparent border-blue-500 rounded-full animate-spin"></div>
+              <p>Creating your page...</p>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

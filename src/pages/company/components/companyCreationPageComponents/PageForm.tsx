@@ -11,6 +11,7 @@ interface PageFormProps {
     name: string;
     description: string;
   }) => void;
+  isSubmitting: boolean;
 }
 
 export const PageForm: React.FC<PageFormProps> = ({ type, onSubmit, setPreviewData }) => {
@@ -22,7 +23,6 @@ export const PageForm: React.FC<PageFormProps> = ({ type, onSubmit, setPreviewDa
     logo: '',
     description: '',
     industry: '',
-    location: '',
     size: '',
     type: '',
   });
@@ -137,15 +137,9 @@ export const PageForm: React.FC<PageFormProps> = ({ type, onSubmit, setPreviewDa
       toast.success(`${type === 'company' ? 'Company' : 'Education'} profile created successfully!`);
       
       onSubmit(e);
-    } catch (err: any) {
-      console.error('Error creating company profile:', err);
+    } catch  {
+      console.error('Error creating company profile:');
       
-      // More user-friendly error message with toast
-      if (err.message) {
-        toast.error(err.message);
-      } else {
-        toast.error('Failed to create profile. Please try again later.');
-      }
     } finally {
       setIsSubmitting(false);
     }

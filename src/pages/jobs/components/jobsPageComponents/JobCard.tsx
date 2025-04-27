@@ -14,7 +14,7 @@ const JobCard: React.FC<JobCardProps> = ({ job, onDismiss, onSelect }) => {
   const navigate = useNavigate();
   
   const handleJobClick = () => {
-    onSelect(job.id);
+    onSelect(job.id!);
     navigate(`/jobs/see-more?selected=${job.id}`);
   };
 
@@ -53,7 +53,7 @@ const JobCard: React.FC<JobCardProps> = ({ job, onDismiss, onSelect }) => {
             id={`dismiss-job-${job.id}`}
             onClick={(e) => {
               e.stopPropagation(); // Prevent the parent div click from triggering
-              onDismiss(job.id);
+              onDismiss(job.id!);
             }}
             className="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full p-1 transition-colors"
           >

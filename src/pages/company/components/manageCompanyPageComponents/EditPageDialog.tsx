@@ -2,6 +2,28 @@ import { useState, FormEvent, useEffect, useRef, ChangeEvent } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components';
 import { toast } from 'sonner';
 
+interface CompanyFormData {
+  name: string;
+  website: string;
+  industry: string;
+  size: string;
+  type: string;
+  phone: string;
+  founded: string;
+  description: string;
+  tagline: string;
+  category_type: string;
+  logo: string;
+  location?: {
+    country: string;
+    address: string;
+    city: string;
+    state: string;
+    postal_code: string;
+    location_name: string;
+  } | null;
+}
+
 interface EditPageDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -26,7 +48,7 @@ interface EditPageDialogProps {
       location_name?: string;
     };
   };
-  onSubmit: (data: any) => void;
+  onSubmit: (data: CompanyFormData) => void | Promise<void>;
 }
 
 const EditPageDialog = ({ open, onOpenChange, companyData, onSubmit }: EditPageDialogProps) => {
@@ -232,25 +254,18 @@ const EditPageDialog = ({ open, onOpenChange, companyData, onSubmit }: EditPageD
       
       // Use toast for notification and don't show additional modal
       toast.promise(
-        // Create a promise that resolves with the onSubmit result
-        new Promise(async (resolve, reject) => {
-          try {
+        (async () => {
             await onSubmit(submitData);
-            resolve(true);
             // Close dialog after successful submission
             setTimeout(() => onOpenChange(false), 500);
-          } catch (error) {
-            reject(error);
-          }
-        }),
+            return true;
+        })(),
         {
           loading: 'Saving changes...',
           success: 'Company information updated successfully!',
           error: 'Failed to save changes. Please try again.'
         }
       );
-    } catch (error) {
-      console.error('Submit error:', error);
     } finally {
       setIsSubmitting(false);
     }

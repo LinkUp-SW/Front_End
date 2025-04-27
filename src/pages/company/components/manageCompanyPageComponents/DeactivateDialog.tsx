@@ -55,10 +55,10 @@ const DeactivatePageDialog: React.FC<DeactivatePageDialogProps> = ({
         navigate('/jobs'); 
       }, 1500);
 
-    } catch (error: any) {
+    } catch  {
       setIsSubmitting(false);
-      console.error('Failed to deactivate company page:', error);
-      toast.error(error.message || 'Failed to deactivate company page');
+      console.error('Failed to deactivate company page:');
+      toast.error( 'Failed to deactivate company page');
     }
   };
 

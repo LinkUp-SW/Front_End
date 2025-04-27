@@ -6,7 +6,7 @@ import JobDetailsStep from './JobDetailsStep';
 import RequirementsStep from './RequirementsStep';
 import ReviewStep from './ReviewStep';
 import ProgressBar from './ProgressBar';
-
+import { Company } from '../../../jobs/types';
 
 export type WorkMode = 'On-site' | 'Remote' | 'Hybrid';
 export type ExperienceLevel = 'Internship' | 'Entry Level' | 'Associate' | 'Mid-Senior' | 'Director' | 'Executive';
@@ -39,12 +39,6 @@ export interface Job {
   targettted_skills?: string[];
 }
 
-export interface Company {
-  _id: string;
-  name: string;
-  logo?: string;
-}
-
 export interface CompanySearchResult {
   _id: string;
   name: string;
@@ -65,6 +59,14 @@ export interface JobFormData extends Partial<Job> {
   salary: string;
   hasEasyApply: boolean;
 }
+
+// Interface for company API result, making sure it has the required fields
+interface CompanyAPIResult {
+  _id: string;
+  name: string;
+  logo?: string;
+}
+
 
 const JobForm: React.FC = () => {
   const { companyId } = useParams<{ companyId: string }>();
@@ -119,8 +121,12 @@ const JobForm: React.FC = () => {
       setIsSearching(true);
       const response = await searchCompaniesAPI(query);
       
-      if (response && response.data) {
-        setCompanySearchResults(response.data.map((company: any) => ({
+      // Fix: Check for the correct response structure and properly type the response
+      if (response && 'companies' in response) {
+        // Force type casting since we know the structure
+        const companiesData = response.companies as unknown as CompanyAPIResult[];
+        
+        setCompanySearchResults(companiesData.map((company) => ({
           _id: company._id,
           name: company.name,
           logo: company.logo || '/src/assets/company.png'
@@ -179,17 +185,34 @@ const JobForm: React.FC = () => {
         setIsLoading(true);
         const response = await getCompanyAdminView(companyId);
         
-        if (response?.company) {
-          setCompanyData(response.company);
-          setJobData(prev => ({
-            ...prev,
-            company: response.company.name || '',
-            logo: response.company.logo || '/src/assets/company.png'
-          }));
-          setSelectedCompanyId(companyId);
+        // Fix: Add proper type checking and null handling
+        if (response) {
+          // Check for the company property first
+          if (response.company) {
+            const company = response.company;
+            setCompanyData(company);
+            setJobData(prev => ({
+              ...prev,
+              company: company.name ?? '',
+              logo: company.logo ?? '/src/assets/company.png'
+            }));
+          }
+          // Then check for companyProfile if company isn't available
+          else if (response.companyProfile) {
+            setCompanyData(response.companyProfile);
+            setJobData(prev => ({
+              ...prev,
+              company: response.companyProfile.name || '',
+              logo: response.companyProfile.logo || '/src/assets/company.png'
+            }));
+            setSelectedCompanyId(companyId);
+          } else {
+            console.error('Company data is missing or malformed:', response);
+            toast.error('Failed to load company data properly');
+          }
         } else {
-          console.error('Company data is missing or malformed:', response);
-          toast.error('Failed to load company data properly');
+          console.error('No response received from API');
+          toast.error('Failed to load company data');
         }
       } catch (error) {
         console.error('Failed to fetch company data:', error);
@@ -282,7 +305,7 @@ const JobForm: React.FC = () => {
       if (selectedCompanyId || companyId) {
         // Use the company ID we have - either selected or from params
         const orgId = selectedCompanyId || companyId || '';
-        const response = await createJobFromCompany(orgId, jobDataToSubmit);
+        await createJobFromCompany(orgId, jobDataToSubmit);
         toast.success('Job posted successfully!');
         navigate(`/company-manage/${orgId}`);
       } else {

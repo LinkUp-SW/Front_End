@@ -3,11 +3,10 @@ import { FaPlus } from 'react-icons/fa';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { getJobsFromCompany } from '@/endpoints/company';
-import { JobCard, Job } from './CompanyJobCard';
+import { JobCard, Job } from './CompanyJobCard'; // Import Job type from CompanyJobCard
 
 interface CompanyJobsComponentProps {
   companyId?: string;
-  companyName?: string;
 }
 
 type JobStatus = 'open' | 'draft' | 'inReview' | 'paused' | 'closed';
@@ -20,11 +19,32 @@ interface JobsState {
   closed: Job[];
 }
 
-interface JobsResponse {
-  jobs: Job[];
+interface ApiJob {
+  _id: string;
+  job_title: string;
+  job_status: string;
+  location: string;
+  workplace_type: string;
+  experience_level: string;
+  posted_time?: string; // optional
+  applied_applications?: Array<unknown>; // optional
 }
 
-const CompanyJobsComponent: React.FC<CompanyJobsComponentProps> = ({ companyId, companyName = "Your Company" }) => {
+function sanitizeJob(apiJob: ApiJob): Job {
+  return {
+    _id: apiJob._id || '',
+    job_title: apiJob.job_title || 'Untitled Job',
+    job_status: apiJob.job_status || 'draft',
+    location: apiJob.location || 'Unknown location',
+    workplace_type: apiJob.workplace_type || 'Unknown',
+    experience_level: apiJob.experience_level || 'Not specified',
+    posted_time: apiJob.posted_time || new Date().toISOString(),
+    applied_applications: apiJob.applied_applications || [],
+  };
+}
+
+
+const CompanyJobsComponent: React.FC<CompanyJobsComponentProps> = ({ companyId }) => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<JobStatus>('open');
   const [isLoading, setIsLoading] = useState(false);
@@ -42,7 +62,7 @@ const CompanyJobsComponent: React.FC<CompanyJobsComponentProps> = ({ companyId, 
       
       try {
         setIsLoading(true);
-        const response = await getJobsFromCompany(companyId) as JobsResponse;
+        const response = await getJobsFromCompany(companyId);
         
         const categorizedJobs: JobsState = {
           open: [],
@@ -52,18 +72,20 @@ const CompanyJobsComponent: React.FC<CompanyJobsComponentProps> = ({ companyId, 
           closed: []
         };
         
-        response.jobs.forEach((job: Job) => {
-          const status = job.job_status.toLowerCase();
+        (response.jobs as ApiJob[]).forEach((apiJob) => {
+          const processedJob = sanitizeJob(apiJob);
+          
+          const status = processedJob.job_status?.toLowerCase();
           if (status === 'open') {
-            categorizedJobs.open.push(job);
+            categorizedJobs.open.push(processedJob);
           } else if (status === 'draft') {
-            categorizedJobs.draft.push(job);
+            categorizedJobs.draft.push(processedJob);
           } else if (status === 'in review') {
-            categorizedJobs.inReview.push(job);
+            categorizedJobs.inReview.push(processedJob);
           } else if (status === 'paused') {
-            categorizedJobs.paused.push(job);
+            categorizedJobs.paused.push(processedJob);
           } else if (status === 'closed') {
-            categorizedJobs.closed.push(job);
+            categorizedJobs.closed.push(processedJob);
           }
         });
         
@@ -166,7 +188,7 @@ const CompanyJobsComponent: React.FC<CompanyJobsComponentProps> = ({ companyId, 
           </button>
         </div>
       </div>
-
+      
       <div className="border-t border-gray-200 dark:border-gray-700 overflow-x-auto">
         <div className="flex whitespace-nowrap min-w-full">
           {(['open', 'draft', 'inReview', 'paused', 'closed'] as JobStatus[]).map((tab) => (

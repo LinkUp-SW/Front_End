@@ -15,14 +15,15 @@ const Sidebar: React.FC = () => {
 
   useEffect(() => {
     const fetchUserCompanies = async () => {
+      setIsLoading(true);
+      
       try {
-        setIsLoading(true);
         const response = await getUserCompanies();
         setUserCompanies(response.organizations || []);
         setError(null);
-      } catch (err: any) {
-        console.error('Failed to fetch user companies:', err);
-        setError(err.message || 'Failed to load your pages');
+      } catch {
+        setError('Failed to load your pages');
+        console.error('Failed to fetch user companies');
       } finally {
         setIsLoading(false);
       }

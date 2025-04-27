@@ -8,8 +8,85 @@ import CompanyJobsComponent from './components/manageCompanyPageComponents/Compa
 import { getCompanyAdminView, getCompanyAllView, updateCompanyProfile } from '@/endpoints/company';
 import { toast } from 'sonner';
 
+
 // Define a type for the navigation tabs
 type NavigationTab = 'analytics' | 'page-posts' | 'edit-page' | 'jobs' | 'settings';
+
+// Define types for company data
+interface BasicCompanyData {
+  _id: string;
+  name: string;
+  logo: string;
+  website: string;
+  industry: string;
+  size: string;
+  type: string;
+  phone: string;
+  founded: string;
+  overview: string;
+  followerCount: number;
+}
+
+// Extended company data including all fields needed for editing
+interface FullCompanyData extends BasicCompanyData {
+  tagline?: string; 
+  email?: string;
+  location?: {
+    country?: string;
+    address?: string;
+    city?: string;
+    state?: string;
+    postal_code?: string;
+    location_name?: string;
+  } | null;
+  socialLinks?: {
+    linkedin?: string;
+    twitter?: string;
+    facebook?: string;
+    instagram?: string;
+  };
+  specialties?: string[];
+  description?: string;
+  mission?: string;
+  values?: string[];
+  benefits?: string[];
+  culture?: string;
+}
+
+// Define type for form submission data
+interface CompanyUpdateData {
+  name?: string;
+  logo?: string;
+  website?: string;
+  industry?: string;
+  size?: string;
+  type?: string;
+  phone?: string;
+  founded?: string;
+  overview?: string;
+  tagline?: string; 
+  email?: string;
+  location?: {
+    country: string;
+    address: string;
+    city: string;
+    state: string;
+    postal_code: string;
+    location_name: string;
+  } | null;
+  socialLinks?: {
+    linkedin?: string;
+    twitter?: string;
+    facebook?: string;
+    instagram?: string;
+  };
+  specialties?: string[];
+  description?: string;
+  mission?: string;
+  values?: string[];
+  benefits?: string[];
+  culture?: string;
+}
 
 const ManageCompanyPage = () => {
   const { companyId } = useParams<{ companyId: string }>();
@@ -17,10 +94,10 @@ const ManageCompanyPage = () => {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [fullCompanyData, setFullCompanyData] = useState<any>(null);
+  const [fullCompanyData, setFullCompanyData] = useState<FullCompanyData | null>(null);
 
   // Company data state
-  const [companyData, setCompanyData] = useState({
+  const [companyData, setCompanyData] = useState<BasicCompanyData>({
     _id: "",
     name: "",
     logo: "",
@@ -42,14 +119,30 @@ const ManageCompanyPage = () => {
       try {
         setIsLoading(true);
         const response = await getCompanyAdminView(companyId);
-        
+        console.log("API Response:", response)
+
         if (response && response.company) {
-          setCompanyData(response.company);
+          const company = response.company;
+          setCompanyData({
+            _id: company._id,
+            name: company.name,
+            logo: company.logo || "",
+            website: company.website || "",
+            industry: company.industry || "",
+            size: company.size || "",
+            type: company.type || "",
+            phone: company.phone || "",
+            founded: company.founded || "",
+            overview: company.overview || "",
+            followerCount: company.followerCount || 0,
+          });
+          setError(null);
+        } else {
+          setError('Company data not available');
         }
-        setError(null);
-      } catch (err: any) {
+      } catch (err) {
         console.error('Failed to fetch company data:', err);
-        setError(err.message || 'Failed to load company data');
+        setError('Failed to load company data');
       } finally {
         setIsLoading(false);
       }
@@ -59,7 +152,7 @@ const ManageCompanyPage = () => {
   }, [companyId]);
 
   // Function to fetch full company data for editing
-  const fetchFullCompanyData = async () => {
+  const fetchFullCompanyData = async (): Promise<FullCompanyData | null> => {
     if (!companyId) {
       console.error("Company ID is missing");
       return null;
@@ -70,13 +163,34 @@ const ManageCompanyPage = () => {
       const response = await getCompanyAllView(companyId);
       console.log("API Response:", response);
       
-      // Check for companyProfile key instead of company
       if (response && response.companyProfile) {
-        // Make sure we're setting the full data
-        const fullData = response.companyProfile;
-        setFullCompanyData(fullData);
+        // Map API Company response to our FullCompanyData type
+        const company = response.companyProfile;
+        const fullData: FullCompanyData = {
+          _id: company._id,
+          name: company.name,
+          logo: company.logo || "",
+          website: company.website || "",
+          industry: company.industry || "",
+          size: company.size || "",
+          type: company.type || "",
+          phone: company.phone || "",
+          founded: company.founded || "",
+          overview: company.overview || "",
+          followerCount: company.followers_count || company.followerCount || 0,
+          email: company.email,
+          tagline: company.tagline,  
+          location: company.location,
+          socialLinks: company.socialLinks,
+          specialties: company.specialties,
+          description: company.description,
+          mission: company.mission,
+          values: company.values,
+          benefits: company.benefits,
+          culture: company.culture
+        };
         
-        // Log the company type for debugging
+        setFullCompanyData(fullData);
         console.log("Company type:", fullData.type);
         
         return fullData;
@@ -85,12 +199,8 @@ const ManageCompanyPage = () => {
         toast.error("Unable to load company data");
         return null;
       }
-    } catch (err: any) {
+    } catch (err) {
       console.error('Failed to fetch full company data:', err);
-      if (err.response) {
-        console.error('API error response:', err.response.data);
-        console.error('API error status:', err.response.status);
-      }
       toast.error("Error loading company data");
       return null;
     }
@@ -119,57 +229,82 @@ const ManageCompanyPage = () => {
     }
   };
 
-  const handleEditSubmit = async (data: any) => {
-    if (!companyId) return;
-    
-    try {
-      // Update the company profile in the backend
-      const response = await updateCompanyProfile(companyId, data);
+  const handleEditSubmit = async (data: CompanyUpdateData) => {
+  if (!companyId) return;
+  
+  try {
+    const response = await updateCompanyProfile(companyId, data);
+
+    if (response && (response.success || response.message)) {
+      console.log("Company profile updated successfully");
+      setEditDialogOpen(false);
+      toast.success("Company information updated successfully!");
       
-      if (response && (response.success || response.message)) {
-        console.log("Company profile updated successfully");
-        
-        // Close the dialog first
-        setEditDialogOpen(false);
-        
-        // Show toast notification
-        toast.success("Company information updated successfully!");
-        
-        // Refresh all company data
-        setIsLoading(true);
-        
-        try {
-          // Refresh the main company data
-          const basicDataResponse = await getCompanyAdminView(companyId);
-          if (basicDataResponse && basicDataResponse.company) {
-            // Make sure we're updating the logo in the state
-            setCompanyData(prevData => ({
-              ...prevData,
-              ...basicDataResponse.company,
-              // Force logo update by adding a timestamp query parameter
-              logo: basicDataResponse.company.logo ? 
-                `${basicDataResponse.company.logo}?t=${new Date().getTime()}` : 
-                ""
-            }));
-          }
-          
-          // Refresh the full company data
-          const fullDataResponse = await getCompanyAllView(companyId);
-          if (fullDataResponse && fullDataResponse.companyProfile) {
-            setFullCompanyData(fullDataResponse.companyProfile);
-          }
-        } catch (refreshError) {
-          console.error("Error refreshing data after update:", refreshError);
-          toast.error("Updated successfully, but couldn't refresh display. Please reload the page.");
+      // Refresh data
+      setIsLoading(true);
+      
+      try {
+        // 1. Refresh basic company data
+        const basicDataResponse = await getCompanyAdminView(companyId);
+        if (basicDataResponse && basicDataResponse.company) { // fix here
+          const company = basicDataResponse.company;
+          setCompanyData({
+            _id: company._id,
+            name: company.name,
+            logo: company.logo ? 
+              `${company.logo}?t=${new Date().getTime()}` : 
+              "",
+            website: company.website || "",
+            industry: company.industry || "",
+            size: company.size || "",
+            type: company.type || "",
+            phone: company.phone || "",
+            founded: company.founded || "",
+            overview: company.overview || "",
+            followerCount: company.followerCount || 0
+          });
         }
-        
-        setIsLoading(false);
+
+        // 2. Refresh full company data (for edit dialog next time)
+        const fullDataResponse = await getCompanyAllView(companyId);
+        if (fullDataResponse && fullDataResponse.companyProfile) {
+          const company = fullDataResponse.companyProfile;
+          const fullData: FullCompanyData = {
+            _id: company._id,
+            name: company.name,
+            logo: company.logo || "",
+            website: company.website || "",
+            industry: company.industry || "",
+            size: company.size || "",
+            type: company.type || "",
+            phone: company.phone || "",
+            founded: company.founded || "",
+            overview: company.overview || "",
+            followerCount: company.followers_count || company.followerCount || 0,
+            email: company.email,
+            location: company.location,
+            socialLinks: company.socialLinks,
+            specialties: company.specialties,
+            description: company.description,
+            mission: company.mission,
+            values: company.values,
+            benefits: company.benefits,
+            culture: company.culture,
+          };
+          setFullCompanyData(fullData);
+        }
+      } catch (refreshError) {
+        console.error("Error refreshing data after update:", refreshError);
+        toast.error("Updated successfully, but couldn't refresh display. Please reload the page.");
       }
-    } catch (err: any) {
-      console.error('Failed to update company profile:', err);
-      toast.error(`Failed to update company profile: ${err.message || "Unknown error"}`);
+
+      setIsLoading(false);
     }
-  };
+  } catch (err) {
+    console.error('Failed to update company profile:', err);
+    toast.error(`Failed to update company profile`);
+  }
+};
 
   // Shows loading state while fetching company data
   if (isLoading) {
@@ -309,7 +444,6 @@ const ManageCompanyPage = () => {
           />
         ) : activeTab === 'jobs' ? (
           <CompanyJobsComponent
-            companyName={companyData.name}
             companyId={companyId}
           />
         ) : (

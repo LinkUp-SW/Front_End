@@ -156,7 +156,7 @@ const SavedJobsDashboard: React.FC = () => {
               <div className="flex items-start">
                 <button 
                   className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
-                  onClick={() => handleRemoveFromSaved(job.id)}
+                  onClick={() => handleRemoveFromSaved(job.id!)}
                   title="Remove from saved"
                 >
                   <MdClose size={20} />

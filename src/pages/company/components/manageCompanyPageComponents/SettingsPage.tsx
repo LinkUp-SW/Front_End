@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { MdOutlineKeyboardArrowRight } from 'react-icons/md';
 import DeactivatePageDialog from './DeactivateDialog';
-import AdminsManagement from './AdminsManagement';
 
 interface SettingsComponentProps {
   companyName?: string;
@@ -10,14 +9,13 @@ interface SettingsComponentProps {
 
 const SettingsComponent: React.FC<SettingsComponentProps> = ({ companyName = "Your Company", companyId = "" }) => {
   const [deactivateDialogOpen, setDeactivateDialogOpen] = useState(false);
-  const [showAdminsManagement, setShowAdminsManagement] = useState(false);
 
   // Array of settings items for easier maintenance and consistent styling
   const settingsItems = [
     {
       title: "Manage admins",
       description: "Control who manages your page",
-      onClick: () => setShowAdminsManagement(true)
+      onClick: () => console.log("Manage amin members clicked")
     },
     {
       title: "Manage restricted members",
@@ -31,14 +29,6 @@ const SettingsComponent: React.FC<SettingsComponentProps> = ({ companyName = "Yo
     }
   ];
 
-  if (showAdminsManagement) {
-    return (
-      <AdminsManagement 
-        organizationId={companyId} 
-        onClose={() => setShowAdminsManagement(false)} 
-      />
-    );
-  }
 
   return (
     <div className="bg-white dark:bg-gray-900 rounded-lg shadow p-4 sm:p-6 dark:shadow-gray-800 w-full max-w-4xl mx-auto">
