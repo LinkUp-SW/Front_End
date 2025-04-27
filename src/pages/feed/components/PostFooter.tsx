@@ -355,29 +355,24 @@ const PostFooter: React.FC<PostFooterProps> = ({
         </div>
       </div>
 
-      {/* Comments Section - only show if there are comments or they've been loaded */}
-      {comments.hasInitiallyLoaded && (
+      {comments.hasInitiallyLoaded && comments.comments.length > 0 && (
         <div className="flex flex-col relative -left-1">
-          {/* Show comments if available */}
-          {comments.comments.length > 0 ? (
-            comments.comments.map((comment, index) => (
-              <CommentWithReplies
-                key={`comment-${comment._id || index}`}
-                postId={postId}
-                comment={comment}
-                replies={comment.children || []}
-                handleCreateComment={handleCreateComment}
-              />
-            ))
-          ) : (
-            <p className="text-center text-gray-500 dark:text-gray-400 py-4">
-              No comments yet. Be the first to comment!
-            </p>
-          )}
+          {/* Show existing comments */}
+          {comments.comments.map((comment, index) => (
+            <CommentWithReplies
+              key={`comment-${comment._id || index}`}
+              postId={postId}
+              comment={comment}
+              replies={
+                (comment.children && Object.values(comment.children)) || []
+              }
+              handleCreateComment={handleCreateComment}
+            />
+          ))}
 
-          {/* Loading state */}
-          {comments.isLoading && (
-            <div className="flex justify-center py-4">
+          {/* Inline loading indicator for "load more" action */}
+          {isLoadingMore && (
+            <div className="flex justify-center my-4">
               <div className="animate-pulse flex space-x-2">
                 <div className="h-2 w-2 bg-blue-500 rounded-full"></div>
                 <div className="h-2 w-2 bg-blue-500 rounded-full"></div>
@@ -386,10 +381,11 @@ const PostFooter: React.FC<PostFooterProps> = ({
             </div>
           )}
 
-          {/* Load More Comments Button */}
+          {/* Load More Comments Button - hidden during loading */}
           {comments.nextCursor !== null &&
             comments.nextCursor !== 0 &&
-            !comments.isLoading && (
+            !comments.isLoading &&
+            !isLoadingMore && (
               <div className="flex justify-center mt-2 mb-4">
                 <button
                   onClick={handleLoadMoreComments}
@@ -405,15 +401,18 @@ const PostFooter: React.FC<PostFooterProps> = ({
         </div>
       )}
 
-      {/* Conditionally render loading state for initial comment load */}
+      {/* Empty state - only shown when no comments and finished loading */}
+      {comments.hasInitiallyLoaded &&
+        comments.comments.length === 0 &&
+        !comments.isLoading && (
+          <p className="text-center text-gray-500 dark:text-gray-400 py-4">
+            No comments yet. Be the first to comment!
+          </p>
+        )}
+
+      {/* Initial loading state - shown when first loading comments */}
       {!comments.hasInitiallyLoaded && comments.isLoading && (
-        <div className="flex justify-center py-4">
-          <div className="animate-pulse flex space-x-2">
-            <div className="h-2 w-2 bg-blue-500 rounded-full"></div>
-            <div className="h-2 w-2 bg-blue-500 rounded-full"></div>
-            <div className="h-2 w-2 bg-blue-500 rounded-full"></div>
-          </div>
-        </div>
+        <div className="w-full"></div>
       )}
     </section>
   );
