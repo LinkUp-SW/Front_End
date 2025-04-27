@@ -473,10 +473,10 @@ const Post: React.FC<PostProps> = ({
         />
 
         {/* Post Image(s) */}
-        {(media && media.media_type === "image") ||
-          (media.media_type === "images" && (
-            <PostImages images={media.link || []} isLandscape={isLandscape} />
-          ))}
+        {((media && media.media_type === "image") ||
+          media.media_type === "images") && (
+          <PostImages images={media.link || []} isLandscape={isLandscape} />
+        )}
 
         {media && media.media_type === "video" && (
           <div className="flex w-1/3 relative left-4 self-center justify-end">
