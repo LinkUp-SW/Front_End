@@ -8,7 +8,6 @@ import messagingReducer from "./slices/messaging/messagingSlice";
 import modalReducer from "./slices/modal/modalSlice";
 import userBioReducer from "./slices/user_profile/userBioSlice";
 import postsReducer from "./slices/feed/postsSlice";
-import commentsReducer from "./slices/feed/commentsSlice";
 import educationReducer from "./slices/education/educationsSlice";
 import licenseReducer from "./slices/license/licensesSlice";
 import skillReducer from "./slices/skills/skillsSlice";
@@ -25,7 +24,6 @@ export const store = configureStore({
     messaging: messagingReducer,
     userBio: userBioReducer,
     posts: postsReducer,
-    comments: commentsReducer,
     education: educationReducer,
     license: licenseReducer,
     skill: skillReducer,

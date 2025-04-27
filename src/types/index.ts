@@ -51,49 +51,6 @@ export interface ProfileCardType {
   university: string;
 }
 
-export interface CommentType {
-  author: {
-    username: string;
-    firstName: string;
-    lastName: string;
-    headline: string;
-    profilePicture: string;
-    connectionDegree: string;
-  };
-  content: string;
-  media: {
-    link: string;
-    mediaType: "image" | "video" | "none";
-  };
-  reacts: string[];
-  tagged_users: string[];
-  is_edited: boolean;
-  userReaction?: string | null;
-  date: number;
-  reactions: {
-    reaction: string;
-  }[];
-  reactionsCount: number;
-  children?: Record<string, CommentType>;
-  userId?: string;
-  parentId: string;
-  _id: string;
-}
-
-export interface CommentObjectType {
-  comments: CommentType[];
-  count: number;
-  nextCursor: number;
-}
-
-export interface CommentDBType {
-  post_id: string;
-  content: string;
-  media: string;
-  parent_id: string | null;
-  tagged_users: string[];
-}
-
 export interface PostType {
   author: PostUserType;
 
@@ -101,6 +58,13 @@ export interface PostType {
   media: {
     link: string[];
     media_type: "image" | "images" | "video" | "link" | "pdf" | "post" | "none";
+  };
+  commentsData?: {
+    comments: CommentType[];
+    count: number;
+    nextCursor: number | null;
+    isLoading?: boolean;
+    hasInitiallyLoaded?: boolean;
   };
   commentsDisabled: string;
   publicPost: boolean;
@@ -133,6 +97,50 @@ export interface PostType {
   activityContext?: ActivityContextType;
 }
 
+export interface CommentType {
+  author: {
+    username: string;
+    firstName: string;
+    lastName: string;
+    headline: string;
+    profilePicture: string;
+    connectionDegree: string;
+  };
+  content: string;
+  media: {
+    link: string;
+    mediaType: "image" | "video" | "none";
+  };
+  reacts: string[];
+  tagged_users: string[];
+  is_edited: boolean;
+  userReaction?: string | null;
+  date: number;
+  reactions: {
+    reaction: string;
+  }[];
+  reactionsCount: number;
+  children?: CommentType[];
+
+  userId?: string;
+  parentId: string;
+  _id: string;
+}
+
+export interface CommentObjectType {
+  comments: CommentType[];
+  count: number;
+  nextCursor: number;
+}
+
+export interface CommentDBType {
+  post_id: string;
+  content: string;
+  media: string;
+  parent_id: string | null;
+  tagged_users: string[];
+}
+
 export interface StatsType {
   likes?: number;
   love?: number;
@@ -159,23 +167,6 @@ export interface PostUserType {
   profilePicture: string;
   connectionDegree: string;
   headline: string;
-}
-
-export interface PostDataType {
-  author: PostUserType;
-  content: string;
-  media: {
-    link: string[];
-    media_type: MediaType;
-  };
-  commentsDisabled: string;
-  publicPost: boolean;
-  taggedUsers: string[];
-  date: number;
-  reacts: string[];
-  isEdited?: boolean;
-  _id: string;
-  user_id: string;
 }
 
 export type PostFilter = "all" | "comments" | "reactions" | "reposts";
