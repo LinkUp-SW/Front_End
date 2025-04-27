@@ -136,7 +136,7 @@ const FeedPage: React.FC<FeedPageProps> = ({
 
   return (
     <>
-      <div className="flex justify-center relative w-full px-0 ">
+      <div className="flex justify-center relative w-full px-0 overflow-x-hidden ">
         <section className="flex w-full justify-center gap-4 px-0 sm:px-10 md:px-0 md:flex-row flex-col">
           {/* Left Sidebar */}
           <aside className="flex flex-col h-full w-full md:max-w-60">
