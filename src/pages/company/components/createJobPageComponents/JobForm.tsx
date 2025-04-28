@@ -60,7 +60,6 @@ export interface JobFormData extends Partial<Job> {
   hasEasyApply: boolean;
 }
 
-// Interface for company API result, making sure it has the required fields
 interface CompanyAPIResult {
   _id: string;
   name: string;
@@ -110,7 +109,7 @@ const JobForm: React.FC = () => {
     verified: true
   });
 
-  // Search for companies
+  
   const searchCompanies = async (query: string) => {
     if (!query || query.length < 2) {
       setCompanySearchResults([]);
@@ -121,10 +120,10 @@ const JobForm: React.FC = () => {
       setIsSearching(true);
       const response = await searchCompaniesAPI(query);
       
-      // Fix: Check for the correct response structure and properly type the response
-      if (response && 'companies' in response) {
-        // Force type casting since we know the structure
-        const companiesData = response.companies as unknown as CompanyAPIResult[];
+      // Fix: Check for the correct response structure based on the actual API response
+      if (response && response.data) {
+        // The API returns data in response.data array, not response.companies
+        const companiesData = response.data as unknown as CompanyAPIResult[];
         
         setCompanySearchResults(companiesData.map((company) => ({
           _id: company._id,

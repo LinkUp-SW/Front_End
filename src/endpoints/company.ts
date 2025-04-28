@@ -5,7 +5,7 @@ import {
   CompanyProfileResponse, 
   UserCompaniesResponse,
   Job
-} from "../../src/pages/jobs/types"; // Import from your unified types file
+} from "../../src/pages/jobs/types";
 
 // Helper functions
 const getAuthToken = () => {
@@ -23,8 +23,7 @@ const getAuthHeader = (token: string) => ({
 export const createCompanyProfile = async (companyData: CompanyProfileData): Promise<CompanyProfileResponse> => {
   const token = getAuthToken();
   const url = '/api/v1/company/create-company-profile';
-  
-  // Log the request data for debugging
+ 
   console.log('Creating company with data:', companyData);
   
   // Clean up data before sending - removing undefined values
@@ -64,7 +63,6 @@ export const updateCompanyProfile = async (companyId: string, companyData: Parti
   const token = getAuthToken();
   const url = `/api/v1/company/update-company-profile/${companyId}`;
   
-  // Log the update data for debugging
   console.log('Updating company with data:', {
     ...companyData,
     logo: companyData.logo ? '[BASE64_DATA]' : undefined
@@ -106,7 +104,7 @@ export const createJobFromCompany = async (organizationId: string, jobData: Part
   return response.data;
 };
 
-// Get jobs from a company
+
 export const getJobsFromCompany = async (organizationId: string): Promise<{ jobs: Job[] }> => {
   const token = getAuthToken();
   const url = `/api/v1/company/get-jobs-from-company/${organizationId}`;
@@ -115,7 +113,7 @@ export const getJobsFromCompany = async (organizationId: string): Promise<{ jobs
   return response.data;
 };
 
-export const searchCompanies = async (query: string): Promise<{ companies: CompanyProfileResponse[] }> => {
+export const searchCompanies = async (query: string): Promise<{ message: string; data: CompanyProfileResponse[] }> => {
   const token = getAuthToken();
   const url = `/api/v1/search/${query}`;
   

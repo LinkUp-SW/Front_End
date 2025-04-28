@@ -90,7 +90,7 @@ interface CompanyUpdateData {
 
 const ManageCompanyPage = () => {
   const { companyId } = useParams<{ companyId: string }>();
-  const [activeTab, setActiveTab] = useState<NavigationTab>('analytics');
+  const [activeTab, setActiveTab] = useState<NavigationTab>('jobs');
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
