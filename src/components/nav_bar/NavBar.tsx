@@ -20,6 +20,8 @@ import { useNavigate } from "react-router-dom";
 import SearchInput from "./SearchInput";
 import UserProfilePopover from "./UserProfilePopover";
 import { defaultProfileImage } from "@/constants";
+import { openCreatePostDialog } from "@/slices/feed/createPostSlice";
+import { CreatePost } from "@/pages/feed/components";
 
 const NavBar = () => {
   // Use the correctly typed dispatch
@@ -30,7 +32,7 @@ const NavBar = () => {
   const userId = Cookies.get("linkup_user_id");
   const [userPopOverOpen, setUserPopOverOpen] = useState(false);
   const [businessPopOverOpen, setBusinessPopOverOpen] = useState(false);
-  
+
   // Make sure to use the correct state property names (loading instead of loading)
   const { data, loading, error } = useSelector(
     (state: RootState) => state.userBio
@@ -76,6 +78,10 @@ const NavBar = () => {
     navigate("/company-creation");
   };
 
+  const handleCreatePost = () => {
+    dispatch(openCreatePostDialog());
+  };
+
   // Use the profile picture if available; otherwise, fall back to a default image.
   const profilePictureUrl = data?.profile_photo || defaultProfileImage;
   return (
@@ -85,6 +91,7 @@ const NavBar = () => {
           <img src={linkUpLogo} alt="LinkUp-Logo" className="w-9 dark:invert" />
 
           <SearchInput />
+          <CreatePost className="hidden" />
         </div>
         <div className="lg:flex items-center gap-4 hidden w-full max-w-[35rem]">
           <NavItems />
@@ -116,7 +123,10 @@ const NavBar = () => {
             </Popover>
           )}
 
-          <Popover open={businessPopOverOpen} onOpenChange={setBusinessPopOverOpen}>
+          <Popover
+            open={businessPopOverOpen}
+            onOpenChange={setBusinessPopOverOpen}
+          >
             <PopoverTrigger asChild>
               <button className="inline-flex cursor-pointer border-l pl-2 flex-col text-gray-600 dark:text-gray-300 items-center">
                 <BsFillGrid3X3GapFill size={30} />
@@ -133,17 +143,21 @@ const NavBar = () => {
                 <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 pb-2 border-b border-gray-200 dark:border-gray-700">
                   Business Option
                 </h3>
-                <button 
+                <button
                   id="create-company-button"
                   onClick={handleCreateCompany}
                   className="w-full text-left px-3 py-3 hover:bg-blue-50 dark:hover:bg-gray-700 rounded-md transition-colors duration-200 flex items-center gap-3 group"
                 >
                   <div className="bg-blue-100 dark:bg-gray-700 p-2 rounded-md group-hover:bg-blue-200 dark:group-hover:bg-gray-600 transition-colors duration-200">
-                    <HiOutlineBuildingOffice2 className="text-blue-600 dark:text-blue-400" size={18} />
+                    <HiOutlineBuildingOffice2
+                      className="text-blue-600 dark:text-blue-400"
+                      size={18}
+                    />
                   </div>
                   <div>
                     <span className="font-medium text-gray-800 dark:text-gray-200 flex items-center">
-                      Create a company page <FaPlus className="ml-2 text-blue-500" size={12} />
+                      Create a company page{" "}
+                      <FaPlus className="ml-2 text-blue-500" size={12} />
                     </span>
                     <span className="text-xs text-gray-500 dark:text-gray-400 block mt-1">
                       Build your professional business presence
@@ -155,7 +169,7 @@ const NavBar = () => {
           </Popover>
         </div>
         <div className="lg:hidden flex items-center gap-2 text-gray-500 dark:text-gray-300">
-          <i>
+          <i onClick={handleCreatePost}>
             <FaPlusSquare size={30} />
           </i>
           <i className="scale-x-[-1]">

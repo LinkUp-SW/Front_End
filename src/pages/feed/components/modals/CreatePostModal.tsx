@@ -27,6 +27,9 @@ import { IoClose as CloseIcon } from "react-icons/io5";
 import DocumentPreview from "./DocumentPreview";
 import LinkPreview from "../LinkPreview"; // Import the LinkPreview component
 import React from "react";
+import UserTagging from "@/pages/feed/components/UserTagging";
+import { processTextFormatting } from "@/components/truncate_text/TruncatedText";
+import { PostDBObject } from "@/types";
 
 interface CreatePostModalProps {
   profileImageUrl: string;
@@ -37,6 +40,9 @@ interface CreatePostModalProps {
   setSelectedMedia: (images: File[]) => void;
   submitPost: (value?: string) => void;
   privacySetting: string;
+  taggedUsers: { name: string; id: string }[];
+  setTaggedUsers: (users: Array<{ name: string; id: string }>) => void;
+  post?: PostDBObject | null;
 }
 
 const CreatePostModal: React.FC<CreatePostModalProps> = ({
@@ -48,14 +54,39 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
   setSelectedMedia,
   submitPost,
   privacySetting,
+  taggedUsers,
+  setTaggedUsers,
+  post,
 }) => {
   const { data } = useSelector((state: RootState) => state.userBio);
   const MemoizedEmojiPicker = memo(EmojiPicker);
   const darkMode = useSelector((state: RootState) => state.theme.theme);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // State to track detected URL
   const [detectedUrl, setDetectedUrl] = useState<string | null>(null);
+  if (post) {
+    setPostText(post.content);
+    if (post.media && post.media.length > 0) {
+      setDetectedUrl(post.media[0]);
+    }
+    if (post.media && post.media.length > 0) {
+      fetch(post.media[0])
+        .then((response) => response.blob())
+        .then((blob) => {
+          const file = new File([blob], "post-media", { type: blob.type });
+          setSelectedMedia([file]);
+        });
+    }
+    if (post.taggedUsers) {
+      const formattedUsers = post.taggedUsers.map((userId) => ({
+        name: userId, // You might want to fetch the actual name from somewhere
+        id: userId,
+      }));
+      setTaggedUsers(formattedUsers);
+    }
+  }
   const handleTextChange = React.useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
       setPostText(e.target.value);
@@ -68,6 +99,11 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
     const matches = text.match(urlRegex);
     return matches && matches.length > 0 ? matches[0] : null;
   };
+
+  useEffect(() => {
+    setTaggedUsers(extractTaggedUsers(postText));
+    console.log(taggedUsers);
+  }, [postText]);
 
   // Detect URL when post text changes
   // Use debounce for URL detection
@@ -116,19 +152,34 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
           </div>
         </div>
       </div>
-      <div className="flex flex-col w-full overflow-y-visible">
-        {/* Text Area */}
-        <TextareaAutoResize
-          rows={4}
-          placeholder="What do you want to talk about?"
-          value={postText}
-          onChange={handleTextChange}
-          autoFocus
-          draggable={false}
-          className="w-full resize-none min-h-[10rem] overflow-hidden outline-0 text-xl border-0 ring-0 
-    focus:ring-0 focus:border-0 focus-visible:border-0 focus-visible:ring-0 dark:bg-gray-900"
-          id="text-input"
-        />
+      <div className="flex flex-col w-full overflow-y-visible relative">
+        {/* User tagging component wrapping the textarea */}
+        <UserTagging
+          text={postText}
+          onTextChange={setPostText}
+          inputRef={textareaRef}
+          className="w-full"
+        >
+          {/* The textarea is a child of UserTagging */}
+          <TextareaAutoResize
+            ref={textareaRef}
+            rows={4}
+            placeholder="What do you want to talk about?"
+            value={postText}
+            onChange={handleTextChange}
+            autoFocus
+            draggable={false}
+            className="w-full resize-none min-h-[10rem] overflow-hidden outline-0 text-xl border-0 ring-0 
+              focus:ring-0 focus:border-0 focus-visible:border-0 focus-visible:ring-0 dark:bg-gray-900"
+            id="text-input"
+          />
+          {taggedUsers.length > 0 && (
+            <div className="mt-2 mb-4 p-3 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800">
+              <p className="text-sm mb-1 text-gray-500 dark:text-gray-400"></p>
+              <FormattedContentText text={postText} />
+            </div>
+          )}
+        </UserTagging>
 
         {selectedMedia.length > 0 && (
           <div>
@@ -271,8 +322,17 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
         <div className="flex w-full justify-end border-t dark:border-gray-600 pt-4 gap-2">
           <BlueButton
             onClick={async () => {
+              // Extract tagged users with IDs for your API
+              const taggedUsers = extractTaggedUsers(postText);
+              // Get just the IDs for the API
+              const taggedUserIds = taggedUsers.map((user) => user.id);
+
+              console.log("Tagged users:", taggedUsers);
+              console.log("Tagged user IDs:", taggedUserIds);
+
+              // Format the content for display (remove the :user_id parts)
+
               if (detectedUrl && selectedMedia.length === 0) {
-                console.log("Submitting post with link:", detectedUrl);
                 submitPost(detectedUrl);
                 setDetectedUrl(null);
               } else {
@@ -295,3 +355,63 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
 };
 
 export default CreatePostModal;
+
+// Update the FormattedContentText component
+export const FormattedContentText = ({ text }: { text: string }) => {
+  // Use a regex that matches from @ to ^ (complete tag)
+  const parts = text.split(/(@[^:]+:[A-Za-z0-9_-]+\^)/g);
+
+  return (
+    <div className="formatted-text">
+      {parts.map((part, index) => {
+        // Check if this part is a tag with the new format
+        if (part.match(/^@[^:]+:[A-Za-z0-9_-]+\^$/)) {
+          // Extract both the name and ID parts
+          const nameMatch = part.match(/@([^:]+):/);
+          const idMatch = part.match(/:([A-Za-z0-9_-]+)\^/);
+
+          if (nameMatch && nameMatch[1] && idMatch && idMatch[1]) {
+            const displayName = nameMatch[1];
+            const userId = idMatch[1];
+
+            return (
+              <a
+                key={index}
+                href={`/user-profile/${userId}`}
+                className="bg-blue-100 text-blue-700 rounded px-1 py-0.5 dark:bg-blue-900 dark:text-blue-300 hover:underline cursor-pointer"
+              >
+                {displayName}
+              </a>
+            );
+          }
+        }
+
+        // Regular text with rich formatting
+        return (
+          <React.Fragment key={index}>
+            {processTextFormatting(part, index)}
+          </React.Fragment>
+        );
+      })}
+    </div>
+  );
+};
+
+export const extractTaggedUsers = (
+  text: string
+): { name: string; id: string }[] => {
+  // Update regex to match the new format with a caret at the end
+  // This will match @Any Name With Spaces:userId^ format
+  const regex = /@([^:]+):([A-Za-z0-9_-]+)\^/g;
+
+  const users: { name: string; id: string }[] = [];
+  let match;
+
+  while ((match = regex.exec(text)) !== null) {
+    const name = match[1]; // No need to replace underscores anymore
+    const id = match[2];
+    users.push({ name, id });
+  }
+
+  return users;
+};

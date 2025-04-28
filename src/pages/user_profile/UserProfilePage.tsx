@@ -9,6 +9,7 @@ import {
   UserInfo,
   ViewedSection,
 } from "./components";
+import Activity from "./components/Activity";
 
 const UserProfilePage = () => {
   return (
@@ -18,6 +19,7 @@ const UserProfilePage = () => {
         <div className="lg:col-span-2 space-y-4">
           <UserInfo />
           <AboutSection />
+          <Activity />
           <ExperienceSection />
           <EducationSection />
           <LicenseSection />

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   WithNavBar,
   ProfileCard,
@@ -8,94 +8,123 @@ import {
 } from "../../components";
 import { PremiumBanner, Shortcuts, CreatePost, Post } from "./components";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
-import { CommentObjectType } from "@/types";
-import { fetchSinglePost } from "@/endpoints/feed";
-import { useParams } from "react-router-dom";
+import { fetchSinglePost, getPostsFeed } from "@/endpoints/feed";
+import { useNavigate, useParams } from "react-router-dom";
 import Cookies from "js-cookie";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { setPosts } from "@/slices/feed/postsSlice"; // adjust if needed
-import { setComments } from "@/slices/feed/commentsSlice";
 
 interface FeedPageProps {
   single?: boolean;
+  profile?: boolean;
 }
 import PostSkeleton from "./components/PostSkeleton";
+import { getUserPosts } from "@/endpoints/userProfile";
+import { toast } from "sonner";
 
-const FeedPage: React.FC<FeedPageProps> = ({ single = false }) => {
+const FeedPage: React.FC<FeedPageProps> = ({
+  single = false,
+  profile = false,
+}) => {
   const posts = useSelector((state: RootState) => state.posts.list);
-  const comments = useSelector((state: RootState) => state.comments.list);
   const dispatch = useDispatch();
   const { id } = useParams<{ id: string }>(); // Extract the 'id' parameter from the URL
   const [viewMore, setViewMore] = useState(true);
   const screenWidth = useSelector((state: RootState) => state.screen.width);
-
+  // Add/modify these state variables at the top of your component
+  const [nextCursor, setNextCursor] = useState<number>(0);
+  const [hasMore, setHasMore] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
-
-  const temporary_feed = [
-    "6806b5a2bfb3de42b857be4c",
-
-    "680ba14b801a855626ece75c",
-    "680ba0a9801a855626ece74d",
-    "680ba090801a855626ece73e",
-    "680b70ca2ea9ffaf2afa7c12",
-    "680ace66b57681e1e91b8d39",
-    "680a6fafb57681e1e91b7c0b",
-    "680a6f79b57681e1e91b7bf9",
-    "680a6b3eb57681e1e91b7b52",
-    "680a6702b57681e1e91b7a52",
-  ];
+  const [initialLoading, setInitialLoading] = useState(true);
+  const observerRef = useRef<HTMLDivElement | null>(null);
 
   const user_token = Cookies.get("linkup_auth_token");
 
-  useEffect(() => {
+  const loadMorePosts = async () => {
+    if (!hasMore || isLoading) return;
+
+    if (!user_token) {
+      toast.error("You must be logged in to view this feed.");
+      navigate("/login", { replace: true });
+      return;
+    }
+
     setIsLoading(true);
-    const fetchData = async () => {
-      try {
-        if (single && !id) {
-          console.error("ID is required for single post view");
-          return;
-        }
+    try {
+      const postPayload = {
+        cursor: nextCursor,
+        limit: 5,
+      };
 
-        // Call both endpoints concurrently
-        const [fetchedData] = await Promise.all([
-          Promise.all(
-            (!single || !id
-              ? temporary_feed.map((postId) =>
-                  fetchSinglePost(postId, user_token ?? "", 0, 10)
-                )
-              : [fetchSinglePost(id, user_token ?? "", 0, 10)]
-            ).filter(Boolean)
-          ),
-        ]);
-        const posts = fetchedData.map((data) => data.post);
-        const comments: CommentObjectType[] = fetchedData.map(
-          (data) => data.comments
-        );
-        console.log(fetchedData);
-        console.log("Posts:", posts);
-        console.log("Comments:", comments);
-        comments.forEach((block) => {
-          block.comments = Object.values(block.comments).reverse();
-        });
-
-        if (posts.length > 0) dispatch(setPosts(posts));
-        else dispatch(setPosts([]));
-        if (comments.length > 0) {
-          dispatch(setComments(comments));
+      // Updated logic to use getFeedPosts
+      if (profile && id) {
+        // Profile posts
+        const response = await getUserPosts(user_token, id, postPayload);
+        if (response && response.posts && response.posts.length > 0) {
+          dispatch(setPosts([...posts, ...response.posts]));
+          setNextCursor(nextCursor + response.posts.length);
+          setHasMore(response.posts.length === 5);
         } else {
-          dispatch(setComments([]));
+          setHasMore(false);
         }
-        setIsLoading(false);
-      } catch (error) {
-        dispatch(setPosts([]));
-        dispatch(setComments([]));
-        console.error("Error fetching feed data", error);
+      } else if (single && id) {
+        // Single post
+        const post = await fetchSinglePost(id, user_token);
+        dispatch(setPosts([post]));
+        setHasMore(false);
+      } else {
+        // Feed posts - now using getPostsFeed
+        const response = await getPostsFeed(user_token, postPayload);
+        if (response && response.posts && response.posts.length > 0) {
+          dispatch(setPosts([...posts, ...response.posts]));
+          setNextCursor(nextCursor + response.posts.length);
+          setHasMore(response.posts.length === 5);
+        } else {
+          setHasMore(false);
+        }
+      }
+    } catch (error) {
+      console.error("Error loading posts:", error);
+      toast.error("Failed to load posts");
+    } finally {
+      setIsLoading(false);
+      setInitialLoading(false);
+    }
+  };
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !isLoading) {
+          loadMorePosts();
+        }
+      },
+      { threshold: 0.5 }
+    );
+
+    if (observerRef.current) {
+      observer.observe(observerRef.current);
+    }
+
+    return () => {
+      if (observerRef.current) {
+        observer.unobserve(observerRef.current);
       }
     };
+  }, [hasMore, isLoading, nextCursor]);
 
-    fetchData();
-  }, [id]);
+  // After successful initial fetch, add:
+
+  useEffect(() => {
+    dispatch(setPosts([]));
+    const initialFetch = async () => {
+      await loadMorePosts();
+    };
+    initialFetch();
+  }, []);
 
   useEffect(() => {
     if (screenWidth < 768) {
@@ -107,7 +136,7 @@ const FeedPage: React.FC<FeedPageProps> = ({ single = false }) => {
 
   return (
     <>
-      <div className="flex justify-center relative w-full px-0 ">
+      <div className="flex justify-center relative w-full px-0 overflow-x-hidden ">
         <section className="flex w-full justify-center gap-4 px-0 sm:px-10 md:px-0 md:flex-row flex-col">
           {/* Left Sidebar */}
           <aside className="flex flex-col h-full w-full md:max-w-60">
@@ -142,30 +171,27 @@ const FeedPage: React.FC<FeedPageProps> = ({ single = false }) => {
           <main className="flex flex-col w-full max-w-auto md:max-w-[27.8rem] lg:max-w-[35rem]">
             {!single && <CreatePost />}
             <div className="mt-4"></div>
-            {isLoading ? (
-              // Skeleton loaders while loading
+            {initialLoading ? (
               <div className="space-y-4">
                 {Array.from({ length: 5 }).map((_, index) => (
                   <PostSkeleton key={`skeleton-${index}`} />
                 ))}
               </div>
-            ) : posts.length != 0 ? (
-              posts.map((post, index) => {
-                return (
+            ) : posts.length > 0 ? (
+              <>
+                {posts.map((post) => (
                   <Post
                     key={`post-${post._id}`}
                     viewMore={viewMore}
                     postData={post}
-                    comments={comments[index]}
-                    action={post.action}
-                    posts={posts}
-                    allComments={comments}
-                    order={index}
+                    action={post.activityContext}
                   />
-                );
-              })
+                ))}
+                {isLoading && <PostSkeleton />}
+                <div ref={observerRef} className="h-10" />
+              </>
             ) : (
-              <p className="text-center text-2xl bg-white border rounded-lg p-4">
+              <p className="text-center text-2xl bg-white dark:bg-gray-900 border-0 rounded-lg p-4">
                 No posts to display. Start connecting to people!
               </p>
             )}

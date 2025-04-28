@@ -41,7 +41,6 @@ import OTP from "./pages/settings/updateEmail/OTP";
 
 import React from "react";
 
-
 // Define your routes as an array of RouteObject (compatible with React Router v6)
 const routes: RouteObject[] = [
   //Add routes and their corresponding needed component page
@@ -87,6 +86,10 @@ const routes: RouteObject[] = [
   {
     path: "/feed/posts/:id",
     element: React.createElement(FeedPage, { single: true }),
+  },
+  {
+    path: "/user-profile/:id/posts",
+    element: React.createElement(FeedPage, { profile: true }),
   },
 
   {

@@ -56,9 +56,7 @@ const LinkPreview: React.FC<LinkPreviewProps> = ({ url, className }) => {
 
   if (error || !metadata) {
     return (
-      <a
-        href={url}
-        target="_blank"
+      <div
         rel="noopener noreferrer"
         className={`block border dark:border-gray-700 rounded-lg overflow-hidden hover:bg-gray-50 dark:hover:bg-gray-800 transition ${className}`}
       >
@@ -66,14 +64,12 @@ const LinkPreview: React.FC<LinkPreviewProps> = ({ url, className }) => {
           <FaGlobe className="h-5 w-5 text-gray-400 mr-2" />
           <p className="text-blue-600 dark:text-blue-400 break-all">{url}</p>
         </div>
-      </a>
+      </div>
     );
   }
 
   return (
-    <a
-      href={url}
-      target="_blank"
+    <div
       rel="noopener noreferrer"
       className={`block border mt-5 dark:border-gray-700 rounded-lg overflow-hidden hover:bg-gray-50 dark:hover:bg-gray-800 transition shadow-sm ${className}`}
     >
@@ -123,7 +119,7 @@ const LinkPreview: React.FC<LinkPreviewProps> = ({ url, className }) => {
           <FaExternalLinkAlt className="h-3 w-3 text-gray-400 flex-shrink-0" />
         </div>
       </div>
-    </a>
+    </div>
   );
 };
 

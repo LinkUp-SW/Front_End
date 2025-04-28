@@ -12,9 +12,15 @@ import CelebrateIcon from "@/assets/Celebrate.svg";
 import LikeIcon from "@/assets/Like.svg";
 import { AiOutlineLike as LikeEmoji } from "react-icons/ai";
 import LoveIcon from "@/assets/Love.svg";
-import LaughIcon from "@/assets/Funny.svg";
 import InsightfulIcon from "@/assets/Insightful.svg";
 import SupportIcon from "@/assets/Support.svg";
+import TruncatedText from "@/components/truncate_text/TruncatedText";
+import {
+  removeComment,
+  removeReply,
+  updateCommentReaction,
+} from "@/slices/feed/postsSlice";
+
 import {
   getCommentActions,
   getPrivateCommentActions,
@@ -38,21 +44,19 @@ import {
   deleteComment,
   deleteReaction,
 } from "@/endpoints/feed";
-import { CommentType, StatsType } from "@/types";
+import { CommentType } from "@/types";
 import moment from "moment";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "@/store";
-import DOMPurify from "dompurify";
+import { useDispatch } from "react-redux";
+
 import Cookies from "js-cookie";
 import TransparentButton from "./buttons/TransparentButton";
 import BlueButton from "./buttons/BlueButton";
 import { toast } from "sonner";
 import IconButton from "./buttons/IconButton";
-import { setComments } from "@/slices/feed/commentsSlice";
+import { getReactionIcons } from "./Post";
 
 export interface CommentProps {
   comment: CommentType;
-  stats: StatsType;
   setIsReplyActive: React.Dispatch<React.SetStateAction<boolean>>;
   postId: string;
 }
@@ -61,7 +65,6 @@ const token = Cookies.get("linkup_auth_token");
 
 const Comment: React.FC<CommentProps> = ({
   comment,
-  stats,
   setIsReplyActive,
   postId,
 }) => {
@@ -73,25 +76,15 @@ const Comment: React.FC<CommentProps> = ({
     connectionDegree,
     headline,
   } = comment.author;
-  const comments = useSelector((state: RootState) => state.comments.list);
   const dispatch = useDispatch();
 
-  if (!stats) {
-    stats = {
-      likes: 15,
-      love: 2,
-      support: 1,
-      celebrate: 1,
-      comments: 2,
-      reposts: 5,
-      person: "Hamada",
-    };
-  }
+  const stats = {
+    comments: comment.children && comment.children.length,
+    total: comment.reactionsCount,
+  };
 
   const { content, date, is_edited, media } = comment;
   const myUserId = Cookies.get("linkup_user_id");
-
-  const sanitizedContent = DOMPurify.sanitize(content);
 
   const [commentMenuOpen, setCommentMenuOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -99,6 +92,9 @@ const Comment: React.FC<CommentProps> = ({
   const [selectedReaction, setSelectedReaction] = useState("None"); // Like, Love, etc.
   const [reactionsOpen, setReactionsOpen] = useState(false); // for Popover open state
   const [viewMore, setViewMore] = useState(false); // if you want to toggle text next to icons
+  const [topStats, setTopStats] = useState(
+    getReactionIcons(comment.topReactions || comment.reactions || [])
+  );
 
   const handleMouseEnter = () => {
     setReactionsOpen(true);
@@ -121,12 +117,13 @@ const Comment: React.FC<CommentProps> = ({
     fetchData();
     setIsLoading(false);
     console.log(isLoading, setViewMore, media);
-  }, []);
 
-  let countChildren = 0;
-  if (comment.children) {
-    countChildren = Object.keys(comment.children).length;
-  }
+    if (comment.userReaction)
+      setSelectedReaction(
+        comment.userReaction.charAt(0).toUpperCase() +
+          comment.userReaction.slice(1).toLowerCase()
+      );
+  }, [comment]);
 
   const reactionIcons = [
     { name: "Celebrate", icon: CelebrateIcon },
@@ -137,58 +134,7 @@ const Comment: React.FC<CommentProps> = ({
     { name: "Support", icon: SupportIcon },
   ];
 
-  const statsArray = [
-    {
-      name: "celebrate",
-      count: stats.celebrate,
-      icon: <img src={CelebrateIcon} alt="Celebrate" width={15} height={15} />,
-    },
-    {
-      name: "love",
-      count: stats.love,
-      icon: <img src={LoveIcon} alt="Love" width={15} height={15} />,
-    },
-    {
-      name: "insightful",
-      count: stats.insightful,
-      icon: (
-        <img src={InsightfulIcon} alt="Insightful" width={15} height={15} />
-      ),
-    },
-    {
-      name: "support",
-      count: stats.support,
-      icon: <img src={SupportIcon} alt="Support" width={15} height={15} />,
-    },
-    {
-      name: "funny",
-      count: stats.funny,
-      icon: <img src={LaughIcon} alt="Funny" width={15} height={15} />,
-    },
-    {
-      name: "like",
-      count: stats.likes,
-      icon: <img src={LikeIcon} alt="Like" width={15} height={15} />,
-    },
-  ];
-
-  const topStats = statsArray
-    .filter((stat) => stat.count)
-    .sort((a, b) => (b.count || 0) - (a.count || 0))
-    .slice(0, 3);
-  if (!topStats.length) {
-    topStats.push(statsArray[5]);
-  }
-
   const navigate = useNavigate();
-
-  const totalStats =
-    (stats.likes || 0) +
-    (stats.celebrate || 0) +
-    (stats.love || 0) +
-    (stats.insightful || 0) +
-    (stats.support || 0) +
-    (stats.funny || 0);
 
   const copyLink = () => {};
   const editComment = () => {};
@@ -204,59 +150,48 @@ const Comment: React.FC<CommentProps> = ({
     if (value != "None") {
       handleCreateReaction(value);
     } else {
-      handleDeleteReaction();
+      handleDeleteReaction(value);
     }
   };
 
+  // Replace your handleCreateReaction function with this improved version
   const handleCreateReaction = async (selected_reaction: string) => {
     if (!token) {
       toast.error("You must be logged in to add a reaction.");
       navigate("/login", { replace: true });
       return;
     }
+
     const reaction = {
       target_type: "Comment",
       reaction: selected_reaction.toLowerCase(),
       comment_id: comment._id,
     };
+
     try {
+      // Show loading indicator or toast if needed
       const result = await createReaction(reaction, postId, token);
-      const newestComments = [...comments];
-      console.log(newestComments, result);
+      console.log("Adding reaction", result);
+      setTopStats(getReactionIcons(result.topReactions || []));
+      dispatch(
+        updateCommentReaction({
+          postId: postId,
+          commentId: comment._id,
+          reactions: result.topReactions,
+          reactionsCount: result.totalCount,
+          userReaction: selected_reaction.toLowerCase(),
+        })
+      );
 
-      // newestComments.forEach((block) => {
-      //   block.comments.forEach((singleComment) => {
-      //     if (singleComment._id === comment._id) {
-      //       // Ensure reacts
-      //       if (!singleComment.reacts) singleComment.reacts = [];
-      //       if (!singleComment.reacts.includes(result.reaction._id)) {
-      //         singleComment.reacts.push(result.reaction);
-      //       }
-
-      //       // Ensure reactions
-      //       if (!singleComment.reactions) singleComment.reactions = [];
-
-      //       if (singleComment.reactions.length < 3) {
-      //         singleComment.reactions.push({ reaction: selectedReaction });
-      //       }
-
-      //       // Always increment reactionsCount
-      //       singleComment.reactionsCount += 1;
-      //     }
-      //   });
-      // });
-
-      // // Dispatch the updated comments to the Redux store
-      // dispatch(setComments(newestComments));
-
-      console.log("New comments", comments);
+      // Update Redux state with the new comments
     } catch (error) {
-      console.log(error);
+      console.error("Error creating reaction:", error);
+      toast.error("Failed to add reaction. Please try again.");
     }
   };
 
-  const handleDeleteReaction = async () => {
-    console.log("Deleting reaction", selectedReaction);
+  // Replace your handleDeleteReaction function with this improved version
+  const handleDeleteReaction = async (selected_reaction: string) => {
     if (!token) {
       toast.error("You must be logged in to remove a reaction.");
       navigate("/login", { replace: true });
@@ -265,27 +200,26 @@ const Comment: React.FC<CommentProps> = ({
 
     try {
       const result = await deleteReaction(
-        { target_type: "Comment" },
-        comment._id,
+        { target_type: "Comment", comment_id: comment._id },
+        postId,
         token
       );
-      console.log(result);
-      // dispatch(
-      //   setPosts(
-      //     posts.map((post) =>
-      //       post.reacts.includes(result.reaction._id)
-      //         ? {
-      //             ...post,
+      setTopStats(getReactionIcons(result.topReactions || []));
 
-      //             reacts: post.reacts.filter((r) => r !== result.reaction._id),
-      //           }
-      //         : post
-      //     )
-      //   )
-      // );
-      console.log("New comments", comments);
+      dispatch(
+        updateCommentReaction({
+          postId: postId,
+          commentId: comment._id,
+          reactions: result.topReactions,
+          reactionsCount: result.totalCount,
+          userReaction: selected_reaction.toLowerCase(),
+        })
+      );
+
+      // Update Redux state with the new comments
     } catch (error) {
-      console.log(error);
+      console.error("Error deleting reaction:", error);
+      toast.error("Failed to remove reaction. Please try again.");
     }
   };
 
@@ -296,7 +230,7 @@ const Comment: React.FC<CommentProps> = ({
       return;
     }
 
-    const loadingToastId = toast.loading("Deleting your post...");
+    const loadingToastId = toast.loading("Deleting your comment...");
 
     try {
       // Call the API to delete the post
@@ -306,46 +240,27 @@ const Comment: React.FC<CommentProps> = ({
         token
       );
       console.log("Deleted:", result);
-      const updated_Comments = comments.map((block) => {
-        const newComments = block.comments.filter((c) => c._id !== comment._id);
-        return {
-          ...block,
-          comments: newComments,
-          count: newComments.length, // 👈 update count
-        };
-      });
-      console.log("Updated comments:", updated_Comments);
-      dispatch(setComments(updated_Comments));
+
       console.log("Comment:", comment);
       if (comment.parentId) {
-        const updatedComments = comments.map((block) => ({
-          ...block,
-          comments: block.comments.map((parentComment) => {
-            if (
-              parentComment.children &&
-              Object.prototype.hasOwnProperty.call(
-                parentComment.children,
-                comment._id
-              )
-            ) {
-              const { ...remainingChildren } = parentComment.children;
-              delete remainingChildren[comment._id];
-
-              return {
-                ...parentComment,
-                children: remainingChildren,
-              };
-            }
-
-            return parentComment;
-          }),
-        }));
-        dispatch(setComments(updatedComments));
+        console.log(
+          `Removing reply ${comment._id} from parent ${comment.parentId}`
+        );
+        dispatch(
+          removeReply({
+            postId,
+            commentId: comment.parentId, // Parent comment ID
+            replyId: comment._id, // This reply's ID
+          })
+        );
+      } else {
+        dispatch(removeComment({ postId: postId, commentId: comment._id }));
       }
 
       // Show success toast
       toast.success("Comment deleted successfully!");
       toast.dismiss(loadingToastId); // Dismiss the loading toast
+      // Update the state to remove the deleted comment
       setDeleteModal(false);
     } catch (error) {
       console.error("Error deleting Comment:", error);
@@ -487,10 +402,14 @@ const Comment: React.FC<CommentProps> = ({
           </div>
         </div>
       </header>
-      <p
-        className="p-1 pl-11 text-xs md:text-sm whitespace-pre-wrap"
-        dangerouslySetInnerHTML={{ __html: sanitizedContent }}
-      ></p>
+      <div className="p-1 pl-11 text-xs md:text-sm whitespace-pre-wrap">
+        <TruncatedText
+          content={content}
+          lineCount={3}
+          id={`comment-${comment._id}`}
+          className="  ml-0 relative -left-5"
+        />
+      </div>
       <footer className="flex pl-10 justify-start items-center gap-0.5 ">
         {/* <div className="flex justify-start w-full items-center pt-4 gap-0"> */}
         <Popover open={reactionsOpen} onOpenChange={setReactionsOpen}>
@@ -626,33 +545,37 @@ const Comment: React.FC<CommentProps> = ({
           </TooltipProvider>
         </Popover>
 
-        <p className="text-xs text-gray-500 dark:text-neutral-400 font-bold">
-          {" "}
-          ·
-        </p>
-
-        <Dialog>
-          <DialogTrigger asChild>
-            <button className="flex border-r pr-3 relative items-end text-gray-500 dark:text-neutral-400 text-xs hover:underline hover:cursor-pointer hover:text-blue-600 dark:hover:text-blue-400">
-              {topStats.map((stat, index) => (
-                <span
-                  key={index}
-                  className="flex items-center text-black dark:text-neutral-200 text-lg"
-                >
-                  {stat.icon}
-                </span>
-              ))}
-              {totalStats}
-            </button>
-          </DialogTrigger>
-          <DialogContent className="dark:bg-gray-900 min-w-[20rem] sm:min-w-[35rem] w-auto dark:border-gray-700">
-            <DialogTitle className=" px-2 text-xl font-medium">
-              Reactions
-            </DialogTitle>
-            <DialogDescription />
-            <ReactionsModal postId={postId} commentId={comment._id} />
-          </DialogContent>
-        </Dialog>
+        {stats.total != 0 && (
+          <>
+            {" "}
+            <p className="text-xs text-gray-500 dark:text-neutral-400 font-bold">
+              {" "}
+              ·
+            </p>
+            <Dialog>
+              <DialogTrigger asChild>
+                <button className="flex pr-3 relative items-end text-gray-500 dark:text-neutral-400 text-xs hover:underline hover:cursor-pointer hover:text-blue-600 dark:hover:text-blue-400">
+                  {topStats.map((stat, index) => (
+                    <span
+                      key={index}
+                      className="flex items-center text-black dark:text-neutral-200 text-lg"
+                    >
+                      {stat}
+                    </span>
+                  ))}
+                  {stats.total}
+                </button>
+              </DialogTrigger>
+              <DialogContent className="dark:bg-gray-900 min-w-[20rem] sm:min-w-[35rem] w-auto dark:border-gray-700">
+                <DialogTitle className=" px-2 text-xl font-medium">
+                  Reactions
+                </DialogTitle>
+                <DialogDescription />
+                <ReactionsModal postId={postId} commentId={comment._id} />
+              </DialogContent>
+            </Dialog>
+          </>
+        )}
 
         <Button
           variant="ghost"
@@ -662,18 +585,26 @@ const Comment: React.FC<CommentProps> = ({
             setIsReplyActive(true);
           }}
         >
-          Reply
+          | Reply
         </Button>
-        {countChildren != 0 && (
-          <>
-            <p className="text-xs  text-gray-500 dark:text-neutral-400 font-bold">
-              {" "}
-              ·
-            </p>
-            <p className="hover:underlinetext-xs text-xs text-gray-500 line-clamp-1 text-ellipsis dark:text-neutral-400 hover:text-blue-600 hover:underline dark:hover:text-blue-400 hover:cursor-pointer">
-              {countChildren == 1 ? "1 Reply" : `${countChildren} Replies`}
-            </p>
-          </>
+        {comment.childrenCount ? (
+          comment.childrenCount != 0 && (
+            <>
+              <p className="text-xs  text-gray-500 dark:text-neutral-400 font-bold">
+                {" "}
+                ·
+              </p>
+              <p className="hover:underlinetext-xs text-xs text-gray-500 line-clamp-1 text-ellipsis dark:text-neutral-400 hover:text-blue-600 hover:underline dark:hover:text-blue-400 hover:cursor-pointer">
+                {comment.childrenCount &&
+                comment.childrenCount != 0 &&
+                comment.childrenCount == 1
+                  ? "1 Reply"
+                  : `${comment.childrenCount} Replies`}
+              </p>
+            </>
+          )
+        ) : (
+          <></>
         )}
       </footer>
     </div>
