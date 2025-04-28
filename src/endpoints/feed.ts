@@ -121,6 +121,7 @@ export const getPostsFeed = async (
   postPayload: {
     cursor: number;
     limit: number;
+    replyLimit?: number | 3;
   }
 ): Promise<{ posts: PostType[]; nextCursor: number | null }> => {
   const response = await axiosInstance.get(`/api/v1/post/posts/feed`, {
@@ -169,17 +170,13 @@ export const fetchSinglePost = async (
       },
       params: {
         limit: 5,
+        replyLimit: 3,
       },
     });
     console.log("FetchSinglePost response:", response.data);
 
     // Extract comments from the response
-    const commentsArray = Object.values(
-      response.data.comments?.comments || {}
-    ).map((comment: any) => ({
-      ...comment,
-      children: Object.values(comment.children || {}),
-    }));
+    const commentsArray = response.data.comments?.comments;
     const commentsCount = response.data.comments?.count || 0;
     const commentsCursor = response.data.comments?.nextCursor || null;
 
@@ -343,6 +340,15 @@ export const editComment = async (
 
 export const createPost = async (postPayload: PostDBObject, token: string) => {
   const response = await axiosInstance.post("api/v1/post/posts", postPayload, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data;
+};
+
+export const editPost = async (postPayload: PostDBObject, token: string) => {
+  const response = await axiosInstance.patch("api/v1/post/posts", postPayload, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
