@@ -30,6 +30,9 @@ import {
   ChangePasswordPage,
   MyItemsPage,
   AllPeoplePage,
+  CompanyCreationPage,
+  ManageCompanyPage,
+  CreateJobPage
 } from "./pages";
 
 import PrimaryEmailPage from "./pages/settings/updateEmail/PrimaryEmailPage";
@@ -103,7 +106,6 @@ const routes: RouteObject[] = [
     path: "/my-items/saved-posts",
     element: React.createElement(MyItemsPage),
   },
-
   {
     path: "/login",
     element: React.createElement(SignInPage),
@@ -179,6 +181,22 @@ const routes: RouteObject[] = [
   {
     path: "/search/users",
     element: React.createElement(AllPeoplePage),
+  },
+  {
+    path: "/company-creation",
+    element: React.createElement(CompanyCreationPage),
+  },
+  {
+    path: "/company-manage/:companyId",
+    element: React.createElement(ManageCompanyPage),
+  },
+  {
+    path: "/company-manage/:companyId/jobs/create",
+    element: React.createElement(CreateJobPage),
+  },
+  {
+    path:"/jobs/create",
+    element: React.createElement(CreateJobPage),
   },
 ];
 
