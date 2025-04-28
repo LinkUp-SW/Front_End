@@ -98,6 +98,7 @@ const UserInfo = () => {
             isInConnection: data.isInConnections,
             isInRecievedConnections: data.is_in_received_connections,
           }}
+          isPremium={data.isSubscribed}
         />
       </div>
       <Dialog open={openSubscribeNowDialog} onOpenChange={setOpenSubscribeNowDialog}>

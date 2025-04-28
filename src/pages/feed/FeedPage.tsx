@@ -25,6 +25,7 @@ import PostSkeleton from "./components/PostSkeleton";
 const FeedPage: React.FC<FeedPageProps> = ({ single = false }) => {
   const posts = useSelector((state: RootState) => state.posts.list);
   const comments = useSelector((state: RootState) => state.comments.list);
+  const userBio = useSelector((state: RootState) => state.userBio.data);
   const dispatch = useDispatch();
   const { id } = useParams<{ id: string }>(); // Extract the 'id' parameter from the URL
   const [viewMore, setViewMore] = useState(true);
@@ -133,7 +134,7 @@ const FeedPage: React.FC<FeedPageProps> = ({ single = false }) => {
             </Button>
             {viewMore && (
               <>
-                <PremiumBanner />
+                {!userBio?.isSubscribed && <PremiumBanner />}
                 <Shortcuts />
               </>
             )}
