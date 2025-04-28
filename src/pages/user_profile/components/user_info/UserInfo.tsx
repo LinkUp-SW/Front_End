@@ -45,7 +45,7 @@ const UserInfo = () => {
   const [isInConnections, setIsInConnections] = useState<boolean | undefined>(
     undefined
   );
-  const [openSubscribeNowDialog,setOpenSubscribeNowDialog]=useState(false)
+  const [openSubscribeNowDialog, setOpenSubscribeNowDialog] = useState(false);
   useEffect(() => {
     if (data) {
       setNumOfConnections(data.number_of_connections);
@@ -101,9 +101,12 @@ const UserInfo = () => {
           isPremium={data.isSubscribed}
         />
       </div>
-      <Dialog open={openSubscribeNowDialog} onOpenChange={setOpenSubscribeNowDialog}>
+      <Dialog
+        open={openSubscribeNowDialog}
+        onOpenChange={setOpenSubscribeNowDialog}
+      >
         <DialogContent className="bg-white dark:bg-gray-900 dark:border-gray-500">
-          <SubscribeNowCard/>
+          <SubscribeNowCard />
         </DialogContent>
       </Dialog>
     </section>
