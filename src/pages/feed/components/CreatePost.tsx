@@ -31,7 +31,7 @@ import { DialogDescription } from "@radix-ui/react-dialog";
 import React from "react";
 import { closeCreatePostDialog } from "@/slices/feed/createPostSlice";
 import { openCreatePostDialog } from "@/slices/feed/createPostSlice";
-import { appendPosts, unshiftPosts } from "@/slices/feed/postsSlice";
+import { unshiftPosts } from "@/slices/feed/postsSlice";
 
 const useDismissModal = () => {
   const dismiss = () => {
@@ -69,7 +69,6 @@ const CreatePost: React.FC<CreatePostProps> = ({ className }) => {
   const isDialogOpen = useSelector(
     (state: RootState) => state.createPost.createPostOpen
   );
-  const { id } = useParams<{ id: string }>(); // Extract the 'id' parameter from the URL
 
   const navigate = useNavigate();
   const user_token = Cookies.get("linkup_auth_token");
