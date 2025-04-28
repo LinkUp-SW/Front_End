@@ -36,6 +36,7 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
   postId,
 }) => {
   console.log("Comment:", comment);
+
   console.log("Replies:", replies);
   // State hooks
   const [showReplies, setShowReplies] = useState(true);
@@ -134,10 +135,10 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
       {/* Replies toggle and list */}
       {commentReplies && commentReplies.length > 0 && (
         <>
-          {commentReplies.length > 3 && (
+          {commentReplies.length > 0 && (
             <button
               onClick={() => setShowReplies(!showReplies)}
-              className="text-sm text-blue-600 hover:underline mt-2 ml-14"
+              className="text-sm text-blue-600 dark:text-blue-300 hover:underline mt-2 ml-14"
             >
               {showReplies
                 ? "Hide Replies"
