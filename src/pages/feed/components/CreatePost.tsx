@@ -13,7 +13,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import CreatePostModal from "./modals/CreatePostModal";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
