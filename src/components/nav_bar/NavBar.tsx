@@ -78,6 +78,10 @@ const NavBar = () => {
     navigate("/company-creation");
   };
 
+  const handleCreatePost = () => {
+    dispatch(openCreatePostDialog());
+  };
+
   // Use the profile picture if available; otherwise, fall back to a default image.
   const profilePictureUrl = data?.profile_photo || defaultProfileImage;
   return (
@@ -165,7 +169,7 @@ const NavBar = () => {
           </Popover>
         </div>
         <div className="lg:hidden flex items-center gap-2 text-gray-500 dark:text-gray-300">
-          <i onClick={handleClick}>
+          <i onClick={handleCreatePost}>
             <FaPlusSquare size={30} />
           </i>
           <i className="scale-x-[-1]">
