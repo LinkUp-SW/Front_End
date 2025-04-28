@@ -15,12 +15,12 @@ import { RootState } from "@/store";
 
 interface FeedPageProps {
   single?: boolean;
-  profile?: boolean;
+  profile?: string;
 }
 
 const FeedPage: React.FC<FeedPageProps> = ({
   single = false,
-  profile = false,
+  profile = "",
 }) => {
   const screenWidth = useSelector((state: RootState) => state.screen.width);
   const [viewMore, setViewMore] = useState(screenWidth >= 768);
@@ -69,7 +69,7 @@ const FeedPage: React.FC<FeedPageProps> = ({
 
         {/* Main Content */}
         <main className="flex flex-col w-full md:max-w-[27.8rem] lg:max-w-[35rem]">
-          {!single && <CreatePost />}
+          {!single && !profile.length && <CreatePost />}
           <div className="mt-4" />
           <PostList
             posts={posts}
