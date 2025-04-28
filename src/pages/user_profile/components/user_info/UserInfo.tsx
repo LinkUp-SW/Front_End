@@ -51,7 +51,6 @@ const UserInfo = () => {
     if (data) {
       setNumOfConnections(data.number_of_connections);
       setIsInConnections(data.isInConnections);
-      console.log(data.isSubscribed)
     }
   }, [data]);
   if (!id || getErrorMessage(error).toLocaleLowerCase() === "user not found") {
