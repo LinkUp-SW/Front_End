@@ -32,7 +32,7 @@ import {
   AllPeoplePage,
   CompanyCreationPage,
   ManageCompanyPage,
-  CreateJobPage
+  CreateJobPage,
 } from "./pages";
 
 import PrimaryEmailPage from "./pages/settings/updateEmail/PrimaryEmailPage";
@@ -89,7 +89,7 @@ const routes: RouteObject[] = [
   },
   {
     path: "/user-profile/:id/posts",
-    element: React.createElement(FeedPage, { profile: true }),
+    element: React.createElement(FeedPage, { profile: ":id" }),
   },
 
   {
@@ -198,7 +198,7 @@ const routes: RouteObject[] = [
     element: React.createElement(CreateJobPage),
   },
   {
-    path:"/jobs/create",
+    path: "/jobs/create",
     element: React.createElement(CreateJobPage),
   },
 ];
