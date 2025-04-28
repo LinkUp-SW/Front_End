@@ -15,12 +15,12 @@ import { RootState } from "@/store";
 
 interface FeedPageProps {
   single?: boolean;
-  profile?: boolean;
+  profile?: string;
 }
 
 const FeedPage: React.FC<FeedPageProps> = ({
   single = false,
-  profile = false,
+  profile = "",
 }) => {
   const screenWidth = useSelector((state: RootState) => state.screen.width);
   const [viewMore, setViewMore] = useState(screenWidth >= 768);

@@ -8,7 +8,7 @@ import { setPosts } from "@/slices/feed/postsSlice";
 import { RootState } from "@/store";
 import { toast } from "sonner";
 
-export function useFeedPosts(single: boolean, profile: boolean) {
+export function useFeedPosts(single: boolean, profile: string) {
   const posts = useSelector((state: RootState) => state.posts.list);
   const dispatch = useDispatch();
   const { id } = useParams<{ id: string }>();
