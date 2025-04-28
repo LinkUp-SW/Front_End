@@ -80,7 +80,6 @@ const Comment: React.FC<CommentProps> = ({
 
   const stats = {
     comments: comment.children && comment.children.length,
-    reposts: 5,
     total: comment.reactionsCount,
   };
 
@@ -125,11 +124,6 @@ const Comment: React.FC<CommentProps> = ({
           comment.userReaction.slice(1).toLowerCase()
       );
   }, [comment]);
-
-  let countChildren = 0;
-  if (comment.children) {
-    countChildren = comment.childrenCount || 0;
-  }
 
   const reactionIcons = [
     { name: "Celebrate", icon: CelebrateIcon },
@@ -593,16 +587,24 @@ const Comment: React.FC<CommentProps> = ({
         >
           | Reply
         </Button>
-        {countChildren != 0 && (
-          <>
-            <p className="text-xs  text-gray-500 dark:text-neutral-400 font-bold">
-              {" "}
-              ·
-            </p>
-            <p className="hover:underlinetext-xs text-xs text-gray-500 line-clamp-1 text-ellipsis dark:text-neutral-400 hover:text-blue-600 hover:underline dark:hover:text-blue-400 hover:cursor-pointer">
-              {countChildren == 1 ? "1 Reply" : `${countChildren} Replies`}
-            </p>
-          </>
+        {comment.childrenCount ? (
+          comment.childrenCount != 0 && (
+            <>
+              <p className="text-xs  text-gray-500 dark:text-neutral-400 font-bold">
+                {" "}
+                ·
+              </p>
+              <p className="hover:underlinetext-xs text-xs text-gray-500 line-clamp-1 text-ellipsis dark:text-neutral-400 hover:text-blue-600 hover:underline dark:hover:text-blue-400 hover:cursor-pointer">
+                {comment.childrenCount &&
+                comment.childrenCount != 0 &&
+                comment.childrenCount == 1
+                  ? "1 Reply"
+                  : `${comment.childrenCount} Replies`}
+              </p>
+            </>
+          )
+        ) : (
+          <></>
         )}
       </footer>
     </div>

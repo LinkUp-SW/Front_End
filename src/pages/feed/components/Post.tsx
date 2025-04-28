@@ -577,7 +577,7 @@ const Post: React.FC<PostProps> = ({
       postData.commentsCount ||
       (postData.comments && postData.comments.length) ||
       0,
-    reposts: 5,
+    reposts: 0,
     total: postData.reactionsCount,
   };
 
@@ -740,7 +740,7 @@ const Post: React.FC<PostProps> = ({
                 ·
               </p>
             )}
-            {stats.reposts && (
+            {stats.reposts !== 0 && (
               <>
                 <p className="hover:underline hover:text-blue-600 dark:hover:text-blue-400 hover:cursor-pointer">
                   {stats.reposts} reposts

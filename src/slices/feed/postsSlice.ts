@@ -28,6 +28,9 @@ const postsSlice = createSlice({
     appendPosts: (state, action: PayloadAction<PostType[]>) => {
       state.list = [...state.list, ...action.payload];
     },
+    unshiftPosts: (state, action: PayloadAction<PostType[]>) => {
+      state.list = [...action.payload, ...state.list];
+    },
 
     updatePost: (
       state,
@@ -63,6 +66,7 @@ const postsSlice = createSlice({
     },
 
     // For adding a new comment to a post
+    // For adding a new comment to a post
     addNewCommentToPost: (
       state,
       action: PayloadAction<{
@@ -73,10 +77,23 @@ const postsSlice = createSlice({
       const { postId, comment } = action.payload;
       const post = state.list.find((post) => post._id === postId);
 
-      if (post && post.commentsData) {
-        // Add new comment to the beginning of the array
-        post.commentsData.comments = [comment, ...post.commentsData.comments];
-        post.commentsData.count += 1;
+      if (post) {
+        // Increment the post's comment count
+        post.commentsCount = (post.commentsCount || 0) + 1;
+
+        if (post.commentsData) {
+          // Add new comment to the beginning of the array
+          post.commentsData.comments = [comment, ...post.commentsData.comments];
+          // Increment the commentsData count
+          post.commentsData.count = (post.commentsData.count || 0) + 1;
+        } else {
+          // Initialize commentsData if it doesn't exist
+          post.commentsData = {
+            comments: [comment],
+            count: 1,
+            nextCursor: null,
+          };
+        }
       }
     },
 
@@ -235,6 +252,12 @@ const postsSlice = createSlice({
 
                 // If we actually removed something, update counts
                 if (updatedComment.children.length < originalLength) {
+                  // ADDED: Update childrenCount
+                  updatedComment.childrenCount = Math.max(
+                    0,
+                    (updatedComment.childrenCount || 0) - 1
+                  );
+
                   // Update post comment count
                   if (post.commentsCount !== undefined) {
                     post.commentsCount -= 1;
@@ -345,6 +368,7 @@ const postsSlice = createSlice({
     ) => {
       const { postId, parentCommentId, reply } = action.payload;
       const post = state.list.find((post) => post._id === postId);
+      let replyAdded = false;
 
       if (post && post.commentsData) {
         // Find the parent comment
@@ -354,6 +378,10 @@ const postsSlice = createSlice({
               // Add reply to this comment
               comments[i].children = comments[i].children || [];
               comments[i].children?.push(reply);
+
+              // Increment the reply count on the parent comment
+
+              comments[i].childrenCount = (comments[i].childrenCount ?? 0) + 1;
               return true;
             }
 
@@ -368,11 +396,17 @@ const postsSlice = createSlice({
           return false;
         };
 
-        findAndAddReply(post.commentsData.comments);
-        post.commentsData.count += 1;
+        replyAdded = findAndAddReply(post.commentsData.comments);
+
+        // Only increment counts if reply was successfully added
+        if (replyAdded) {
+          // Increment both the total post comment count
+          post.commentsCount = (post.commentsCount || 0) + 1;
+          // And the commentsData count
+          post.commentsData.count = (post.commentsData.count || 0) + 1;
+        }
       }
     },
-
     // Pagination and loading state
     setNextCursor: (state, action: PayloadAction<number>) => {
       state.nextCursor = action.payload;
@@ -408,6 +442,7 @@ export const {
   removeComment,
   removeReply,
   updateCommentReaction,
+  unshiftPosts,
 } = postsSlice.actions;
 
 export default postsSlice.reducer;

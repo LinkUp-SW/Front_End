@@ -31,6 +31,7 @@ import { DialogDescription } from "@radix-ui/react-dialog";
 import React from "react";
 import { closeCreatePostDialog } from "@/slices/feed/createPostSlice";
 import { openCreatePostDialog } from "@/slices/feed/createPostSlice";
+import { appendPosts, unshiftPosts } from "@/slices/feed/postsSlice";
 
 const useDismissModal = () => {
   const dismiss = () => {
@@ -227,15 +228,20 @@ const CreatePost: React.FC<CreatePostProps> = ({ className }) => {
         }
       );
       const post = await fetchSinglePost(response.postId, user_token);
-      // const comment: CommentObjectType = {
-      //   comments: [],
-      //   count: 0,
-      //   nextCursor: 0,
-      // };
-      if (post && !id) {
-        // const newPosts = [post.post, ...posts];
-        // dispatch(setPosts(newPosts));
-        // const newComments = [comment, ...comments];
+      if (post) {
+        // Prepare the post with comments-related fields
+        const postWithComments = {
+          ...post,
+          commentsCount: 0,
+          commentsData: {
+            comments: [],
+            count: 0,
+            nextCursor: null,
+          },
+        };
+
+        // Add the new post to the Redux store at the beginning of the list
+        dispatch(unshiftPosts([postWithComments]));
       }
     } catch {
       toast.error("Error creating post. Please try again.");
