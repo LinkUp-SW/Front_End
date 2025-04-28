@@ -41,6 +41,23 @@ const skillSlice = createSlice({
         skill.total_endorsements = (skill.total_endorsements || 0) + 1;
       }
     },
+    removeEndorsement(
+      state,
+      action: PayloadAction<{ skillId: string; userId: string }>
+    ) {
+      const skill = state.items.find((s) => s._id === action.payload.skillId);
+      if (skill) {
+        // Filter out the endorsement by the specified userId
+        skill.endorsments = skill.endorsments.filter(
+          (endorsement) => endorsement.user_id !== action.payload.userId
+        );
+        // Decrease the total endorsements count
+        skill.total_endorsements = Math.max(
+          (skill.total_endorsements || 0) - 1,
+          0
+        );
+      }
+    },
     addExperienceToSkill(
       state,
       action: PayloadAction<{
@@ -333,6 +350,7 @@ export const {
   updateSkill,
   removeSkill,
   endorseSkill,
+  removeEndorsement,
   addExperienceToSkill,
   addEducationToSkill,
   addLicenseToSkill,
