@@ -352,9 +352,6 @@ const PostFooter: React.FC<PostFooterProps> = ({
               key={`comment-${comment._id || index}`}
               postId={postId}
               comment={comment}
-              replies={
-                (comment.children && Object.values(comment.children)) || []
-              }
               handleCreateComment={handleCreateComment}
             />
           ))}

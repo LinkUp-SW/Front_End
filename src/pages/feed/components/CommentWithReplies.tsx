@@ -6,15 +6,19 @@ import { Button, Popover, PopoverContent, PopoverTrigger } from "@/components";
 import { MdOutlineEmojiEmotions } from "react-icons/md";
 import { GoFileMedia as MediaIcon } from "react-icons/go";
 import EmojiPicker, { Theme, EmojiClickData } from "emoji-picker-react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { CommentType } from "@/types";
 import { hasRichFormatting } from "@/utils/index";
 import { FormattedContentText } from "./modals/CreatePostModal";
 import UserTagging from "./UserTagging";
+import Cookies from "js-cookie";
+import { getReplies } from "@/endpoints/feed";
+import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
+import { addRepliesToComment } from "@/slices/feed/postsSlice";
 
 interface CommentWithRepliesProps {
-  replies?: CommentType[]; // Now optional as replies might be in comment.children
   handleCreateComment: (
     selectedImage: File | null,
     commentInput: string,
@@ -26,14 +30,17 @@ interface CommentWithRepliesProps {
   postId: string;
 }
 
+const user_token = Cookies.get("linkup_auth_token");
+
 const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
-  replies,
   handleCreateComment,
   comment,
   postId,
 }) => {
+  const replies = comment.children || [];
+  const hasMoreReplies = replies.length < (comment.childrenCount || 0);
+  console.log("Has more replies:", hasMoreReplies);
   console.log("Comment:", comment);
-
   console.log("Replies:", replies);
   // State hooks
   const [showReplies, setShowReplies] = useState(true);
@@ -42,6 +49,9 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
   const [isReplyActive, setIsReplyActive] = useState(false);
   const [commentInput, setCommentInput] = useState("");
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [isLoadingReplies, setIsLoadingReplies] = useState(false);
+  const [nextCursor, setNextCursor] = useState(0);
+  console.log("cursor:", nextCursor);
 
   // Refs
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -49,9 +59,12 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
   const commentRef = useRef<HTMLDivElement>(null);
   const replyRefs = useRef<Array<HTMLDivElement | null>>([]);
 
+  const navigate = useNavigate();
+
   // Selectors
   const darkMode = useSelector((state: RootState) => state.theme.theme);
   const { data } = useSelector((state: RootState) => state.userBio);
+  const dispatch = useDispatch();
 
   // Get comments from the comment.children property if replies not provided
   const commentReplies = replies || comment.children || [];
@@ -88,6 +101,46 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
       setReplyHeights(0);
     }
   }, [commentReplies, showReplies]);
+
+  const handleLoadMoreReplies = async () => {
+    if (isLoadingReplies) return;
+    if (!user_token) {
+      toast.error("You must be logged in to view this feed.");
+      navigate("/login", { replace: true });
+      return;
+    }
+
+    setIsLoadingReplies(true);
+    try {
+      const response = await getReplies(
+        {
+          cursor: nextCursor || 2,
+          limit: 5,
+          replyLimit: 2,
+        },
+        postId,
+        comment._id,
+        user_token
+      );
+      console.log("Responseeeee:", response);
+
+      // Update the replies in the comment
+      dispatch(
+        addRepliesToComment({
+          postId,
+          parentCommentId: comment._id,
+          replies: response.replies,
+          nextCursor: response.nextCursor,
+        })
+      );
+      setNextCursor(response.nextCursor);
+    } catch (error) {
+      console.error("Error loading more replies:", error);
+      toast.error("Failed to load more replies");
+    } finally {
+      setIsLoadingReplies(false);
+    }
+  };
 
   // Event handlers
   const handleEmojiRequest = (emoji: EmojiClickData) => {
@@ -158,7 +211,27 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
           )}
         </>
       )}
-
+      {showReplies && commentReplies && commentReplies.length > 0 && (
+        <div className="mt-2 space-y-2">
+          {/* Load More Replies button */}
+          {hasMoreReplies && (
+            <button
+              onClick={handleLoadMoreReplies}
+              disabled={isLoadingReplies}
+              className="text-sm text-blue-600 dark:text-blue-300 hover:underline ml-14 mb-2 flex items-center gap-2"
+            >
+              {isLoadingReplies ? (
+                <>
+                  <div className="animate-spin h-4 w-4 border-2 border-blue-500 border-t-transparent rounded-full" />
+                  Loading replies...
+                </>
+              ) : (
+                `Show more replies `
+              )}
+            </button>
+          )}
+        </div>
+      )}
       {/* Reply input */}
       {isReplyActive ? (
         <div className="flex gap-2 pl-10 pt-2">

@@ -60,7 +60,7 @@ const AddDocumentModal: React.FC<AddDocumentModalProps> = ({
       )}
       <input
         type="file"
-        accept=".pdf,.docx,.doc"
+        accept=".pdf"
         ref={fileInputRef}
         onChange={handleAdd}
         className="self-center hidden"

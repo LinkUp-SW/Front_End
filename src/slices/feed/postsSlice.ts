@@ -380,8 +380,10 @@ const postsSlice = createSlice({
               comments[i].children?.push(reply);
 
               // Increment the reply count on the parent comment
+              comments[i].childrenCount = comments[i].childrenCount || 0;
 
               comments[i].childrenCount = (comments[i].childrenCount ?? 0) + 1;
+
               return true;
             }
 

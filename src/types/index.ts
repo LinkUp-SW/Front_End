@@ -135,6 +135,8 @@ export interface CommentObjectType {
   comments: CommentType[];
   count: number;
   nextCursor: number;
+  hasInitiallyLoaded?: boolean;
+  isLoading?: boolean;
 }
 
 export interface CommentDBType {
