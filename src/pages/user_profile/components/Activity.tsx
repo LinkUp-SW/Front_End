@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { openCreatePostDialog } from "@/slices/feed/createPostSlice";
@@ -24,6 +24,7 @@ const Activity: React.FC = () => {
   const [activeTab, setActiveTab] = useState<"post" | "comment" | "video">(
     "post"
   );
+  const routeLocation = useLocation();
   const [posts, setPosts] = useState<PostType[]>([]);
   const [menuOpenStates, setMenuOpenStates] = useState<Record<string, boolean>>(
     {}
@@ -69,7 +70,7 @@ const Activity: React.FC = () => {
     };
 
     fetchPosts();
-  }, [userId]);
+  }, [routeLocation.pathname]);
 
   // Filter posts based on active tab
   const filteredPosts = posts.filter((post) => {
@@ -236,7 +237,7 @@ const Activity: React.FC = () => {
         {/* Show All Posts */}
         <div className="flex justify-center mt-8">
           <Link
-            to={`/user-profile/${userId}/posts`}
+            to={`/user-profile/${id}/posts`}
             className="text-blue-600 dark:text-blue-300 hover:underline flex items-center"
           >
             Show all posts →

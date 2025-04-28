@@ -69,7 +69,7 @@ const FeedPage: React.FC<FeedPageProps> = ({
 
         {/* Main Content */}
         <main className="flex flex-col w-full md:max-w-[27.8rem] lg:max-w-[35rem]">
-          {!single && <CreatePost />}
+          {!single && !profile.length && <CreatePost />}
           <div className="mt-4" />
           <PostList
             posts={posts}
