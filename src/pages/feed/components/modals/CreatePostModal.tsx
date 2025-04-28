@@ -29,6 +29,7 @@ import LinkPreview from "../LinkPreview"; // Import the LinkPreview component
 import React from "react";
 import UserTagging from "@/pages/feed/components/UserTagging";
 import { processTextFormatting } from "@/components/truncate_text/TruncatedText";
+import { PostDBObject } from "@/types";
 
 interface CreatePostModalProps {
   profileImageUrl: string;
@@ -41,6 +42,7 @@ interface CreatePostModalProps {
   privacySetting: string;
   taggedUsers: { name: string; id: string }[];
   setTaggedUsers: (users: Array<{ name: string; id: string }>) => void;
+  post?: PostDBObject | null;
 }
 
 const CreatePostModal: React.FC<CreatePostModalProps> = ({
@@ -54,6 +56,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
   privacySetting,
   taggedUsers,
   setTaggedUsers,
+  post,
 }) => {
   const { data } = useSelector((state: RootState) => state.userBio);
   const MemoizedEmojiPicker = memo(EmojiPicker);
@@ -63,6 +66,27 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
 
   // State to track detected URL
   const [detectedUrl, setDetectedUrl] = useState<string | null>(null);
+  if (post) {
+    setPostText(post.content);
+    if (post.media && post.media.length > 0) {
+      setDetectedUrl(post.media[0]);
+    }
+    if (post.media && post.media.length > 0) {
+      fetch(post.media[0])
+        .then((response) => response.blob())
+        .then((blob) => {
+          const file = new File([blob], "post-media", { type: blob.type });
+          setSelectedMedia([file]);
+        });
+    }
+    if (post.taggedUsers) {
+      const formattedUsers = post.taggedUsers.map((userId) => ({
+        name: userId, // You might want to fetch the actual name from somewhere
+        id: userId,
+      }));
+      setTaggedUsers(formattedUsers);
+    }
+  }
   const handleTextChange = React.useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
       setPostText(e.target.value);
