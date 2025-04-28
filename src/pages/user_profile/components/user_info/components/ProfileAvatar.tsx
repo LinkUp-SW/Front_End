@@ -11,13 +11,18 @@ import Header from "../../modals/components/Header";
 import ProfilePictureModal from "../../modals/picture_modal/ProfilePictureModal";
 import { useState } from "react";
 import { defaultProfileImage } from "@/constants";
-
+import premiumLogo from "@/assets/linkup_premium.png";
 type ProfileAvatarProps = {
   src: string;
   isOwner: boolean;
+  isPremium: boolean;
 };
 
-export const ProfileAvatar = ({ src, isOwner }: ProfileAvatarProps) => {
+export const ProfileAvatar = ({
+  src,
+  isOwner,
+  isPremium,
+}: ProfileAvatarProps) => {
   const [pic, setPic] = useState(src);
   const [isOpen, setIsOpen] = useState(false);
   return (
@@ -54,6 +59,14 @@ export const ProfileAvatar = ({ src, isOwner }: ProfileAvatarProps) => {
             />
           </DialogContent>
         </Dialog>
+      )}
+      {isPremium && (
+        <img
+          src={premiumLogo}
+          className={`absolute hover:opacity-85 transition-all duration-300 cursor-pointer bg-gray-300 dark:bg-gray-800 p-1 rounded-md z-20 w-7 h-7 ${
+            isOwner ? "-bottom-1 left-[0.4rem]" : "-bottom-1 right-[0.26rem]"
+          }`}
+        />
       )}
     </div>
   );

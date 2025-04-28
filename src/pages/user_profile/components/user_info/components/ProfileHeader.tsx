@@ -58,7 +58,7 @@ export const ProfileHeader = ({
       </p>
     )}
 
-    {isOwner && <EditUserBio user={user} userid={userid} intros={intros} />}
+    {isOwner && <EditUserBio user={user} userid={userid} intros={intros}  />}
     <div className="sm:grid gap-2 absolute right-0 hidden">
       {intros.work_experience && (
         <Link
@@ -94,12 +94,12 @@ const EditUserBio: React.FC<Partial<ProfileHeaderProps>> = ({
 }) => {
   const [open, setOpen] = useState(false);
   return (
-    <div className="absolute right-[-1rem] top-[-5rem]">
+    <div className="absolute right-[-1rem] top-[-4.5rem] flex gap-2 items-center">
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
           <button
             id="edit-user-bio"
-            className="absolute hover:opacity-85 transition-all duration-300 cursor-pointer bg-gray-300 dark:bg-gray-800 p-2 rounded-full top-3 right-3"
+            className="hover:opacity-85 transition-all duration-300 cursor-pointer bg-gray-300 dark:bg-gray-800 p-2 rounded-full"
             aria-label="Edit User Bio"
           >
             <FaPencilAlt size={20} />

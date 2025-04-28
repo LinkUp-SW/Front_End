@@ -50,6 +50,7 @@ const UserInfo = () => {
     if (data) {
       setNumOfConnections(data.number_of_connections);
       setIsInConnections(data.isInConnections);
+      console.log(data.isSubscribed)
     }
   }, [data]);
   if (!id || getErrorMessage(error).toLocaleLowerCase() === "user not found") {
@@ -64,7 +65,7 @@ const UserInfo = () => {
   return (
     <section className="bg-white dark:bg-gray-900 rounded-lg shadow-md overflow-hidden">
       <CoverPhoto src={data.cover_photo} isOwner={data.is_me}>
-        <ProfileAvatar src={data.profile_photo} isOwner={data.is_me} />
+        <ProfileAvatar src={data.profile_photo} isOwner={data.is_me} isPremium={data.isSubscribed} />
       </CoverPhoto>
 
       <div className="pt-20 px-6 pb-6">
