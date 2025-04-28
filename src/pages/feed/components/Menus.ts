@@ -1,11 +1,9 @@
 import {
   FaBan,
   FaBookmark,
-  FaClock,
   FaEdit,
   FaFlag,
   FaLink,
-  FaRocket,
   FaTrash,
   FaUserSlash,
   FaEyeSlash,
@@ -155,21 +153,6 @@ export const REPOST_MENU = [
     subtext: "Instantly bring this post to others' feeds",
     action: () => console.log("Repost 2"),
     icon: React.createElement(RepostIcon, { className: "mr-2" }),
-  },
-];
-
-export const COMMENT_SORTING_MENU: MenuAction[] = [
-  {
-    name: "Most relevant",
-    subtext: "See the most relevant comments",
-    action: () => console.log("Most relevant pressed"),
-    icon: React.createElement(FaRocket, { className: "mr-2" }),
-  },
-  {
-    name: "Most recent",
-    subtext: "See all the comments, the most recent comments are first",
-    action: () => console.log("Most Recent pressed"),
-    icon: React.createElement(FaClock, { className: "mr-2" }),
   },
 ];
 

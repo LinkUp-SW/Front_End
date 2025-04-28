@@ -30,6 +30,9 @@ import {
   ChangePasswordPage,
   MyItemsPage,
   AllPeoplePage,
+  CompanyCreationPage,
+  ManageCompanyPage,
+  CreateJobPage
 } from "./pages";
 
 import PrimaryEmailPage from "./pages/settings/updateEmail/PrimaryEmailPage";
@@ -37,7 +40,6 @@ import AddEmailPage from "./pages/settings/updateEmail/AddEmailPage";
 import OTP from "./pages/settings/updateEmail/OTP";
 
 import React from "react";
-
 
 // Define your routes as an array of RouteObject (compatible with React Router v6)
 const routes: RouteObject[] = [
@@ -85,6 +87,10 @@ const routes: RouteObject[] = [
     path: "/feed/posts/:id",
     element: React.createElement(FeedPage, { single: true }),
   },
+  {
+    path: "/user-profile/:id/posts",
+    element: React.createElement(FeedPage, { profile: true }),
+  },
 
   {
     path: "/manage-invitations",
@@ -103,7 +109,6 @@ const routes: RouteObject[] = [
     path: "/my-items/saved-posts",
     element: React.createElement(MyItemsPage),
   },
-
   {
     path: "/login",
     element: React.createElement(SignInPage),
@@ -179,6 +184,22 @@ const routes: RouteObject[] = [
   {
     path: "/search/users",
     element: React.createElement(AllPeoplePage),
+  },
+  {
+    path: "/company-creation",
+    element: React.createElement(CompanyCreationPage),
+  },
+  {
+    path: "/company-manage/:companyId",
+    element: React.createElement(ManageCompanyPage),
+  },
+  {
+    path: "/company-manage/:companyId/jobs/create",
+    element: React.createElement(CreateJobPage),
+  },
+  {
+    path:"/jobs/create",
+    element: React.createElement(CreateJobPage),
   },
 ];
 

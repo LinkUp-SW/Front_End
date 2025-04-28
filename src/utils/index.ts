@@ -238,16 +238,24 @@ export function isSkillResponse(obj: unknown): obj is SkillResponse {
   return false;
 }
 
-type RelationKey = 'licenses' | 'educations' | 'experiences'
+type RelationKey = "licenses" | "educations" | "experiences";
 
 export function buildSkillNamesMap(
-  skills: Array<{ _id: string; name: string } & { [K in RelationKey]: { _id: string }[] }>,
+  skills: Array<
+    { _id: string; name: string } & { [K in RelationKey]: { _id: string }[] }
+  >,
   relation: RelationKey
 ): Record<string, string[]> {
   return skills.reduce<Record<string, string[]>>((map, skill) => {
     for (const { _id } of skill[relation]) {
-      (map[_id] ??= []).push(skill.name)
+      (map[_id] ??= []).push(skill.name);
     }
-    return map
-  }, {})
+    return map;
+  }, {});
 }
+
+export const hasRichFormatting = (text: string): boolean => {
+  const richFormatRegex =
+    /(\*[^*]+\*)|(-[^-]+-)|(~[^~]+~)|(@[^:]+:[A-Za-z0-9_-]+\^)/;
+  return richFormatRegex.test(text);
+};

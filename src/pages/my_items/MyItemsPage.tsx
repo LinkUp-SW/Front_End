@@ -2,7 +2,7 @@ import { SavedPostsDashboard, WithNavBar } from "@/components";
 import { useLocation } from "react-router-dom";
 import {
   LeftSidebar,
-  JobsDashboard,
+  SavedJobsDashboard,
   InterviewTipsPanel,
   Footer,
 } from "@/components";
@@ -54,7 +54,7 @@ const MyItemsPage: React.FC = () => {
           {selectedPage === "saved-jobs" ? (
             <>
               <div className="md:col-span-6">
-                <JobsDashboard />
+                <SavedJobsDashboard />
               </div>
 
               <div className="md:col-span-3">

@@ -69,7 +69,7 @@ const JobListings: React.FC<JobListingsProps> = ({
     
     if (filters.workModes.length > 0) {
       result = result.filter(job => 
-        filters.workModes.includes(job.workMode)
+        filters.workModes.includes(job.workMode!)
       );
     }
     
@@ -196,7 +196,7 @@ const JobListings: React.FC<JobListingsProps> = ({
         onJobSelect(job);
       } else {
         setJobDetailLoading(true);
-        fetchSelectedJob(job.id);
+        fetchSelectedJob(job.id!);
       }
       return;
     }
@@ -204,7 +204,7 @@ const JobListings: React.FC<JobListingsProps> = ({
     if (hasCompleteData) {
       setSelectedJob(job);
     } else {
-      fetchSelectedJob(job.id);
+      fetchSelectedJob(job.id!);
     }
   };
 

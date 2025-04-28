@@ -71,11 +71,11 @@ const JobHeader: React.FC<JobHeaderProps> = ({ job }) => {
       
       if (isSaved) {
         // Remove job from saved jobs
-        await removeFromSaved(job.id);
+        await removeFromSaved(job.id!);
         setIsSaved(false);
       } else {
         // Add job to saved jobs
-        await saveJob(job.id);
+        await saveJob(job.id!);
         setIsSaved(true);
       }
       
