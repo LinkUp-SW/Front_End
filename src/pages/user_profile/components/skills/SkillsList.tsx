@@ -59,8 +59,6 @@ const SkillsList: React.FC<SkillListProps> = ({
 
   useEffect(() => {
     const currentSkill = skills.find((sk) => sk._id === skill._id);
-    console.log(currentSkill);
-    console.log(userID);
     if (userID) {
       const isUserEndorsed = currentSkill?.endorsments.find(
         (user) => user.user_id === currentUserId
