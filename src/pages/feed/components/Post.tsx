@@ -111,19 +111,8 @@ const Post: React.FC<PostProps> = ({
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const posts = useSelector((state: RootState) => state.posts.list);
-  if (!postData || !postData._id) {
-    return (
-      <div className={className}>
-        <PostSkeleton />
-      </div>
-    );
-  }
-
-  // Extract data needed for early hooks
-
-  // Extract all other data after hooks
   const { author }: { author: PostUserType } = postData;
-  const { date } = postData;
+  const { date, media } = postData;
   const commentsData = {
     comments: postData.commentsData?.comments || [],
     count: postData.commentsData?.count || 0,
@@ -135,7 +124,6 @@ const Post: React.FC<PostProps> = ({
   // useEffect hooks
   const postModal = usePostModal();
 
-  const { media } = postData;
   useEffect(() => {
     if (
       media &&
@@ -164,6 +152,17 @@ const Post: React.FC<PostProps> = ({
           postData.userReaction.slice(1).toLowerCase()
       );
   }, [postData.userReaction]);
+  if (!postData || !postData._id) {
+    return (
+      <div className={className}>
+        <PostSkeleton />
+      </div>
+    );
+  }
+
+  // Extract data needed for early hooks
+
+  // Extract all other data after hooks
 
   // Comment handling functions
   const handleToggleComments = async () => {

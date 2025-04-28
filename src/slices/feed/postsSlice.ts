@@ -160,12 +160,12 @@ const postsSlice = createSlice({
             const existingChildren = comment.children || [];
             const existingChildrenArray = Array.isArray(existingChildren)
               ? existingChildren
-              : Object.values(existingChildren);
+              : (Object.values(existingChildren) as CommentType[]);
 
             // Create a new array with existing and new replies
             // Filter out any duplicates by ID
             const existingIds = new Set(
-              existingChildrenArray.map((r: any) => r._id)
+              existingChildrenArray.map((r) => r._id)
             );
             const uniqueNewReplies = replies.filter(
               (r) => !existingIds.has(r._id)
@@ -288,7 +288,7 @@ const postsSlice = createSlice({
       action: PayloadAction<{
         postId: string;
         commentId: string;
-        reactions: any[]; // Use proper type here based on your API response
+        reactions: { reaction: string }[]; // Use proper type here based on your API response
         reactionsCount: number;
         userReaction: string | null;
       }>
