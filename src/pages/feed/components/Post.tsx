@@ -13,6 +13,8 @@ import {
   ActivityContextType,
   CommentDBType,
   CommentType,
+  MediaType,
+  PostDBObject,
   PostType,
   PostUserType,
 } from "@/types";
@@ -68,6 +70,7 @@ import DocumentPreview from "./modals/DocumentPreview";
 import LinkPreview from "./LinkPreview";
 import PostSkeleton from "./PostSkeleton";
 import CommentSkeleton from "./CommentSkeleton";
+import { usePostModal } from "@/hooks/usePostModal";
 
 interface PostProps {
   postData: PostType;
@@ -131,6 +134,8 @@ const Post: React.FC<PostProps> = ({
   };
 
   // useEffect hooks
+  const postModal = usePostModal();
+
   const { media } = postData;
   useEffect(() => {
     if (
@@ -148,6 +153,10 @@ const Post: React.FC<PostProps> = ({
   useEffect(() => {
     if (postData.isSaved) setIsSaved(postData.isSaved);
   }, [postData.isSaved]);
+
+  useEffect(() => {
+    console.log("New POst:", postData);
+  }, [postData]);
 
   useEffect(() => {
     if (postData.userReaction)
@@ -176,6 +185,15 @@ const Post: React.FC<PostProps> = ({
     if (!commentsData.hasInitiallyLoaded) {
       await handleLoadComments();
     }
+  };
+
+  const postDB: PostDBObject = {
+    commentsDisabled: postData.commentsDisabled,
+    content: postData.content,
+    media: postData.media.link,
+    mediaType: postData.media.media_type as MediaType,
+    publicPost: postData.publicPost,
+    taggedUsers: postData.taggedUsers,
   };
 
   const handleLoadComments = async () => {
@@ -243,6 +261,7 @@ const Post: React.FC<PostProps> = ({
           },
         })
       );
+      console.log("End  post:", postData);
     } catch (error) {
       console.error("Failed to load comments:", error);
       toast.error("Failed to load comments");
@@ -415,7 +434,20 @@ const Post: React.FC<PostProps> = ({
 
   // Post action functions
   const handleEditPostButton = () => {
-    // To be implemented
+    setPostMenuOpen(false); // Close the menu if it's open
+
+    // Create the post object in the format expected by your modal
+    const postForEdit: PostDBObject = {
+      content: postData.content,
+      mediaType: (postData.media?.media_type as MediaType) || "none",
+      media: postData.media?.link || [],
+      commentsDisabled: postData.commentsDisabled || "Anyone",
+      publicPost: postData.publicPost !== false,
+      taggedUsers: postData.taggedUsers || [],
+    };
+
+    // Open the global edit modal with this post
+    postModal.openEdit(postForEdit);
   };
 
   const deleteModal = () => {
@@ -543,7 +575,10 @@ const Post: React.FC<PostProps> = ({
   );
 
   const stats = {
-    comments: postData.commentsCount,
+    comments:
+      postData.commentsCount ||
+      (postData.comments && postData.comments.length) ||
+      0,
     reposts: 5,
     total: postData.reactionsCount,
   };
