@@ -64,19 +64,18 @@ export const updateCompanyProfile = async (companyId: string, companyData: Parti
   const token = getAuthToken();
   const url = `/api/v1/company/update-company-profile/${companyId}`;
   
-  // Create a copy of the data without the logo
-  const dataWithoutLogo = { ...companyData };
-  delete dataWithoutLogo.logo;
-  
   // Log the update data for debugging
-  console.log('Updating company with data:', dataWithoutLogo);
+  console.log('Updating company with data:', {
+    ...companyData,
+    logo: companyData.logo ? '[BASE64_DATA]' : undefined
+  });
   
   // Clean up data before sending - removing undefined values
   const cleanData = Object.fromEntries(
-    Object.entries(dataWithoutLogo).filter(([, value]) => value !== undefined && value !== '')
+    Object.entries(companyData).filter(([, value]) => value !== undefined && value !== '')
   );
   
-  // Regular JSON request
+  // Regular JSON request with the logo included
   const response = await axiosInstance.put(url, cleanData, getAuthHeader(token));
   
   return response.data;
