@@ -36,11 +36,12 @@ const UserInfo = () => {
         : Promise.resolve(null),
     [token, id, shouldFetch]
   );
-
+  
   // Choose which data to display:
   // If we're not fetching (i.e. the profile is the logged-in user's), use the global state.
   // Otherwise, use the data from the custom hook.
   const { data, loading, error } = shouldFetch ? fetchData : userBioState;
+  console.log(shouldFetch,data)
   const [numOfConnections, setNumOfConnections] = useState(0);
   const [isInConnections, setIsInConnections] = useState<boolean | undefined>(
     undefined

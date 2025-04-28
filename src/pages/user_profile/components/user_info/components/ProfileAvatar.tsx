@@ -9,7 +9,7 @@ import {
 import { FcAddImage } from "react-icons/fc";
 import Header from "../../modals/components/Header";
 import ProfilePictureModal from "../../modals/picture_modal/ProfilePictureModal";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { defaultProfileImage } from "@/constants";
 import premiumLogo from "@/assets/linkup_premium.png";
 type ProfileAvatarProps = {
@@ -25,6 +25,9 @@ export const ProfileAvatar = ({
 }: ProfileAvatarProps) => {
   const [pic, setPic] = useState(src);
   const [isOpen, setIsOpen] = useState(false);
+  useEffect(() => {
+    setPic(src);
+  }, [src]);
   return (
     <div className="absolute -bottom-16 left-4">
       <img

@@ -8,7 +8,7 @@ import {
   DialogTrigger,
   TruncatedText,
 } from "@/components";
-import { useParams } from "react-router-dom";
+import {  useParams } from "react-router-dom";
 import AboutModal from "./modals/about_modal/AboutModal";
 import Header from "./modals/components/Header";
 import { IoDiamond } from "react-icons/io5";
@@ -25,7 +25,7 @@ const AboutSection = () => {
   const authToken = Cookies.get("linkup_auth_token");
   const { id } = useParams();
   const { data, loading, error } = useFetchData(() =>
-    authToken && id ? getUserAbout(authToken, id) : Promise.resolve(null)
+    authToken && id ? getUserAbout(authToken, id) : Promise.resolve(null),[authToken,id]
   );
   const [aboutData, setAboutData] = useState<About>({
     about: "",
