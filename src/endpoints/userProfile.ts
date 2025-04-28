@@ -104,11 +104,11 @@ export const getUserPosts = async (
   );
   console.log("GetUserPosts:", response.data);
   console.log("Returned:", {
-    posts: response.data.posts.map((post: any) => ({
+    posts: response.data.posts.map((post: PostType) => ({
       ...post,
       commentsData: {
         comments: [], // Empty initially
-        count: post.commentCount || 0,
+        count: post.commentsCount || 0,
         nextCursor: 0,
         isLoading: false,
         hasInitiallyLoaded: false,
@@ -117,11 +117,11 @@ export const getUserPosts = async (
     nextCursor: response.data.nextCursor,
   });
   return {
-    posts: response.data.posts.map((post: any) => ({
+    posts: response.data.posts.map((post: PostType) => ({
       ...post,
       commentsData: {
         comments: [], // Empty initially
-        count: post.commentCount || 0,
+        count: post.commentsCount || 0,
         nextCursor: 0,
         isLoading: false,
         hasInitiallyLoaded: false,

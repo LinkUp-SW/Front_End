@@ -134,14 +134,14 @@ export const getPostsFeed = async (
 
   // Filter out null posts and transform the rest
   const validPosts = (response.data.posts || []).filter(
-    (post: any) => post !== null
+    (post: PostType) => post !== null
   );
 
-  const transformedPosts = validPosts.map((post: any) => ({
+  const transformedPosts = validPosts.map((post: PostType) => ({
     ...post,
     commentsData: {
       comments: [], // Empty initially
-      count: post.commentCount || 0,
+      count: post.commentsCount || 0,
       nextCursor: 0,
       isLoading: false,
       hasInitiallyLoaded: false,

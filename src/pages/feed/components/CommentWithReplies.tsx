@@ -8,12 +8,9 @@ import { GoFileMedia as MediaIcon } from "react-icons/go";
 import EmojiPicker, { Theme, EmojiClickData } from "emoji-picker-react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
-import { CommentType, CommentDBType } from "@/types";
+import { CommentType } from "@/types";
 import { hasRichFormatting } from "@/utils/index";
-import {
-  FormattedContentText,
-  extractTaggedUsers,
-} from "./modals/CreatePostModal";
+import { FormattedContentText } from "./modals/CreatePostModal";
 import UserTagging from "./UserTagging";
 
 interface CommentWithRepliesProps {
@@ -45,9 +42,6 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
   const [isReplyActive, setIsReplyActive] = useState(false);
   const [commentInput, setCommentInput] = useState("");
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const [taggedUsers, setTaggedUsers] = useState<
-    { name: string; id: string }[]
-  >([]);
 
   // Refs
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -76,10 +70,6 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
       });
     }
   }, [isReplyActive]);
-
-  useEffect(() => {
-    setTaggedUsers(extractTaggedUsers(commentInput));
-  }, [commentInput]);
 
   // Measure comment heights for UI
   useEffect(() => {

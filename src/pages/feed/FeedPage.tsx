@@ -179,13 +179,12 @@ const FeedPage: React.FC<FeedPageProps> = ({
               </div>
             ) : posts.length > 0 ? (
               <>
-                {posts.map((post, index) => (
+                {posts.map((post) => (
                   <Post
                     key={`post-${post._id}`}
                     viewMore={viewMore}
                     postData={post}
                     action={post.activityContext}
-                    order={index}
                   />
                 ))}
                 {isLoading && <PostSkeleton />}

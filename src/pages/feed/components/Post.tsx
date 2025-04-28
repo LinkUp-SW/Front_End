@@ -71,12 +71,12 @@ import LinkPreview from "./LinkPreview";
 import PostSkeleton from "./PostSkeleton";
 import CommentSkeleton from "./CommentSkeleton";
 import { usePostModal } from "@/hooks/usePostModal";
+import { RootState } from "@/store";
 
 interface PostProps {
   postData: PostType;
   viewMore: boolean; // used to hide certain elements for responsive design
   action?: ActivityContextType; // used if the post is an action
-  order: number;
   className?: string;
 }
 
@@ -87,13 +87,30 @@ const Post: React.FC<PostProps> = ({
   postData,
   viewMore,
   action,
-  order,
+
   className,
 }) => {
   // All hooks at the top level
+  // State hooks
+  const [isLandscape, setIsLandscape] = useState<boolean>(false);
+  const [isSaved, setIsSaved] = useState<boolean>(postData?.isSaved || false);
+  const [postMenuOpen, setPostMenuOpen] = useState(false);
+  const [commentsOpen, setCommentsOpen] = useState(false);
+  const [reactionsOpen, setReactionsOpen] = useState(false);
+  const [willDelete, setWillDelete] = useState(false);
+  const [topStats, setTopStats] = useState(
+    getReactionIcons(postData?.topReactions || postData?.reactions || [])
+  );
+  const [selectedReaction, setSelectedReaction] = useState<string>(
+    postData?.userReaction
+      ? postData?.userReaction.charAt(0).toUpperCase() +
+          postData?.userReaction.slice(1).toLowerCase()
+      : "None"
+  );
+  const [loadingComments, setLoadingComments] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const posts = useSelector((state: any) => state.posts.list);
+  const posts = useSelector((state: RootState) => state.posts.list);
   if (!postData || !postData._id) {
     return (
       <div className={className}>
@@ -104,27 +121,9 @@ const Post: React.FC<PostProps> = ({
 
   // Extract data needed for early hooks
 
-  // State hooks
-  const [isLandscape, setIsLandscape] = useState<boolean>(false);
-  const [isSaved, setIsSaved] = useState<boolean>(postData?.isSaved || false);
-  const [postMenuOpen, setPostMenuOpen] = useState(false);
-  const [commentsOpen, setCommentsOpen] = useState(false);
-  const [reactionsOpen, setReactionsOpen] = useState(false);
-  const [willDelete, setWillDelete] = useState(false);
-  const [topStats, setTopStats] = useState(
-    getReactionIcons(postData.topReactions || postData.reactions || [])
-  );
-  const [selectedReaction, setSelectedReaction] = useState<string>(
-    postData?.userReaction
-      ? postData.userReaction.charAt(0).toUpperCase() +
-          postData.userReaction.slice(1).toLowerCase()
-      : "None"
-  );
-  const [loadingComments, setLoadingComments] = useState(false);
-
   // Extract all other data after hooks
   const { author }: { author: PostUserType } = postData;
-  const { date, reacts, taggedUsers } = postData;
+  const { date } = postData;
   const commentsData = {
     comments: postData.commentsData?.comments || [],
     count: postData.commentsData?.count || 0,
@@ -187,14 +186,14 @@ const Post: React.FC<PostProps> = ({
     }
   };
 
-  const postDB: PostDBObject = {
-    commentsDisabled: postData.commentsDisabled,
-    content: postData.content,
-    media: postData.media.link,
-    mediaType: postData.media.media_type as MediaType,
-    publicPost: postData.publicPost,
-    taggedUsers: postData.taggedUsers,
-  };
+  // const postDB: PostDBObject = {
+  //   commentsDisabled: postData.commentsDisabled,
+  //   content: postData.content,
+  //   media: postData.media.link,
+  //   mediaType: postData.media.media_type as MediaType,
+  //   publicPost: postData.publicPost,
+  //   taggedUsers: postData.taggedUsers,
+  // };
 
   const handleLoadComments = async () => {
     if (!token) {

@@ -1,4 +1,4 @@
-import React, { useRef, useState, memo, useEffect } from "react";
+import React, { useRef, useState, memo } from "react";
 import {
   Popover,
   PopoverContent,
@@ -12,7 +12,7 @@ import { GoFileMedia as MediaIcon } from "react-icons/go";
 import CommentWithReplies from "./CommentWithReplies";
 import { MdOutlineEmojiEmotions } from "react-icons/md";
 import EmojiPicker, { Theme, EmojiClickData } from "emoji-picker-react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 import UserTagging from "../components/UserTagging";
 import { FormattedContentText } from "./modals/CreatePostModal";
@@ -26,9 +26,6 @@ import {
 import { toast } from "sonner";
 import BlueButton from "./buttons/BlueButton";
 import { extractTaggedUsers } from "./modals/CreatePostModal";
-import Cookies from "js-cookie";
-
-const token = Cookies.get("linkup_auth_token");
 
 // Updated interface to match the structure shown in the screenshot
 interface PostFooterProps {
@@ -53,20 +50,12 @@ const PostFooter: React.FC<PostFooterProps> = ({
   // Create a ref for the horizontally scrollable container
   const [commentInput, setCommentInput] = useState("");
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const [taggedUsers, setTaggedUsers] = useState<
-    { name: string; id: string }[]
-  >([]);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
-  const dispatch = useDispatch();
   const darkMode = useSelector((state: RootState) => state.theme.theme);
   const { data } = useSelector((state: RootState) => state.userBio);
-
-  useEffect(() => {
-    setTaggedUsers(extractTaggedUsers(commentInput));
-  }, [commentInput]);
 
   // Function to handle loading more comments using the provided callback
   const handleLoadMoreComments = async () => {

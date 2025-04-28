@@ -46,8 +46,8 @@ import {
 } from "@/endpoints/feed";
 import { CommentType } from "@/types";
 import moment from "moment";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "@/store";
+import { useDispatch } from "react-redux";
+
 import Cookies from "js-cookie";
 import TransparentButton from "./buttons/TransparentButton";
 import BlueButton from "./buttons/BlueButton";
