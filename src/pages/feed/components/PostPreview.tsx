@@ -116,6 +116,7 @@ const PostPreview: React.FC<PostPreviewProps> = ({
                 id={`post-content-${post._id}`}
                 content={post.content}
                 lineCount={3}
+                hideLinks={true}
               />
 
               {post.media.media_type === "pdf" && (
