@@ -13,6 +13,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       socketService.connect(token)
         .then(() => {
           console.log("Socket connected from provider");
+          socketService.setOnlineStatus(true);
           setConnected(true);
         })
         .catch((err) => {
@@ -21,6 +22,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
 
     return () => {
+      socketService.setOnlineStatus(false);
       socketService.disconnect(); // Cleanup on unmount
       setConnected(false);
     };
