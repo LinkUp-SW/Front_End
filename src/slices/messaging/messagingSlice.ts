@@ -91,6 +91,7 @@ interface MessageState {
   editText: string;
   user2Id:string;
   message:MessageChat;
+  responsiveIsSidebar:boolean;
 
 
 
@@ -117,7 +118,9 @@ const initialState: MessageState = {
     reacted: false,
     isSeen: false,
     isOwnMessage: false,
+    
   },
+  responsiveIsSidebar:false,
 
 
 
@@ -181,6 +184,9 @@ const MessagingSlice = createSlice({
       state.editingMessageId = "";
       state.editText = "";
     },
+    setResponsiveIsSidebar: (state, action: PayloadAction<boolean>) => {
+      state.responsiveIsSidebar = action.payload;
+    },
 
  
     
@@ -190,5 +196,5 @@ const MessagingSlice = createSlice({
   },
 });
 
-export const {toggleStarred, activeButton, searchFiltering, selectMessage,selectUserName,selectUserStatus,setEditingMessageId,setEditText,clearEditingState,selectUserId,addMessage} = MessagingSlice.actions;
+export const {toggleStarred, activeButton, searchFiltering, selectMessage,selectUserName,selectUserStatus,setEditingMessageId,setEditText,clearEditingState,selectUserId,addMessage,setResponsiveIsSidebar} = MessagingSlice.actions;
 export default MessagingSlice.reducer;
