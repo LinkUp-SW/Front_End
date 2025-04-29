@@ -14,7 +14,7 @@ const MessagingPage = () => {
   );
 
   return (
-    <div className=" flex h-[calc(100vh-100px)] w-full fixed top-[50px] lg:top-[100px] left-0 bg-gray-100 dark:bg-gray-900">
+    <div className="bg-[#f4f2ee] flex h-[calc(100vh-100px)] w-full fixed top-[50px] lg:top-[100px] left-0  dark:bg-gray-900">
       <div className="bg-white dark:bg-gray-800 flex-1 h-full border-r  lg:ml-10 border-gray-200 dark:border-gray-700 flex flex-col">
         <div
           className={`bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 flex-shrink-0 ${
