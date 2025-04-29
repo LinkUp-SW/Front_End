@@ -20,7 +20,6 @@ export interface NotificationSender {
   lastName: string;
   profilePhoto: string | null;
 }
-
 export interface Notification {
   id: string;
   sender: NotificationSender;
