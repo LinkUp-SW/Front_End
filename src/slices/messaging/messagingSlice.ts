@@ -96,6 +96,7 @@ interface MessageState {
   responsiveIsSidebar:boolean;
   chatData:chattingMessages;
   setEditedMessageIds: string[];
+  onlineStatus: boolean;
 
 
 
@@ -125,6 +126,7 @@ const initialState: MessageState = {
     isOwnMessage: false,
     isDeleted: false,
     isEdited: false, 
+
   },
   responsiveIsSidebar:false,
   chatData: {
@@ -139,6 +141,7 @@ const initialState: MessageState = {
     messages: []
 },
 setEditedMessageIds:[],
+onlineStatus: false,
 
 
 };
@@ -214,6 +217,11 @@ const MessagingSlice = createSlice({
       state.responsiveIsSidebar = action.payload;
     },
 
+    /*onlineStatus*/
+    setOnlineStatus: (state, action: PayloadAction<boolean>) => {
+      state.onlineStatus = action.payload; 
+    },
+
     
     
     
@@ -222,5 +230,5 @@ const MessagingSlice = createSlice({
   },
 });
 
-export const {toggleStarred, activeButton, searchFiltering, selectMessage,selectUserName,selectUserStatus,setEditingMessageId,setEditText,clearEditingState,selectUserId,addMessage,setResponsiveIsSidebar,setChatData,setEditedMessageIds} = MessagingSlice.actions;
+export const {toggleStarred, activeButton, searchFiltering, selectMessage,selectUserName,selectUserStatus,setEditingMessageId,setEditText,clearEditingState,selectUserId,addMessage,setResponsiveIsSidebar,setChatData,setEditedMessageIds,setOnlineStatus} = MessagingSlice.actions;
 export default MessagingSlice.reducer;
