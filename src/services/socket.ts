@@ -9,6 +9,7 @@ export interface SocketIncomingMessage {
     timestamp: string;
     is_seen: boolean;
   };
+  messageId: string;
 }
 export interface incomingTypingIndicator {
   conversationId: string;
