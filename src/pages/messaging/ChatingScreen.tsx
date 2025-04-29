@@ -16,7 +16,6 @@ import {
 import {
   setEditingMessageId,
   setEditText,
-  addMessage,
 } from "../../slices/messaging/messagingSlice";
 import { toast } from "sonner";
 import { socketService } from "@/services/socket";
@@ -67,14 +66,15 @@ const ChatingScreen = () => {
   /*const messages = conversation ? conversation.user1_sent_messages : [];*/
   const [dataChat, setChatData] = useState<chattingMessages>();
   const [loading, setLoading] = useState<boolean>(true);
-  const [msgDeleted, setMsgDeleted] = useState<boolean>(false);
+
+  const [deletedMessageIds, setDeletedMessageIds] = useState<string[]>([]);
+
   const [isTyping, setIsTyping] =
     useState<boolean>(false); /*related to typing indicator (sockets) */
   const [readByUserId, setReadByUserId] = useState<string | null>(
     null
   ); /*related to read messages (sockets) */
   const [lastOwnMessageId, setLastOwnMessageId] = useState<string | null>(null);
-
 
   const findLastMessageFromCurrentUser = (messages: MessageChat[]) => {
     // Start from the end and find the first message from the current user
@@ -97,7 +97,6 @@ const ChatingScreen = () => {
   }, [dataChat]);
   // Add this useEffect to update the lastOwnMessageId whenever messages change
 
-
   useEffect(() => {
     const fetchChatting = async () => {
       try {
@@ -117,12 +116,7 @@ const ChatingScreen = () => {
 
     fetchChatting();
   }, [selectedConvID]);
-  useEffect(() => {
-    if (msgDeleted) {
-      // set it back to false right after render
-      setMsgDeleted(false);
-    }
-  }, [msgDeleted]);
+
   useEffect(() => {
     const unsubscribeT = socketService.on<incomingTypingIndicator>(
       "user_typing",
@@ -227,7 +221,7 @@ const ChatingScreen = () => {
         if (incoming.conversationId !== selectedConvID) return;
 
         const newMsg: MessageChat = {
-          messageId: Date.now().toString(), // temp ID
+          messageId: incoming.messageId, 
           senderId: incoming.senderId,
           senderName:
             incoming.senderId === id
@@ -239,6 +233,8 @@ const ChatingScreen = () => {
           reacted: false,
           isSeen: incoming.message.is_seen,
           isOwnMessage: incoming.senderId === id, // Compare with your user ID
+          isDeleted: false,
+          isEdited: false,
         };
 
         setChatData(
@@ -274,7 +270,12 @@ const ChatingScreen = () => {
 
   // Add this to your ChatingScreen component
 
-  if (loading) return <div><LinkUpLoader/></div>;
+  if (loading)
+    return (
+      <div>
+        <LinkUpLoader />
+      </div>
+    );
 
   const shouldShowProfile = (index: number) => {
     if (index === 0) return true;
@@ -298,11 +299,18 @@ const ChatingScreen = () => {
   const handlingDeleteMsg = async (convId: string, msgId: string) => {
     try {
       await deleteMessages(token!, convId, msgId);
-      setChatData((prev) => ({
-        ...prev!,
-        messages: prev!.messages.filter((msg) => msg.messageId !== msgId),
-      }));
-      setMsgDeleted(true);
+      setDeletedMessageIds((prev) => [...prev, msgId]);
+      setChatData((prev) => {
+        if (!prev) return prev;
+
+        return {
+          ...prev,
+          messages: prev.messages.map((msg) =>
+            msg.messageId === msgId ? { ...msg, isDeleted: true } : msg
+          ),
+        };
+      });
+
       toast.success("Message deleted");
     } catch (err) {
       console.log("Error deleting:", err);
@@ -354,67 +362,89 @@ const ChatingScreen = () => {
           dataChat?.messages.length === 0 ? (
             <p className="text-center text-gray-500">No messages yet</p>
           ) : (
-            dataChat?.messages?.map((msg, index) => (
-              <div>
-                {shouldShowProfile(index) ? (
-                  <div className="mt-2">
-                    <div className="flex items-center">
-                      <img
-                        id="user-img"
-                        className="rounded-full w-10 h-10"
-                        src={
-                          msg.isOwnMessage
-                            ? user2Img
-                            : dataChat.otherUser.profilePhoto
-                        }
-                        alt="Profile"
-                      />
-                      <p id="user-name" className="pl-3 font-semibold">
-                        {msg.isOwnMessage
-                          ? user2Name
-                          : `${dataChat.otherUser.firstName} ${dataChat.otherUser.lastName}`}
-                        <span className="text-xs text-gray-500">
-                          {" "}
-                          · {new Date(msg.timestamp).toLocaleTimeString()}
-                        </span>
-                      </p>
+            dataChat?.messages?.map((msg, index) => {
+              const isDeleted =
+                msg.isDeleted || deletedMessageIds.includes(msg.messageId);
+              const showProfile = shouldShowProfile(index);
+              const messageTime = new Date(msg.timestamp).toLocaleTimeString();
+              const profilePhoto = msg.isOwnMessage
+                ? user2Img
+                : dataChat.otherUser.profilePhoto;
+              const userName = msg.isOwnMessage
+                ? user2Name
+                : `${dataChat.otherUser.firstName} ${dataChat.otherUser.lastName}`;
+
+              return (
+                <div key={index}>
+                  {/* Profile Section - Conditionally rendered */}
+                  {showProfile && (
+                    <div className="mt-2">
+                      <div className="flex items-center">
+                        <img
+                          id="user-img"
+                          className="rounded-full w-10 h-10"
+                          src={profilePhoto}
+                          alt="Profile"
+                        />
+                        <p id="user-name" className="pl-3 font-semibold">
+                          {userName}
+                          <span className="text-xs text-gray-500">
+                            {" "}
+                            · {messageTime}
+                          </span>
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      {msgDeleted ? (
-                        <div>This message has been deleted.</div>
+                  )}
+
+                  {/* Message Content */}
+                  <div
+                    className={`w-full hover:bg-gray-200 ${
+                      showProfile ? "pl-14" : "pl-14"
+                    } hover:cursor-pointer flex justify-between`}
+                  >
+                    <div >
+                      {isDeleted ? (
+                        <div className="pr-2 pl-2 bg-gray-100 rounded-lg  break-words">This message has been deleted.</div>
                       ) : (
-                        <div className="w-full hover:bg-gray-200 pl-14 hover:cursor-pointer flex justify-between ">
-                          <div>{msg.message}</div>
-                          <div>
-                            <Popover.Root>
-                              <Popover.Trigger asChild>
-                                <button
-                                  id="dots-btn"
-                                  className="p-1 hover:bg-gray-200 rounded-full"
-                                >
-                                  <HiOutlineDotsHorizontal
-                                    size={15}
-                                    className="text-gray-500"
-                                  />
-                                </button>
-                              </Popover.Trigger>
-                              <Popover.Portal>
-                                <Popover.Content
-                                  className="bg-white shadow-lg rounded-lg p-1 w-56 border border-gray-200 z-20"
-                                  sideOffset={5}
-                                >
-                                  <button
-                                    id="forward"
-                                    className="block w-full text-left py-2 px-3 text-sm hover:bg-gray-100 rounded"
-                                  >
-                                    Forward
-                                  </button>
-                                  <button
-                                    id="share-via-email"
-                                    className="block w-full text-left py-2 px-3 text-sm hover:bg-gray-100 rounded"
-                                  >
-                                    Share via email
-                                  </button>
+                        msg.message
+                      )}
+                    </div>
+
+                    {/* Three dots menu - always visible */}
+                    {!isDeleted && (
+                      <div>
+                        <Popover.Root>
+                          <Popover.Trigger asChild>
+                            <button
+                              id="dots-btn"
+                              className="p-1 hover:bg-gray-200 rounded-full"
+                            >
+                              <HiOutlineDotsHorizontal
+                                size={15}
+                                className="text-gray-500"
+                              />
+                            </button>
+                          </Popover.Trigger>
+                          <Popover.Portal>
+                            <Popover.Content
+                              className="bg-white shadow-lg rounded-lg p-1 w-56 border border-gray-200 z-20"
+                              sideOffset={5}
+                            >
+                              <button
+                                id="forward"
+                                className="block w-full text-left py-2 px-3 text-sm hover:bg-gray-100 rounded"
+                              >
+                                Forward
+                              </button>
+                              <button
+                                id="share-via-email"
+                                className="block w-full text-left py-2 px-3 text-sm hover:bg-gray-100 rounded"
+                              >
+                                Share via email
+                              </button>
+                              {msg.isOwnMessage && (
+                                <>
                                   <button
                                     id="delete"
                                     className="block w-full text-left py-2 px-3 text-sm hover:bg-gray-100 rounded"
@@ -439,35 +469,33 @@ const ChatingScreen = () => {
                                   >
                                     Edit
                                   </button>
-                                </Popover.Content>
-                              </Popover.Portal>
-                            </Popover.Root>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                    {msg.isOwnMessage &&
-                      msg.isSeen &&
-                      msg.messageId === lastOwnMessageId && (
-                        <div className="pl-14 mt-1 flex items-center gap-2">
-                          <div className="w-5 h-5 rounded-full overflow-hidden border border-gray-300">
-                            <img
-                              src={dataChat.otherUser.profilePhoto}
-                              alt="Read by"
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                          <span className="text-xs text-gray-500">Seen</span>
-                        </div>
-                      )}
+                                </>
+                              )}
+                            </Popover.Content>
+                          </Popover.Portal>
+                        </Popover.Root>
+                      </div>
+                    )}
                   </div>
-                ) : (
-                  <div className="w-full hover:bg-gray-200 pl-14 hover:cursor-pointer ">
-                    {msg.message}
-                  </div>
-                )}
-              </div>
-            ))
+
+                  {/* Seen indicator */}
+                  {msg.isOwnMessage &&
+                    msg.isSeen &&
+                    msg.messageId === lastOwnMessageId && (
+                      <div className="pl-14 mt-1 flex items-center gap-2">
+                        <div className="w-5 h-5 rounded-full overflow-hidden border border-gray-300">
+                          <img
+                            src={dataChat.otherUser.profilePhoto}
+                            alt="Read by"
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <span className="text-xs text-gray-500">Seen</span>
+                      </div>
+                    )}
+                </div>
+              );
+            })
           )}
         </div>
         {/* Typing Indicator */}
