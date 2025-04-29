@@ -46,11 +46,11 @@ export const PagePreview: React.FC<PagePreviewProps> = ({
               </>
             )}
           </div>
-          <h3 className="text-xl font-medium text-gray-800 dark:text-white mb-1">
+          <h3 className="text-xl font-medium text-gray-800 dark:text-white mb-1 break-words max-w-full overflow-hidden">
             {name || (type === 'company' ? 'Company name' : 'Institution name')}
           </h3>
           <div className="min-h-12">
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-1 break-words">
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-1 break-words max-w-full overflow-hidden">
               {truncatedDescription || 'Tagline'}
             </p>
             {description && description.length > 100 && (
@@ -63,9 +63,6 @@ export const PagePreview: React.FC<PagePreviewProps> = ({
             )}
           </div>
           <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Industry</p>
-          <button className="px-4 py-1 bg-blue-600 text-white rounded-full flex items-center justify-center">
-            <span className="mr-1">+</span> Follow
-          </button>
         </div>
       </div>
     </div>
