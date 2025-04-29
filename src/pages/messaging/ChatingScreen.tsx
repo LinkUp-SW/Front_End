@@ -16,6 +16,7 @@ import {
 import {
   setEditingMessageId,
   setEditText,
+  setChatData
 } from "../../slices/messaging/messagingSlice";
 import { toast } from "sonner";
 import { socketService } from "@/services/socket";
@@ -54,17 +55,17 @@ const ChatingScreen = () => {
   );*/
 
   const userBioState = useSelector((state: RootState) => state.userBio.data);
-  const starredConversations = useSelector(
-    (state: RootState) => state.messaging.starredConversations
-  );
+  const starredConversations = useSelector((state: RootState) => state.messaging.starredConversations);
 
   const isCurrentConversationStarred =
     starredConversations.includes(selectedConvID);
 
   const msg = useSelector((state: RootState) => state.messaging.message);
+  const dataChat=useSelector((state: RootState) => state.messaging.chatData);
+  const editedMessageIds=useSelector((state: RootState) => state.messaging.setEditedMessageIds);
+ 
 
   /*const messages = conversation ? conversation.user1_sent_messages : [];*/
-  const [dataChat, setChatData] = useState<chattingMessages>();
   const [loading, setLoading] = useState<boolean>(true);
 
   const [deletedMessageIds, setDeletedMessageIds] = useState<string[]>([]);
@@ -104,7 +105,7 @@ const ChatingScreen = () => {
         if (!token) return;
 
         const res = await getConversation(token, selectedConvID);
-        setChatData(res);
+        dispatch(setChatData(res));
         toast.success("Messages loaded successfully");
       } catch (error) {
         console.error("Failed to fetch conversations:", error);
@@ -158,17 +159,13 @@ const ChatingScreen = () => {
           setReadByUserId(data.readBy);
 
           // Update all messages to be seen
-          setChatData((prev) => {
-            if (!prev) return prev;
-
-            return {
-              ...prev,
-              messages: prev.messages.map((msg) => ({
-                ...msg,
-                isSeen: true,
-              })),
-            };
-          });
+          dispatch(setChatData({
+            ...dataChat,
+            messages: dataChat?.messages?.map((msg) => ({
+              ...msg,
+              isSeen: true,
+            })) || []
+          }));
         }
       }
     );
@@ -196,17 +193,13 @@ const ChatingScreen = () => {
           socketService.markAsRead(selectedConvID);
 
           // Update local state
-          setChatData((prev) => {
-            if (!prev) return prev;
-
-            return {
-              ...prev,
-              messages: prev.messages.map((msg) => ({
-                ...msg,
-                isSeen: msg.isOwnMessage ? msg.isSeen : true, // Only mark the other user's messages as seen
-              })),
-            };
-          });
+          dispatch(setChatData({
+            ...dataChat,
+            messages: dataChat.messages.map((msg) => ({
+              ...msg,
+              isSeen: msg.isOwnMessage ? msg.isSeen : true,
+            }))
+          }));
         })
         .catch((err) => {
           console.error("Failed to mark messages as seen:", err);
@@ -237,15 +230,14 @@ const ChatingScreen = () => {
           isEdited: false,
         };
 
-        setChatData(
-          (prev) =>
-            prev
-              ? {
-                  ...prev,
-                  messages: [...prev.messages, newMsg],
-                }
-              : prev // or null-safe fallback
-        );
+        dispatch(setChatData(
+          dataChat
+            ? {
+                ...dataChat,
+                messages: [...(dataChat.messages || []), newMsg],
+              }
+            : dataChat // maintain null-safe fallback
+        ));
       }
     );
 
@@ -255,18 +247,14 @@ const ChatingScreen = () => {
   }, [selectedConvID, dataChat, id]);
 
   useEffect(() => {
-    if (msg && msg.messageId && selectedConvID) {
+    if (msg && msg.messageId && selectedConvID && dataChat) {
       // Only update if this is a valid message and relates to current conversation
-      setChatData((prev) =>
-        prev
-          ? {
-              ...prev,
-              messages: [...prev.messages, msg],
-            }
-          : prev
-      );
+      dispatch(setChatData({
+        ...dataChat,
+        messages: [...(dataChat.messages || []), msg],
+      }));
     }
-  }, [msg]);
+  }, [msg, dataChat, selectedConvID]);
 
   // Add this to your ChatingScreen component
 
@@ -300,16 +288,13 @@ const ChatingScreen = () => {
     try {
       await deleteMessages(token!, convId, msgId);
       setDeletedMessageIds((prev) => [...prev, msgId]);
-      setChatData((prev) => {
-        if (!prev) return prev;
-
-        return {
-          ...prev,
-          messages: prev.messages.map((msg) =>
-            msg.messageId === msgId ? { ...msg, isDeleted: true } : msg
-          ),
-        };
-      });
+      dispatch(setChatData({
+        ...dataChat,
+        messages: dataChat.messages.map((msg) =>
+          msg.messageId === msgId ? { ...msg, isDeleted: true } : msg
+        )
+      }));
+      
 
       toast.success("Message deleted");
     } catch (err) {
@@ -363,8 +348,8 @@ const ChatingScreen = () => {
             <p className="text-center text-gray-500">No messages yet</p>
           ) : (
             dataChat?.messages?.map((msg, index) => {
-              const isDeleted =
-                msg.isDeleted || deletedMessageIds.includes(msg.messageId);
+              const isDeleted = msg.isDeleted || deletedMessageIds.includes(msg.messageId);
+              const isEdited = msg.isEdited || editedMessageIds.includes(msg.messageId);
               const showProfile = shouldShowProfile(index);
               const messageTime = new Date(msg.timestamp).toLocaleTimeString();
               const profilePhoto = msg.isOwnMessage
@@ -407,9 +392,18 @@ const ChatingScreen = () => {
                       {isDeleted ? (
                         <div className="pr-2 pl-2 bg-gray-100 rounded-lg  break-words">This message has been deleted.</div>
                       ) : (
-                        msg.message
+                        <>
+                        {msg.message}
+                        {msg.isEdited && (
+                          <span className="text-s text-gray-500  pl-2">
+                            (Edited)
+                          </span>
+                        )}
+                        </>
                       )}
+                     
                     </div>
+                   
 
                     {/* Three dots menu - always visible */}
                     {!isDeleted && (
