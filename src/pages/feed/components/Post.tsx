@@ -572,10 +572,7 @@ const Post: React.FC<PostProps> = ({
   );
 
   const stats = {
-    comments:
-      postData.commentsCount ||
-      (postData.comments && postData.comments.length) ||
-      0,
+    comments: postData.commentsCount || 0,
     reposts: 0,
     total: postData.reactionsCount,
   };
@@ -740,7 +737,7 @@ const Post: React.FC<PostProps> = ({
                 {stats.comments} comments
               </p>
             )}
-            {stats.reposts !== 0 && stats.comments !== 0 && (
+            {stats.reposts !== 0 && stats.comments && stats.comments !== 0 && (
               <p className="text-xs text-gray-500 dark:text-neutral-400 font-bold">
                 {" "}
                 ·
