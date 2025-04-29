@@ -80,6 +80,10 @@
     --text-color: var(--dark-text-color);
 }
 
+*{
+    scroll-behavior: smooth;
+}
+
 /* Example usage */
 body {
     background-color: var(--background-color);

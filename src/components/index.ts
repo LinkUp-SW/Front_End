@@ -76,6 +76,7 @@ import InterviewTipsPanel from "@/components/my_items/InterviewTipsPanel";
 import Footer from "@/components/my_items/Footer";
 import SavedPostsDashboard from "@/components/my_items/SavedPostsDashboard";
 import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
+import SubscribeNowCard from "./subscribe_now/SubscribeNowCard";
 
 export {
   UserList,
@@ -152,4 +153,5 @@ export {
   Alert,
   AlertTitle,
   AlertDescription,
+  SubscribeNowCard,
 };

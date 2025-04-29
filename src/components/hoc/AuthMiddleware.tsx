@@ -1,6 +1,6 @@
 import { userLogOut, validateAuthToken } from "@/endpoints/userAuth";
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Cookies from "js-cookie";
 import { AxiosError } from "axios";
 import LinkUpLoader from "../linkup_loader/LinkUpLoader";
@@ -12,9 +12,11 @@ interface AuthMiddlewareProps {
 
 const AuthMiddleware = ({ children }: AuthMiddlewareProps) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [isVerified, setIsVerified] = useState(false);
   const token = Cookies.get("linkup_auth_token");
   const myUserId = Cookies.get("linkup_user_id");
+  const userType = Cookies.get("linkup_user_type");
 
   useEffect(() => {
     let isMounted = true;
@@ -22,7 +24,8 @@ const AuthMiddleware = ({ children }: AuthMiddlewareProps) => {
 
     const checkAuth = async () => {
       try {
-        if (!token || !myUserId) {
+        if (!token || !myUserId || !userType) {
+          Cookies.remove("linkup_user_type");
           await userLogOut();
           navigate("/login", { replace: true });
           return;
@@ -38,10 +41,29 @@ const AuthMiddleware = ({ children }: AuthMiddlewareProps) => {
           }
           setIsVerified(true);
         }
+
+        if (userType === "admin") {
+          if (
+            location.pathname !== "/login" ||
+            !location.pathname.startsWith("/signup") ||
+            !location.pathname.startsWith("/admin")
+          ) {
+            navigate("/admin/dashboard", {
+              replace: true,
+            });
+          }
+        } else {
+          if (location.pathname.startsWith("/admin")) {
+            navigate("/feed", {
+              replace: true,
+            });
+          }
+        }
       } catch (error: unknown) {
         if (isMounted) {
           Cookies.remove("linkup_auth_token");
           Cookies.remove("linkup_user_id");
+          Cookies.remove("linkup_user_type");
 
           let redirectPath = "/login";
           if (error instanceof AxiosError) {

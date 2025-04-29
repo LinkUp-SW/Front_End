@@ -104,6 +104,8 @@ const Activity: React.FC = () => {
   const reportPost = () => {};
   const unfollow = () => {};
 
+  if (posts.length === 0) return null;
+
   return (
     <section className="bg-white p-4 dark:bg-gray-900 rounded-lg shadow-md overflow-hidden">
       <div className="w-full mx-auto">

@@ -13,6 +13,7 @@ import {
 import { FaPencilAlt } from "react-icons/fa";
 import EditUserBioModal from "../../modals/edit_user_bio_modal/EditUserBioModal";
 import { useState } from "react";
+import premiumLogo from "@/assets/linkup_premium.png";
 
 type ProfileHeaderProps = {
   userid: string;
@@ -24,6 +25,7 @@ type ProfileHeaderProps = {
   };
   isOwner: boolean;
   isInConnection?: boolean;
+  isPremium: boolean;
 };
 
 export const ProfileHeader = ({
@@ -33,6 +35,7 @@ export const ProfileHeader = ({
   intros,
   isOwner,
   isInConnection,
+  isPremium,
 }: ProfileHeaderProps) => (
   <div className="mb-4 grid gap-1 relative">
     <h1 className="text-2xl font-bold text-gray-800 dark:text-white">
@@ -58,6 +61,16 @@ export const ProfileHeader = ({
       </p>
     )}
 
+    {isPremium && (
+      <img
+        src={premiumLogo}
+        className={`absolute hover:opacity-85 transition-all duration-300 cursor-pointer rounded-md z-20 w-7 h-7 ${
+          isOwner
+            ? "right-[2rem] top-[-4.1rem]"
+            : "right-[-0.7rem] top-[-4.2rem]"
+        }`}
+      />
+    )}
     {isOwner && <EditUserBio user={user} userid={userid} intros={intros} />}
     <div className="sm:grid gap-2 absolute right-0 hidden">
       {intros.work_experience && (
@@ -94,12 +107,12 @@ const EditUserBio: React.FC<Partial<ProfileHeaderProps>> = ({
 }) => {
   const [open, setOpen] = useState(false);
   return (
-    <div className="absolute right-[-1rem] top-[-5rem]">
+    <div className="absolute right-[-1rem] top-[-4.5rem] flex gap-2 items-center">
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
           <button
             id="edit-user-bio"
-            className="absolute hover:opacity-85 transition-all duration-300 cursor-pointer bg-gray-300 dark:bg-gray-800 p-2 rounded-full top-3 right-3"
+            className="hover:opacity-85 transition-all duration-300 cursor-pointer bg-gray-300 dark:bg-gray-800 p-2 rounded-full"
             aria-label="Edit User Bio"
           >
             <FaPencilAlt size={20} />
