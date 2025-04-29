@@ -1,5 +1,8 @@
 import { useDispatch } from "react-redux";
-import { setEditingMessageId,addMessage } from "../../slices/messaging/messagingSlice";
+import {
+  setEditingMessageId,
+  addMessage,
+} from "../../slices/messaging/messagingSlice";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { useState } from "react";
@@ -10,14 +13,18 @@ import { BsEmojiSmile } from "react-icons/bs";
 import { BsThreeDots } from "react-icons/bs";
 import { IoIosClose } from "react-icons/io";
 import { FaFileAlt } from "react-icons/fa";
-import {editMessage} from "@/endpoints/messaging";
+import { editMessage } from "@/endpoints/messaging";
 import Cookies from "js-cookie";
-import {setEditText,clearEditingState} from "../../slices/messaging/messagingSlice";
+import {
+  setEditText,
+  clearEditingState,
+  setChatData,
+  setEditedMessageIds,
+} from "../../slices/messaging/messagingSlice";
 import { toast } from "sonner";
 import { socketService } from "@/services/socket";
 import { useParams } from "react-router-dom";
-import {MessageChat,} from "@/endpoints/messaging";
-
+import { MessageChat } from "@/endpoints/messaging";
 
 const SendingMessages = () => {
   const { id } = useParams();
@@ -34,6 +41,9 @@ const SendingMessages = () => {
   );
 
   const editText = useSelector((state: RootState) => state.messaging.editText);
+  const msg = useSelector((state: RootState) => state.messaging.message);
+  const dataChat = useSelector((state: RootState) => state.messaging.chatData);
+  const editedMessageIds=useSelector((state: RootState) => state.messaging.setEditedMessageIds);
 
   const dispatch = useDispatch();
   /* const [selectedImage, setSelectedMessages] = useState("");*/
@@ -41,6 +51,7 @@ const SendingMessages = () => {
   const [text, setText] = useState<string>("");
   const [files, setFiles] = useState<File[]>([]);
   const [selectedFile, setSelectedFile] = useState(false);
+
 
   const handleEmojiRequest = (emoji: { emoji: string }) => {
     setText((prevMessage) => prevMessage + emoji.emoji);
@@ -60,29 +71,41 @@ const SendingMessages = () => {
 
   const handleSendMessage = () => {
     if (!text.trim()) return;
-     const newMsg: MessageChat = {
-              messageId: Date.now().toString(), // temp ID
-              senderId: id!,
-              senderName:"YOU",
-              message: text,
-              media:  [],
-              timestamp:new Date().toISOString(),
-              reacted: false,
-              isSeen: false,
-              isOwnMessage: true, // Compare with your user ID
-              isDeleted: false,
-              isEdited: false,
-            };
-    dispatch(addMessage(newMsg)); 
-    socketService.sendPrivateMessage(selectedUser2ID, text, []); 
+    const newMsg: MessageChat = {
+      messageId: Date.now().toString(), // temp ID
+      senderId: id!,
+      senderName: "YOU",
+      message: text,
+      media: [],
+      timestamp: new Date().toISOString(),
+      reacted: false,
+      isSeen: false,
+      isOwnMessage: true, // Compare with your user ID
+      isDeleted: false,
+      isEdited: false,
+    };
+    dispatch(addMessage(newMsg));
+    socketService.sendPrivateMessage(selectedUser2ID, text, []);
     setText("");
   };
 
   const handleEditingMsgSave = async () => {
     if (!editText.trim()) return;
     try {
-      await editMessage(token!, selectedConvID, editingMessageId, editText); // All synced from Redux
+      await editMessage(token!, selectedConvID, editingMessageId, editText);
       dispatch(clearEditingState());
+      dispatch(setEditedMessageIds([...editedMessageIds,editingMessageId]));
+      dispatch(
+        setChatData({
+          ...dataChat,
+          messages: dataChat.messages.map((msg) =>
+            msg.messageId === editingMessageId
+              ? { ...msg,message:editText, isEdited: true }
+              : msg
+          ),
+        })
+      );
+
       toast.success("Message updated successfully");
     } catch (error) {
       console.error("Error editing message:", error);
@@ -90,7 +113,7 @@ const SendingMessages = () => {
     }
   };
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setText(e.target.value)
+    setText(e.target.value);
 
     socketService.sendTypingIndicator(selectedConvID);
 
@@ -139,55 +162,56 @@ const SendingMessages = () => {
       <div className="border-t border-gray-200 flex flex-col flex-shrink-0 bg-[#f4f2ee]">
         {editingMessageId ? (
           <div className="w-full p-7">
-          <p className="text-lg font-semibold text-gray-800 mb-2">Edit message</p>
-          
-          <div className="pl-3 pt-3 pb-3 pr-15 border-1 bg-white">
-          <textarea
-            id="edit-text-message"
+            <p className="text-lg font-semibold text-gray-800 mb-2">
+              Edit message
+            </p>
 
-            value={editText}
-            onChange={(e) => dispatch(setEditText(e.target.value))}
-            placeholder="Edit your message..."
-            className="bg-[#f4f2ee] w-full min-h-[80px]  text-gray-800 p-3 rounded-md resize-none outline-none border border-gray-200 focus:ring-2 focus:ring-blue-500"
-          />
-          </div>
-          <div className="flex justify-between items-center mt-3">
-            <button
-              id="emoji-btn"
-              onClick={() => setSelectedEmoji(!selectedEmoji)}
-              className="text-gray-500 hover:text-blue-600"
-              title="Add Emoji"
-            >
-              <BsEmojiSmile size={22} />
-            </button>
-      
-            <div className="space-x-2">
+            <div className="pl-3 pt-3 pb-3 pr-15 border-1 bg-white">
+              <textarea
+                id="edit-text-message"
+                value={editText}
+                onChange={(e) => dispatch(setEditText(e.target.value))}
+                placeholder="Edit your message..."
+                className="bg-[#f4f2ee] w-full min-h-[80px]  text-gray-800 p-3 rounded-md resize-none outline-none border border-gray-200 focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div className="flex justify-between items-center mt-3">
               <button
-                id="cancel-edit-message"
-                onClick={() => {
-                  dispatch(setEditingMessageId(""));
-                  setEditText("");
-                }}
-                className="px-4 py-1 rounded-full text-sm  border border-blue-700 text-blue-700 hover:bg-gray-100"
+                id="emoji-btn"
+                onClick={() => setSelectedEmoji(!selectedEmoji)}
+                className="text-gray-500 hover:text-blue-600"
+                title="Add Emoji"
               >
-                Cancel
+                <BsEmojiSmile size={22} />
               </button>
-      
-              <button
-                id="save-edit-message"
-                onClick={handleEditingMsgSave}
-                disabled={!editText.trim()}
-                className={`px-4 py-1 rounded-full text-sm ${
-                  editText.trim()
-                    ? "bg-blue-600 text-white hover:bg-blue-700"
-                    : "bg-gray-100 text-gray-400 cursor-not-allowed"
-                }`}
-              >
-                Save
-              </button>
+
+              <div className="space-x-2">
+                <button
+                  id="cancel-edit-message"
+                  onClick={() => {
+                    dispatch(setEditingMessageId(""));
+                    setEditText("");
+                  }}
+                  className="px-4 py-1 rounded-full text-sm  border border-blue-700 text-blue-700 hover:bg-gray-100"
+                >
+                  Cancel
+                </button>
+
+                <button
+                  id="save-edit-message"
+                  onClick={handleEditingMsgSave}
+                  disabled={!editText.trim()}
+                  className={`px-4 py-1 rounded-full text-sm ${
+                    editText.trim()
+                      ? "bg-blue-600 text-white hover:bg-blue-700"
+                      : "bg-gray-100 text-gray-400 cursor-not-allowed"
+                  }`}
+                >
+                  Save
+                </button>
+              </div>
             </div>
           </div>
-        </div>  
         ) : (
           <div>
             <div className="px-4 pt-2 pb-1">
