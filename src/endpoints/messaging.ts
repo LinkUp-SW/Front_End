@@ -41,6 +41,8 @@ export interface MessageChat
     reacted: boolean;
     isSeen: boolean;
     isOwnMessage: boolean;
+    isDeleted: boolean;
+    isEdited: boolean;
   }
 
 export interface chattingMessages{
@@ -118,9 +120,38 @@ export const editMessage = async (
   return response.data;
 };
 
+export const markConversationAsRead = async (
+  token: string,
+  conversationId: string
+) => {
+  const response = await axiosInstance.put(
+    `/api/v1/conversations/${conversationId}/read`,
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
 
-
-
+export const markMessagesAsSeen = async (
+  token: string,
+  conversationId: string
+) => {
+  const response = await axiosInstance.put(
+    `/api/v1/messages/${conversationId}/seen`,
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+  
+};
 export const getUnseenMessagesCountByConversation = async (
   token: string
 ): Promise<unreadMessagesCount[]> => {
@@ -133,6 +164,19 @@ export const getUnseenMessagesCountByConversation = async (
     }
   );
   return response.data.formattedUnseenCountByConversation;
+};
+export const getUnseenMessagesCount = async (
+  token: string
+): Promise<number> => {
+  const response = await axiosInstance.get(
+    '/api/v1/conversation/unread-conversations',
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data.unseenCount;
 };
 
 
