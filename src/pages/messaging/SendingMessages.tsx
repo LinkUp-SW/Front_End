@@ -213,14 +213,14 @@ const SendingMessages = () => {
             </div>
           </div>
         ) : (
-          <div>
+          <div className="bg-white  dark:bg-gray-800 pt-3s">
             <div className="px-4 pt-2 pb-1">
               <textarea
                 id="text-message"
                 value={text}
                 onChange={handleInputChange}
                 placeholder="Write a message..."
-                className="w-full min-h-16 max-h-24 bg-gray-50 text-gray-700 p-3 rounded-md resize-none outline-none border-none"
+                className="w-full min-h-16 max-h-24 bg-[#f4f2ee] text-gray-700 p-3 rounded-md resize-none outline-none border-none"
               />
             </div>
 
