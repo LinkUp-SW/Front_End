@@ -67,7 +67,7 @@ export interface PostType {
     hasInitiallyLoaded?: boolean;
   };
   commentsCount?: number;
-  topReactions?: { reaction: string }[];
+  topReactions?: string[];
   commentsDisabled: string;
   publicPost: boolean;
   taggedUsers: string[];
@@ -118,7 +118,7 @@ export interface CommentType {
   is_edited: boolean;
   userReaction?: string | null;
   childrenCount?: number;
-  topReactions?: { reaction: string }[];
+  topReactions?: string[];
   date: number;
   reactions: {
     reaction: string;
@@ -163,7 +163,16 @@ export interface ActivityContextType {
   actorId: string;
   actorName: string;
   actorUsername: string;
-  type: "reaction" | "comment" | "repost";
+  type:
+    | "like"
+    | "love"
+    | "support"
+    | "insightful"
+    | "celebrate"
+    | "funny"
+    | "comment"
+    | "repost";
+  actorPicture: string;
 }
 
 export interface PostUserType {

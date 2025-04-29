@@ -99,7 +99,7 @@ const Post: React.FC<PostProps> = ({
   const [reactionsOpen, setReactionsOpen] = useState(false);
   const [willDelete, setWillDelete] = useState(false);
   const [topStats, setTopStats] = useState(
-    getReactionIcons(postData?.topReactions || postData?.reactions || [])
+    getReactionIcons(postData?.topReactions || [])
   );
   const [selectedReaction, setSelectedReaction] = useState<string>(
     postData?.userReaction
@@ -173,7 +173,6 @@ const Post: React.FC<PostProps> = ({
     }
 
     if (commentsOpen) {
-      setCommentsOpen(false);
       return;
     }
 
@@ -573,10 +572,7 @@ const Post: React.FC<PostProps> = ({
   );
 
   const stats = {
-    comments:
-      postData.commentsCount ||
-      (postData.comments && postData.comments.length) ||
-      0,
+    comments: postData.commentsCount || 0,
     reposts: 0,
     total: postData.reactionsCount,
   };
@@ -596,6 +592,13 @@ const Post: React.FC<PostProps> = ({
       <CardContent className="flex flex-col items-start pl-0 w-full">
         {action && (
           <header className="flex pl-4 justify-start items-center w-full border-b gap-2 pb-2 dark:border-neutral-700">
+            <Link to={`/user-profile/${action.actorUsername}`}>
+              <img
+                src={action.actorPicture}
+                alt={action.actorName}
+                className="w-4 h-4 md:w-6 md:h-6 rounded-full"
+              />
+            </Link>
             <span className="text-gray-500 text-xs dark:text-neutral-400">
               <Link
                 to="#"
@@ -727,14 +730,14 @@ const Post: React.FC<PostProps> = ({
             {stats.comments !== 0 && (
               <p
                 onClick={() => {
-                  setCommentsOpen(true);
+                  handleToggleComments();
                 }}
                 className="hover:underline hover:text-blue-600 dark:hover:text-blue-400 hover:cursor-pointer"
               >
                 {stats.comments} comments
               </p>
             )}
-            {stats.reposts !== 0 && stats.comments !== 0 && (
+            {stats.reposts !== 0 && stats.comments && stats.comments !== 0 && (
               <p className="text-xs text-gray-500 dark:text-neutral-400 font-bold">
                 {" "}
                 ·
@@ -781,6 +784,7 @@ const Post: React.FC<PostProps> = ({
                               handleReact("None");
                             }
                           }}
+                          id={`reaction-button-${index}`}
                           className={`flex dark:hover:bg-zinc-800 dark:hover:text-neutral-200 ${
                             selectedReaction === "Like"
                               ? "text-blue-700 dark:text-blue-500 hover:text-blue-700 dark:hover:text-blue-400"
@@ -825,6 +829,7 @@ const Post: React.FC<PostProps> = ({
                             key={`repost-${index}`}
                             variant="ghost"
                             size="lg"
+                            id="repost-button"
                             onClick={button.callback}
                             className={`flex dark:hover:bg-zinc-800 dark:hover:text-neutral-200 items-center gap-2 hover:cursor-pointer transition-all`}
                           >
@@ -839,6 +844,7 @@ const Post: React.FC<PostProps> = ({
                                 key={`repost-button-${index}`}
                                 variant="ghost"
                                 size="lg"
+                                id={`repost-button-${index}`}
                                 onClick={button.callback}
                                 className={`flex w-fit h-fit dark:hover:bg-zinc-800 dark:hover:text-neutral-200 items-center gap-2 hover:cursor-pointer transition-all`}
                               >
@@ -862,6 +868,7 @@ const Post: React.FC<PostProps> = ({
                       <Button
                         key={`engagement-${index}`}
                         variant="ghost"
+                        id={`engagement-${button.name}`}
                         size="lg"
                         onClick={button.callback}
                         className={`flex dark:hover:bg-zinc-800 dark:hover:text-neutral-200 items-center gap-2 hover:cursor-pointer transition-all`}
@@ -899,6 +906,7 @@ const Post: React.FC<PostProps> = ({
                           }s forwards`,
                           opacity: 0,
                         }}
+                        id={`reaction-button-${reaction.alt}`}
                         onClick={() => {
                           handleReact(reaction.alt);
                           setReactionsOpen(false);
@@ -989,7 +997,7 @@ const Post: React.FC<PostProps> = ({
 
 export default Post;
 
-export function getReactionIcons(reactions: { reaction: string }[]) {
+export function getReactionIcons(reactions: string[]) {
   const reactionIconsMap: Record<string, JSX.Element> = {
     celebrate: <img src={CelebrateIcon} alt="Celebrate" className="w-4 h-4" />,
     love: <img src={LoveIcon} alt="Love" className="w-4 h-4" />,
@@ -1002,6 +1010,6 @@ export function getReactionIcons(reactions: { reaction: string }[]) {
   };
 
   return reactions
-    .map((reaction) => reactionIconsMap[reaction.reaction.toLowerCase()])
+    .map((reaction) => reactionIconsMap[reaction.toLowerCase()])
     .filter((icon) => icon); // Filter out undefined icons
 }
