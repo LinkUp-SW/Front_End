@@ -93,7 +93,7 @@ const Comment: React.FC<CommentProps> = ({
   const [reactionsOpen, setReactionsOpen] = useState(false); // for Popover open state
   const [viewMore, setViewMore] = useState(false); // if you want to toggle text next to icons
   const [topStats, setTopStats] = useState(
-    getReactionIcons(comment.topReactions || comment.reactions || [])
+    getReactionIcons(comment.topReactions || [])
   );
 
   const handleMouseEnter = () => {
@@ -277,7 +277,7 @@ const Comment: React.FC<CommentProps> = ({
       ? getPrivateCommentActions(copyLink, editComment, deleteCommentModal)
       : getCommentActions(copyLink, reportComment, hideComment);
 
-  const timeAgo = moment(date).fromNow();
+  const timeAgo = moment(date * 1000).fromNow();
 
   return (
     <div className="flex flex-col px-0">
