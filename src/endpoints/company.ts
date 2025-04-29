@@ -170,3 +170,48 @@ export const removeAdmin = async (companyId: string, adminId: string): Promise<{
   const response = await axiosInstance.delete(url, getAuthHeader(token));
   return response.data;
 };
+
+
+
+export interface Follower {
+  _id: string;
+  user_id: string;
+  bio: {
+    first_name: string;
+    last_name: string;
+    headline: string;
+  };
+  profile_photo?: string;
+}
+
+export const getCompanyFollowers = async (organizationId: string): Promise<{ followers: Follower[] }> => {
+  const token = getAuthToken();
+  const url = `/api/v1/company/get-followers/${organizationId}`;
+  
+  const response = await axiosInstance.get(url, getAuthHeader(token));
+  return response.data;
+};
+
+export const blockFollower = async (organizationId: string, followerId: string): Promise<{ success: boolean; message: string }> => {
+  const token = getAuthToken();
+  const url = `/api/v1/company/block-follower/${organizationId}/${followerId}`;
+  
+  const response = await axiosInstance.post(url, {}, getAuthHeader(token));
+  return response.data;
+};
+
+export const getBlockedFollowers = async (organizationId: string): Promise<{ blocked_followers: Follower[] }> => {
+  const token = getAuthToken();
+  const url = `/api/v1/company/get-blocked-followers/${organizationId}`;
+  
+  const response = await axiosInstance.get(url, getAuthHeader(token));
+  return response.data;
+};
+
+export const unblockFollower = async (organizationId: string, followerId: string): Promise<{ success: boolean; message: string }> => {
+  const token = getAuthToken();
+  const url = `/api/v1/company/unblock-follower/${organizationId}/${followerId}`;
+  
+  const response = await axiosInstance.delete(url, getAuthHeader(token));
+  return response.data;
+};

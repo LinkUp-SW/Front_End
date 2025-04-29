@@ -1,4 +1,3 @@
-// In a common types file (e.g., src/types/index.ts)
 
 // Company interface for API responses
 export interface Company {
