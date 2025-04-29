@@ -94,6 +94,8 @@ interface MessageState {
   user2Id:string;
   message:MessageChat;
   responsiveIsSidebar:boolean;
+  chatData:chattingMessages;
+  setEditedMessageIds: string[];
 
 
 
@@ -122,11 +124,21 @@ const initialState: MessageState = {
     isSeen: false,
     isOwnMessage: false,
     isDeleted: false,
-    isEdited: false,
-    
+    isEdited: false, 
   },
   responsiveIsSidebar:false,
-
+  chatData: {
+    conversationId: '',
+    otherUser: {
+      userId: '',
+      firstName: '',
+      lastName: '',
+      profilePhoto: '',
+      onlineStatus: false
+    },
+    messages: []
+},
+setEditedMessageIds:[],
 
 
 };
@@ -177,8 +189,12 @@ const MessagingSlice = createSlice({
       state.activeFilter = action.payload; 
     },
 
+  /*chatData 3ashan el edit w el delete y update fee wa2tha*/
+  setChatData:(state, action: PayloadAction<chattingMessages>) => {
+    state.chatData = action.payload; 
+  },
 
-  
+  /*editing*/
     setEditingMessageId:(state, action: PayloadAction<string>) => {
       state.editingMessageId = action.payload; 
     },
@@ -189,11 +205,16 @@ const MessagingSlice = createSlice({
       state.editingMessageId = "";
       state.editText = "";
     },
+                /*setEditedMessageIds 3ashan a print (Edited)*/  
+    setEditedMessageIds: (state, action: PayloadAction<string[]>) => {
+      state.setEditedMessageIds = action.payload;
+    },
+    /*Responsiveness bta3 el messagingPage*/
     setResponsiveIsSidebar: (state, action: PayloadAction<boolean>) => {
       state.responsiveIsSidebar = action.payload;
     },
 
- 
+    
     
     
     
@@ -201,5 +222,5 @@ const MessagingSlice = createSlice({
   },
 });
 
-export const {toggleStarred, activeButton, searchFiltering, selectMessage,selectUserName,selectUserStatus,setEditingMessageId,setEditText,clearEditingState,selectUserId,addMessage,setResponsiveIsSidebar} = MessagingSlice.actions;
+export const {toggleStarred, activeButton, searchFiltering, selectMessage,selectUserName,selectUserStatus,setEditingMessageId,setEditText,clearEditingState,selectUserId,addMessage,setResponsiveIsSidebar,setChatData,setEditedMessageIds} = MessagingSlice.actions;
 export default MessagingSlice.reducer;
