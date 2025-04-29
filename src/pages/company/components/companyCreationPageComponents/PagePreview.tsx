@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 interface PagePreviewProps {
   type: 'company' | 'education';
   logoPreview?: string | null;
@@ -11,6 +13,13 @@ export const PagePreview: React.FC<PagePreviewProps> = ({
   name, 
   description 
 }) => {
+  const [expanded, setExpanded] = useState(false);
+  
+  // Truncate description if it's longer than 100 characters
+  const truncatedDescription = description && description.length > 100 && !expanded
+    ? description.substring(0, 100) + '...'
+    : description;
+    
   return (
     <div className="bg-white dark:bg-gray-900 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
       <div className="flex items-center mb-4">
@@ -37,16 +46,23 @@ export const PagePreview: React.FC<PagePreviewProps> = ({
               </>
             )}
           </div>
-          <h3 className="text-xl font-medium text-gray-800 dark:text-white mb-1">
+          <h3 className="text-xl font-medium text-gray-800 dark:text-white mb-1 break-words max-w-full overflow-hidden">
             {name || (type === 'company' ? 'Company name' : 'Institution name')}
           </h3>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
-            {description || 'Tagline'}
-          </p>
+          <div className="min-h-12">
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-1 break-words max-w-full overflow-hidden">
+              {truncatedDescription || 'Tagline'}
+            </p>
+            {description && description.length > 100 && (
+              <button 
+                onClick={() => setExpanded(!expanded)} 
+                className="text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+              >
+                {expanded ? 'Show less' : 'Show more'}
+              </button>
+            )}
+          </div>
           <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Industry</p>
-          <button className="px-4 py-1 bg-blue-600 text-white rounded-full flex items-center justify-center">
-            <span className="mr-1">+</span> Follow
-          </button>
         </div>
       </div>
     </div>
