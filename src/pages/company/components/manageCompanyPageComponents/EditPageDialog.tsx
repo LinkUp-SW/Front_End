@@ -64,7 +64,7 @@ const EditPageDialog = ({ open, onOpenChange, companyData, onSubmit }: EditPageD
     description: '',
     tagline: '',
     category_type: '',
-    logo: '', // Store logo as base64 string
+    logo: '', 
   });
   const [logoUrl, setLogoUrl] = useState('/src/assets/buildings.jpeg');
   const [hasLocation, setHasLocation] = useState(false);
@@ -363,7 +363,7 @@ const EditPageDialog = ({ open, onOpenChange, companyData, onSubmit }: EditPageD
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">* indicates required</p>
             
             <div className="mb-6">
-              <label className="block text-gray-700 dark:text-gray-300 mb-1 text-sm font-medium">Description</label>
+              <label className="block text-gray-700 dark:text-gray-300 mb-1 text-sm font-medium">Description*</label>
               <textarea
                 name="description"
                 value={formData.description}
@@ -371,7 +371,13 @@ const EditPageDialog = ({ open, onOpenChange, companyData, onSubmit }: EditPageD
                 placeholder={isEducationalInstitution ? "Add an About Us with a brief overview of your institution" : "Add an About Us with a brief overview of your products and services"}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 rows={3}
+                maxLength={200}
+                required
               />
+              <div className="flex justify-between mt-1">
+                <span className="text-xs text-gray-500 dark:text-gray-400">*Required</span>
+                <span className="text-xs text-gray-500 dark:text-gray-400">{formData.description.length}/200 characters</span>
+              </div>
             </div>
             
             {/* Rest of Details section remains the same */}

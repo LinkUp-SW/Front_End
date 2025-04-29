@@ -295,11 +295,11 @@ export const PageForm: React.FC<PageFormProps> = ({ type, onSubmit, setPreviewDa
           placeholder="ex: An information services firm helping small businesses succeed." 
           className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
           rows={3}
-          maxLength={120}
+          maxLength={200}
         ></textarea>
         <div className="flex justify-between text-xs text-gray-500 mt-1">
           <span>Use your tagline to briefly describe what your organization does. This can be changed later.</span>
-          <span>{charCount}/120</span>
+          <span>{charCount}/200</span>
         </div>
       </div>
 

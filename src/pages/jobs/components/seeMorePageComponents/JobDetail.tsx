@@ -12,6 +12,7 @@ interface JobDetailProps {
 const JobDetail: React.FC<JobDetailProps> = ({ job, isLoading = false }) => {
   const [isFollowing, setIsFollowing] = useState<boolean>(false);
   const [followLoading, setFollowLoading] = useState<boolean>(false);
+  const [showFullDescription, setShowFullDescription] = useState<boolean>(false);
 
   useEffect(() => {
     // Check if user is following when job changes
@@ -32,11 +33,12 @@ const JobDetail: React.FC<JobDetailProps> = ({ job, isLoading = false }) => {
     };
     
     checkFollowStatus();
+    // Reset show full description when job changes
+    setShowFullDescription(false);
   }, [job]);
 
   const handleFollowToggle = async () => {
     // Use direct ID instead of companyInfo.organizationId
-    // This ensures we use the correct organizational ID from props
     if (!job || !job.companyInfo) return;
     
     // Get the organizational ID directly from the job
@@ -62,6 +64,18 @@ const JobDetail: React.FC<JobDetailProps> = ({ job, isLoading = false }) => {
     } finally {
       setFollowLoading(false);
     }
+  };
+
+  // Handle description display
+  const getCompanyDescription = () => {
+    const description = job?.companyInfo?.description || 
+      "A growing company focused on innovation and excellence in their field.";
+    
+    if (showFullDescription || description.length <= 200) {
+      return description;
+    }
+    
+    return `${description.substring(0, 200)}...`;
   };
 
   // Show loading state
@@ -159,15 +173,26 @@ const JobDetail: React.FC<JobDetailProps> = ({ job, isLoading = false }) => {
           {job.companyInfo?.employeeCount && `${job.companyInfo.employeeCount}`}
         </div>
         
-        <p className="text-sm mb-2 text-gray-700 dark:text-gray-400">
-          {job.companyInfo?.description || 
-           "A growing company focused on innovation and excellence in their field."}
-        </p>
+        <div className="mb-4">
+          <p className="text-sm text-gray-700 dark:text-gray-400 break-words">
+            {getCompanyDescription()}
+          </p>
+          
+          {job.companyInfo?.description && job.companyInfo.description.length > 200 && (
+            <button 
+              className="text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 mt-1"
+              onClick={() => setShowFullDescription(!showFullDescription)}
+            >
+              {showFullDescription ? 'Show less' : 'Show more'}
+            </button>
+          )}
+        </div>
+        
         <button 
           id="btn-show-more-company"
           className="block w-full text-center border border-blue-600 dark:border-blue-500 text-blue-600 dark:text-blue-400 rounded-full py-2 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
         >
-          Show more
+          Visit company page
         </button>
       </div>
     </div>
