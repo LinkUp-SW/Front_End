@@ -14,18 +14,34 @@ export interface WithdrawInvitationType {
   userId: string;
   userName: string;
 }
+export interface NotificationSender {
+  id: string;
+  firstName: string;
+  lastName: string;
+  profilePhoto: string | null;
+}
 
 export interface Notification {
   id: string;
-  type: "job" | "post" | "recommendation" | "message" | "connection";
+  sender: NotificationSender;
+  createdAt: string;
   content: string;
-  time: string;
-  profileImg?: string;
-  action?: string;
-  actionLink?: string;
-  location?: string;
-  count?: number;
-  isNew: boolean; // Make isNew non-optional to avoid undefined checks
+  referenceId: string | null;
+  type: string;
+  isRead: boolean;
+}
+
+export interface NotificationResponse {
+  notifications: Notification[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+  };
+  unReadCount: number;
 }
 
 export interface PostType {
