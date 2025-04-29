@@ -70,6 +70,8 @@ const SendingMessages = () => {
               reacted: false,
               isSeen: false,
               isOwnMessage: true, // Compare with your user ID
+              isDeleted: false,
+              isEdited: false,
             };
     dispatch(addMessage(newMsg)); 
     socketService.sendPrivateMessage(selectedUser2ID, text, []); 
@@ -134,57 +136,58 @@ const SendingMessages = () => {
         </div>
       )}
 
-      <div className="border-t border-gray-200 flex flex-col flex-shrink-0">
-        {/* Message input area */}
+      <div className="border-t border-gray-200 flex flex-col flex-shrink-0 bg-[#f4f2ee]">
         {editingMessageId ? (
-          <div>
-            <p>Edit Message</p>
-            <textarea
-              id="edit-text-message"
-              value={editText}
-              onChange={(e) => dispatch(setEditText(e.target.value))}
-              placeholder="Write a message..."
-              className="w-full min-h-16 max-h-24 bg-gray-50 text-gray-700 p-3 rounded-md resize-none outline-none border-none"
-            />
-            <div className="flex justify-between">
-              <div>
-                <button
-                  id="emoji-btn"
-                  onClick={() => setSelectedEmoji(!selectedEmoji)}
-                  className="text-gray-500 hover:text-gray-700 relative"
-                >
-                  <BsEmojiSmile size={20} />
-                </button>
-              </div>
+          <div className="w-full p-7">
+          <p className="text-lg font-semibold text-gray-800 mb-2">Edit message</p>
+          
+          <div className="pl-3 pt-3 pb-3 pr-15 border-1 bg-white">
+          <textarea
+            id="edit-text-message"
 
-              <div>
-                <button
-                  id="cancel-edit-message"
-                  onClick={()=>{
-                    dispatch(setEditingMessageId(""))
-                    setEditText("")
-                  }}
-                  disabled={!editText.trim()}
-                  className="px-4 py-1 rounded-full text-sm bg-gray-200 text-gray-700 hover:bg-gray-300" 
-                >
-                  Cancel
-                </button>
-
-                <button
-                  id="save-edit-message"
-                  onClick={handleEditingMsgSave}
-                  disabled={!editText.trim()}
-                  className={`px-4 py-1 rounded-full text-sm ${
-                    text.trim()
-                      ? "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                      : "bg-gray-100 text-gray-400 cursor-not-allowed"
-                  }`}
-                >
-                  Save
-                </button>
-              </div>
+            value={editText}
+            onChange={(e) => dispatch(setEditText(e.target.value))}
+            placeholder="Edit your message..."
+            className="bg-[#f4f2ee] w-full min-h-[80px]  text-gray-800 p-3 rounded-md resize-none outline-none border border-gray-200 focus:ring-2 focus:ring-blue-500"
+          />
+          </div>
+          <div className="flex justify-between items-center mt-3">
+            <button
+              id="emoji-btn"
+              onClick={() => setSelectedEmoji(!selectedEmoji)}
+              className="text-gray-500 hover:text-blue-600"
+              title="Add Emoji"
+            >
+              <BsEmojiSmile size={22} />
+            </button>
+      
+            <div className="space-x-2">
+              <button
+                id="cancel-edit-message"
+                onClick={() => {
+                  dispatch(setEditingMessageId(""));
+                  setEditText("");
+                }}
+                className="px-4 py-1 rounded-full text-sm  border border-blue-700 text-blue-700 hover:bg-gray-100"
+              >
+                Cancel
+              </button>
+      
+              <button
+                id="save-edit-message"
+                onClick={handleEditingMsgSave}
+                disabled={!editText.trim()}
+                className={`px-4 py-1 rounded-full text-sm ${
+                  editText.trim()
+                    ? "bg-blue-600 text-white hover:bg-blue-700"
+                    : "bg-gray-100 text-gray-400 cursor-not-allowed"
+                }`}
+              >
+                Save
+              </button>
             </div>
           </div>
+        </div>  
         ) : (
           <div>
             <div className="px-4 pt-2 pb-1">
