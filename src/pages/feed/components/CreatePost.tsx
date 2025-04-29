@@ -22,14 +22,16 @@ import PostSettingsModal from "./modals/PostSettingsModal";
 import UploadMediaModal from "./modals/UploadMediaModal";
 import AddDocumentModal from "./modals/AddDocumentModal";
 import CommentControlModal from "./modals/CommentControlModal";
-import { CommentObjectType, MediaType, PostDBObject } from "@/types";
+import { MediaType, PostDBObject } from "@/types";
 import Cookies from "js-cookie";
 import { toast } from "sonner";
 import { createPost, fetchSinglePost } from "@/endpoints/feed";
 import { DialogDescription } from "@radix-ui/react-dialog";
-import { setPosts } from "@/slices/feed/postsSlice";
-import { setComments } from "@/slices/feed/commentsSlice";
+
 import React from "react";
+import { closeCreatePostDialog } from "@/slices/feed/createPostSlice";
+import { openCreatePostDialog } from "@/slices/feed/createPostSlice";
+import { unshiftPosts } from "@/slices/feed/postsSlice";
 
 const useDismissModal = () => {
   const dismiss = () => {
@@ -47,10 +49,12 @@ const useDismissModal = () => {
     dismiss,
   };
 };
+interface CreatePostProps {
+  className?: string;
+}
 
-const CreatePost: React.FC = () => {
-  const posts = useSelector((state: RootState) => state.posts.list);
-  const comments = useSelector((state: RootState) => state.comments.list);
+const CreatePost: React.FC<CreatePostProps> = ({ className }) => {
+  //const posts = useSelector((state: RootState) => state.posts.list);
   const dispatch = useDispatch();
   const { data, loading } = useSelector((state: RootState) => state.userBio);
   const [privacySetting, setPrivacySetting] = useState<string>("Anyone");
@@ -58,7 +62,13 @@ const CreatePost: React.FC = () => {
   const [commentSetting, setCommentSetting] = useState<string>("Anyone");
   const [selectedMedia, setSelectedMedia] = useState<File[]>([]);
   const [activeModal, setActiveModal] = useState<string>("create-post");
+  const [taggedUsers, setTaggedUsers] = useState<
+    { name: string; id: string }[]
+  >([]);
   const { dismiss } = useDismissModal();
+  const isDialogOpen = useSelector(
+    (state: RootState) => state.createPost.createPostOpen
+  );
 
   const navigate = useNavigate();
   const user_token = Cookies.get("linkup_auth_token");
@@ -190,8 +200,8 @@ const CreatePost: React.FC = () => {
       mediaType: (media_type as MediaType) || "none",
       media: media,
       commentsDisabled: commentSetting,
-      publicPost: privacySetting === "anyone",
-      taggedUsers: [],
+      publicPost: privacySetting === "Anyone",
+      taggedUsers: taggedUsers.map((user) => user.id),
     };
 
     try {
@@ -216,17 +226,21 @@ const CreatePost: React.FC = () => {
           duration: 15000,
         }
       );
-      const post = await fetchSinglePost(response.postId, user_token, 0, 1);
-      const comment: CommentObjectType = {
-        comments: [],
-        count: 0,
-        nextCursor: 0,
-      };
+      const post = await fetchSinglePost(response.postId, user_token);
       if (post) {
-        const newPosts = [post.post, ...posts];
-        dispatch(setPosts(newPosts));
-        const newComments = [comment, ...comments];
-        dispatch(setComments(newComments));
+        // Prepare the post with comments-related fields
+        const postWithComments = {
+          ...post,
+          commentsCount: 0,
+          commentsData: {
+            comments: [],
+            count: 0,
+            nextCursor: null,
+          },
+        };
+
+        // Add the new post to the Redux store at the beginning of the list
+        dispatch(unshiftPosts([postWithComments]));
       }
     } catch {
       toast.error("Error creating post. Please try again.");
@@ -235,7 +249,9 @@ const CreatePost: React.FC = () => {
 
   return (
     <>
-      <Card className="mb-1 w-full bg-white border-0 pr-4 dark:bg-gray-900 ">
+      <Card
+        className={`mb-1 w-full bg-white border-0 pr-4 dark:bg-gray-900 ${className}`}
+      >
         <CardContent>
           <div className="flex space-x-3 justify-start items-start">
             <Link to={"#"}>
@@ -258,17 +274,20 @@ const CreatePost: React.FC = () => {
             <Dialog
               onOpenChange={(isOpen) => {
                 if (!isOpen) {
+                  dispatch(closeCreatePostDialog());
                   setTimeout(() => {
-                    setSelectedMedia([]); // Reset activeModal to "create-post" when the modal is closed
+                    setSelectedMedia([]);
                     setActiveModal("create-post");
                   }, 200);
                 }
               }}
+              open={isDialogOpen}
             >
               <DialogTrigger asChild className="w-full">
                 <Button
                   variant="ghost"
                   id="create-post-button"
+                  onClick={() => dispatch(openCreatePostDialog())}
                   className="w-[90%] h-11 border p-4 hover:bg-gray-200 dark:hover:bg-zinc-800 transition-colors hover:cursor-pointer hover:text-gray-950 dark:hover:text-neutral-200 rounded-full border-gray-400 font-medium text-black focus:outline-none text-left dark:text-neutral-300"
                 >
                   <p className="w-full">Start a post</p>
@@ -302,6 +321,8 @@ const CreatePost: React.FC = () => {
                     privacySetting={privacySetting}
                     selectedMedia={selectedMedia}
                     setSelectedMedia={setSelectedMedia}
+                    taggedUsers={taggedUsers}
+                    setTaggedUsers={setTaggedUsers}
                   />
                 ) : activeModal == "add-document" ? (
                   <AddDocumentModal

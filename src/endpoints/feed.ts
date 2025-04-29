@@ -116,19 +116,97 @@ function extractYoutubeId(url: string): string | null {
   return match && match[7]?.length === 11 ? match[7] : null;
 }
 
-export const getFeedPosts = async (): Promise<PostType[]> => {
+export const getPostsFeed = async (
+  token: string,
+  postPayload: {
+    cursor: number;
+    limit: number;
+    replyLimit?: number | 3;
+  }
+): Promise<{ posts: PostType[]; nextCursor: number | null }> => {
+  const response = await axiosInstance.get(`/api/v1/post/posts/feed`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    params: postPayload,
+  });
+  console.log("GetPostsFeed:", response.data);
+
+  // Filter out null posts and transform the rest
+  const validPosts = (response.data.posts || []).filter(
+    (post: PostType) => post !== null
+  );
+
+  const transformedPosts = validPosts.map((post: PostType) => ({
+    ...post,
+    commentsData: {
+      comments: [], // Empty initially
+      count: post.commentsCount || 0,
+      nextCursor: 0,
+      isLoading: false,
+      hasInitiallyLoaded: false,
+    },
+  }));
+
+  console.log("Returned:", {
+    posts: transformedPosts,
+    nextCursor: response.data.nextCursor,
+  });
+
+  return {
+    posts: transformedPosts,
+    nextCursor: response.data.nextCursor,
+  };
+};
+
+export const fetchSinglePost = async (
+  postId: string,
+  token: string
+): Promise<PostType> => {
   try {
-    const response = await axios.get(
-      import.meta.env.VITE_NODE_ENV === "DEV"
-        ? "/api/posts"
-        : "actual api endpoint"
-    );
-    return response.data;
+    const response = await axiosInstance.get(`api/v1/post/posts/${postId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      params: {
+        limit: 5,
+        replyLimit: 2,
+      },
+    });
+    console.log("FetchSinglePost response:", response.data);
+
+    // Extract comments from the response
+    const commentsArray = response.data.comments?.comments;
+    const commentsCount = response.data.comments?.count || 0;
+    const commentsCursor = response.data.comments?.nextCursor || null;
+
+    // Return post with embedded comments
+    console.log("Here:", {
+      ...response.data.post,
+      commentsData: {
+        comments: commentsArray, // Include comments from API response
+        count: commentsCount,
+        nextCursor: commentsCursor,
+        isLoading: false,
+        hasInitiallyLoaded: true, // Mark as initially loaded since we have comments
+      },
+    });
+    return {
+      ...response.data.post,
+      commentsData: {
+        comments: commentsArray, // Include comments from API response
+        count: commentsCount,
+        nextCursor: commentsCursor,
+        isLoading: false,
+        hasInitiallyLoaded: true, // Mark as initially loaded since we have comments
+      },
+    };
   } catch (error) {
     console.log(error);
     throw error;
   }
 };
+
 export const getPostComments = async (): Promise<CommentType[]> => {
   try {
     const response = await axios.get(
@@ -141,6 +219,36 @@ export const getPostComments = async (): Promise<CommentType[]> => {
     console.log(error);
     throw error;
   }
+};
+
+// New function to load comments for a post on demand
+export const loadPostComments = async (
+  postId: string,
+  token: string,
+  cursor: number = 0,
+  limit: number = 5
+): Promise<{
+  comments: CommentType[];
+  count: number;
+  nextCursor: number | null;
+}> => {
+  const response = await axiosInstance.get(`api/v1/post/comment/${postId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    params: {
+      cursor: cursor,
+      limit: limit,
+      replyLimit: 2, // Get a few replies for each comment
+    },
+  });
+  console.log("API response:", response);
+
+  return {
+    comments: Object.values(response.data.comments),
+    count: response.data.count,
+    nextCursor: response.data.nextCursor,
+  };
 };
 
 export const getSinglePost = async (postId: string): Promise<PostType> => {
@@ -239,6 +347,15 @@ export const createPost = async (postPayload: PostDBObject, token: string) => {
   return response.data;
 };
 
+export const editPost = async (postPayload: PostDBObject, token: string) => {
+  const response = await axiosInstance.patch("api/v1/post/posts", postPayload, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data;
+};
+
 export const createComment = async (
   postPayload: CommentDBType,
   token: string
@@ -285,17 +402,70 @@ export const getReactions = async (
 };
 
 export const deleteReaction = async (
-  postPayload: { target_type: string },
+  postPayload: { target_type: string; comment_id?: string },
   postId: string,
-  token: string
+  token: string,
+  commentId?: string | null
 ) => {
   const response = await axiosInstance.delete(
-    `api/v1/post/reaction/${postId}`,
+    !commentId
+      ? `api/v1/post/reaction/${postId}/`
+      : `api/v1/post/reaction/${postId}/${commentId}`,
     {
       headers: {
         Authorization: `Bearer ${token}`,
       },
       data: postPayload,
+    }
+  );
+
+  return response.data;
+};
+
+export const getCommentsForPost = async (
+  postPayload: {
+    cursor: number;
+    limit: number;
+    replyLimit: number;
+  },
+  postId: string,
+  token: string
+) => {
+  const response = await axiosInstance.get(`api/v1/post/comment/${postId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    params: {
+      cursor: postPayload.cursor,
+      limit: postPayload.limit,
+      replyLimit: postPayload.replyLimit,
+    },
+  });
+
+  return response.data;
+};
+
+export const getReplies = async (
+  postPayload: {
+    cursor: number;
+    limit: number;
+    replyLimit: number;
+  },
+  postId: string,
+  commentId: string,
+  token: string
+) => {
+  const response = await axiosInstance.get(
+    `api/v1/post/comment/${postId}/${commentId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      params: {
+        cursor: postPayload.cursor,
+        limit: postPayload.limit,
+        replyLimit: postPayload.replyLimit,
+      },
     }
   );
 
@@ -360,27 +530,4 @@ export const getSavedPosts = async (
   });
 
   return response.data;
-};
-
-export const fetchSinglePost = async (
-  postId: string,
-  token: string,
-  cursor: number,
-  limit: number
-) => {
-  try {
-    const response = await axiosInstance.get(`api/v1/post/posts/${postId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      params: {
-        cursor: cursor,
-        limit: limit,
-      },
-    });
-    return response.data;
-  } catch (error) {
-    console.log(error);
-    throw error;
-  }
 };

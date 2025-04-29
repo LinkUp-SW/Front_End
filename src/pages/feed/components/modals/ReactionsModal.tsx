@@ -67,9 +67,8 @@ const ReactionsModal: React.FC<ReactionsModalProps> = ({
           postId,
           token
         );
-
-        setReactionList(result.reactions.reactions || []);
-        setReactionCounts(result.reactions.reactionCounts || {});
+        setReactionList(result.topReactions.topReactions || []);
+        setReactionCounts(result.topReactions.reactionCounts || {});
       } catch (error) {
         toast.error("Failed to fetch reactions.");
         console.error("Error fetching reactions:", error);

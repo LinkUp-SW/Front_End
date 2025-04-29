@@ -51,55 +51,23 @@ export interface ProfileCardType {
   university: string;
 }
 
-export interface CommentType {
-  author: {
-    username: string;
-    firstName: string;
-    lastName: string;
-    headline: string;
-    profilePicture: string;
-    connectionDegree: string;
-  };
-  content: string;
-  media: {
-    link: string;
-    mediaType: "image" | "video" | "none";
-  };
-  reacts: string[];
-  tagged_users: string[];
-  is_edited: boolean;
-  date: number;
-  reactions: {
-    reaction: string;
-  }[];
-  reactionsCount: number;
-  children?: Record<string, CommentType>;
-  userId?: string;
-  parentId: string;
-  _id: string;
-}
-
-export interface CommentObjectType {
-  comments: CommentType[];
-  count: number;
-  nextCursor: number;
-}
-
-export interface CommentDBType {
-  post_id: string;
-  content: string;
-  media: string;
-  parent_id: string | null;
-  tagged_users: string[];
-}
-
 export interface PostType {
   author: PostUserType;
+
   content: string;
   media: {
     link: string[];
     media_type: "image" | "images" | "video" | "link" | "pdf" | "post" | "none";
   };
+  commentsData?: {
+    comments: CommentType[];
+    count: number;
+    nextCursor: number | null;
+    isLoading?: boolean;
+    hasInitiallyLoaded?: boolean;
+  };
+  commentsCount?: number;
+  topReactions?: string[];
   commentsDisabled: string;
   publicPost: boolean;
   taggedUsers: string[];
@@ -107,6 +75,7 @@ export interface PostType {
   reacts: string[];
   isEdited?: boolean;
   _id: string;
+  userReaction?: string | null;
   user_id: string;
   comments: string[];
   isSaved?: boolean;
@@ -127,7 +96,55 @@ export interface PostType {
     reposts?: number;
   };
 
-  action?: ActionType;
+  activityContext?: ActivityContextType;
+}
+
+export interface CommentType {
+  author: {
+    username: string;
+    firstName: string;
+    lastName: string;
+    headline: string;
+    profilePicture: string;
+    connectionDegree: string;
+  };
+  content: string;
+  media: {
+    link: string;
+    mediaType: "image" | "video" | "none";
+  };
+  reacts: string[];
+  tagged_users: string[];
+  is_edited: boolean;
+  userReaction?: string | null;
+  childrenCount?: number;
+  topReactions?: string[];
+  date: number;
+  reactions: {
+    reaction: string;
+  }[];
+  reactionsCount: number;
+  children?: CommentType[];
+
+  userId?: string;
+  parentId: string;
+  _id: string;
+}
+
+export interface CommentObjectType {
+  comments: CommentType[];
+  count: number;
+  nextCursor: number;
+  hasInitiallyLoaded?: boolean;
+  isLoading?: boolean;
+}
+
+export interface CommentDBType {
+  post_id: string;
+  content: string;
+  media: string;
+  parent_id: string | null;
+  tagged_users: string[];
 }
 
 export interface StatsType {
@@ -142,10 +159,20 @@ export interface StatsType {
   person?: string;
 }
 
-export interface ActionType {
-  name?: string;
-  profileImage?: string;
-  action?: "like" | "comment" | "repost" | "love";
+export interface ActivityContextType {
+  actorId: string;
+  actorName: string;
+  actorUsername: string;
+  type:
+    | "like"
+    | "love"
+    | "support"
+    | "insightful"
+    | "celebrate"
+    | "funny"
+    | "comment"
+    | "repost";
+  actorPicture: string;
 }
 
 export interface PostUserType {
@@ -155,23 +182,6 @@ export interface PostUserType {
   profilePicture: string;
   connectionDegree: string;
   headline: string;
-}
-
-export interface PostDataType {
-  author: PostUserType;
-  content: string;
-  media: {
-    link: string[];
-    media_type: MediaType;
-  };
-  commentsDisabled: string;
-  publicPost: boolean;
-  taggedUsers: string[];
-  date: number;
-  reacts: string[];
-  isEdited?: boolean;
-  _id: string;
-  user_id: string;
 }
 
 export type PostFilter = "all" | "comments" | "reactions" | "reposts";

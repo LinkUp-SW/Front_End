@@ -31,7 +31,10 @@ import MyItemsPage from "./my_items/MyItemsPage";
 import PrimaryEmailPage from "./settings/updateEmail/PrimaryEmailPage";
 import OTP from "./settings/updateEmail/OTP";
 import AddEmailPage from "./settings/updateEmail/AddEmailPage";
-import AllPeoplePage from "./search/AllPeoplePage";
+import AllPeoplePage from "./search/AllPeoplePage";import CompanyCreationPage from "./company/CompanyCreationPage";
+import ManageCompanyPage from "./company/ManageCompanyPage"
+import  CreateJobPage from "./company/CreateJobPage"
+
 //Export the Imported Pages
 export {
   LandingPage,
@@ -67,4 +70,7 @@ export {
   OTP,
   AddEmailPage,
   AllPeoplePage,
+  CompanyCreationPage,
+  ManageCompanyPage,
+  CreateJobPage
 };

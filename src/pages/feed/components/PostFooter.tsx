@@ -4,17 +4,18 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { FaChevronDown, FaRocket, FaClock } from "react-icons/fa";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components";
 import { Link } from "react-router-dom";
-import { CommentDBType, CommentObjectType } from "@/types";
+import { CommentDBType, CommentType } from "@/types";
 import { GoFileMedia as MediaIcon } from "react-icons/go";
 import CommentWithReplies from "./CommentWithReplies";
 import { MdOutlineEmojiEmotions } from "react-icons/md";
 import EmojiPicker, { Theme, EmojiClickData } from "emoji-picker-react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
+import UserTagging from "../components/UserTagging";
+import { FormattedContentText } from "./modals/CreatePostModal";
 import {
   Carousel,
   CarouselContent,
@@ -24,64 +25,63 @@ import {
 } from "@/components/ui/carousel";
 import { toast } from "sonner";
 import BlueButton from "./buttons/BlueButton";
+import { extractTaggedUsers } from "./modals/CreatePostModal";
 
-interface SortingMenuItem {
-  name: string;
-  subtext: string;
-  action: () => void;
-  icon: React.ReactNode;
-}
-
-export const COMMENT_SORTING_MENU: SortingMenuItem[] = [
-  {
-    name: "Most relevant",
-    subtext: "See the most relevant comments",
-    action: () => console.log("Most relevant pressed"),
-    icon: <FaRocket className="mr-2" />,
-  },
-  {
-    name: "Most recent",
-    subtext: "See all the comments, the most recent comments are first",
-    action: () => console.log("Most Recent pressed"),
-    icon: <FaClock className="mr-2" />,
-  },
-];
-
+// Updated interface to match the structure shown in the screenshot
 interface PostFooterProps {
-  sortingMenu: boolean;
-  setSortingMenu: React.Dispatch<React.SetStateAction<boolean>>;
-  sortingState: string;
-  handleSortingState: (selectedState: string) => void;
-  comments: CommentObjectType;
+  comments: {
+    comments: CommentType[];
+    count: number;
+    nextCursor: number | null;
+    hasInitiallyLoaded: boolean;
+    isLoading: boolean;
+  };
   addNewComment: (newComment: CommentDBType) => Promise<void>;
-
   postId: string;
+  loadMoreComments?: () => Promise<void>;
 }
 
 const PostFooter: React.FC<PostFooterProps> = ({
-  sortingMenu,
-  setSortingMenu,
-  sortingState,
-  handleSortingState,
   comments,
   addNewComment,
   postId,
+  loadMoreComments,
 }) => {
   // Create a ref for the horizontally scrollable container
   const [commentInput, setCommentInput] = useState("");
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  console.log("Comment for post:", comments);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
-
+  const inputRef = useRef<HTMLTextAreaElement>(null);
   const darkMode = useSelector((state: RootState) => state.theme.theme);
-
   const { data } = useSelector((state: RootState) => state.userBio);
+
+  // Function to handle loading more comments using the provided callback
+  const handleLoadMoreComments = async () => {
+    if (!loadMoreComments || isLoadingMore || comments.isLoading) return;
+
+    setIsLoadingMore(true);
+    try {
+      await loadMoreComments();
+    } catch (error) {
+      console.error("Error loading more comments:", error);
+      toast.error("Failed to load more comments. Please try again.");
+    } finally {
+      setIsLoadingMore(false);
+    }
+  };
+
+  // Check if text contains any rich formatting
+  const hasRichFormatting = (text: string): boolean => {
+    const richFormatRegex =
+      /(\*[^*]+\*)|(-[^-]+-)|(~[^~]+~)|(@[^:]+:[A-Za-z0-9_-]+\^)/;
+    return richFormatRegex.test(text);
+  };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      console.log(selectedImage);
       setSelectedImage(file);
     }
   };
@@ -99,6 +99,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
     }
 
     const reader = new FileReader();
+    const extractedTaggedUsers = extractTaggedUsers(commentInput);
 
     reader.onload = () => {
       const base64Image = reader.result as string;
@@ -107,11 +108,9 @@ const PostFooter: React.FC<PostFooterProps> = ({
         post_id: postId,
         content: commentInput,
         media: selectedImage ? base64Image : "",
-        tagged_users: [],
+        tagged_users: extractedTaggedUsers.map((user) => user.id),
         parent_id: parentId,
       };
-
-      console.log("New comment created:", newComment);
 
       // Reset input and selected image
       setCommentInput("");
@@ -131,11 +130,9 @@ const PostFooter: React.FC<PostFooterProps> = ({
         post_id: postId,
         content: commentInput,
         media: "",
-        tagged_users: [],
+        tagged_users: extractedTaggedUsers.map((user) => user.id),
         parent_id: parentId,
       };
-
-      console.log("New comment created:", newComment);
 
       // Reset input and selected image
       setCommentInput("");
@@ -149,30 +146,17 @@ const PostFooter: React.FC<PostFooterProps> = ({
     }
   };
 
-  const stats = {
-    likes: 15,
-    love: 2,
-    support: 1,
-    celebrate: 1,
-    comments: comments.count,
-    reposts: 5,
-    person: "Hamada",
-  };
-
   const MemoizedEmojiPicker = memo(EmojiPicker);
-  console.log("Footer comments", comments);
-
-  const inputRef = useRef<HTMLTextAreaElement>(null);
 
   const handleEmojiRequest = (emoji: EmojiClickData) => {
     setCommentInput((prevMessage) => prevMessage + emoji.emoji);
   };
 
   return (
-    <section className="flex flex-col w-full gap-4 ">
-      {/* Container for text buttons with relative so our scroll button can be absolute */}
+    <section className="flex flex-col w-full gap-4">
+      {/* Container for text buttons with relative positioning */}
       <Carousel className="w-full">
-        <CarouselContent className="px-2 ">
+        <CarouselContent className="px-2">
           {[
             "I appreciate this!",
             "Congratulations!",
@@ -185,9 +169,9 @@ const PostFooter: React.FC<PostFooterProps> = ({
           ].map((text, index) => (
             <CarouselItem
               key={index}
-              className=" basis-1/2 sm:basis-1/3 lg:basis-1/4 px-6"
+              className="basis-1/2 sm:basis-1/3 lg:basis-1/4 px-6"
             >
-              <div className="">
+              <div>
                 <Button
                   variant="outline"
                   size="sm"
@@ -220,23 +204,57 @@ const PostFooter: React.FC<PostFooterProps> = ({
             onClick={() => {
               inputRef.current?.focus();
             }}
-            className="w-full relative flex-col flex dark:focus:ring-0 dark:focus:border-0 border p-2 focus:ring-black focus:ring-2 transition-colors dark:hover:bg-gray-800 hover:text-gray-950 dark:hover:text-neutral-300 rounded-xl border-gray-400 font-normal text-sm text-black  text-left dark:text-neutral-300"
+            className="w-full relative flex-col flex dark:focus:ring-0 dark:focus:border-0 border p-2 focus:ring-black focus:ring-2 transition-colors dark:hover:bg-gray-800 hover:text-gray-950 dark:hover:text-neutral-300 rounded-xl border-gray-400 font-normal text-sm text-black text-left dark:text-neutral-300"
           >
-            <textarea
-              ref={inputRef}
-              id="comment-input"
-              placeholder="Add a comment..."
-              value={commentInput}
-              autoFocus
-              onFocus={() => {
-                inputRef.current?.scrollIntoView({
-                  behavior: "smooth",
-                  block: "center",
-                });
-              }}
-              onChange={(e) => setCommentInput(e.target.value)}
-              className="w-full h- resize-none py-0 placeholder:text-neutral-500 dark:placeholder:text-neutral-300 focus:ring-0 focus:border-0 active:border-0"
-            />
+            <div className="relative w-full">
+              {/* Actual input field */}
+              <textarea
+                ref={inputRef}
+                id="comment-input"
+                placeholder="Add a comment..."
+                value={commentInput}
+                autoFocus
+                onFocus={() => {
+                  inputRef.current?.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center",
+                  });
+                }}
+                onChange={(e) => setCommentInput(e.target.value)}
+                onKeyDown={(e) => {
+                  // This ensures keyboard events are captured by the input
+                  if (
+                    ["ArrowDown", "ArrowUp", "Enter", "Tab"].includes(e.key) &&
+                    commentInput.includes("@")
+                  ) {
+                    e.preventDefault(); // Prevent default for navigation keys
+                  }
+                }}
+                className="w-full h-auto resize-none py-0 placeholder:text-neutral-500 dark:placeholder:text-neutral-300 focus:ring-0 focus:border-0 active:border-0"
+              />
+
+              {/* User tagging component */}
+              <UserTagging
+                text={commentInput}
+                onTextChange={setCommentInput}
+                inputRef={inputRef}
+                className="absolute inset-0 z-20"
+              />
+            </div>
+
+            {/* Rich text preview - only show if there's rich formatting */}
+            {hasRichFormatting(commentInput) &&
+              commentInput.trim().length > 0 && (
+                <div className="mt-3 p-3 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                    Preview:
+                  </p>
+                  <div className="text-sm text-gray-900 dark:text-gray-100">
+                    <FormattedContentText text={commentInput} />
+                  </div>
+                </div>
+              )}
+
             {selectedImage && (
               <div className="relative mt-2">
                 <img
@@ -257,129 +275,130 @@ const PostFooter: React.FC<PostFooterProps> = ({
                 </button>
               </div>
             )}
-            {
-              <div
-                className={`flex  ${
-                  selectedImage || commentInput.trim().length != 0
-                    ? "justify-between "
-                    : "absolute right-0 "
-                }`}
-              >
-                <div className="relative">
-                  <Popover>
-                    <PopoverTrigger asChild onClick={() => {}}>
-                      <Button
-                        variant="ghost"
-                        className="hover:cursor-pointer rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 dark:hover:text-neutral-200"
-                      >
-                        <MdOutlineEmojiEmotions />
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent
-                      forceMount
-                      className="dark:bg-gray-900 w-fit p-0 dark:border-gray-600"
+            <div
+              className={`flex ${
+                selectedImage || commentInput.trim().length !== 0
+                  ? "justify-between"
+                  : "absolute right-0"
+              }`}
+            >
+              <div className="relative">
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      className="hover:cursor-pointer rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 dark:hover:text-neutral-200"
                     >
-                      <MemoizedEmojiPicker
-                        className="dark:bg-gray-900 w-full p-0"
-                        theme={darkMode === "dark" ? Theme.DARK : Theme.LIGHT}
-                        width={"full"}
-                        onEmojiClick={handleEmojiRequest}
-                      />
-                    </PopoverContent>
-                  </Popover>
-
-                  <input
-                    type="file"
-                    accept="image/*"
-                    ref={fileInputRef}
-                    onChange={handleFileUpload}
-                    className="hidden"
-                  />
-                  <Button
-                    variant="ghost"
-                    onClick={() => fileInputRef.current?.click()}
-                    className="hover:cursor-pointer rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 dark:hover:text-neutral-200"
+                      <MdOutlineEmojiEmotions />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent
+                    forceMount
+                    className="dark:bg-gray-900 w-fit p-0 dark:border-gray-600"
                   >
-                    <MediaIcon />
-                  </Button>
-                </div>
-                <BlueButton
-                  className={`${
-                    selectedImage || commentInput.trim().length != 0
-                      ? ""
-                      : "hidden"
-                  }`}
-                  onClick={() =>
-                    handleCreateComment(
-                      selectedImage,
-                      commentInput,
-                      setSelectedImage,
-                      setCommentInput,
-                      null
-                    )
-                  }
-                  disabled={commentInput.trim().length == 0 && !selectedImage}
+                    <MemoizedEmojiPicker
+                      className="dark:bg-gray-900 w-full p-0"
+                      theme={darkMode === "dark" ? Theme.DARK : Theme.LIGHT}
+                      width={"full"}
+                      onEmojiClick={handleEmojiRequest}
+                    />
+                  </PopoverContent>
+                </Popover>
+
+                <input
+                  type="file"
+                  accept="image/*"
+                  ref={fileInputRef}
+                  onChange={handleFileUpload}
+                  className="hidden"
+                />
+                <Button
+                  variant="ghost"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="hover:cursor-pointer rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 dark:hover:text-neutral-200"
                 >
-                  Comment
-                </BlueButton>
+                  <MediaIcon />
+                </Button>
               </div>
-            }
+              <BlueButton
+                className={`${
+                  selectedImage || commentInput.trim().length !== 0
+                    ? ""
+                    : "hidden"
+                }`}
+                onClick={() =>
+                  handleCreateComment(
+                    selectedImage,
+                    commentInput,
+                    setSelectedImage,
+                    setCommentInput,
+                    null
+                  )
+                }
+                disabled={commentInput.trim().length === 0 && !selectedImage}
+              >
+                Comment
+              </BlueButton>
+            </div>
           </div>
         </div>
       </div>
-      {comments.count != 0 && (
-        <>
-          <div className="flex relative -left-5">
-            <Popover open={sortingMenu} onOpenChange={setSortingMenu}>
-              <PopoverTrigger
-                asChild
-                className="rounded-full z-10 dark:hover:bg-zinc-700 hover:cursor-pointer dark:hover:text-neutral-200 h-8 gap-1.5 px-3"
-              >
-                <div className="flex items-center gap-1 text-gray-500 text-sm font-medium ">
-                  <p>{sortingState}</p>
-                  <FaChevronDown />
-                </div>
-              </PopoverTrigger>
-              <PopoverContent className="relative  dark:bg-gray-900 bg-white border-neutral-200 dark:border-gray-700 p-0 pt-1">
-                <div className="flex flex-col w-full p-0">
-                  {COMMENT_SORTING_MENU.map((item, index) => (
-                    <Button
-                      key={index}
-                      onClick={() => {
-                        handleSortingState(item.name);
-                        setSortingMenu(false);
-                        item.action();
-                      }}
-                      className="flex justify-start items-center rounded-none bg-transparent w-full h-16 pt-4 py-4 hover:bg-neutral-200 text-gray-900  dark:hover:bg-gray-600 dark:hover:text-white hover:cursor-pointer"
-                    >
-                      <div className="flex justify-start w-full  text-gray-600 dark:text-neutral-200">
-                        <div className="p-4 pl-0 ">{item.icon}</div>
-                        <div className="flex flex-col items-start justify-center">
-                          <span className="font-medium">{item.name}</span>
-                          <span className="text-xs text-wrap text-left font-normal">
-                            {item.subtext}
-                          </span>
-                        </div>
-                      </div>
-                    </Button>
-                  ))}
-                </div>
-              </PopoverContent>
-            </Popover>
-          </div>
-          <div className="flex flex-col relative -left-1 -top-3">
-            {comments.comments.map((data, index: number) => (
-              <CommentWithReplies
-                key={index}
-                postId={postId}
-                comment={data}
-                stats={stats}
-                replies={data.children ? Object.values(data.children) : []}
-                handleCreateComment={handleCreateComment}
-              />
-            ))}
-          </div>
-        </>
+
+      {comments.hasInitiallyLoaded && comments.comments.length > 0 && (
+        <div className="flex flex-col relative -left-1">
+          {/* Show existing comments */}
+          {comments.comments.map((comment, index) => (
+            <CommentWithReplies
+              key={`comment-${comment._id || index}`}
+              postId={postId}
+              comment={comment}
+              handleCreateComment={handleCreateComment}
+            />
+          ))}
+
+          {/* Inline loading indicator for "load more" action */}
+          {isLoadingMore && (
+            <div className="flex justify-center my-4">
+              <div className="animate-pulse flex space-x-2">
+                <div className="h-2 w-2 bg-blue-500 rounded-full"></div>
+                <div className="h-2 w-2 bg-blue-500 rounded-full"></div>
+                <div className="h-2 w-2 bg-blue-500 rounded-full"></div>
+              </div>
+            </div>
+          )}
+
+          {/* Load More Comments Button - hidden during loading */}
+          {comments.nextCursor !== null &&
+            comments.nextCursor !== 0 &&
+            !comments.isLoading &&
+            !isLoadingMore && (
+              <div className="flex justify-center mt-2 mb-4">
+                <button
+                  onClick={handleLoadMoreComments}
+                  disabled={
+                    isLoadingMore || comments.isLoading || !loadMoreComments
+                  }
+                  className="text-blue-600 dark:text-blue-400 hover:underline font-medium flex items-center gap-2 py-2 px-4 rounded transition-colors hover:bg-gray-100 dark:hover:bg-gray-800"
+                >
+                  {isLoadingMore ? "Loading..." : "Load more comments..."}
+                </button>
+              </div>
+            )}
+        </div>
+      )}
+
+      {/* Empty state - only shown when no comments and finished loading */}
+      {comments.hasInitiallyLoaded &&
+        comments.comments.length === 0 &&
+        !comments.isLoading && (
+          <p className="text-center text-gray-500 dark:text-gray-400 py-4">
+            No comments yet. Be the first to comment!
+          </p>
+        )}
+
+      {/* Initial loading state - shown when first loading comments */}
+      {!comments.hasInitiallyLoaded && comments.isLoading && (
+        <div className="w-full"></div>
       )}
     </section>
   );
