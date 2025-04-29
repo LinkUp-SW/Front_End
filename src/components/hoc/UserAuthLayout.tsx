@@ -3,7 +3,7 @@ import linkUpLogo from "@/assets/link_up.png";
 import { useNavigate } from "react-router-dom";
 import { AxiosError } from "axios";
 import Cookies from "js-cookie";
-import { validateAuthToken } from "@/endpoints/userAuth";
+import { userLogOut, validateAuthToken } from "@/endpoints/userAuth";
 import LinkUpLoader from "../linkup_loader/LinkUpLoader";
 
 const UserAuthLayout = <P extends object>(
@@ -15,6 +15,7 @@ const UserAuthLayout = <P extends object>(
     const [authCheckCompleted, setAuthCheckCompleted] = useState(false);
     const token = Cookies.get("linkup_auth_token");
     const myUserId = Cookies.get("linkup_user_id");
+    const userType = Cookies.get("linkup_user_type");
 
     useEffect(() => {
       let isMounted = true;
@@ -32,11 +33,17 @@ const UserAuthLayout = <P extends object>(
           });
 
           if (isMounted) {
-            if (response.success && myUserId) {
-              navigate("/feed", { replace: true });
+            if (response.success && myUserId && userType) {
+              if (userType.toLocaleLowerCase() === "admin") {
+                navigate("/admin/dashboard", { replace: true });
+              } else {
+                navigate("/feed", { replace: true });
+              }
             } else {
               Cookies.remove("linkup_auth_token");
               Cookies.remove("linkup_user_id");
+              Cookies.remove("linkup_user_type");
+              await userLogOut();
               setAuthCheckCompleted(true);
             }
           }
@@ -65,7 +72,7 @@ const UserAuthLayout = <P extends object>(
     }, [navigate, token]);
 
     if (!authCheckCompleted) {
-      return <LinkUpLoader/>;
+      return <LinkUpLoader />;
     }
 
     return (

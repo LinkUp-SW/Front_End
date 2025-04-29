@@ -6,7 +6,7 @@ import NavItems from "./NavItems";
 import { FaPlusSquare } from "react-icons/fa";
 import { MdArrowDropDown } from "react-icons/md";
 import { HiOutlineBuildingOffice2 } from "react-icons/hi2";
-import ThemeToggle from "../theme_toggle/ThemeToggle";
+import { CiLogout } from "react-icons/ci";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { getErrorMessage } from "@/utils/errorHandler";
 import { toast } from "sonner";
@@ -22,6 +22,7 @@ import UserProfilePopover from "./UserProfilePopover";
 import { defaultProfileImage } from "@/constants";
 import { openCreatePostDialog } from "@/slices/feed/createPostSlice";
 import { CreatePost } from "@/pages/feed/components";
+import { Link } from "react-router-dom";
 
 const NavBar = () => {
   // Use the correctly typed dispatch
@@ -64,6 +65,7 @@ const NavBar = () => {
   const handleLogout = async () => {
     try {
       await userLogOut();
+      Cookies.remove("linkup_user_type");
       setTimeout(() => {
         window.location.replace("/login");
       }, 1000);
@@ -172,10 +174,13 @@ const NavBar = () => {
           <i onClick={handleCreatePost}>
             <FaPlusSquare size={30} />
           </i>
-          <i className="scale-x-[-1]">
+          <Link to={"/messaging"} className="scale-x-[-1]">
             <BsChatDotsFill size={30} />
-          </i>
-          <ThemeToggle />
+          </Link>
+
+          <button onClick={handleLogout}>
+            <CiLogout size={30} />
+          </button>
         </div>
       </nav>
     </header>

@@ -544,3 +544,37 @@ export const addUserResume = async (token: string, resume: File) => {
   );
   return response.data;
 };
+
+export const endorseSkill = async (
+  token: string,
+  userId: string,
+  skillId: string
+) => {
+  const response = await axiosInstance.post(
+    `api/v1/user/endorse-skill/${userId}/${skillId}`,
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
+
+
+export const removeEndorsement = async (
+  token: string,
+  userId: string,
+  skillId: string
+) => {
+  const response = await axiosInstance.delete(
+    `api/v1/user/remove-endorsement/${userId}/${skillId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
