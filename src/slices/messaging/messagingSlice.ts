@@ -72,6 +72,8 @@ interface MessageChat
     reacted: boolean;
     isSeen: boolean;
     isOwnMessage: boolean;
+    isDeleted: boolean;
+    isEdited: boolean;
   }
 interface chattingMessages{
   conversationId: string;
@@ -92,6 +94,7 @@ interface MessageState {
   user2Id:string;
   message:MessageChat;
   responsiveIsSidebar:boolean;
+
 
 
 
@@ -118,6 +121,8 @@ const initialState: MessageState = {
     reacted: false,
     isSeen: false,
     isOwnMessage: false,
+    isDeleted: false,
+    isEdited: false,
     
   },
   responsiveIsSidebar:false,
