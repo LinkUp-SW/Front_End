@@ -46,6 +46,7 @@ const SideBar = () => {
     (state: RootState) => state.messaging.activeFilter
   );
   const search = useSelector((state: RootState) => state.messaging.search);
+  const onlineStatus=useSelector((state: RootState) => state.messaging.onlineStatus);
 
   /*const [deleted, setDeleted] = useState(false);*/
   const [dotAppearance, setDotAppearance] = useState<string[]>([]);
@@ -399,12 +400,16 @@ const handleSelectConversation = (
                       </button>
                     </div>
                   ) : (
+                    <div className="relative w-12 h-12">
                     <img
                       id="profile-section"
-                      className="rounded-full w-12 h-12 border border-gray-200"
+                      className="rounded-full w-12 h-12 border  border-gray-200"
                       src={data.otherUser.profilePhoto}
                       alt="profile"
                     />
+                    {onlineStatus && (<span className="absolute bottom-0 right-0 w-3 h-3 bg-[#01754f] border-2 border-white rounded-full"></span>)} 
+                    
+                  </div>
                   )}
                 </div>
 
