@@ -17,7 +17,11 @@ import { AxiosError } from "axios";
 import { useEffect, useState } from "react";
 import { Dialog, DialogContent, SubscribeNowCard } from "@/components";
 
-const UserInfo = () => {
+interface UserInfoProps {
+  setIsProfileVisible: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const UserInfo: React.FC<UserInfoProps> = ({ setIsProfileVisible }) => {
   const token = Cookies.get("linkup_auth_token");
   const myUserId = Cookies.get("linkup_user_id");
 
@@ -36,12 +40,11 @@ const UserInfo = () => {
         : Promise.resolve(null),
     [token, id, shouldFetch]
   );
-  
+
   // Choose which data to display:
   // If we're not fetching (i.e. the profile is the logged-in user's), use the global state.
   // Otherwise, use the data from the custom hook.
   const { data, loading, error } = shouldFetch ? fetchData : userBioState;
-  console.log(shouldFetch,data)
   const [numOfConnections, setNumOfConnections] = useState(0);
   const [isInConnections, setIsInConnections] = useState<boolean | undefined>(
     undefined
@@ -51,6 +54,12 @@ const UserInfo = () => {
     if (data) {
       setNumOfConnections(data.number_of_connections);
       setIsInConnections(data.isInConnections);
+      setIsProfileVisible(
+        data.is_me ||
+          (data.profile_visibility === "Connections only" &&
+            !!data.isInConnections) ||
+          data.profile_visibility === "Public"
+      );
     }
   }, [data]);
   if (!id || getErrorMessage(error).toLocaleLowerCase() === "user not found") {
@@ -65,7 +74,11 @@ const UserInfo = () => {
   return (
     <section className="bg-white dark:bg-gray-900 rounded-lg shadow-md overflow-hidden">
       <CoverPhoto src={data.cover_photo} isOwner={data.is_me}>
-        <ProfileAvatar src={data.profile_photo} isOwner={data.is_me} isPremium={data.isSubscribed} />
+        <ProfileAvatar
+          src={data.profile_photo}
+          isOwner={data.is_me}
+          isPremium={data.isSubscribed}
+        />
       </CoverPhoto>
 
       <div className="pt-20 px-6 pb-6">
