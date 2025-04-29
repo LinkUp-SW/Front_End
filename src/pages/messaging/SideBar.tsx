@@ -5,6 +5,7 @@ import {
   selectUserName,
   selectUserStatus,
   selectUserId,
+  setResponsiveIsSidebar,
 } from "../../slices/messaging/messagingSlice";
 import { toggleStarred } from "../../slices/messaging/messagingSlice";
 import * as Popover from "@radix-ui/react-popover";
@@ -29,11 +30,13 @@ import {
   getAllConversations,
   deleteConversation,
   getUnseenMessagesCountByConversation,
+  markConversationAsRead,
 } from "@/endpoints/messaging";
 import Cookies from "js-cookie";
 import { Conversation } from "@/endpoints/messaging";
 import { toast } from "sonner";
 import { socketService } from "@/services/socket";
+import LinkUpLoader from "../../components/linkup_loader/LinkUpLoader";
 
 const SideBar = () => {
   const token = Cookies.get("linkup_auth_token");
@@ -147,11 +150,14 @@ const SideBar = () => {
         );
       }
     );
+    
 
     return () => {
       unsubscribe(); // Clean up
     };
   }, []);
+
+  
 
   const filterButtonData = {
     Focused: dataInfo,
@@ -169,7 +175,7 @@ const SideBar = () => {
     ),
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <div><LinkUpLoader/></div>;
 
   const filteredMessagesSearch = filterButtonData[activeFilter].filter(
     (info) =>
@@ -177,32 +183,49 @@ const SideBar = () => {
       info.lastMessage.message.toLowerCase().includes(search.toLowerCase())
   );
 
-  const handleSelectConversation = (
-    conversationID: string,
-    dataType: string[],
-    user2Name: string,
-    userStatus: boolean,
-    user2Id: string
-  ) => {
-    dispatch(selectMessage(conversationID.toString()));
-    dispatch(selectUserName(user2Name));
-    dispatch(selectUserStatus(userStatus));
-    dispatch(selectUserId(user2Id));
-    if (dataType.includes("unread")) {
-      setDataInfo((prevData) =>
-        prevData.map((message) =>
-          message.conversationId === conversationID
-            ? {
-                ...message,
-                type: message.conversationType.filter((t) => t !== "unread"),
-              }
-            : message
-        )
-      );
-    }
-    setSelectedConversationStyle(conversationID);
+ // In SideBar.tsx, update the handleSelectConversation function
+const handleSelectConversation = (
+  conversationID: string,
+  dataType: string[],
+  user2Name: string,
+  userStatus: boolean,
+  user2Id: string
+) => {
+  dispatch(selectMessage(conversationID.toString()));
+  dispatch(selectUserName(user2Name));
+  dispatch(selectUserStatus(userStatus));
+  dispatch(selectUserId(user2Id));
+  dispatch(setResponsiveIsSidebar(true))
+  
+  // If this conversation has unread messages
+  if (dataType.includes("unread")) {
+    // Update local state
+    setDataInfo((prevData) =>
+      prevData.map((message) =>
+        message.conversationId === conversationID
+          ? {
+              ...message,
+              conversationType: message.conversationType.filter((t) => t !== "unread"),
+              unreadCount: 0
+            }
+          : message
+      )
+    );
+    
+    // Mark as read in both socket and API
     socketService.markAsRead(conversationID);
-  };
+    
+    // Call the API to mark the conversation as read
+    if (token) {
+      markConversationAsRead(token, conversationID)
+        .catch(err => {
+          console.error("Failed to mark conversation as read:", err);
+        });
+    }
+  }
+  
+  setSelectedConversationStyle(conversationID);
+};
 
   const handleHoverEnter = (conversationID: string) => {
     if (!selectedItems.includes(conversationID)) {
