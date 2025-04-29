@@ -11,6 +11,7 @@ import {
   chattingMessages,
   deleteMessages,
   MessageChat,
+  markMessagesAsSeen,
 } from "@/endpoints/messaging";
 import {
   setEditingMessageId,
@@ -25,6 +26,7 @@ import {
   incomingMessageRead,
 } from "@/services/socket";
 import { useParams } from "react-router-dom";
+import LinkUpLoader from "../../components/linkup_loader/LinkUpLoader";
 
 const ChatingScreen = () => {
   const { id } = useParams();
@@ -71,6 +73,30 @@ const ChatingScreen = () => {
   const [readByUserId, setReadByUserId] = useState<string | null>(
     null
   ); /*related to read messages (sockets) */
+  const [lastOwnMessageId, setLastOwnMessageId] = useState<string | null>(null);
+
+
+  const findLastMessageFromCurrentUser = (messages: MessageChat[]) => {
+    // Start from the end and find the first message from the current user
+    for (let i = messages.length - 1; i >= 0; i--) {
+      if (messages[i].isOwnMessage) {
+        return messages[i].messageId;
+      }
+    }
+    return null;
+  };
+
+  // Add this state variable (only once)
+
+  // Add this useEffect to update the lastOwnMessageId whenever messages change
+  useEffect(() => {
+    if (dataChat && dataChat.messages) {
+      const id = findLastMessageFromCurrentUser(dataChat.messages);
+      setLastOwnMessageId(id);
+    }
+  }, [dataChat]);
+  // Add this useEffect to update the lastOwnMessageId whenever messages change
+
 
   useEffect(() => {
     const fetchChatting = async () => {
@@ -128,12 +154,16 @@ const ChatingScreen = () => {
     };
   }, [selectedConvID, id]);
 
+  // Update the socket listener for message_read to properly handle read receipts
   useEffect(() => {
     const unsubscribeRead = socketService.on<incomingMessageRead>(
       "messages_read",
       (data) => {
         if (data.conversationId === selectedConvID && data.readBy !== id) {
+          // Store the ID of the user who read the message
           setReadByUserId(data.readBy);
+
+          // Update all messages to be seen
           setChatData((prev) => {
             if (!prev) return prev;
 
@@ -153,10 +183,10 @@ const ChatingScreen = () => {
       unsubscribeRead();
     };
   }, [selectedConvID, id]);
-  // Replace the useEffect for marking messages as read with this improved version
+  // Replace your existing useEffect for marking messages as read with this improved version
   useEffect(() => {
     // Only run if we have data and a selected conversation
-    if (!dataChat || !selectedConvID || !dataChat.messages) return;
+    if (!dataChat || !selectedConvID || !dataChat.messages || !token) return;
 
     // Check if there are unread messages from the other user
     const hasUnreadMessages = dataChat.messages.some(
@@ -165,23 +195,30 @@ const ChatingScreen = () => {
 
     // If there are unread messages, mark them as read
     if (hasUnreadMessages) {
-      // Send read status to socket
-      socketService.markAsRead(selectedConvID);
+      // Call the API endpoint
+      markMessagesAsSeen(token, selectedConvID)
+        .then(() => {
+          // Send read status to socket
+          socketService.markAsRead(selectedConvID);
 
-      // Update local state
-      setChatData((prev) => {
-        if (!prev) return prev;
+          // Update local state
+          setChatData((prev) => {
+            if (!prev) return prev;
 
-        return {
-          ...prev,
-          messages: prev.messages.map((msg) => ({
-            ...msg,
-            isSeen: msg.isOwnMessage ? msg.isSeen : true, // Only mark the other user's messages as seen
-          })),
-        };
-      });
+            return {
+              ...prev,
+              messages: prev.messages.map((msg) => ({
+                ...msg,
+                isSeen: msg.isOwnMessage ? msg.isSeen : true, // Only mark the other user's messages as seen
+              })),
+            };
+          });
+        })
+        .catch((err) => {
+          console.error("Failed to mark messages as seen:", err);
+        });
     }
-  }, [dataChat, selectedConvID]);
+  }, [dataChat, selectedConvID, token]);
 
   useEffect(() => {
     const unsubscribe = socketService.on<SocketIncomingMessage>(
@@ -235,7 +272,9 @@ const ChatingScreen = () => {
     }
   }, [msg]);
 
-  if (loading) return <div>Loading...</div>;
+  // Add this to your ChatingScreen component
+
+  if (loading) return <div><LinkUpLoader/></div>;
 
   const shouldShowProfile = (index: number) => {
     if (index === 0) return true;
@@ -407,10 +446,9 @@ const ChatingScreen = () => {
                         </div>
                       )}
                     </div>
-                    {/* Replace your existing "Seen" indicator with this */}
-                    {index === dataChat.messages.length - 1 &&
-                      msg.isOwnMessage &&
-                      msg.isSeen && (
+                    {msg.isOwnMessage &&
+                      msg.isSeen &&
+                      msg.messageId === lastOwnMessageId && (
                         <div className="pl-14 mt-1 flex items-center gap-2">
                           <div className="w-5 h-5 rounded-full overflow-hidden border border-gray-300">
                             <img
