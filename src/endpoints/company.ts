@@ -215,3 +215,27 @@ export const unblockFollower = async (organizationId: string, followerId: string
   const response = await axiosInstance.delete(url, getAuthHeader(token));
   return response.data;
 };
+
+export const checkIsFollowing = async (organizationId: string): Promise<{ isFollower: boolean }> => {
+  const token = getAuthToken();
+  const url = `/api/v1/search/is-follower/${organizationId}`;
+  
+  const response = await axiosInstance.get(url, getAuthHeader(token));
+  return response.data;
+};
+
+export const followOrganization = async (organizationId: string): Promise<{ success: boolean; message: string }> => {
+  const token = getAuthToken();
+  const url = `/api/v1/company/follow-organization/${organizationId}`;
+  
+  const response = await axiosInstance.post(url, {}, getAuthHeader(token));
+  return response.data;
+};
+
+export const unfollowOrganization = async (organizationId: string): Promise<{ success: boolean; message: string }> => {
+  const token = getAuthToken();
+  const url = `/api/v1/company/unfollow-organization/${organizationId}`;
+  
+  const response = await axiosInstance.delete(url, getAuthHeader(token));
+  return response.data;
+};

@@ -100,7 +100,7 @@ const EditPageDialog = ({ open, onOpenChange, companyData, onSubmit }: EditPageD
   
   // Define type options based on category
   const educationalTypes = ['University', 'College', 'High school', 'Middle school', 'Elementary school'];
-  const companyTypes = ['Public company', 'Private company', 'Nonprofit', 'Government Agency', 'Partnership'];
+  const companyTypes = ['Public company', 'Private company', 'Nonprofit', 'Government agency', 'Partnership'];
   
   // Update form data when companyData changes or dialog opens
   useEffect(() => {

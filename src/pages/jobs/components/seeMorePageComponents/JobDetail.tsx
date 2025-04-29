@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import JobHeader from "./JobHeader";
 import JobContent from "./JobContent";
 import { Job } from "../../types";
+import { checkIsFollowing, followOrganization, unfollowOrganization } from "@/endpoints/company";
 
 interface JobDetailProps {
   job?: Job;
@@ -9,6 +10,60 @@ interface JobDetailProps {
 }
 
 const JobDetail: React.FC<JobDetailProps> = ({ job, isLoading = false }) => {
+  const [isFollowing, setIsFollowing] = useState<boolean>(false);
+  const [followLoading, setFollowLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    // Check if user is following when job changes
+    const checkFollowStatus = async () => {
+      // Make sure we have a job and an organization ID
+      if (job && job.companyInfo && job.companyInfo._id) {
+        try {
+          const { isFollower } = await checkIsFollowing(job.companyInfo._id);
+          setIsFollowing(isFollower);
+        } catch (error) {
+          console.error("Error checking follow status:", error);
+          setIsFollowing(false); // Default to not following on error
+        }
+      } else {
+        // Reset to not following if no job or organization ID
+        setIsFollowing(false);
+      }
+    };
+    
+    checkFollowStatus();
+  }, [job]);
+
+  const handleFollowToggle = async () => {
+    // Use direct ID instead of companyInfo.organizationId
+    // This ensures we use the correct organizational ID from props
+    if (!job || !job.companyInfo) return;
+    
+    // Get the organizational ID directly from the job
+    const organizationId = job.companyInfo._id || "";
+    
+    if (!organizationId) {
+      console.error("No organization ID available");
+      return;
+    }
+    
+    setFollowLoading(true);
+    try {
+      if (isFollowing) {
+        await unfollowOrganization(organizationId);
+        setIsFollowing(false);
+      } else {
+        await followOrganization(organizationId);
+        setIsFollowing(true);
+      }
+    } catch (error) {
+      console.error("Error toggling follow status:", error);
+      // Don't change state on error - keep previous state
+    } finally {
+      setFollowLoading(false);
+    }
+  };
+
   // Show loading state
   if (isLoading) {
     return (
@@ -70,30 +125,38 @@ const JobDetail: React.FC<JobDetailProps> = ({ job, isLoading = false }) => {
               />
             ) : (
               <div className="w-12 h-12 bg-gray-100 dark:bg-gray-800 flex items-center justify-center rounded">
-              <span className="text-lg font-semibold text-gray-500 dark:text-gray-400">
-                {job.company.substring(0, 2)}
-              </span>
-            </div>
+                <span className="text-lg font-semibold text-gray-500 dark:text-gray-400">
+                  {job.company.substring(0, 2)}
+                </span>
+              </div>
             )}
             <div>
               <h3 className="font-medium dark:text-white">{job.company}</h3>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                {job.companyInfo?.followers_count } followers
+                {job.companyInfo?.followers_count} followers
               </p>
             </div>
           </div>
           
           <button 
             id="btn-follow-company"
-            className="border rounded-full px-4 py-1 flex items-center gap-2 text-blue-600 dark:text-blue-400 border-blue-600 dark:border-blue-400 text-sm"
+            className={`border rounded-full px-4 py-1 flex items-center gap-2 text-sm transition-colors ${
+              isFollowing 
+                ? "text-gray-600 dark:text-gray-400 border-gray-600 dark:border-gray-400" 
+                : "text-blue-600 dark:text-blue-400 border-blue-600 dark:border-blue-400"
+            }`}
+            onClick={handleFollowToggle}
+            disabled={followLoading}
           >
-            + Follow
+            {followLoading ? (
+              <span className="inline-block w-4 h-4 border-2 border-t-transparent border-blue-600 dark:border-blue-400 rounded-full animate-spin mr-1"></span>
+            ) : isFollowing ? "Following" : "+ Follow"}
           </button>
         </div>
         
         <div className="text-sm text-gray-700 dark:text-gray-400 mb-3">
-          {job.companyInfo?.industryType } • 
-          {job.companyInfo?.employeeCount } 
+          {job.companyInfo?.industryType && `${job.companyInfo.industryType} • `}
+          {job.companyInfo?.employeeCount && `${job.companyInfo.employeeCount}`}
         </div>
         
         <p className="text-sm mb-2 text-gray-700 dark:text-gray-400">

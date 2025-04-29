@@ -55,8 +55,8 @@ export interface UserCompaniesResponse {
 export interface CompanyProfileResponse {
   message?: string;
   companyProfile: Company;
-  company?: Company; // For backward compatibility
-  success?: boolean; // Added for compatibility
+  company?: Company; 
+  success?: boolean; 
 }
 
 // Request payload interface
@@ -96,7 +96,7 @@ export interface CompanyProfileData {
   culture?: string;
 }
 
-// Unified Job interface
+
 export interface Job {
   _id: string; // Using _id to match backend MongoDB convention
   id?: string; // For compatibility
