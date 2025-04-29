@@ -311,7 +311,7 @@ const postsSlice = createSlice({
       action: PayloadAction<{
         postId: string;
         commentId: string;
-        reactions: { reaction: string }[]; // Use proper type here based on your API response
+        reactions: string[]; // Use proper type here based on your API response
         reactionsCount: number;
         userReaction: string | null;
       }>
@@ -330,10 +330,10 @@ const postsSlice = createSlice({
             if (comment._id === commentId) {
               return {
                 ...comment,
-                reactions: reactions,
+                reactions: reactions.map((r) => ({ reaction: r })),
                 reactionsCount: reactionsCount,
                 userReaction: userReaction,
-                topReactions: reactions, // Assuming topReactions is used in your UI
+                topReactions: reactions, // Simply use the reactions array directly
               };
             }
 

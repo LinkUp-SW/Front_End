@@ -161,11 +161,14 @@ export const RECENT_SEARCHES = [
 
 export const POST_ACTIONS: Record<string, string> = {
   like: "likes this",
-  comment: "commented on this",
-  repost: "reposted this",
   love: "loves this",
   insightful: "finds this insightful",
   celebrate: "celebrates this",
+  funny: "finds this funny",
+  support: "supports this",
+  comment: "commented on this",
+  repost: "reposted this",
+
   error: "no action",
 };
 
@@ -310,7 +313,6 @@ export const COUNTRY_CITY_MAP: { [key: string]: string[] } = {
   ],
 };
 
-
 // Map of Egypt and Middle Eastern countries to their international dialing codes
 export const COUNTRY_PHONE_CODE_MAP: { [key: string]: string } = {
   Egypt: "+20",
@@ -328,9 +330,6 @@ export const COUNTRY_PHONE_CODE_MAP: { [key: string]: string } = {
   Yemen: "+967",
   Turkey: "+90",
 };
-
-
-
 
 export const defaultProfileImage =
   "https://res.cloudinary.com/dyhnxqs6f/image/upload/v1719229880/meme_k18ky2_c_crop_w_674_h_734_x_0_y_0_u0o1yz.png";

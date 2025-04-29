@@ -170,7 +170,7 @@ export const fetchSinglePost = async (
       },
       params: {
         limit: 5,
-        replyLimit: 3,
+        replyLimit: 2,
       },
     });
     console.log("FetchSinglePost response:", response.data);
@@ -239,7 +239,7 @@ export const loadPostComments = async (
     params: {
       cursor: cursor,
       limit: limit,
-      replyLimit: 3, // Get a few replies for each comment
+      replyLimit: 2, // Get a few replies for each comment
     },
   });
   console.log("API response:", response);

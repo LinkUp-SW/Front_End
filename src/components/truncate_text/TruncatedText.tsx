@@ -3,15 +3,17 @@ import { Link } from "react-router-dom";
 
 interface TruncatedTextProps {
   content: string;
-  lineCount?: number;
   id: string;
+  lineCount?: number;
+  hideLinks?: boolean;
   className?: string;
 }
 
 const TruncatedText: React.FC<TruncatedTextProps> = ({
   content,
-  lineCount = 3,
   id,
+  lineCount = 3,
+  hideLinks = false,
   className,
 }) => {
   const textRef = useRef<HTMLParagraphElement>(null);
@@ -238,15 +240,26 @@ const TruncatedText: React.FC<TruncatedTextProps> = ({
     // Step 4: Apply text formatting and render
     return finalSegments.map((segment, index) => {
       if (segment.type === "mention") {
-        return (
-          <Link
-            key={`mention-${index}`}
-            to={`/user-profile/${segment.userId}`}
-            className="text-blue-600 dark:text-blue-400 font-medium hover:underline cursor-pointer"
-          >
-            {segment.content}
-          </Link>
-        );
+        if (!hideLinks) {
+          return (
+            <Link
+              key={`mention-${index}`}
+              to={`/user-profile/${segment.userId}`}
+              className="text-blue-600 dark:text-blue-400 font-medium hover:underline cursor-pointer"
+            >
+              {segment.content}
+            </Link>
+          );
+        } else {
+          return (
+            <span
+              key={`mention-${index}`}
+              className="text-blue-600 dark:text-blue-400 font-medium hover:underline cursor-pointer"
+            >
+              {segment.content}
+            </span>
+          );
+        }
       } else if (segment.type === "url") {
         return (
           <div
