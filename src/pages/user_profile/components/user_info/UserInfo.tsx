@@ -77,7 +77,6 @@ const UserInfo: React.FC<UserInfoProps> = ({ setIsProfileVisible }) => {
         <ProfileAvatar
           src={data.profile_photo}
           isOwner={data.is_me}
-          isPremium={data.isSubscribed}
         />
       </CoverPhoto>
 
@@ -92,6 +91,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ setIsProfileVisible }) => {
           connectionsCount={numOfConnections}
           isOwner={data.is_me}
           isInConnection={isInConnections}
+          isPremium={data.isSubscribed}
         />
 
         <ProfileActionButtons
