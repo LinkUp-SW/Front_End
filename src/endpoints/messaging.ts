@@ -120,38 +120,47 @@ export const editMessage = async (
   return response.data;
 };
 
-export const markConversationAsRead = async (
-  token: string,
-  conversationId: string
-) => {
-  const response = await axiosInstance.put(
-    `/api/v1/conversations/${conversationId}/read`,
-    {},
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
-  return response.data;
+
+
+export const markConversationAsRead = async (token: string, conversationId: string) => {
+  try {
+    const response = await axiosInstance.put(
+      `/api/v1/conversations/${conversationId}/read`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;  // This will contain the success message from the backend
+  } catch (error) {
+    throw new Error('Error marking conversation as read');
+  }
 };
 
-export const markMessagesAsSeen = async (
-  token: string,
-  conversationId: string
-) => {
-  const response = await axiosInstance.put(
-    `/api/v1/messages/${conversationId}/seen`,
-    {},
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
-  return response.data;
-  
+export const markConversationAsUnread = async (token: string, conversationId: string) => {
+  try {
+    const response = await axiosInstance.put(
+      `/api/v1/conversations/${conversationId}/unread`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data; // { message: 'Conversation marked as unread' }
+  } catch (error) {
+    console.error("Error marking conversation as unread:", error);
+    throw new Error('Error marking conversation as unread');
+  }
 };
+
+
+
+
+
 export const getUnseenMessagesCountByConversation = async (
   token: string
 ): Promise<unreadMessagesCount[]> => {
@@ -180,7 +189,22 @@ export const getUnseenMessagesCount = async (
 };
 
 
-
+export const markMessagesAsSeen = async (
+  token: string,
+  conversationId: string
+) => {
+  const response = await axiosInstance.put(
+    `/api/v1/messages/${conversationId}/seen`,
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+  
+};
 
 
 
