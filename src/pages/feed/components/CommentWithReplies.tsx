@@ -38,7 +38,7 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
   postId,
 }) => {
   const replies = comment.children || [];
-  const hasMoreReplies = replies.length < (comment.childrenCount || 0);
+  const hasMoreReplies = replies.length < (comment.children_count || 0);
   console.log("Has more replies:", hasMoreReplies);
   console.log("Comment:", comment);
   console.log("Replies:", replies);

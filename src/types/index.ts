@@ -138,7 +138,7 @@ export interface CommentObjectType {
 export interface CommentDBType {
   post_id: string;
   content: string;
-  media: string;
+  media: string[];
   parent_id: string | null;
   tagged_users: string[];
 }

@@ -83,6 +83,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
     const file = e.target.files?.[0];
     if (file) {
       setSelectedImage(file);
+      console.log("Uploaded:", file);
     }
   };
 
@@ -103,14 +104,16 @@ const PostFooter: React.FC<PostFooterProps> = ({
 
     reader.onload = () => {
       const base64Image = reader.result as string;
+      console.log("Base64 Image:", base64Image);
 
       const newComment = {
         post_id: postId,
         content: commentInput,
-        media: selectedImage ? base64Image : "",
+        media: selectedImage ? [base64Image] : [""],
         tagged_users: extractedTaggedUsers.map((user) => user.id),
         parent_id: parentId,
       };
+      console.log("Comment Payload:", newComment);
 
       // Reset input and selected image
       setCommentInput("");
@@ -129,7 +132,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
       const newComment = {
         post_id: postId,
         content: commentInput,
-        media: "",
+        media: [""],
         tagged_users: extractedTaggedUsers.map((user) => user.id),
         parent_id: parentId,
       };

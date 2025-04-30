@@ -62,7 +62,7 @@ const PostHeader: React.FC<PostHeaderProps> = ({
             </p>
             <p className="text-xs text-gray-500 dark:text-neutral-400">
               {" "}
-              {user.connectionDegree}
+              {user.connection_degree}
             </p>
           </Link>
           <nav
