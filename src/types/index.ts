@@ -26,7 +26,7 @@ export interface Notification {
   createdAt: string;
   content: string;
   referenceId: string;
-  type: string;
+  type: 'reacted'|'message'|'connection_request'|'comment'|'follow'|'connection_accepted';
   isRead: boolean;
 }
 
