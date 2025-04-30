@@ -42,7 +42,7 @@ const PostHeader: React.FC<PostHeaderProps> = ({
     <header className="flex items-center space-x-3 w-full pl-4 pt-1 pb-4">
       <Link to={`/user-profile/${user.username}`}>
         <img
-          src={user.profilePicture}
+          src={user.profile_picture}
           alt={user.username}
           className="w-8 h-8 md:w-12 md:h-12 rounded-full"
         />
@@ -54,7 +54,7 @@ const PostHeader: React.FC<PostHeaderProps> = ({
             className="flex gap-1 items-center"
           >
             <h2 className="text-xs md:text-sm font-semibold sm:text-base hover:cursor-pointer hover:underline hover:text-blue-600 dark:hover:text-blue-400">
-              {user.firstName + " " + user.lastName}
+              {user.first_name + " " + user.last_name}
             </h2>
             <p className="text-lg text-gray-500 dark:text-neutral-400 font-bold">
               {" "}

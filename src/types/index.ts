@@ -176,10 +176,10 @@ export interface ActivityContextType {
 }
 
 export interface PostUserType {
-  firstName: string;
-  lastName: string;
+  first_name: string;
+  last_name: string;
   username: string;
-  profilePicture: string;
+  profile_picture: string;
   connectionDegree: string;
   headline: string;
 }
