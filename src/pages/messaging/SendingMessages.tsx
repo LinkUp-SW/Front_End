@@ -43,7 +43,9 @@ const SendingMessages = () => {
   const editText = useSelector((state: RootState) => state.messaging.editText);
   const msg = useSelector((state: RootState) => state.messaging.message);
   const dataChat = useSelector((state: RootState) => state.messaging.chatData);
-  const editedMessageIds=useSelector((state: RootState) => state.messaging.setEditedMessageIds);
+  const editedMessageIds = useSelector(
+    (state: RootState) => state.messaging.setEditedMessageIds
+  );
 
   const dispatch = useDispatch();
   /* const [selectedImage, setSelectedMessages] = useState("");*/
@@ -51,7 +53,6 @@ const SendingMessages = () => {
   const [text, setText] = useState<string>("");
   const [files, setFiles] = useState<File[]>([]);
   const [selectedFile, setSelectedFile] = useState(false);
-
 
   const handleEmojiRequest = (emoji: { emoji: string }) => {
     setText((prevMessage) => prevMessage + emoji.emoji);
@@ -71,8 +72,9 @@ const SendingMessages = () => {
 
   const handleSendMessage = () => {
     if (!text.trim()) return;
+
     const newMsg: MessageChat = {
-      messageId: Date.now().toString(), // temp ID
+      messageId: `temp-${Date.now()}`,
       senderId: id!,
       senderName: "YOU",
       message: text,
@@ -80,11 +82,18 @@ const SendingMessages = () => {
       timestamp: new Date().toISOString(),
       reacted: false,
       isSeen: false,
-      isOwnMessage: true, // Compare with your user ID
+      isOwnMessage: true,
       isDeleted: false,
       isEdited: false,
     };
-    dispatch(addMessage(newMsg));
+
+    // dispatch(addMessage(newMsg));
+    dispatch(
+      setChatData({
+        ...dataChat!,
+        messages: [...(dataChat?.messages || []), newMsg],
+      })
+    );
     socketService.sendPrivateMessage(selectedUser2ID, text, []);
     setText("");
   };
@@ -94,13 +103,13 @@ const SendingMessages = () => {
     try {
       await editMessage(token!, selectedConvID, editingMessageId, editText);
       dispatch(clearEditingState());
-      dispatch(setEditedMessageIds([...editedMessageIds,editingMessageId]));
+      dispatch(setEditedMessageIds([...editedMessageIds, editingMessageId]));
       dispatch(
         setChatData({
           ...dataChat,
           messages: dataChat.messages.map((msg) =>
             msg.messageId === editingMessageId
-              ? { ...msg,message:editText, isEdited: true }
+              ? { ...msg, message: editText, isEdited: true }
               : msg
           ),
         })
