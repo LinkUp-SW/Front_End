@@ -70,7 +70,7 @@ const SideBar = () => {
         if (!token) return;
 
         const data: { conversations: Conversation[] } =
-          await getAllConversations(token);
+        await getAllConversations(token);
         setDataInfo(data.conversations);
         toast.success("Conversations loaded successfully");
       } catch (error) {
@@ -226,6 +226,11 @@ const handleSelectConversation = async (
   }
 
   setSelectedConversationStyle(conversationID);
+ 
+
+  
+
+
 };
 
   const handleHoverEnter = (conversationID: string) => {
@@ -275,9 +280,7 @@ const handleSelectConversation = async (
                 conversationType: message.conversationType.includes("Unread")
                   ? message.conversationType.filter((t) => t !== "Unread")
                   : [...message.conversationType, "Unread"],
-                  unreadCount: message.conversationType.includes("Unread")
-                  ? 0 
-                  : 1,
+              
               }
             : message
         )
@@ -576,7 +579,7 @@ const handleSelectConversation = async (
 
                 {data.conversationType.includes("Unread") && (
                   <span className="flex items-center justify-center text-xs rounded-full text-white w-4 h-4 bg-blue-600 font-medium">
-                    {data.unreadCount}
+                    
                   </span>
                 )}
               </div>
