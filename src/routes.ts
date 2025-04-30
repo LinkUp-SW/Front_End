@@ -1,5 +1,3 @@
-// src/routes.ts
-
 import { RouteObject } from "react-router-dom";
 import {
   LandingPage,
@@ -29,6 +27,11 @@ import {
   SignInAndSecurityPage,
   ChangePasswordPage,
   MyItemsPage,
+  AccountPreferencePage,
+  InstructionPage,
+  ReasonPage,
+  OtherOptionPage,
+  LastPage,
   AllPeoplePage,
   CompanyCreationPage,
   ManageCompanyPage,
@@ -38,6 +41,8 @@ import {
 import PrimaryEmailPage from "./pages/settings/updateEmail/PrimaryEmailPage";
 import AddEmailPage from "./pages/settings/updateEmail/AddEmailPage";
 import OTP from "./pages/settings/updateEmail/OTP";
+import BlockingListPage from "./pages/settings/BlockingListPage";
+import VisibilityPage from "./pages/settings/VisibilityPage";
 
 import React from "react";
 
@@ -170,6 +175,27 @@ const routes: RouteObject[] = [
     element: React.createElement(ChangePasswordPage),
   },
   {
+    path: "/settings/preference",
+    element: React.createElement(AccountPreferencePage),
+  },
+  // New routes for account closing flow
+  {
+    path: "/settings/close-account",
+    element: React.createElement(InstructionPage),
+  },
+  {
+    path: "/settings/close-account/reason",
+    element: React.createElement(ReasonPage),
+  },
+  {
+    path: "/settings/close-account/other-option",
+    element: React.createElement(OtherOptionPage),
+  },
+  {
+    path: "/settings/close-account/confirm",
+    element: React.createElement(LastPage),
+  },
+  {
     path: "/settings/security/email",
     element: React.createElement(PrimaryEmailPage),
   },
@@ -200,6 +226,15 @@ const routes: RouteObject[] = [
   {
     path: "/jobs/create",
     element: React.createElement(CreateJobPage),
+  },
+  
+  {
+    path: "/settings/visibility",
+    element: React.createElement(VisibilityPage),
+  },
+  {
+    path: "/settings/visibility/blocking",
+    element: React.createElement(BlockingListPage),
   },
 ];
 
