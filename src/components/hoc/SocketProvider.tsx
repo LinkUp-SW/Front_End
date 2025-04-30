@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import { socketService } from "@/services/socket";
 import Cookies from "js-cookie";
 import { useDispatch } from "react-redux";
@@ -6,9 +6,15 @@ import {
   setFriendOnlineStatus,
 } from "../../slices/messaging/messagingSlice";
 
-export const SocketContext = createContext({});
+interface SocketContextType {
+  connected: boolean;
+}
 
-export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+const SocketContext = createContext<SocketContextType>({ connected: false });
+
+export const useSocketContext = () => useContext(SocketContext);
+
+const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [connected, setConnected] = useState(false);
   const dispatch = useDispatch();
   useEffect(() => {
@@ -30,15 +36,13 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         .catch((err) => {
           console.error("Socket connection failed:", err);
         }); 
-    }
-    
-
+    } 
     return () => {
       socketService.setOnlineStatus(false); 
       socketService.disconnect(); // Cleanup on unmount
       setConnected(false);
     };
-  }, []);
+  }, [dispatch]); // Added dispatch to dependency array
 
   return (
     <SocketContext.Provider value={{ connected }}>
@@ -46,3 +50,4 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     </SocketContext.Provider>
   );
 };
+export default SocketProvider;
