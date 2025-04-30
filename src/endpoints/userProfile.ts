@@ -562,7 +562,6 @@ export const endorseSkill = async (
   return response.data;
 };
 
-
 export const removeEndorsement = async (
   token: string,
   userId: string,
