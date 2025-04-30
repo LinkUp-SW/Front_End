@@ -31,6 +31,7 @@ import {
   deleteConversation,
   getUnseenMessagesCountByConversation,
   markConversationAsRead,
+  markConversationAsUnread,
 } from "@/endpoints/messaging";
 import Cookies from "js-cookie";
 import { Conversation } from "@/endpoints/messaging";
@@ -46,9 +47,7 @@ const SideBar = () => {
     (state: RootState) => state.messaging.activeFilter
   );
   const search = useSelector((state: RootState) => state.messaging.search);
-  const friendOnlineStatus = useSelector(
-    (state: RootState) => state.messaging.onlineFriends
-  );
+  const onlineStatus=useSelector((state: RootState) => state.messaging.onlineStatus);
 
   /*const [deleted, setDeleted] = useState(false);*/
   const [dotAppearance, setDotAppearance] = useState<string[]>([]);
@@ -112,7 +111,7 @@ const SideBar = () => {
               return {
                 ...conversation,
                 unreadCount: unreadConversation.unreadCount,
-                conversationType: [...conversation.conversationType, "unread"],
+                conversationType: [...conversation.conversationType, "Unread"],
               };
             }
             return conversation;
@@ -142,9 +141,9 @@ const SideBar = () => {
                 unreadCount: data.count,
                 conversationType:
                   data.count > 0
-                    ? [...new Set([...conversation.conversationType, "unread"])]
+                    ? [...new Set([...conversation.conversationType, "Unread"])]
                     : conversation.conversationType.filter(
-                        (type) => type !== "unread"
+                        (type) => type !== "Unread"
                       ),
               };
             }
@@ -165,7 +164,7 @@ const SideBar = () => {
   const filterButtonData = {
     Focused: dataInfo,
     [FILTER_OPTIONS_MESSAGES.UNREAD]: dataInfo.filter((info) =>
-      info.conversationType.includes("unread")
+      info.conversationType.includes("Unread")
     ),
     [FILTER_OPTIONS_MESSAGES.MY_CONNECTIONS]: dataInfo.filter((info) =>
       info.conversationType.includes("myconnections")
@@ -187,7 +186,7 @@ const SideBar = () => {
   );
 
  // In SideBar.tsx, update the handleSelectConversation function
-const handleSelectConversation = (
+const handleSelectConversation = async (
   conversationID: string,
   dataType: string[],
   user2Name: string,
@@ -198,35 +197,34 @@ const handleSelectConversation = (
   dispatch(selectUserName(user2Name));
   dispatch(selectUserStatus(userStatus));
   dispatch(selectUserId(user2Id));
-  dispatch(setResponsiveIsSidebar(true))
-  
+  dispatch(setResponsiveIsSidebar(true));
+
   // If this conversation has unread messages
-  if (dataType.includes("unread")) {
-    // Update local state
-    setDataInfo((prevData) =>
-      prevData.map((message) =>
-        message.conversationId === conversationID
-          ? {
-              ...message,
-              conversationType: message.conversationType.filter((t) => t !== "unread"),
-              unreadCount: 0
-            }
-          : message
-      )
-    );
-    
-    // Mark as read in both socket and API
-    // socketService.markAsRead(conversationID);
-    
-    // Call the API to mark the conversation as read
+  if (dataType.includes("Unread")) {
     if (token) {
-      markConversationAsRead(token, conversationID)
-        .catch(err => {
-          console.error("Failed to mark conversation as read:", err);
-        });
+      try {
+        await markConversationAsRead(token, conversationID); // API call first
+
+        // On success, update local state and show toast
+        setDataInfo((prevData) =>
+          prevData.map((message) =>
+            message.conversationId === conversationID
+              ? {
+                  ...message,
+                  conversationType: message.conversationType.filter((t) => t !== "Unread"),
+                  unreadCount: 0
+                }
+              : message
+          )
+        );
+        toast.success("Conversation marked as read");
+      } catch (err) {
+        console.error("Failed to mark conversation as read:", err);
+        toast.error("Failed to mark conversation as read");
+      }
     }
   }
-  
+
   setSelectedConversationStyle(conversationID);
 };
 
@@ -265,20 +263,32 @@ const handleSelectConversation = (
     );
   };
 
-  const unreadFiltering = (conversationID: string) => {
-    setDataInfo((prevData) =>
-      prevData.map((message) =>
-        message.conversationId === conversationID
-          ? {
-              ...message,
-              conversationType: message.conversationType.includes("unread")
-                ? message.conversationType.filter((t) => t !== "unread")
-                : [...message.conversationType, "unread"],
-            }
-          : message
-      )
-    );
+
+  const unreadFiltering = async (conversationID: string) => {
+    try {
+      await markConversationAsUnread(token!, conversationID);
+      setDataInfo((prevData) =>
+        prevData.map((message) =>
+          message.conversationId === conversationID
+            ? {
+                ...message,
+                conversationType: message.conversationType.includes("Unread")
+                  ? message.conversationType.filter((t) => t !== "Unread")
+                  : [...message.conversationType, "Unread"],
+                  unreadCount: message.conversationType.includes("Unread")
+                  ? 0 
+                  : 1,
+              }
+            : message
+        )
+      );
+      toast.success("Conversation marked as unread");
+    } catch (err) {
+      console.error("Error marking as unread:", err);
+      toast.error("Failed to mark conversation as unread");
+    }
   };
+  
 
   const starredFiltering = (conversationID: string) => {
     dispatch(toggleStarred(conversationID.toString()));
@@ -368,7 +378,7 @@ const handleSelectConversation = (
               className={`relative flex items-start p-4 hover:cursor-pointer ${
                 SelectedConversationStyle === data.conversationId
                   ? "bg-[#e6eef4] hover:bg-[#d9e5f0]"
-                  : data.conversationType.includes("unread")
+                  : data.conversationType.includes("Unread")
                   ? "bg-[#eaf4fe] hover:bg-[#d9e5f0]"
                   : "hover:bg-gray-100"
               }`}
@@ -409,7 +419,7 @@ const handleSelectConversation = (
                       src={data.otherUser.profilePhoto}
                       alt="profile"
                     />
-                    {data.otherUser.onlineStatus && (<span className="absolute bottom-0 right-0 w-3 h-3 bg-[#01754f] border-2 border-white rounded-full"></span>)} 
+                    {onlineStatus && (<span className="absolute bottom-0 right-0 w-3 h-3 bg-[#01754f] border-2 border-white rounded-full"></span>)} 
                     
                   </div>
                   )}
@@ -419,7 +429,7 @@ const handleSelectConversation = (
                   <div className="flex justify-between items-center">
                     <p
                       className={`text-sm ${
-                        data.conversationType.includes("unread")
+                        data.conversationType.includes("Unread")
                           ? "font-semibold"
                           : "font-medium"
                       }`}
@@ -480,7 +490,7 @@ const handleSelectConversation = (
                           className="block w-full text-left py-2 px-3 text-sm hover:bg-gray-100 rounded"
                           onClick={() => unreadFiltering(data.conversationId)}
                         >
-                          {data.conversationType.includes("unread")
+                          {data.conversationType.includes("Unread")
                             ? "Mark as read"
                             : "Mark as unread"}
                         </button>
@@ -564,7 +574,7 @@ const handleSelectConversation = (
                   <FaStar id="star" size={15} className="text-[#c37d16]" />
                 )}
 
-                {data.conversationType.includes("unread") && (
+                {data.conversationType.includes("Unread") && (
                   <span className="flex items-center justify-center text-xs rounded-full text-white w-4 h-4 bg-blue-600 font-medium">
                     {data.unreadCount}
                   </span>
