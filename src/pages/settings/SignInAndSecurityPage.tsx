@@ -19,7 +19,7 @@ const SignInAndSecurityPage: React.FC = () => {
                 </span>
               </div>
               <Link 
-                to="/settings/email" 
+                to="/settings/security/email" 
                 className="flex items-center justify-center text-[#0891b2] w-8 h-8 rounded-full transition-colors duration-200 ease-in-out hover:bg-[rgba(8,145,178,0.08)]"
               >
                 <FaArrowRight className="w-4 h-4" />
