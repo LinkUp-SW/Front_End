@@ -82,9 +82,9 @@ const Users = () => {
 
   return (
     <>
-      <div className="bg-gradient-to-b from-white via-blue-50 to-blue-100 dark:from-gray-800 dark:via-gray-900 dark:to-gray-950 rounded-2xl shadow-xl p-6 transform transition duration-300 mb-12">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Users</h2>
+      <div className="bg-gradient-to-b from-white via-blue-50 to-blue-100 dark:from-gray-800 dark:via-gray-900 dark:to-gray-950 rounded-2xl shadow-xl p-4 sm:p-6 transform transition duration-300 mb-12">
+        <div className="flex justify-between items-center mb-4 sm:mb-6">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Users</h2>
           <button
             onClick={() => setShowForm(true)}
             className="bg-gradient-to-r from-blue-500 to-green-400 text-white p-2 rounded-full hover:opacity-90 transition"
@@ -93,8 +93,8 @@ const Users = () => {
           </button>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm text-left text-gray-700 dark:text-gray-300">
+        <div className="w-full overflow-x-auto">
+          <table className="min-w-[600px] sm:min-w-full w-full text-sm text-left text-gray-700 dark:text-gray-300">
             <thead className="text-xs uppercase text-gray-500 dark:text-gray-400">
               <tr>
                 <th className="px-4 py-2">Profile</th>
@@ -103,7 +103,7 @@ const Users = () => {
                 <th className="px-4 py-2">Email</th>
                 <th className="px-4 py-2">ID</th>
                 <th className="px-4 py-2">Type</th>
-                <th className="px-4 py-2 text-center">Action</th> {/* Center Action title */}
+                <th className="px-4 py-2 text-center">Action</th>
               </tr>
             </thead>
             <tbody>
@@ -113,12 +113,12 @@ const Users = () => {
                     <img
                       src={user.profilePic}
                       alt="Profile"
-                      className="w-10 h-10 rounded-full object-cover"
+                      className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover"
                     />
                   </td>
-                  <td className="px-4 py-2">{user.firstName}</td>
-                  <td className="px-4 py-2">{user.secondName}</td>
-                  <td className="px-4 py-2">{user.email}</td>
+                  <td className="px-4 py-2 break-words">{user.firstName}</td>
+                  <td className="px-4 py-2 break-words">{user.secondName}</td>
+                  <td className="px-4 py-2 break-words">{user.email}</td>
                   <td className="px-4 py-2">{user.id}</td>
                   <td className="px-4 py-2">{user.type}</td>
                   <td className="px-4 py-2">
@@ -130,7 +130,7 @@ const Users = () => {
                         <FiTrash2 size={18} />
                       </button>
                     </div>
-                  </td> {/* Center Trash icon */}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -138,11 +138,10 @@ const Users = () => {
         </div>
       </div>
 
-      {/* Modal Form */}
       {showForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-          <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-2xl w-full max-w-md mx-4">
-            <h3 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white text-center">
+          <div className="bg-white dark:bg-gray-800 p-6 sm:p-8 rounded-2xl shadow-2xl w-full max-w-md mx-4">
+            <h3 className="text-xl sm:text-2xl font-bold mb-6 text-gray-900 dark:text-white text-center">
               Add New Admin
             </h3>
             <div className="space-y-4">
