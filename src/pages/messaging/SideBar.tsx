@@ -46,7 +46,9 @@ const SideBar = () => {
     (state: RootState) => state.messaging.activeFilter
   );
   const search = useSelector((state: RootState) => state.messaging.search);
-  const onlineStatus=useSelector((state: RootState) => state.messaging.onlineStatus);
+  const friendOnlineStatus = useSelector(
+    (state: RootState) => state.messaging.onlineFriends
+  );
 
   /*const [deleted, setDeleted] = useState(false);*/
   const [dotAppearance, setDotAppearance] = useState<string[]>([]);
@@ -214,7 +216,7 @@ const handleSelectConversation = (
     );
     
     // Mark as read in both socket and API
-    socketService.markAsRead(conversationID);
+    // socketService.markAsRead(conversationID);
     
     // Call the API to mark the conversation as read
     if (token) {
@@ -407,7 +409,7 @@ const handleSelectConversation = (
                       src={data.otherUser.profilePhoto}
                       alt="profile"
                     />
-                    {onlineStatus && (<span className="absolute bottom-0 right-0 w-3 h-3 bg-[#01754f] border-2 border-white rounded-full"></span>)} 
+                    {data.otherUser.onlineStatus && (<span className="absolute bottom-0 right-0 w-3 h-3 bg-[#01754f] border-2 border-white rounded-full"></span>)} 
                     
                   </div>
                   )}
