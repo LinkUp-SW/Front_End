@@ -39,13 +39,13 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
           >
             My jobs
           </button>
-          <span
+          {/* <span
             className={`
               "text-gray-600 dark:text-gray-400
               text-sm pr-4`}
           >
             {data?.number_of_saved_jobs}
-          </span>
+          </span> */}
         </div>
 
         <div
