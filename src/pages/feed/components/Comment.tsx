@@ -402,7 +402,7 @@ const Comment: React.FC<CommentProps> = ({
           </div>
         </div>
       </header>
-      <div className="flex flex-col">
+      <div className="flex flex-col justify-start">
         <div className="p-1 pl-11 text-xs md:text-sm whitespace-pre-wrap">
           <TruncatedText
             content={content}
@@ -411,6 +411,24 @@ const Comment: React.FC<CommentProps> = ({
             className="  ml-0 relative -left-5"
           />
         </div>
+        {media && media.link && (
+          <Dialog>
+            <DialogTrigger asChild>
+              <img
+                src={media.link}
+                alt="Comment media"
+                className="max-h-60 self-start object-contain rounded-lg ml-11 mt-2 cursor-pointer"
+              />
+            </DialogTrigger>
+            <DialogContent className="max-w-[90vw] max-h-[90vh] p-0 border-0 bg-transparent">
+              <img
+                src={media.link}
+                alt="Comment media fullscreen"
+                className="w-full h-full object-contain"
+              />
+            </DialogContent>
+          </Dialog>
+        )}
       </div>
       <footer className="flex pl-10 justify-start items-center gap-0.5 ">
         {/* <div className="flex justify-start w-full items-center pt-4 gap-0"> */}
@@ -547,13 +565,17 @@ const Comment: React.FC<CommentProps> = ({
           </TooltipProvider>
         </Popover>
 
-        {stats.total && stats.total != 0 && (
+        {stats.total != 0 && (
           <>
             {" "}
-            <p className="text-xs text-gray-500 dark:text-neutral-400 font-bold">
-              {" "}
-              ·
-            </p>
+            {stats.total > 0 ? (
+              <p className="text-xs text-gray-500 dark:text-neutral-400 font-bold">
+                {" "}
+                ·
+              </p>
+            ) : (
+              <></>
+            )}
             <Dialog>
               <DialogTrigger asChild>
                 <button className="flex pr-3 relative items-end text-gray-500 dark:text-neutral-400 text-xs hover:underline hover:cursor-pointer hover:text-blue-600 dark:hover:text-blue-400">

@@ -292,6 +292,7 @@ const Post: React.FC<PostProps> = ({
     try {
       // Call the API to create the comment
       const createdComment = await createComment(newComment, token);
+      console.log("Created Comment:", createdComment);
 
       if (!newComment.parent_id) {
         // Add top-level comment

@@ -139,6 +139,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
 
       // Reset input and selected image
       setCommentInput("");
+
       setSelectedImage(null);
       if (fileInputRef.current) {
         fileInputRef.current.value = ""; // Reset the file input value
