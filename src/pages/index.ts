@@ -37,9 +37,13 @@ import LastPage from "./settings/LastPage";
 import PrimaryEmailPage from "./settings/updateEmail/PrimaryEmailPage";
 import OTP from "./settings/updateEmail/OTP";
 import AddEmailPage from "./settings/updateEmail/AddEmailPage";
-import AllPeoplePage from "./search/AllPeoplePage";import CompanyCreationPage from "./company/CompanyCreationPage";
-import ManageCompanyPage from "./company/ManageCompanyPage"
-import  CreateJobPage from "./company/CreateJobPage"
+import AllPeoplePage from "./search/AllPeoplePage";
+import CompanyCreationPage from "./company/CompanyCreationPage";
+import ManageCompanyPage from "./company/ManageCompanyPage";
+import CreateJobPage from "./company/CreateJobPage";
+// Import new visibility pages
+import VisibilityPage from "./settings/VisibilityPage";
+import BlockingListPage from "./settings/BlockingListPage";
 
 //Export the Imported Pages
 export {
@@ -84,5 +88,8 @@ export {
   AllPeoplePage,
   CompanyCreationPage,
   ManageCompanyPage,
-  CreateJobPage
+  CreateJobPage,
+  // Export new visibility pages
+  VisibilityPage,
+  BlockingListPage
 };
