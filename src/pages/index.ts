@@ -28,6 +28,12 @@ import UserExperiencesPage from "./user_profile/user_experiences/UserExperiences
 import SignInAndSecurityPage from "./settings/SignInAndSecurityPage";
 import ChangePasswordPage from "./settings/ChangePasswordPage";
 import MyItemsPage from "./my_items/MyItemsPage";
+import AccountPreferencePage from "./settings/AccountPreferencePage";
+// Import new close account pages
+import InstructionPage from "./settings/InstructionPage";
+import ReasonPage from "./settings/ReasonPage";
+import OtherOptionPage from "./settings/OtherOptionPage";
+import LastPage from "./settings/LastPage";
 import PrimaryEmailPage from "./settings/updateEmail/PrimaryEmailPage";
 import OTP from "./settings/updateEmail/OTP";
 import AddEmailPage from "./settings/updateEmail/AddEmailPage";
@@ -66,6 +72,12 @@ export {
   SignInAndSecurityPage,
   ChangePasswordPage,
   MyItemsPage,
+  AccountPreferencePage,
+  // Export new close account pages
+  InstructionPage,
+  ReasonPage,
+  OtherOptionPage,
+  LastPage,
   PrimaryEmailPage,
   OTP,
   AddEmailPage,

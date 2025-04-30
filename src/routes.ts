@@ -29,6 +29,11 @@ import {
   SignInAndSecurityPage,
   ChangePasswordPage,
   MyItemsPage,
+  AccountPreferencePage,
+  InstructionPage,
+  ReasonPage,
+  OtherOptionPage,
+  LastPage,
   AllPeoplePage,
   CompanyCreationPage,
   ManageCompanyPage,
@@ -168,6 +173,27 @@ const routes: RouteObject[] = [
   {
     path: "/settings/security/changepassword",
     element: React.createElement(ChangePasswordPage),
+  },
+  {
+    path: "/settings/preference",
+    element: React.createElement(AccountPreferencePage),
+  },
+  // New routes for account closing flow
+  {
+    path: "/settings/close-account",
+    element: React.createElement(InstructionPage),
+  },
+  {
+    path: "/settings/close-account/reason",
+    element: React.createElement(ReasonPage),
+  },
+  {
+    path: "/settings/close-account/other-option",
+    element: React.createElement(OtherOptionPage),
+  },
+  {
+    path: "/settings/close-account/confirm",
+    element: React.createElement(LastPage),
   },
   {
     path: "/settings/security/email",
