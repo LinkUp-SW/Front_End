@@ -7,14 +7,12 @@ import { RootState } from '@/store';
 import notificationPicture2 from "@/assets/notificationpicture2.jpeg";
 import { getNotifications, markNotificationAsRead, getUnreadNotificationsCount } from '@/endpoints/notifications';
 import { Notification } from '@/types';
-import format from 'date-fns/format';
-
+import { format } from 'date-fns';
 
 export type Tab = 'all' | 'posts' | 'messages';
 export type PostFilter = 'all' | 'comments' | 'reactions';
 
-
-// First, update the filtering function
+// Update the filtering function to handle null/undefined content
 export const filterNotificationsByTab = (
   notifications: Notification[],
   activeTab: Tab,
@@ -26,9 +24,9 @@ export const filterNotificationsByTab = (
 
   switch (activeTab) {
     case 'posts': {
-      // Filter notifications related to comments and reactions
+      // Filter notifications related to comments and reactions, safely handling null/undefined content
       const postRelatedNotifications = notifications.filter(notification => {
-        const content = notification.content.toLowerCase();
+        const content = notification.content ? notification.content.toLowerCase() : '';
         return (
           content.includes('comment') ||
           content.includes('reacted')
@@ -38,13 +36,13 @@ export const filterNotificationsByTab = (
       // Apply additional filtering if a specific post filter is selected
       if (activePostFilter === 'comments') {
         return postRelatedNotifications.filter(n => 
-          n.content.toLowerCase().includes('comment')
+          n.content && n.content.toLowerCase().includes('comment')
         );
       }
 
       if (activePostFilter === 'reactions') {
         return postRelatedNotifications.filter(n =>
-          n.content.toLowerCase().includes('reacted')
+          n.content && n.content.toLowerCase().includes('reacted')
         );
       }
 
@@ -69,7 +67,7 @@ const NotificationsPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<Tab>('all');
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [unreadCount, setUnreadCount] = useState<number>(0);
+  const [unReadCount, setUnreadCount] = useState<number>(0);
   const [showPostDropdown, setShowPostDropdown] = useState<boolean>(false);
   const [activePostFilter, setActivePostFilter] = useState<PostFilter>('all');
   const [clickedNotifications, setClickedNotifications] = useState<Set<string>>(new Set());
@@ -78,7 +76,7 @@ const NotificationsPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   const isDarkMode = useSelector((state: RootState) => state.theme.theme === 'dark');
-  const token = Cookies.get('linkup_auth_token');
+  const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ0ZXN0VXNlcklkIiwiaWF0IjoxNzQ2MDE0MjU2LCJleHAiOjE3NDk2MTQyNTZ9.xg_hSYg3mzVvTiPXiGuMqTZ7GpRXUlMtl1qjwax61Is';
 
   const fetchNotifications = async () => {
     if (!token) {
@@ -90,8 +88,13 @@ const NotificationsPage: React.FC = () => {
     try {
       const response = await getNotifications(token);
       setNotifications(response.notifications);
+      
+      // Set unreadCount from the response
       setUnreadCount(response.unReadCount);
       setError(null);
+      
+      console.log("Fetched notifications:", response.notifications);
+      console.log("Unread count:", response.unReadCount);
     } catch (error) {
       console.error('Error fetching notifications:', error);
       setError('Failed to load notifications');
@@ -106,6 +109,7 @@ const NotificationsPage: React.FC = () => {
     try {
       const count = await getUnreadNotificationsCount(token);
       setUnreadCount(count);
+      console.log("Updated unread count:", count);
     } catch (error) {
       console.error('Error updating unread count:', error);
     }
@@ -113,7 +117,7 @@ const NotificationsPage: React.FC = () => {
 
   useEffect(() => {
     fetchNotifications();
-  }, [token]);
+  }, []);
 
   useEffect(() => {
     const handleResize = () => {
@@ -165,8 +169,10 @@ const NotificationsPage: React.FC = () => {
   };
 
   const handleNotificationClick = async (notification: Notification) => {
-    if (!token || notification.isRead) return;
+    // Don't mark as read if already read
+    if (!notification.id || notification.isRead) return;
 
+    // Optimistically update the UI
     setClickedNotifications(prev => {
       const newSet = new Set(prev);
       newSet.add(notification.id);
@@ -175,6 +181,8 @@ const NotificationsPage: React.FC = () => {
     
     try {
       await markNotificationAsRead(token, notification.id);
+      
+      // Update the notifications array to mark this notification as read
       setNotifications(prevNotifications =>
         prevNotifications.map(item =>
           item.id === notification.id
@@ -182,9 +190,16 @@ const NotificationsPage: React.FC = () => {
             : item
         )
       );
+      
+      // Decrement the unread count
+      setUnreadCount(prevCount => Math.max(0, prevCount - 1));
+      
+      // Also fetch the updated count from the server to ensure consistency
       await updateUnreadCount();
     } catch (error) {
       console.error('Error marking notification as read:', error);
+      
+      // Revert UI optimistic update in case of error
       setClickedNotifications(prev => {
         const newSet = new Set(prev);
         newSet.delete(notification.id);
@@ -195,12 +210,14 @@ const NotificationsPage: React.FC = () => {
 
   const handleMarkAsRead = async (e: React.MouseEvent, notification: Notification) => {
     e.stopPropagation();
-    if (!token || notification.isRead) return;
+    if (!notification.id || notification.isRead) return;
 
     setActiveOptionsDropdown(null);
     
     try {
       await markNotificationAsRead(token, notification.id);
+      
+      // Update the notifications array
       setNotifications(prevNotifications =>
         prevNotifications.map(item =>
           item.id === notification.id
@@ -208,6 +225,11 @@ const NotificationsPage: React.FC = () => {
             : item
         )
       );
+      
+      // Decrement the unread count
+      setUnreadCount(prevCount => Math.max(0, prevCount - 1));
+      
+      // Also fetch the updated count from the server
       await updateUnreadCount();
     } catch (error) {
       console.error('Error marking notification as read:', error);
@@ -260,9 +282,18 @@ const NotificationsPage: React.FC = () => {
   };
 
   const formatNotificationTime = (createdAt: string): string => {
-    return format(new Date(createdAt), 'MMM d, yyyy h:mm a');
+    if (!createdAt) {
+      return 'Date not available';
+    }
+  
+    const date = new Date(createdAt);
+    if (isNaN(date.getTime())) {
+      return 'Invalid date';
+    }
+  
+    return format(date, 'MMM d, yyyy h:mm a');
   };
-
+  
   return (
     <div className={`${styles.container} ${isDarkMode ? styles.darkMode : ''}`}>
       <div className={styles.content}>
@@ -281,7 +312,7 @@ const NotificationsPage: React.FC = () => {
               className={`${styles.tabButton} ${activeTab === 'all' ? styles.activeTab : ''}`} 
               onClick={() => handleTabChange('all')}>
               All
-              {unreadCount > 0 && <span className={styles.tabNotificationBadge}>{unreadCount}</span>}
+              {unReadCount > 0 && <span className={styles.tabNotificationBadge}>{unReadCount}</span>}
             </button>
             
             <div className={styles.postsTabContainer}>
@@ -348,10 +379,11 @@ const NotificationsPage: React.FC = () => {
                     )}
                     <div className={styles.notificationImage}>
                       <img 
-                        src={notification.sender.profilePhoto || "/api/placeholder/50/50"} 
-                        alt={`${notification.sender.firstName} ${notification.sender.lastName}`} 
+                        src={notification.sender?.profilePhoto || "/api/placeholder/50/50"} 
+                        alt={`${notification.sender?.firstName || 'User'} ${notification.sender?.lastName || 'Name'}`} 
                       />
                     </div>
+
                     <div className={styles.notificationContent}>
                       <p>{notification.content}</p>
                       {notification.referenceId && (
