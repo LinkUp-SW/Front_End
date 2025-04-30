@@ -105,8 +105,8 @@ const Activity: React.FC = () => {
   const unfollow = () => {};
 
   return (
-    <section className="bg-white p-4 dark:bg-gray-900 rounded-lg shadow-md overflow-hidden">
-      <div className="w-full mx-auto">
+    <section className="bg-white p-4 dark:bg-gray-900 rounded-lg shadow-md overflow-hidden max-w-7xl w-full">
+      <div className="w-full mx-auto max-w-7xl">
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
@@ -185,46 +185,38 @@ const Activity: React.FC = () => {
           ) : filteredPosts.length > 0 ? (
             <div
               ref={scrollContainerRef}
-              className="flex gap-4 overflow-x-auto hide-scrollbar snap-x snap-mandatory"
+              className="flex gap-4 overflow-x-auto hide-scrollbar snap-x snap-mandatory max-w-[44rem]"
               style={{
                 scrollbarWidth: "none",
                 msOverflowStyle: "none",
               }}
             >
               {filteredPosts.map((post) => (
-                <div
+                <PostPreview
                   key={`post-${post._id}`}
-                  className="snap-start"
-                  style={{
-                    minWidth: "calc(50% - 8px)",
-                    maxWidth: "calc(50% - 8px)",
-                    flexBasis: "calc(50% - 8px)",
-                  }}
-                >
-                  <PostPreview
-                    post={post}
-                    menuActions={
-                      id === userId
-                        ? getPersonalMenuActions(
-                            handleSaveButton,
-                            handleEditPostButton,
-                            deleteModal,
-                            post._id,
-                            isSaved
-                          )
-                        : getMenuActions(
-                            handleSaveButton,
-                            blockPost,
-                            reportPost,
-                            unfollow,
-                            post._id,
-                            isSaved
-                          )
-                    }
-                    onMenuOpenChange={(isOpen) => setMenuOpen(post._id, isOpen)}
-                    showFooter={true}
-                  />
-                </div>
+                  post={post}
+                  className="w-full"
+                  menuActions={
+                    id === userId
+                      ? getPersonalMenuActions(
+                          handleSaveButton,
+                          handleEditPostButton,
+                          deleteModal,
+                          post._id,
+                          isSaved
+                        )
+                      : getMenuActions(
+                          handleSaveButton,
+                          blockPost,
+                          reportPost,
+                          unfollow,
+                          post._id,
+                          isSaved
+                        )
+                  }
+                  onMenuOpenChange={(isOpen) => setMenuOpen(post._id, isOpen)}
+                  showFooter={true}
+                />
               ))}
             </div>
           ) : (
