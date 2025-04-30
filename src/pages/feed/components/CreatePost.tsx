@@ -231,8 +231,8 @@ const CreatePost: React.FC<CreatePostProps> = ({ className }) => {
         // Prepare the post with comments-related fields
         const postWithComments = {
           ...post,
-          commentsCount: 0,
-          commentsData: {
+          comments_count: 0,
+          comments_data: {
             comments: [],
             count: 0,
             nextCursor: null,

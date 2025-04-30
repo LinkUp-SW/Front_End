@@ -69,18 +69,18 @@ const Comment: React.FC<CommentProps> = ({
   postId,
 }) => {
   const {
-    profilePicture,
+    profile_picture,
     username,
-    firstName,
-    lastName,
-    connectionDegree,
+    first_name,
+    last_name,
+    connection_degree,
     headline,
   } = comment.author;
   const dispatch = useDispatch();
 
   const stats = {
     comments: comment.children && comment.children.length,
-    total: comment.reactionsCount,
+    total: comment.reactions_count,
   };
 
   const { content, date, is_edited, media } = comment;
@@ -93,7 +93,7 @@ const Comment: React.FC<CommentProps> = ({
   const [reactionsOpen, setReactionsOpen] = useState(false); // for Popover open state
   const [viewMore, setViewMore] = useState(false); // if you want to toggle text next to icons
   const [topStats, setTopStats] = useState(
-    getReactionIcons(comment.topReactions || [])
+    getReactionIcons(comment.top_reactions || [])
   );
 
   const handleMouseEnter = () => {
@@ -118,10 +118,10 @@ const Comment: React.FC<CommentProps> = ({
     setIsLoading(false);
     console.log(isLoading, setViewMore, media);
 
-    if (comment.userReaction)
+    if (comment.user_reaction)
       setSelectedReaction(
-        comment.userReaction.charAt(0).toUpperCase() +
-          comment.userReaction.slice(1).toLowerCase()
+        comment.user_reaction.charAt(0).toUpperCase() +
+          comment.user_reaction.slice(1).toLowerCase()
       );
   }, [comment]);
 
@@ -172,14 +172,14 @@ const Comment: React.FC<CommentProps> = ({
       // Show loading indicator or toast if needed
       const result = await createReaction(reaction, postId, token);
       console.log("Adding reaction", result);
-      setTopStats(getReactionIcons(result.topReactions || []));
+      setTopStats(getReactionIcons(result.top_reactions || []));
       dispatch(
         updateCommentReaction({
           postId: postId,
           commentId: comment._id,
-          reactions: result.topReactions,
-          reactionsCount: result.totalCount,
-          userReaction: selected_reaction.toLowerCase(),
+          reactions: result.top_reactions,
+          reactions_count: result.totalCount,
+          user_reaction: selected_reaction.toLowerCase(),
         })
       );
 
@@ -204,15 +204,15 @@ const Comment: React.FC<CommentProps> = ({
         postId,
         token
       );
-      setTopStats(getReactionIcons(result.topReactions || []));
+      setTopStats(getReactionIcons(result.top_reactions || []));
 
       dispatch(
         updateCommentReaction({
           postId: postId,
           commentId: comment._id,
-          reactions: result.topReactions,
-          reactionsCount: result.totalCount,
-          userReaction: selected_reaction.toLowerCase(),
+          reactions: result.top_reactions,
+          reactions_count: result.totalCount,
+          user_reaction: selected_reaction.toLowerCase(),
         })
       );
 
@@ -242,14 +242,14 @@ const Comment: React.FC<CommentProps> = ({
       console.log("Deleted:", result);
 
       console.log("Comment:", comment);
-      if (comment.parentId) {
+      if (comment.parent_id) {
         console.log(
-          `Removing reply ${comment._id} from parent ${comment.parentId}`
+          `Removing reply ${comment._id} from parent ${comment.parent_id}`
         );
         dispatch(
           removeReply({
             postId,
-            commentId: comment.parentId, // Parent comment ID
+            commentId: comment.parent_id, // Parent comment ID
             replyId: comment._id, // This reply's ID
           })
         );
@@ -283,7 +283,7 @@ const Comment: React.FC<CommentProps> = ({
     <div className="flex flex-col px-0">
       <header className="flex items-center space-x-3 w-full">
         <img
-          src={profilePicture}
+          src={profile_picture}
           alt={username}
           className="w-8 h-8 rounded-full relative z-10"
         />
@@ -296,7 +296,7 @@ const Comment: React.FC<CommentProps> = ({
               className="flex gap-1 items-center"
             >
               <h2 className="text-xs font-semibold sm:text-sm hover:cursor-pointer hover:underline hover:text-blue-600 dark:hover:text-blue-400">
-                {firstName + " " + lastName}
+                {first_name + " " + last_name}
               </h2>
               <p className="text-lg text-gray-500 dark:text-neutral-400 font-bold">
                 {" "}
@@ -304,7 +304,7 @@ const Comment: React.FC<CommentProps> = ({
               </p>
               <p className="text-xs text-gray-500 dark:text-neutral-400">
                 {" "}
-                {connectionDegree}
+                {connection_degree}
               </p>
             </Link>
             <nav className={`flex relative left-5`}>
@@ -587,19 +587,19 @@ const Comment: React.FC<CommentProps> = ({
         >
           | Reply
         </Button>
-        {comment.childrenCount ? (
-          comment.childrenCount != 0 && (
+        {comment.children_count ? (
+          comment.children_count != 0 && (
             <>
               <p className="text-xs  text-gray-500 dark:text-neutral-400 font-bold">
                 {" "}
                 ·
               </p>
               <p className="hover:underlinetext-xs text-xs text-gray-500 line-clamp-1 text-ellipsis dark:text-neutral-400 hover:text-blue-600 hover:underline dark:hover:text-blue-400 hover:cursor-pointer">
-                {comment.childrenCount &&
-                comment.childrenCount != 0 &&
-                comment.childrenCount == 1
+                {comment.children_count &&
+                comment.children_count != 0 &&
+                comment.children_count == 1
                   ? "1 Reply"
-                  : `${comment.childrenCount} Replies`}
+                  : `${comment.children_count} Replies`}
               </p>
             </>
           )

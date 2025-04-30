@@ -92,7 +92,7 @@ export const getUserPosts = async (
     cursor: number;
     limit: number;
   }
-): Promise<{ posts: PostType[]; nextCursor: number | null }> => {
+): Promise<{ posts: PostType[]; next_cursor: number | null }> => {
   const response = await axiosInstance.get(
     `/api/v2/post/posts/user/${userId}`,
     {
@@ -106,9 +106,9 @@ export const getUserPosts = async (
   console.log("Returned:", {
     posts: response.data.posts.map((post: PostType) => ({
       ...post,
-      commentsData: {
+      comments_data: {
         comments: [], // Empty initially
-        count: post.commentsCount || 0,
+        count: post.comments_count || 0,
         nextCursor: 0,
         isLoading: false,
         hasInitiallyLoaded: false,
@@ -119,15 +119,15 @@ export const getUserPosts = async (
   return {
     posts: response.data.posts.map((post: PostType) => ({
       ...post,
-      commentsData: {
+      comments_data: {
         comments: [], // Empty initially
-        count: post.commentsCount || 0,
+        count: post.comments_count || 0,
         nextCursor: 0,
         isLoading: false,
         hasInitiallyLoaded: false,
       },
     })),
-    nextCursor: response.data.nextCursor,
+    next_cursor: response.data.next_cursor,
   };
 };
 

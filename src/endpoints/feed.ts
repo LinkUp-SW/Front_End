@@ -123,7 +123,7 @@ export const getPostsFeed = async (
     limit: number;
     replyLimit?: number | 3;
   }
-): Promise<{ posts: PostType[]; nextCursor: number | null }> => {
+): Promise<{ posts: PostType[]; next_cursor: number | null }> => {
   const response = await axiosInstance.get(`/api/v2/post/posts/feed`, {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -139,10 +139,10 @@ export const getPostsFeed = async (
 
   const transformedPosts = validPosts.map((post: PostType) => ({
     ...post,
-    commentsData: {
+    comments_data: {
       comments: [], // Empty initially
-      count: post.commentsCount || 0,
-      nextCursor: 0,
+      count: post.comments_count || 0,
+      next_cursor: 0,
       isLoading: false,
       hasInitiallyLoaded: false,
     },
@@ -150,12 +150,12 @@ export const getPostsFeed = async (
 
   console.log("Returned:", {
     posts: transformedPosts,
-    nextCursor: response.data.nextCursor,
+    next_cursor: response.data.next_cursor,
   });
 
   return {
     posts: transformedPosts,
-    nextCursor: response.data.nextCursor,
+    next_cursor: response.data.next_cursor,
   };
 };
 
@@ -177,26 +177,26 @@ export const fetchSinglePost = async (
 
     // Extract comments from the response
     const commentsArray = response.data.comments?.comments;
-    const commentsCount = response.data.comments?.count || 0;
-    const commentsCursor = response.data.comments?.nextCursor || null;
+    const comments_count = response.data.comments?.count || 0;
+    const commentsCursor = response.data.comments?.next_cursor || null;
 
     // Return post with embedded comments
     console.log("Here:", {
       ...response.data.post,
-      commentsData: {
+      comments_data: {
         comments: commentsArray, // Include comments from API response
-        count: commentsCount,
-        nextCursor: commentsCursor,
+        count: comments_count,
+        next_cursor: commentsCursor,
         isLoading: false,
         hasInitiallyLoaded: true, // Mark as initially loaded since we have comments
       },
     });
     return {
       ...response.data.post,
-      commentsData: {
+      comments_data: {
         comments: commentsArray, // Include comments from API response
-        count: commentsCount,
-        nextCursor: commentsCursor,
+        count: comments_count,
+        next_cursor: commentsCursor,
         isLoading: false,
         hasInitiallyLoaded: true, // Mark as initially loaded since we have comments
       },
@@ -230,7 +230,7 @@ export const loadPostComments = async (
 ): Promise<{
   comments: CommentType[];
   count: number;
-  nextCursor: number | null;
+  next_cursor: number | null;
 }> => {
   const response = await axiosInstance.get(`api/v2/post/comment/${postId}`, {
     headers: {
@@ -247,7 +247,7 @@ export const loadPostComments = async (
   return {
     comments: Object.values(response.data.comments),
     count: response.data.count,
-    nextCursor: response.data.nextCursor,
+    next_cursor: response.data.next_cursor,
   };
 };
 
