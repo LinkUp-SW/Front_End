@@ -3,13 +3,13 @@ import { createGetHandler } from "../handler_wrapper/getHandler";
 const MOCK_POSTS: PostType[] = [
   {
     author: {
-      firstName: "Abdelrahman",
-      lastName: "Doma",
+      first_name: "Abdelrahman",
+      last_name: "Doma",
       headline:
         "Student at German University in cairo Student at German University in cairo Student at German University in cairo",
-      profilePicture:
+      profile_picture:
         "https://gratisography.com/wp-content/uploads/2024/11/gratisography-augmented-reality-800x525.jpg",
-      connectionDegree: "Following",
+      connection_degree: "Following",
       username: "Abdelrahman-Doma32",
     },
 
@@ -33,13 +33,13 @@ In junior interviews, you assess potential, not just skills or experience. That�
 
 Always happy to know your thoughts on this 👇`,
     date: 0,
-    publicPost: true,
-    isEdited: true,
-    commentsDisabled: "Anyone",
+    public_post: true,
+    is_edited: true,
+    comments_disabled: "Anyone",
     reacts: [],
     user_id: "123",
     _id: "111",
-    taggedUsers: [],
+    tagged_users: [],
     comments: [],
     media: {
       media_type: "images",
@@ -62,17 +62,17 @@ Always happy to know your thoughts on this 👇`,
     },
 
     reactions: [],
-    reactionsCount: 0,
+    reactions_count: 0,
   },
   {
     author: {
-      firstName: "Abdelrahman",
-      lastName: "Doma",
+      first_name: "Abdelrahman",
+      last_name: "Doma",
       headline:
         "Student at German University in cairo Student at German University in cairo Student at German University in cairo",
-      profilePicture:
+      profile_picture:
         "https://gratisography.com/wp-content/uploads/2024/11/gratisography-augmented-reality-800x525.jpg",
-      connectionDegree: "Following",
+      connection_degree: "Following",
       username: "Abdelrahman-Doma32",
     },
 
@@ -96,13 +96,13 @@ In junior interviews, you assess potential, not just skills or experience. That�
 
 Always happy to know your thoughts on this 👇`,
     date: 0,
-    publicPost: true,
-    isEdited: true,
-    commentsDisabled: "Anyone",
+    public_post: true,
+    is_edited: true,
+    comments_disabled: "Anyone",
     reacts: [],
     user_id: "123",
     _id: "111",
-    taggedUsers: [],
+    tagged_users: [],
     comments: [],
     media: {
       media_type: "images",
@@ -125,17 +125,17 @@ Always happy to know your thoughts on this 👇`,
     },
 
     reactions: [],
-    reactionsCount: 0,
+    reactions_count: 0,
   },
   {
     author: {
-      firstName: "Abdelrahman",
-      lastName: "Doma",
+      first_name: "Abdelrahman",
+      last_name: "Doma",
       headline:
         "Student at German University in cairo Student at German University in cairo Student at German University in cairo",
-      profilePicture:
+      profile_picture:
         "https://gratisography.com/wp-content/uploads/2024/11/gratisography-augmented-reality-800x525.jpg",
-      connectionDegree: "Following",
+      connection_degree: "Following",
       username: "Abdelrahman-Doma32",
     },
 
@@ -159,13 +159,13 @@ In junior interviews, you assess potential, not just skills or experience. That�
 
 Always happy to know your thoughts on this 👇`,
     date: 0,
-    publicPost: true,
-    isEdited: true,
-    commentsDisabled: "Anyone",
+    public_post: true,
+    is_edited: true,
+    comments_disabled: "Anyone",
     reacts: [],
     user_id: "123",
     _id: "111",
-    taggedUsers: [],
+    tagged_users: [],
     comments: [],
     media: {
       media_type: "images",
@@ -188,7 +188,7 @@ Always happy to know your thoughts on this 👇`,
     },
 
     reactions: [],
-    reactionsCount: 0,
+    reactions_count: 0,
   },
 ];
 

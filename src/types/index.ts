@@ -176,7 +176,7 @@ export interface PostUserType {
   last_name: string;
   username: string;
   profile_picture: string;
-  connectionDegree: string;
+  connection_degree: string;
   headline: string;
 }
 
