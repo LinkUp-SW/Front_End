@@ -104,7 +104,7 @@ const Invitations = () => {
         )}
         <button
           id="showall-invitations-button"
-          className="text-blue-600 hover:underline cursor-pointer"
+          className="text-cyan-600 dark:text-blue-400 hover:underline cursor-pointer"
           onClick={() => navigate("/manage-invitations")}
         >
           Manage
@@ -161,7 +161,7 @@ const Invitations = () => {
               <button
                 id="accept-invitation-button"
                 onClick={() => acceptInvitations(invite.user_id)}
-                className="px-4 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 cursor-pointer"
+                className=" affirmativeBtn px-4 py-1 rounded-lg cursor-pointer"
               >
                 Accept
               </button>

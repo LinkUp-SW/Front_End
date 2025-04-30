@@ -236,3 +236,63 @@ export function isSkillResponse(obj: unknown): obj is SkillResponse {
   }
   return false;
 }
+
+type RelationKey = "licenses" | "educations" | "experiences";
+
+export function buildSkillNamesMap(
+  skills: Array<
+    { _id: string; name: string } & { [K in RelationKey]: { _id: string }[] }
+  >,
+  relation: RelationKey
+): Record<string, string[]> {
+  return skills.reduce<Record<string, string[]>>((map, skill) => {
+    for (const { _id } of skill[relation]) {
+      (map[_id] ??= []).push(skill.name);
+    }
+    return map;
+  }, {});
+}
+
+export const hasRichFormatting = (text: string): boolean => {
+  const richFormatRegex =
+    /(\*[^*]+\*)|(-[^-]+-)|(~[^~]+~)|(@[^:]+:[A-Za-z0-9_-]+\^)/;
+  return richFormatRegex.test(text);
+};
+
+export async function compressDataUrl(
+  dataUrl: string,
+  maxW = 800,
+  maxH = 800,
+  quality = 0.7
+): Promise<Blob> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      // calculate target size
+      let { width, height } = img;
+      if (width > maxW || height > maxH) {
+        if (width / height > maxW / maxH) {
+          height = Math.round(height * (maxW / width));
+          width = maxW;
+        } else {
+          width = Math.round(width * (maxH / height));
+          height = maxH;
+        }
+      }
+      // draw to canvas
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext("2d")!;
+      ctx.drawImage(img, 0, 0, width, height);
+      // export blob
+      canvas.toBlob(
+        (blob) => (blob ? resolve(blob) : reject("toBlob failed")),
+        "image/jpeg",
+        quality
+      );
+    };
+    img.onerror = () => reject("Image load error");
+    img.src = dataUrl;
+  });
+}

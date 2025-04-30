@@ -8,7 +8,7 @@ import {
   DialogTrigger,
   TruncatedText,
 } from "@/components";
-import { Link, useParams } from "react-router-dom";
+import {  useParams } from "react-router-dom";
 import AboutModal from "./modals/about_modal/AboutModal";
 import Header from "./modals/components/Header";
 import { IoDiamond } from "react-icons/io5";
@@ -25,7 +25,7 @@ const AboutSection = () => {
   const authToken = Cookies.get("linkup_auth_token");
   const { id } = useParams();
   const { data, loading, error } = useFetchData(() =>
-    authToken && id ? getUserAbout(authToken, id) : Promise.resolve(null)
+    authToken && id ? getUserAbout(authToken, id) : Promise.resolve(null),[authToken,id]
   );
   const [aboutData, setAboutData] = useState<About>({
     about: "",
@@ -62,7 +62,14 @@ const AboutSection = () => {
   if (!data || (!data.is_me && !data.about.about)) return null;
 
   if (data.is_me && !aboutData.about)
-    return <EmptyAboutSection setAboutData={setAboutData} setIsOpenModal={setIsOpenModal} isOpenModal={isOpenModal} isOwner={data.is_me} />;
+    return (
+      <EmptyAboutSection
+        setAboutData={setAboutData}
+        setIsOpenModal={setIsOpenModal}
+        isOpenModal={isOpenModal}
+        isOwner={data.is_me}
+      />
+    );
 
   return (
     <section
@@ -110,7 +117,7 @@ const AboutSection = () => {
                 job experiences.
               </DialogDescription>
               <AboutModal
-              setIsOpenModal={setIsOpenModal}
+                setIsOpenModal={setIsOpenModal}
                 setAboutData={setAboutData}
                 fetchedSkills={aboutData.skills}
                 description={aboutData.about}
@@ -121,8 +128,8 @@ const AboutSection = () => {
       </header>
       <TruncatedText id="about-section-paragraph" content={aboutData.about} />
       {aboutData.skills.length !== 0 && (
-        <Link
-          to={"#skills-section"}
+        <a
+          href={"#skills-section"}
           className="group min-h-5 border relative flex flex-col rounded-md p-2 transition-colors duration-200
     hover:bg-gray-100 hover:text-gray-700  
     dark:hover:bg-gray-300 dark:hover:text-gray-800  
@@ -154,18 +161,23 @@ const AboutSection = () => {
               className="text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-800"
             />
           </button>
-        </Link>
+        </a>
       )}
     </section>
   );
 };
 
 // Accept a prop to determine if the current user is the profile owner.
-const EmptyAboutSection = ({ isOwner = false, isOpenModal, setIsOpenModal,setAboutData}:{
-  isOwner:boolean,
-  isOpenModal:boolean,
-  setIsOpenModal:(isOpenModal:boolean)=>void,
-  setAboutData:(aboutData:About)=>void
+const EmptyAboutSection = ({
+  isOwner = false,
+  isOpenModal,
+  setIsOpenModal,
+  setAboutData,
+}: {
+  isOwner: boolean;
+  isOpenModal: boolean;
+  setIsOpenModal: (isOpenModal: boolean) => void;
+  setAboutData: (aboutData: About) => void;
 }) => {
   return (
     <section
@@ -190,7 +202,10 @@ const EmptyAboutSection = ({ isOwner = false, isOpenModal, setIsOpenModal,setAbo
             <DialogHeader>
               <Header title="Add About" />
             </DialogHeader>
-            <AddAboutModal  setAboutData={setAboutData} setIsOpenModal={setIsOpenModal}/>
+            <AddAboutModal
+              setAboutData={setAboutData}
+              setIsOpenModal={setIsOpenModal}
+            />
           </DialogContent>
         </Dialog>
       ) : null}

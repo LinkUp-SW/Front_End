@@ -1,7 +1,11 @@
 import Cookies from "js-cookie";
 import { useParams } from "react-router-dom";
 import useFetchData from "@/hooks/useFetchData";
-import { deleteUserSkills, getUserSkills } from "@/endpoints/userProfile";
+import {
+  deleteUserSkills,
+  getUserBio,
+  getUserSkills,
+} from "@/endpoints/userProfile";
 import { Skill } from "@/types";
 import { ResourcesSection, ViewedSection } from "../components";
 import { Fragment, useEffect, useState } from "react";
@@ -36,7 +40,9 @@ import {
   updateSkill as updateGlobalSkill,
   removeSkill as removeGlobalSkill,
 } from "@/slices/skills/skillsSlice";
-
+import { updateLicense as updateGlobalLicense } from "@/slices/license/licensesSlice";
+import { updateExperience as updateGlobalExperience } from "@/slices/experience/experiencesSlice";
+import { updateEducation as updateGlobalEducation } from "@/slices/education/educationsSlice";
 interface FetchDataResult {
   skills: Skill[];
   is_me: boolean;
@@ -52,6 +58,9 @@ const UserSkillsPage = () => {
   );
 
   const dispatch = useDispatch<AppDispatch>();
+  const licenses = useSelector((state: RootState) => state.license.items);
+  const experiences = useSelector((state: RootState) => state.experience.items);
+  const educations = useSelector((state: RootState) => state.education.items);
   const skills = useSelector((state: RootState) => state.skill.items);
   const isMe = data?.is_me ?? false;
   const isEmpty = skills.length === 0;
@@ -71,16 +80,51 @@ const UserSkillsPage = () => {
 
   const handleEditSkill = (updatedSkill: Skill) => {
     dispatch(updateGlobalSkill(updatedSkill));
+
     setEditOpen(false);
     setSkillToEdit(null);
   };
 
+  // Handler for deleting
   const handleConfirmDelete = async () => {
     if (!selectedSkill) return;
     startSubmitting();
     try {
-      const response = await deleteUserSkills(authToken as string, selectedSkill);
-      dispatch(removeGlobalSkill(selectedSkill));
+      const response = await deleteUserSkills(
+        authToken as string,
+        selectedSkill._id as string
+      );
+      dispatch(removeGlobalSkill(selectedSkill._id as string));
+      educations.forEach((education) => {
+        dispatch(
+          updateGlobalEducation({
+            ...education,
+            skills: education.skills.filter(
+              (skill) => skill !== selectedSkill.name
+            ),
+          })
+        );
+      });
+      experiences.forEach((experience) => {
+        dispatch(
+          updateGlobalExperience({
+            ...experience,
+            skills: experience.skills.filter(
+              (skill) => skill !== selectedSkill.name
+            ),
+          })
+        );
+      });
+      licenses.forEach((license) => {
+        dispatch(
+          updateGlobalLicense({
+            ...license,
+            skills: license.skills.filter(
+              (skill) => skill !== selectedSkill.name
+            ),
+          })
+        );
+      });
       setDeleteDialogOpen(false);
       toast.success(response.message);
     } catch (err) {
@@ -90,16 +134,104 @@ const UserSkillsPage = () => {
     }
   };
 
+  const skillNamesByLicenseId = skills.reduce<Record<string, string[]>>(
+    (map, skill) => {
+      skill.licenses.forEach((lic) => {
+        if (!map[lic._id]) {
+          map[lic._id] = [];
+        }
+        map[lic._id].push(skill.name);
+      });
+      return map;
+    },
+    {}
+  );
+  const skillNamesByEducationId = skills.reduce<Record<string, string[]>>(
+    (map, skill) => {
+      skill.educations.forEach((edu) => {
+        if (!map[edu._id]) {
+          map[edu._id] = [];
+        }
+        map[edu._id].push(skill.name);
+      });
+      return map;
+    },
+    {}
+  );
+
+  const skillNamesByExperienceId = skills.reduce<Record<string, string[]>>(
+    (map, skill) => {
+      skill.experiences.forEach((exp) => {
+        if (!map[exp._id]) {
+          map[exp._id] = [];
+        }
+        map[exp._id].push(skill.name);
+      });
+      return map;
+    },
+    {}
+  );
+
+  useEffect(() => {
+    licenses.forEach((license) => {
+      const skillNames = license._id
+        ? skillNamesByLicenseId[license._id] || []
+        : [];
+      dispatch(
+        updateGlobalLicense({
+          ...license,
+          skills: skillNames,
+        })
+      );
+    });
+    experiences.forEach((experience) => {
+      const skillNames = experience._id
+        ? skillNamesByExperienceId[experience._id] || []
+        : [];
+      dispatch(
+        updateGlobalExperience({
+          ...experience,
+          skills: skillNames,
+        })
+      );
+    });
+    educations.forEach((education) => {
+      const skillNames = education._id
+        ? skillNamesByEducationId[education._id] || []
+        : [];
+      dispatch(
+        updateGlobalEducation({
+          ...education,
+          skills: skillNames,
+        })
+      );
+    });
+  }, [skills]);
+
   // Local UI state
-  const [selectedSkill, setSelectedSkill] = useState<string | null>(null);
+  const [selectedSkill, setSelectedSkill] = useState<Skill | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [skillToEdit, setSkillToEdit] = useState<Skill | null>(null);
   const [editOpen, setEditOpen] = useState(false);
+  const [isUserInConnection, setIsUserInConnection] = useState<
+    boolean | undefined
+  >(undefined);
+
+  useEffect(() => {
+    getUserBio(authToken as string, id as string)
+      .then((data) => setIsUserInConnection(data.isInConnections))
+      .catch(() => toast.error("couldnt retrieve the connection state"));
+  }, [id]);
 
   if (error) {
     return (
-      <section id="skills-section" className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow">
-        <p className="text-red-500">Failed to load skills. Please try again later.</p>
+      <section
+        id="skills-section"
+        className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow"
+      >
+        <p className="text-red-500">
+          Failed to load skills. Please try again later.
+        </p>
       </section>
     );
   }
@@ -138,6 +270,8 @@ const UserSkillsPage = () => {
                       setSelectedSkill={setSelectedSkill}
                       idx={idx}
                       isMe={isMe}
+                      isInConnections={isUserInConnection}
+                      userID={id}
                     />
                   </Fragment>
                 ))
@@ -177,7 +311,10 @@ const UserSkillsPage = () => {
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <DialogContent aria-describedby={undefined} className="max-w-[425px] dark:bg-gray-900">
+        <DialogContent
+          aria-describedby={undefined}
+          className="max-w-[425px] dark:bg-gray-900"
+        >
           <DialogHeader>
             <DialogTitle className="text-lg flex items-center gap-2">
               <MdDeleteForever className="text-pink-500" />
@@ -219,7 +356,10 @@ const EmptySkills: React.FC<{
     <div className="grid gap-2 dark:text-gray-100">
       <div className="opacity-65 flex gap-2 items-center">
         <div className="p-3 rounded-xl border-2 dark:border-gray-600">
-          <FaRegLightbulb size={20} className="text-gray-600 dark:text-gray-300" />
+          <FaRegLightbulb
+            size={20}
+            className="text-gray-600 dark:text-gray-300"
+          />
         </div>
         {isMe ? (
           <div className="flex flex-col justify-center">

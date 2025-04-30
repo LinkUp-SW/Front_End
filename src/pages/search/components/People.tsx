@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { FaPaperPlane } from "react-icons/fa";
+import { IoPersonAdd } from "react-icons/io5";
 import {
   Person,
   connectWithUser,
@@ -38,7 +40,7 @@ const People: React.FC<{
       );
     } catch (error) {
       console.error("Connection failed", error);
-      toast.error(getErrorMessage(error) || "Failed to sent connection");
+      toast.error(getErrorMessage(error) || "Failed to send connection");
     } finally {
       setConnectingUserIds((prev) => prev.filter((id) => id !== userId));
     }
@@ -125,43 +127,49 @@ const People: React.FC<{
                   </p>
                 </div>
               </div>
-              {person.connection_degree === "1st" ? (
-                <button
-                  id="message-button"
-                  className="px-4 py-2 border rounded-full text-blue-600 border-blue-600 hover:bg-blue-100 dark:hover:bg-gray-700"
-                >
-                  Message
-                </button>
-              ) : person.is_in_received_connections ? (
-                <button
-                  id="accept-invitation-button"
-                  onClick={() => handleAccept(person.user_id)}
-                  disabled={acceptingUserIds.includes(person.user_id)}
-                  className="px-4 py-2 border rounded-fullc hover:bg-green-100 dark:hover:bg-gray-700 disabled:opacity-50"
-                >
-                  {acceptingUserIds.includes(person.user_id)
-                    ? "Accepting..."
-                    : "Accept"}
-                </button>
-              ) : person.is_in_sent_connections ? (
-                <button
-                  id="pending-button"
-                  className="px-4 py-2 border rounded-full text-gray-400 border-gray-400 cursor-not-allowed"
-                >
-                  Pending
-                </button>
-              ) : (
-                <button
-                  id="connect-button"
-                  onClick={() => handleConnect(person.user_id)}
-                  disabled={connectingUserIds.includes(person.user_id)}
-                  className="px-4 py-2 border rounded-full text-gray-600 border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50"
-                >
-                  {connectingUserIds.includes(person.user_id)
-                    ? "Connecting..."
-                    : "Connect"}
-                </button>
-              )}
+              <div className="flex-shrink-0">
+                {person.connection_degree === "1st" ? (
+                  <button
+                    id="message-button"
+                    className="w-full sm:w-auto px-4 py-2 border rounded-full text-blue-600 border-blue-600 hover:bg-blue-100 dark:hover:bg-gray-700 flex items-center justify-center gap-2"
+                  >
+                    <FaPaperPlane />
+                    Message
+                  </button>
+                ) : person.is_in_received_connections ? (
+                  <button
+                    id="accept-invitation-button"
+                    onClick={() => handleAccept(person.user_id)}
+                    disabled={acceptingUserIds.includes(person.user_id)}
+                    className="w-full sm:w-auto px-4 py-2 border rounded-full text-green-600 border-green-600 hover:bg-green-100 dark:hover:bg-gray-700 disabled:opacity-50"
+                    style={{ minWidth: "118px" }}
+                  >
+                    {acceptingUserIds.includes(person.user_id)
+                      ? "Accepting..."
+                      : "Accept"}
+                  </button>
+                ) : person.is_in_sent_connections ? (
+                  <button
+                    id="pending-button"
+                    className="w-full sm:w-auto px-4 py-2 border rounded-full text-gray-400 border-gray-400 cursor-not-allowed flex items-center justify-center"
+                    style={{ minWidth: "118px" }}
+                  >
+                    Pending
+                  </button>
+                ) : (
+                  <button
+                    id="connect-button"
+                    onClick={() => handleConnect(person.user_id)}
+                    disabled={connectingUserIds.includes(person.user_id)}
+                    className="w-full sm:w-auto px-4 py-2 border rounded-full text-blue-600 border-blue-600 hover:bg-blue-100 dark:hover:bg-gray-700 disabled:opacity-50 flex items-center justify-center gap-2"
+                  >
+                    <IoPersonAdd />
+                    {connectingUserIds.includes(person.user_id)
+                      ? "Connecting..."
+                      : "Connect"}
+                  </button>
+                )}
+              </div>
             </div>
           ))}
         </div>
