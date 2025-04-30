@@ -81,7 +81,18 @@ const PostFooter: React.FC<PostFooterProps> = ({
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+
     if (file) {
+      const maxFileSizeInMB = 10;
+      const maxFileSize = maxFileSizeInMB * 1048576; // 10 MB
+
+      if (file.size > maxFileSize) {
+        toast.error(
+          `File "${file.name}" exceeds the maximum size of ${maxFileSizeInMB} MB.`
+        );
+        return false;
+      }
+
       setSelectedImage(file);
       console.log("Uploaded:", file);
     }

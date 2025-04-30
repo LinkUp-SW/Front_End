@@ -149,6 +149,17 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    const maxFileSizeInMB = 10;
+    const maxFileSize = maxFileSizeInMB * 1048576; // 10 MB
+
+    if (file) {
+      if (file.size > maxFileSize) {
+        toast.error(
+          `File "${file.name}" exceeds the maximum size of ${maxFileSizeInMB} MB.`
+        );
+        return false;
+      }
+    }
     if (file) {
       setSelectedImage(file);
     }
