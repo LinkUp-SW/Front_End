@@ -66,6 +66,12 @@ interface CompanyAPIResult {
   logo?: string;
 }
 
+// Define validation errors interface
+interface ValidationErrors {
+  title: boolean;
+  location: boolean;
+  salary: boolean;
+}
 
 const JobForm: React.FC = () => {
   const { companyId } = useParams<{ companyId: string }>();
@@ -76,6 +82,13 @@ const JobForm: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isFreeJob, setIsFreeJob] = useState<boolean>(!companyId);
   
+  // Form validation state
+  const [validationErrors, setValidationErrors] = useState<ValidationErrors>({
+    title: false,
+    location: false,
+    salary: false,
+  });
+
   // Company search state
   const [companySearchQuery, setCompanySearchQuery] = useState('');
   const [companySearchResults, setCompanySearchResults] = useState<CompanySearchResult[]>([]);
@@ -229,6 +242,11 @@ const JobForm: React.FC = () => {
     const { name, value } = e.target;
     setJobData(prev => ({ ...prev, [name]: value }));
     
+    // Clear validation error when user edits a field
+    if (name in validationErrors) {
+      setValidationErrors(prev => ({ ...prev, [name]: false }));
+    }
+    
     // If company name is being changed, show search results
     if (name === 'company' && isFreeJob) {
       setCompanySearchQuery(value);
@@ -262,8 +280,29 @@ const JobForm: React.FC = () => {
     setJobData(prev => ({ ...prev, [field]: items }));
   };
 
+  // Validation function
+  const validateFirstStep = (): boolean => {
+    const errors: ValidationErrors = {
+      title: !jobData.title.trim(),
+      location: !jobData.location.trim(),
+      salary: !jobData.salary.trim(),
+    };
+    
+    setValidationErrors(errors);
+    
+    return !Object.values(errors).some(hasError => hasError);
+  };
+
   // Navigation handlers
   const handleNext = () => {
+    if (currentStep === 1) {
+      // Validate first step fields before proceeding
+      if (!validateFirstStep()) {
+        toast.error('Please fill in all required fields before proceeding');
+        return;
+      }
+    }
+    
     if (currentStep < totalSteps) {
       setCurrentStep(prev => prev + 1);
     } else {
@@ -280,6 +319,13 @@ const JobForm: React.FC = () => {
   // Form submission
   const handleSubmit = async () => {
     try {
+      // Final validation before submission
+      if (!validateFirstStep()) {
+        toast.error('Please fill in all required fields before submitting');
+        setCurrentStep(1); // Go back to first step if validation fails
+        return;
+      }
+      
       setIsLoading(true);
       
       // Check if company is selected
@@ -393,6 +439,7 @@ const JobForm: React.FC = () => {
             companySearchResults={companySearchResults}
             companySearchQuery={companySearchQuery}
             handleSelectCompany={handleSelectCompany}
+            validationErrors={validationErrors}
           />
         )}
         {currentStep === 2 && (

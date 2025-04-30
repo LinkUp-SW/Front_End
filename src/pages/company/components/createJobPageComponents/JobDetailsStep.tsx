@@ -1,6 +1,12 @@
 import React from 'react';
 import { JobFormData, WorkMode, CompanySearchResult } from './JobForm';
 
+interface ValidationErrors {
+  title?: boolean;
+  location?: boolean;
+  salary?: boolean;
+}
+
 interface JobDetailsStepProps {
   jobData: JobFormData;
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
@@ -11,6 +17,7 @@ interface JobDetailsStepProps {
   companySearchResults: CompanySearchResult[];
   companySearchQuery: string;
   handleSelectCompany: (company: CompanySearchResult) => void;
+  validationErrors: ValidationErrors;
 }
 
 const JobDetailsStep: React.FC<JobDetailsStepProps> = ({
@@ -22,27 +29,40 @@ const JobDetailsStep: React.FC<JobDetailsStepProps> = ({
   isSearching,
   companySearchResults,
   companySearchQuery,
-  handleSelectCompany
+  handleSelectCompany,
+  validationErrors
 }) => {
   return (
     <>
       <div className="text-sm text-gray-500 dark:text-gray-400 mb-2">* Indicates required</div>
       
       <div className="mb-6">
-        <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">Job details*</h2>
+        <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">Job details</h2>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Job title*</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Job title*
+              {validationErrors.title && (
+                <span className="text-red-500 ml-1">Required</span>
+              )}
+            </label>
             <input
               type="text"
               name="title"
               value={jobData.title}
               onChange={handleInputChange}
               placeholder="Frontend Developer"
-              className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+              className={`w-full border ${
+                validationErrors.title 
+                  ? 'border-red-500 dark:border-red-500' 
+                  : 'border-gray-300 dark:border-gray-600'
+              } rounded px-3 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100`}
               required
             />
+            {validationErrors.title && (
+              <p className="mt-1 text-sm text-red-500">Please enter a job title</p>
+            )}
           </div>
           
           <div className="relative">
@@ -117,16 +137,28 @@ const JobDetailsStep: React.FC<JobDetailsStepProps> = ({
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mt-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Job location*</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Job location*
+              {validationErrors.location && (
+                <span className="text-red-500 ml-1">Required</span>
+              )}
+            </label>
             <input
               type="text"
               name="location"
               value={jobData.location}
               onChange={handleInputChange}
               placeholder="Cairo, Egypt"
-              className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+              className={`w-full border ${
+                validationErrors.location 
+                  ? 'border-red-500 dark:border-red-500' 
+                  : 'border-gray-300 dark:border-gray-600'
+              } rounded px-3 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100`}
               required
             />
+            {validationErrors.location && (
+              <p className="mt-1 text-sm text-red-500">Please enter a job location</p>
+            )}
           </div>
           
           <div>
@@ -150,42 +182,33 @@ const JobDetailsStep: React.FC<JobDetailsStepProps> = ({
         </div>
 
         <div className="mt-4">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Salary range*</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            Salary range*
+            {validationErrors.salary && (
+              <span className="text-red-500 ml-1">Required</span>
+            )}
+          </label>
           <input
             type="text"
             name="salary"
             value={jobData.salary}
             onChange={handleInputChange}
             placeholder="50000"
-            className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+            className={`w-full border ${
+              validationErrors.salary 
+                ? 'border-red-500 dark:border-red-500' 
+                : 'border-gray-300 dark:border-gray-600'
+            } rounded px-3 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100`}
             required
           />
-        </div>
-
-        <div className="mt-4 flex items-center">
-          <input
-            type="checkbox"
-            name="hasEasyApply"
-            id="hasEasyApply"
-            checked={jobData.hasEasyApply}
-            onChange={(e) => handleInputChange({
-              ...e,
-              target: {
-                ...e.target,
-                name: 'hasEasyApply',
-                value: e.target.checked.toString()
-              }
-            } as React.ChangeEvent<HTMLInputElement>)}
-            className="h-4 w-4 text-blue-600 dark:text-blue-500 border-gray-300 dark:border-gray-600 rounded"
-          />
-          <label htmlFor="hasEasyApply" className="ml-2 text-sm text-gray-700 dark:text-gray-300">
-            Enable easy apply
-          </label>
+          {validationErrors.salary && (
+            <p className="mt-1 text-sm text-red-500">Please enter a salary range</p>
+          )}
         </div>
       </div>
 
       <div className="mb-6">
-        <label className="block text-lg font-semibold mb-3 sm:mb-4 text-gray-900 dark:text-gray-100">Description*</label>
+        <label className="block text-lg font-semibold mb-3 sm:mb-4 text-gray-900 dark:text-gray-100">Description</label>
         <div className="border border-gray-300 dark:border-gray-600 rounded p-2 mb-2 bg-white dark:bg-gray-800">
           <textarea
             name="description"

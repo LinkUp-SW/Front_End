@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Job } from "../../types";
+import JobApplicationDialog from './JobApplicationDialog';
 
 interface JobContentProps {
   job: Job;
@@ -8,6 +9,7 @@ interface JobContentProps {
 const JobContent: React.FC<JobContentProps> = ({ job }) => {
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [activeSection, setActiveSection] = useState<'responsibilities' | 'qualifications' | 'benefits'>('responsibilities');
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   
   const descriptionText = job.description || "";
   
@@ -119,11 +121,17 @@ const JobContent: React.FC<JobContentProps> = ({ job }) => {
         
         <div className="mt-8 mb-6">
           <button 
-            id="btn-apply-now"
-            className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg"
+            onClick={() => setIsDialogOpen(true)}
+            className="py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg w-full"
           >
             Apply Now
           </button>
+          
+          <JobApplicationDialog 
+            open={isDialogOpen}
+            onOpenChange={setIsDialogOpen}
+            job={job}
+          />
         </div>
       </div>
     </>

@@ -69,6 +69,33 @@ interface JobSearchResponse {
   nextCursor: string;
 }
 
+// New interface for user information in job application
+export interface UserInfo {
+  bio: {
+    contact_info: {
+      phone_number: number;
+      country_code: string;
+    };
+    first_name: string;
+    last_name: string;
+    headline: string;
+  };
+  _id: string;
+  profile_photo: string;
+  resume: string;
+  email?: string;
+}
+
+// New interface for job application payload
+export interface JobApplicationData {
+  phone_number: number;
+  country_code: string;
+  first_name: string;
+  last_name: string;
+  profile_photo: string;
+  resume: string;
+}
+
 // Token helper function
 const getAuthToken = () => {
   const token = Cookies.get('linkup_auth_token');
@@ -77,7 +104,6 @@ const getAuthToken = () => {
   }
   return token;
 };
-
 
 // Helper function to add auth header
 const getAuthHeader = (token: string) => ({
@@ -111,8 +137,6 @@ export const fetchSingleJob = async (token: string, jobId: string): Promise<{ da
   return response.data;
 };
 
-
-
 // Saved jobs functions
 export const fetchSavedJobs = async (): Promise<JobData[]> => {
   const token = getAuthToken();
@@ -132,6 +156,25 @@ export const removeFromSaved = async (jobId: string): Promise<{ message: string 
   const token = getAuthToken();
   const url = `/api/v1/jobs/unsave-jobs/${jobId}`;
   const response = await axiosInstance.delete(url, getAuthHeader(token));
+  return response.data;
+};
+
+// New job application related functions
+export const fetchUserJobApplicationInfo = async (): Promise<UserInfo> => {
+  const token = getAuthToken();
+  const response = await axiosInstance.get('/api/v1/job-application/apply-for-job', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.data.data;
+};
+
+export const submitJobApplication = async (jobId: string, applicationData: JobApplicationData): Promise<{ message: string }> => {
+  const token = getAuthToken();
+  const response = await axiosInstance.post(
+    `/api/v1/job-application/create-job-application/${jobId}`, 
+    applicationData,
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
   return response.data;
 };
 
@@ -172,13 +215,11 @@ export const convertJobDataToJob = (jobData: JobData): Job => {
   };
 };
 
-
 export const getSearchJobs = async (
-  
-  query:string,
-  cursor:string | null,
-  limit:number |null
-): Promise<JobSearchResponse > => {
+  query: string,
+  cursor: string | null,
+  limit: number | null
+): Promise<JobSearchResponse> => {
   const response = await axiosInstance.get(
     "/api/v1/jobs/search-jobs",
     {
@@ -189,4 +230,4 @@ export const getSearchJobs = async (
     }
   );
   return response.data;
-}
+};
