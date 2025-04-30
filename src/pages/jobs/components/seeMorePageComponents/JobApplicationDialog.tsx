@@ -17,6 +17,16 @@ interface JobApplicationDialogProps {
   job?: Job;
 }
 
+// Define an API error interface to replace 'any'
+interface ApiError {
+  response?: {
+    data?: {
+      message?: string;
+    };
+  };
+  message: string;
+}
+
 const JobApplicationDialog: React.FC<JobApplicationDialogProps> = ({ 
   open, 
   onOpenChange,
@@ -130,12 +140,15 @@ const JobApplicationDialog: React.FC<JobApplicationDialogProps> = ({
         navigate('/jobs');
       }, 1500);
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       setIsSubmitting(false);
       console.error('Failed to submit job application:', error);
       
+      // Type guard to safely handle the error object
+      const apiError = error as ApiError;
+      
       // Display error message from API response if available
-      const errorMessage = error.response?.data?.message || 'Failed to submit your application';
+      const errorMessage = apiError.response?.data?.message || apiError.message || 'Failed to submit your application';
       toast.error(errorMessage);
     }
   };
