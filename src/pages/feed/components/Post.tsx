@@ -72,6 +72,7 @@ import PostSkeleton from "./PostSkeleton";
 import CommentSkeleton from "./CommentSkeleton";
 import { usePostModal } from "@/hooks/usePostModal";
 import { RootState } from "@/store";
+import { FaCommentSlash } from "react-icons/fa";
 
 interface PostProps {
   postData: PostType;
@@ -143,7 +144,19 @@ const Post: React.FC<PostProps> = ({
 
   useEffect(() => {
     console.log("New POst:", postData);
-  }, [postData]);
+    const commentButton = document.getElementById("engagement-Comment");
+
+    if (commentButton && postData.comments_disabled === "No one") {
+      // Add disabled attribute and styles
+      commentButton.setAttribute("disabled", "true");
+      commentButton.classList.add(
+        "opacity-50",
+        "cursor-not-allowed",
+        "hover:cursor-not-allowed"
+      );
+      commentButton.classList.remove("hover:cursor-pointer");
+    }
+  }, [postData.comments_disabled]);
 
   useEffect(() => {
     if (postData.user_reaction)
@@ -768,6 +781,7 @@ const Post: React.FC<PostProps> = ({
                 index: number
               ) => {
                 const key = `engagement-${button.name}-${index}`;
+
                 return (
                   <React.Fragment key={key}>
                     {button.name === "Like" ? (
@@ -969,9 +983,10 @@ const Post: React.FC<PostProps> = ({
       </CardContent>
 
       <CardFooter className="flex flex-col w-full">
-        {commentsOpen && (
+        {commentsOpen && postData.comments_disabled !== "No one" && (
           <>
             {/* Always show PostFooter with comment input */}
+
             <PostFooter
               postId={postData._id}
               addNewComment={addNewComment}
@@ -983,6 +998,8 @@ const Post: React.FC<PostProps> = ({
                   : [],
               }}
               loadMoreComments={handleLoadComments}
+              comment_privacy={postData.comments_disabled}
+              connection_degree={postData.author.connection_degree}
             />
 
             {/* Show skeletons below the existing content when loading more */}
@@ -992,6 +1009,14 @@ const Post: React.FC<PostProps> = ({
               </div>
             )}
           </>
+        )}
+        {postData.comments_disabled === "No one" && (
+          <div className="flex gap-4 w-full items-center">
+            <FaCommentSlash />
+            <div className="text-left w-full dark:text-neutral-200 ">
+              The author has disabled commenting on this post.
+            </div>
+          </div>
         )}
       </CardFooter>
     </Card>

@@ -26,6 +26,7 @@ import {
 import { toast } from "sonner";
 import BlueButton from "./buttons/BlueButton";
 import { extractTaggedUsers } from "./modals/CreatePostModal";
+import { FaCommentSlash } from "react-icons/fa";
 
 // Updated interface to match the structure shown in the screenshot
 interface PostFooterProps {
@@ -38,6 +39,8 @@ interface PostFooterProps {
   };
   addNewComment: (newComment: CommentDBType) => Promise<void>;
   postId: string;
+  comment_privacy: string;
+  connection_degree: string;
   loadMoreComments?: () => Promise<void>;
 }
 
@@ -46,6 +49,8 @@ const PostFooter: React.FC<PostFooterProps> = ({
   addNewComment,
   postId,
   loadMoreComments,
+  comment_privacy,
+  connection_degree,
 }) => {
   // Create a ref for the horizontally scrollable container
   const [commentInput, setCommentInput] = useState("");
@@ -205,6 +210,15 @@ const PostFooter: React.FC<PostFooterProps> = ({
         <CarouselPrevious className="dark:bg-gray-900 dark:text-neutral-400 absolute -left-5" />
         <CarouselNext className="dark:bg-gray-900 dark:text-neutral-400 absolute -right-8" />
       </Carousel>
+      {comment_privacy === "Connections only" &&
+        connection_degree !== "1st" && (
+          <div className="flex gap-4 w-full items-center">
+            <FaCommentSlash />
+            <div className="text-left w-full dark:text-neutral-200 ">
+              The author only allows his connections to comment on this post.
+            </div>
+          </div>
+        )}
 
       <div className="flex w-full items-center justify-between h-full">
         <div className="flex space-x-3 justify-start items-center w-full h-full">
@@ -228,6 +242,10 @@ const PostFooter: React.FC<PostFooterProps> = ({
                 id="comment-input"
                 placeholder="Add a comment..."
                 value={commentInput}
+                disabled={
+                  comment_privacy === "Connections only" &&
+                  connection_degree !== "1st"
+                }
                 autoFocus
                 onFocus={() => {
                   inputRef.current?.scrollIntoView({
@@ -302,6 +320,10 @@ const PostFooter: React.FC<PostFooterProps> = ({
                   <PopoverTrigger asChild>
                     <Button
                       variant="ghost"
+                      disabled={
+                        comment_privacy === "Connections only" &&
+                        connection_degree !== "1st"
+                      }
                       className="hover:cursor-pointer rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 dark:hover:text-neutral-200"
                     >
                       <MdOutlineEmojiEmotions />
@@ -330,6 +352,10 @@ const PostFooter: React.FC<PostFooterProps> = ({
                 <Button
                   variant="ghost"
                   onClick={() => fileInputRef.current?.click()}
+                  disabled={
+                    comment_privacy === "Connections only" &&
+                    connection_degree !== "1st"
+                  }
                   className="hover:cursor-pointer rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 dark:hover:text-neutral-200"
                 >
                   <MediaIcon />
@@ -350,7 +376,11 @@ const PostFooter: React.FC<PostFooterProps> = ({
                     null
                   )
                 }
-                disabled={commentInput.trim().length === 0 && !selectedImage}
+                disabled={
+                  (commentInput.trim().length === 0 && !selectedImage) ||
+                  (comment_privacy === "Connections only" &&
+                    connection_degree !== "1st")
+                }
               >
                 Comment
               </BlueButton>
