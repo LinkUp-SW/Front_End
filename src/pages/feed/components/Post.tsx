@@ -386,7 +386,7 @@ const Post: React.FC<PostProps> = ({
           postId: postData._id,
           updatedPost: {
             reactions: result.top_reactions,
-            reactions_count: result.total_count,
+            reactions_count: result.reactions_count,
             user_reaction: selected_reaction.toLowerCase(),
           },
         })
@@ -418,7 +418,7 @@ const Post: React.FC<PostProps> = ({
           postId: postData._id,
           updatedPost: {
             reactions: result.top_reactions,
-            reactions_count: result.total_count,
+            reactions_count: result.reactions_count,
             user_reaction: null,
           },
         })

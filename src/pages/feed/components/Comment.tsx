@@ -178,7 +178,7 @@ const Comment: React.FC<CommentProps> = ({
           postId: postId,
           commentId: comment._id,
           reactions: result.top_reactions,
-          reactions_count: result.totalCount,
+          reactions_count: result.reactions_count,
           user_reaction: selected_reaction.toLowerCase(),
         })
       );
@@ -402,13 +402,15 @@ const Comment: React.FC<CommentProps> = ({
           </div>
         </div>
       </header>
-      <div className="p-1 pl-11 text-xs md:text-sm whitespace-pre-wrap">
-        <TruncatedText
-          content={content}
-          lineCount={3}
-          id={`comment-${comment._id}`}
-          className="  ml-0 relative -left-5"
-        />
+      <div className="flex flex-col">
+        <div className="p-1 pl-11 text-xs md:text-sm whitespace-pre-wrap">
+          <TruncatedText
+            content={content}
+            lineCount={3}
+            id={`comment-${comment._id}`}
+            className="  ml-0 relative -left-5"
+          />
+        </div>
       </div>
       <footer className="flex pl-10 justify-start items-center gap-0.5 ">
         {/* <div className="flex justify-start w-full items-center pt-4 gap-0"> */}
@@ -545,7 +547,7 @@ const Comment: React.FC<CommentProps> = ({
           </TooltipProvider>
         </Popover>
 
-        {stats.total != 0 && (
+        {stats.total && stats.total != 0 && (
           <>
             {" "}
             <p className="text-xs text-gray-500 dark:text-neutral-400 font-bold">
