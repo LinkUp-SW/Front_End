@@ -37,7 +37,7 @@ const PostPreview: React.FC<PostPreviewProps> = ({
 
   return (
     <div
-      className={`border-t dark:border-t-gray-600 shrink-0 p-4 ${
+      className={`border-t dark:border-t-gray-600 w-[20rem] p-4 ${
         compact ? "" : "mb-4"
       } h-[320px]`}
       style={{
@@ -45,7 +45,7 @@ const PostPreview: React.FC<PostPreviewProps> = ({
         flexDirection: "column",
       }}
     >
-      <div className="flex flex-col gap-3 h-full">
+      <div className="flex flex-col gap-3 w-[20rem] h-full">
         {showHeader && (
           <div className="relative -left-7">
             <PostHeader
@@ -111,13 +111,10 @@ const PostPreview: React.FC<PostPreviewProps> = ({
               </>
             )}
 
-            <div className="flex flex-col">
-              <TruncatedText
-                id={`post-content-${post._id}`}
-                content={post.content}
-                lineCount={3}
-                hideLinks={true}
-              />
+            <div className="flex flex-col w-[20rem]">
+              <div className="line-clamp-3 break-words text-wrap w-[20rem]">
+                {post.content}
+              </div>
 
               {post.media.media_type === "pdf" && (
                 <DocumentPreview

@@ -362,17 +362,17 @@ const TruncatedText: React.FC<TruncatedTextProps> = ({
   };
 
   return (
-    <div className={`pl-4 ${className || ""}`}>
+    <div className={`pl-4 w-full ${className || ""}`}>
       {/* Hidden element for measurement (off-screen) */}
       <p
         ref={textRef}
         id={id}
-        className="text-sm whitespace-pre-wrap break-words invisible absolute -z-10"
+        className="text-sm whitespace-pre-wrap break-words invisible w-1/2 absolute -z-10"
       >
         {content}
       </p>
 
-      <p className="text-sm whitespace-pre-wrap break-all">
+      <p className="text-sm whitespace-pre-wrap break-all w-full">
         {expanded || !isTruncated
           ? formatText(content)
           : formatText(truncatedText)}

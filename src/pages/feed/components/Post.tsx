@@ -620,11 +620,13 @@ const Post: React.FC<PostProps> = ({
           publicPost={postData.publicPost}
           date={date}
         />
-        <TruncatedText
-          id="post-content"
-          content={postData.content}
-          lineCount={3}
-        />
+        {postData.content && (
+          <TruncatedText
+            id="post-content"
+            content={postData.content}
+            lineCount={3}
+          />
+        )}
 
         {/* Post Image(s) */}
         {((media && media.media_type === "image") ||
