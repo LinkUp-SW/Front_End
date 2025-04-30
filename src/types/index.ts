@@ -18,14 +18,14 @@ export interface NotificationSender {
   id: string;
   firstName: string;
   lastName: string;
-  profilePhoto: string | null;
+  profilePhoto: string;
 }
 export interface Notification {
   id: string;
   sender: NotificationSender;
   createdAt: string;
   content: string;
-  referenceId: string | null;
+  referenceId: string;
   type: string;
   isRead: boolean;
 }
