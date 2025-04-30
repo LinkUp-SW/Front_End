@@ -8,8 +8,9 @@ export interface SocketIncomingMessage {
     media?: string[];
     timestamp: string;
     is_seen: boolean;
+    messageId: string;
   };
-  messageId: string;
+  
 }
 export interface incomingTypingIndicator {
   conversationId: string;
@@ -121,9 +122,9 @@ class SocketService {
       console.log('Unread messages count:', data);
     });
 
-    this.socket.on('unread_conversations', (data) => {
-      console.log('Unread conversations:', data);
-    });
+    // this.socket.on('unread_conversations', (data) => {
+    //   console.log('Unread conversations:', data);
+    // });
 
     // Read receipts
     this.socket.on('messages_read', (data) => {
@@ -185,10 +186,10 @@ class SocketService {
   }
 
   // Mark conversation as read
-  markAsRead(conversationId: string): void {
-    if (!this.socket?.connected) return;
-    this.socket.emit("mark_as_read", { conversationId });
-  }
+  // markAsRead(conversationId: string): void {
+  //   if (!this.socket?.connected) return;
+  //   this.socket.emit("mark_as_read", { conversationId });
+  // }
 
   // Set online status
   setOnlineStatus(isOnline: boolean): void {
