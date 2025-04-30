@@ -1,34 +1,6 @@
 import axiosInstance from "@/services/axiosInstance";
+import { Notification, NotificationResponse } from "@/types";
 
-export interface NotificationSender {
-  id: string;
-  firstName: string;
-  lastName: string;
-  profilePhoto: string;
-}
-
-export interface Notification {
-  id: string;
-  sender: NotificationSender;
-  createdAt: string;
-  content: string;
-  referenceId: string;
-  type: string;
-  isRead: boolean;
-}
-
-export interface NotificationResponse {
-  notifications: Notification[];
-  pagination: {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-    hasNextPage: boolean;
-    hasPreviousPage: boolean;
-  };
-  unReadCount: number;
-}
 
 export const getNotifications = async (
   token: string,
