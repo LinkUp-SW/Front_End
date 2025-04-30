@@ -93,6 +93,7 @@ const NotificationsPage: React.FC = () => {
     (state: RootState) => state.theme.theme === "dark"
   );
   const token = Cookies.get("linkup_auth_token");
+  const userId=Cookies.get('linkup_user_id')
 
   const fetchNotifications = async () => {
     if (!token) {
@@ -320,7 +321,7 @@ const NotificationsPage: React.FC = () => {
     return format(date, "MMM d, yyyy h:mm a");
   };
 
-  const handleNavigation = (type: Notification["type"]) => {
+  const handleNavigation = (type: Notification["type"],refId:string) => {
     if (type === "connection_request") {
       return navigate(`/my-network`);
     }
@@ -329,6 +330,12 @@ const NotificationsPage: React.FC = () => {
     }
     if (type === "message") {
       return navigate("/messaging");
+    }
+    if(type==='comment'||type==='reacted'){
+      return navigate(`/feed/posts/${refId}`)
+    }
+    if(type==='connection_accepted'){
+      return navigate(`/connections/${userId}`)
     }
   };
 
@@ -476,7 +483,7 @@ const NotificationsPage: React.FC = () => {
                           className={styles.actionButton}
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleNavigation(notification.type);
+                            handleNavigation(notification.type,notification.referenceId);
                           }}
                         >
                           View {notification.type}
