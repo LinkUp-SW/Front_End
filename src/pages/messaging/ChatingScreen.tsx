@@ -77,33 +77,10 @@ const ChatingScreen = () => {
 
   const [deletedMessageIds, setDeletedMessageIds] = useState<string[]>([]);
 
-  const [isTyping, setIsTyping] =
-    useState<boolean>(false); /*related to typing indicator (sockets) */
-  const [readByUserId, setReadByUserId] = useState<string | null>(
-    null
-  ); /*related to read messages (sockets) */
+  const [isTyping, setIsTyping] =useState<boolean>(false); /*related to typing indicator (sockets) */
+
   const [lastOwnMessageId, setLastOwnMessageId] = useState<string | null>(null);
 
-  const findLastMessageFromCurrentUser = (messages: MessageChat[]) => {
-    // Start from the end and find the first message from the current user
-    for (let i = messages.length - 1; i >= 0; i--) {
-      if (messages[i].isOwnMessage) {
-        return messages[i].messageId;
-      }
-    }
-    return null;
-  };
-
-  // Add this state variable (only once)
-
-  // Add this useEffect to update the lastOwnMessageId whenever messages change
-  useEffect(() => {
-    if (dataChat && dataChat.messages) {
-      const id = findLastMessageFromCurrentUser(dataChat.messages);
-      setLastOwnMessageId(id);
-    }
-  }, [dataChat]);
-  // Add this useEffect to update the lastOwnMessageId whenever messages change
 
   useEffect(() => {
     const fetchChatting = async () => {
@@ -156,70 +133,47 @@ const ChatingScreen = () => {
     };
   }, [selectedConvID, id]);
 
+  useEffect(() => {
+    if (!selectedConvID) return;
+  
+    const interval = setInterval(() => {
+      socketService.markAsRead(selectedConvID);
+    }, 3000); // every 3 seconds (adjust as needed)
+  
+    return () => {
+      clearInterval(interval); // cleanup on unmount or selectedConvID change
+    };
+  }, [selectedConvID]);
   
 
-  // Update the socket listener for message_read to properly handle read receipts
   useEffect(() => {
-    const unsubscribeRead = socketService.on<incomingMessageRead>(
+    const unsubscribe = socketService.on<incomingMessageRead>(
       "messages_read",
-      (data) => {
-        if (data.conversationId === selectedConvID && data.readBy !== id) {
-          // Store the ID of the user who read the message
-          setReadByUserId(data.readBy);
-
-          // Update all messages to be seen
+      (incoming) => {
+        if (
+          incoming.conversationId === selectedConvID &&
+          incoming.readBy !== id 
+        ) {
           dispatch(
             setChatData({
-              ...dataChat,
-              messages:
-                dataChat?.messages?.map((msg) => ({
-                  ...msg,
-                  isSeen: true,
-                })) || [],
+              ...dataChat!,
+              messages: dataChat!.messages.map((msg) =>
+                msg.senderId === id ? { ...msg, isSeen: true } : msg
+              ),
             })
           );
         }
       }
     );
-
+  
     return () => {
-      unsubscribeRead();
+      unsubscribe();
     };
-  }, [selectedConvID, id]);
-  // Replace your existing useEffect for marking messages as read with this improved version
-  useEffect(() => {
-    // Only run if we have data and a selected conversation
-    if (!dataChat || !selectedConvID || !dataChat.messages || !token) return;
+  }, [selectedConvID, id, dataChat]);
+  
 
-    // Check if there are unread messages from the other user
-    const hasUnreadMessages = dataChat.messages.some(
-      (msg) => !msg.isSeen && !msg.isOwnMessage
-    );
 
-    // If there are unread messages, mark them as read
-    if (hasUnreadMessages) {
-      // Call the API endpoint
-      markMessagesAsSeen(token, selectedConvID)
-        .then(() => {
-          // Send read status to socket
-          // socketService.markAsRead(selectedConvID);
 
-          // Update local state
-          dispatch(
-            setChatData({
-              ...dataChat,
-              messages: dataChat.messages.map((msg) => ({
-                ...msg,
-                isSeen: msg.isOwnMessage ? msg.isSeen : true,
-              })),
-            })
-          );
-        })
-        .catch((err) => {
-          console.error("Failed to mark messages as seen:", err);
-        });
-    }
-  }, [dataChat, selectedConvID, token]);
 
   useEffect(() => {
     const unsubscribe = socketService.on<SocketIncomingMessage>(
@@ -344,10 +298,10 @@ const ChatingScreen = () => {
                 id="userStatuse"
                 className="text-xs text-gray-500 flex items-center gap-1"
               >
-                {friendOnlineStatus[dataChat.otherUser.userId] && (
+                {dataChat.otherUser.onlineStatus && (
                   <span className="inline-block w-2 h-2 bg-[#01754f] rounded-full"></span>
                 )}
-                {friendOnlineStatus[dataChat.otherUser.userId] ? "Online" : "Offline"}
+                {dataChat.otherUser.onlineStatus ? "Online" : "Offline"}
               </p>
             </div>
           )}
@@ -509,7 +463,7 @@ const ChatingScreen = () => {
                   {/* Seen indicator */}
                   {msg.isOwnMessage &&
                     msg.isSeen &&
-                    msg.messageId === lastOwnMessageId && (
+                     (
                       <div className="pl-14 mt-1 flex items-center gap-2">
                         <div className="w-5 h-5 rounded-full overflow-hidden border border-gray-300">
                           <img
