@@ -94,7 +94,7 @@ export const getUserPosts = async (
   }
 ): Promise<{ posts: PostType[]; nextCursor: number | null }> => {
   const response = await axiosInstance.get(
-    `/api/v1/post/posts/user/${userId}`,
+    `/api/v2/post/posts/user/${userId}`,
     {
       headers: {
         Authorization: `Bearer ${token}`,
