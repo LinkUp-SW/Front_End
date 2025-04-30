@@ -186,10 +186,10 @@ class SocketService {
   }
 
   // Mark conversation as read
-  // markAsRead(conversationId: string): void {
-  //   if (!this.socket?.connected) return;
-  //   this.socket.emit("mark_as_read", { conversationId });
-  // }
+  markAsRead(conversationId: string): void {
+    if (!this.socket?.connected) return;
+    this.socket.emit("mark_as_read", { conversationId });
+  }
 
   // Set online status
   setOnlineStatus(isOnline: boolean): void {
