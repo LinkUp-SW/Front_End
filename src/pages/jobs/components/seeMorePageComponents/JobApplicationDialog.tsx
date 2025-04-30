@@ -119,6 +119,7 @@ const JobApplicationDialog: React.FC<JobApplicationDialogProps> = ({
       const applicationData: JobApplicationData = {
         phone_number: parseInt(phoneNumber),
         country_code: countryCode,
+        email:email,
         first_name: firstName,
         last_name: lastName,
         profile_photo: profilePhoto,
@@ -343,6 +344,18 @@ const JobApplicationDialog: React.FC<JobApplicationDialogProps> = ({
                         type="tel"
                         value={phoneNumber}
                         onChange={(e) => setPhoneNumber(e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-gray-400 dark:focus:ring-gray-500 dark:bg-gray-800 dark:text-white"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Email*
+                      </label>
+                      <input
+                        type="tel"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
                         className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-gray-400 dark:focus:ring-gray-500 dark:bg-gray-800 dark:text-white"
                         required
                       />

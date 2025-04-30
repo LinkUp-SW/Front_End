@@ -239,3 +239,44 @@ export const unfollowOrganization = async (organizationId: string): Promise<{ su
   const response = await axiosInstance.delete(url, getAuthHeader(token));
   return response.data;
 };
+
+export interface JobApplicant {
+  _id: string;
+  job_id: string;
+  user_id: {
+    _id: string;
+    bio: {
+      first_name: string;
+      last_name: string;
+      headline: string;
+      contact_info?: {
+        phone_number: number;
+        country_code: string;
+      };
+    };
+    profile_photo?: string;
+  };
+  first_name: string;
+  last_name: string;
+  phone_number: number;
+  country_code: string;
+  email: string;
+  resume: string;
+  application_status: 'Pending' | 'Viewed' | 'Accepted' | 'Rejected';
+}
+
+export const getJobApplicants = async (jobId: string): Promise<{ data: JobApplicant[] }> => {
+  const token = getAuthToken();
+  const url = `/api/v1/job-application/get-job-applications/${jobId}`;
+  
+  const response = await axiosInstance.get(url, getAuthHeader(token));
+  return response.data;
+};
+
+export const updateApplicationStatus = async (applicantId: string, status: JobApplicant['application_status']): Promise<{ success: boolean; message: string }> => {
+  const token = getAuthToken();
+  const url = `/api/v1/job-application/update-job-application-status/${applicantId}`;
+  
+  const response = await axiosInstance.put(url, { status }, getAuthHeader(token));
+  return response.data;
+};

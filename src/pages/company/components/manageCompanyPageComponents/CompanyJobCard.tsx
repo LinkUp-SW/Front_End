@@ -13,10 +13,10 @@ export interface Job {
 
 interface JobCardProps {
   job: Job;
-  onEdit: (jobId: string) => void;
+  onViewApplicants: (jobId: string) => void;
 }
 
-export const JobCard: React.FC<JobCardProps> = ({ job, onEdit }) => {
+export const JobCard: React.FC<JobCardProps> = ({ job, onViewApplicants }) => {
   return (
     <div 
       id={`job-card-${job._id}`} 
@@ -27,8 +27,8 @@ export const JobCard: React.FC<JobCardProps> = ({ job, onEdit }) => {
         <span 
           id={`job-status-${job._id}`}
           className={`px-2 py-1 text-xs rounded-full inline-block w-fit ${
-            job.job_status === 'Open' ? 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300' : 
-            job.job_status === 'Closed' ? 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300' :
+            job.job_status.toLowerCase() === 'open' ? 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300' : 
+            job.job_status.toLowerCase() === 'closed' ? 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300' :
             'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300'
           }`}
         >
@@ -49,14 +49,17 @@ export const JobCard: React.FC<JobCardProps> = ({ job, onEdit }) => {
       </p>
       
       <div id={`job-card-footer-${job._id}`} className="border-t border-gray-100 dark:border-gray-700 pt-3 flex flex-col sm:flex-row sm:justify-between gap-2">
-        <span id={`job-applicants-count-${job._id}`} className="text-sm dark:text-gray-400">
+        <button
+          id={`job-applicants-btn-${job._id}`}
+          onClick={() => onViewApplicants(job._id)}
+          className="text-sm text-blue-600 dark:text-blue-400 hover:underline text-left"
+        >
           {job.applied_applications?.length || 0} applicants
-        </span>
+        </button>
         <div className="flex space-x-2">
           <button 
             id={`job-edit-btn-${job._id}`}
             className="text-red-600 dark:text-red-400 text-sm hover:underline"
-            onClick={() => onEdit(job._id)}
           >
             Close
           </button>

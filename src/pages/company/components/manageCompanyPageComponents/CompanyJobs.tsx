@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { getJobsFromCompany } from '@/endpoints/company';
 import { JobCard, Job } from './CompanyJobCard'; 
+import JobApplicantsComponent from './JobApplicantsComponent';
 
 interface CompanyJobsComponentProps {
   companyId?: string;
@@ -40,7 +41,6 @@ function sanitizeJob(apiJob: ApiJob): Job {
   };
 }
 
-
 const CompanyJobsComponent: React.FC<CompanyJobsComponentProps> = ({ companyId }) => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<JobStatus>('open');
@@ -49,6 +49,8 @@ const CompanyJobsComponent: React.FC<CompanyJobsComponentProps> = ({ companyId }
     open: [],
     closed: []
   });
+  const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
+  const [showApplicants, setShowApplicants] = useState(false);
 
   useEffect(() => {
     const fetchJobs = async () => {
@@ -94,9 +96,15 @@ const CompanyJobsComponent: React.FC<CompanyJobsComponentProps> = ({ companyId }
     navigate(`/company-manage/${companyId}/jobs/create`);
   };
 
-  const handleEditJob = (jobId: string) => {
-    if (!companyId) return;
-    navigate(`/company-manage/${companyId}/jobs/edit/${jobId}`);
+
+  const handleViewApplicants = (jobId: string) => {
+    setSelectedJobId(jobId);
+    setShowApplicants(true);
+  };
+
+  const handleBackToJobs = () => {
+    setShowApplicants(false);
+    setSelectedJobId(null);
   };
 
   const tabNames = {
@@ -148,6 +156,16 @@ const CompanyJobsComponent: React.FC<CompanyJobsComponentProps> = ({ companyId }
     );
   }
 
+  // Show job applicants component when a job is selected
+  if (showApplicants && selectedJobId) {
+    return (
+      <JobApplicantsComponent 
+        jobId={selectedJobId}
+        onBack={handleBackToJobs}
+      />
+    );
+  }
+
   return (
     <div className="bg-white dark:bg-gray-900 rounded-lg shadow dark:shadow-gray-800 w-full max-w-4xl mx-auto">
       <div className="p-4 sm:p-6">
@@ -191,7 +209,7 @@ const CompanyJobsComponent: React.FC<CompanyJobsComponentProps> = ({ companyId }
               <JobCard 
                 key={job._id} 
                 job={job} 
-                onEdit={handleEditJob}
+                onViewApplicants={handleViewApplicants}
               />
             ))}
           </div>

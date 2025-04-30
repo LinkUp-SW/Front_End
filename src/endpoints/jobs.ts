@@ -83,13 +83,14 @@ export interface UserInfo {
   _id: string;
   profile_photo: string;
   resume: string;
-  email?: string;
+  email: string;
 }
 
 // New interface for job application payload
 export interface JobApplicationData {
   phone_number: number;
   country_code: string;
+  email: string;
   first_name: string;
   last_name: string;
   profile_photo: string;
@@ -230,4 +231,32 @@ export const getSearchJobs = async (
     }
   );
   return response.data;
+};
+
+export interface AppliedJobsResponse {
+  message: string;
+  count: number;
+  data: AppliedJobData[];
+}
+
+export interface AppliedJobData extends JobData {
+  application_status: 'Pending' | 'Viewed' | 'Accepted' | 'Rejected';
+  application_id: string;
+}
+
+// Add this new function to fetch applied jobs
+export const fetchAppliedJobs = async (): Promise<AppliedJobData[]> => {
+  const token = getAuthToken();
+  const url = '/api/v1/job-application/get-applied-jobs';
+  const response = await axiosInstance.get(url, getAuthHeader(token));
+  return response.data.data || [];
+};
+
+// Helper to convert AppliedJobData to Job interface with application status
+export const convertAppliedJobDataToJob = (jobData: AppliedJobData): Job & { application_status: string, application_id: string } => {
+  return {
+    ...convertJobDataToJob(jobData),
+    application_status: jobData.application_status,
+    application_id: jobData.application_id
+  };
 };
