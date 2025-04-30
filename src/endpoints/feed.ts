@@ -124,7 +124,7 @@ export const getPostsFeed = async (
     replyLimit?: number | 3;
   }
 ): Promise<{ posts: PostType[]; nextCursor: number | null }> => {
-  const response = await axiosInstance.get(`/api/v1/post/posts/feed`, {
+  const response = await axiosInstance.get(`/api/v2/post/posts/feed`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -164,7 +164,7 @@ export const fetchSinglePost = async (
   token: string
 ): Promise<PostType> => {
   try {
-    const response = await axiosInstance.get(`api/v1/post/posts/${postId}`, {
+    const response = await axiosInstance.get(`api/v2/post/posts/${postId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -232,7 +232,7 @@ export const loadPostComments = async (
   count: number;
   nextCursor: number | null;
 }> => {
-  const response = await axiosInstance.get(`api/v1/post/comment/${postId}`, {
+  const response = await axiosInstance.get(`api/v2/post/comment/${postId}`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -296,7 +296,7 @@ export const getPostReactions = async (): Promise<string[]> => {
 };
 
 export const deletePost = async (postId: string, token: string) => {
-  const response = await axiosInstance.delete(`api/v1/post/posts/${postId}`, {
+  const response = await axiosInstance.delete(`api/v2/post/posts/${postId}`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -309,7 +309,7 @@ export const deleteComment = async (
   token: string
 ) => {
   const response = await axiosInstance.delete(
-    `api/v1/post/comment/${postPayload.post_id}/${postPayload.comment_id}`,
+    `api/v2/post/comment/${postPayload.post_id}/${postPayload.comment_id}`,
     {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -329,7 +329,7 @@ export const editComment = async (
   },
   token: string
 ) => {
-  const response = await axiosInstance.patch(`api/v1/post/comment`, {
+  const response = await axiosInstance.patch(`api/v2/post/comment`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -339,7 +339,7 @@ export const editComment = async (
 };
 
 export const createPost = async (postPayload: PostDBObject, token: string) => {
-  const response = await axiosInstance.post("api/v1/post/posts", postPayload, {
+  const response = await axiosInstance.post("api/v2/post/posts", postPayload, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -348,7 +348,7 @@ export const createPost = async (postPayload: PostDBObject, token: string) => {
 };
 
 export const editPost = async (postPayload: PostDBObject, token: string) => {
-  const response = await axiosInstance.patch("api/v1/post/posts", postPayload, {
+  const response = await axiosInstance.patch("api/v2/post/posts", postPayload, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -361,7 +361,7 @@ export const createComment = async (
   token: string
 ) => {
   const response = await axiosInstance.post(
-    `api/v1/post/comment/${postPayload.post_id}`,
+    `api/v2/post/comment/${postPayload.post_id}`,
     postPayload,
     {
       headers: {
@@ -385,7 +385,7 @@ export const getReactions = async (
   postId: string,
   token: string
 ) => {
-  const response = await axiosInstance.get(`api/v1/post/reaction/${postId}`, {
+  const response = await axiosInstance.get(`api/v2/post/reaction/${postId}`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -409,8 +409,8 @@ export const deleteReaction = async (
 ) => {
   const response = await axiosInstance.delete(
     !commentId
-      ? `api/v1/post/reaction/${postId}/`
-      : `api/v1/post/reaction/${postId}/${commentId}`,
+      ? `api/v2/post/reaction/${postId}/`
+      : `api/v2/post/reaction/${postId}/${commentId}`,
     {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -431,7 +431,7 @@ export const getCommentsForPost = async (
   postId: string,
   token: string
 ) => {
-  const response = await axiosInstance.get(`api/v1/post/comment/${postId}`, {
+  const response = await axiosInstance.get(`api/v2/post/comment/${postId}`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -456,7 +456,7 @@ export const getReplies = async (
   token: string
 ) => {
   const response = await axiosInstance.get(
-    `api/v1/post/comment/${postId}/${commentId}`,
+    `api/v2/post/comment/${postId}/${commentId}`,
     {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -478,7 +478,7 @@ export const createReaction = async (
   token: string
 ) => {
   const response = await axiosInstance.post(
-    `api/v1/post/reaction/${postId}`,
+    `api/v2/post/reaction/${postId}`,
     postPayload,
     {
       headers: {
@@ -492,7 +492,7 @@ export const createReaction = async (
 
 export const savePost = async (postId: string, token: string) => {
   const response = await axiosInstance.post(
-    `api/v1/post/save-post`,
+    `api/v2/post/save-post`,
     { postId: postId },
     {
       headers: {
@@ -505,7 +505,7 @@ export const savePost = async (postId: string, token: string) => {
 };
 
 export const unsavePost = async (postId: string, token: string) => {
-  const response = await axiosInstance.delete(`api/v1/post/save-post`, {
+  const response = await axiosInstance.delete(`api/v2/post/save-post`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -522,7 +522,7 @@ export const getSavedPosts = async (
   },
   token: string
 ) => {
-  const response = await axiosInstance.get(`api/v1/post/save-post`, {
+  const response = await axiosInstance.get(`api/v2/post/save-post`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
