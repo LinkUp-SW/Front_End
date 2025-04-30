@@ -55,10 +55,10 @@ export const JobCard: React.FC<JobCardProps> = ({ job, onEdit }) => {
         <div className="flex space-x-2">
           <button 
             id={`job-edit-btn-${job._id}`}
-            className="text-blue-600 dark:text-blue-400 text-sm hover:underline"
+            className="text-red-600 dark:text-red-400 text-sm hover:underline"
             onClick={() => onEdit(job._id)}
           >
-            Edit
+            Close
           </button>
         </div>
       </div>

@@ -507,7 +507,7 @@ const JobApplicationDialog: React.FC<JobApplicationDialogProps> = ({
                     Back
                   </button>
                 ) : (
-                  <div></div> // Empty div to maintain layout when no back button
+                  <div></div> 
                 )}
                 
                 {currentStep === 'preview' ? (

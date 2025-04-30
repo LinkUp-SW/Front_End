@@ -3,19 +3,16 @@ import { FaPlus } from 'react-icons/fa';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { getJobsFromCompany } from '@/endpoints/company';
-import { JobCard, Job } from './CompanyJobCard'; // Import Job type from CompanyJobCard
+import { JobCard, Job } from './CompanyJobCard'; 
 
 interface CompanyJobsComponentProps {
   companyId?: string;
 }
 
-type JobStatus = 'open' | 'draft' | 'inReview' | 'paused' | 'closed';
+type JobStatus = 'open' | 'closed';
 
 interface JobsState {
   open: Job[];
-  draft: Job[];
-  inReview: Job[];
-  paused: Job[];
   closed: Job[];
 }
 
@@ -26,15 +23,15 @@ interface ApiJob {
   location: string;
   workplace_type: string;
   experience_level: string;
-  posted_time?: string; // optional
-  applied_applications?: Array<unknown>; // optional
+  posted_time?: string; 
+  applied_applications?: Array<unknown>; 
 }
 
 function sanitizeJob(apiJob: ApiJob): Job {
   return {
     _id: apiJob._id || '',
     job_title: apiJob.job_title || 'Untitled Job',
-    job_status: apiJob.job_status || 'draft',
+    job_status: apiJob.job_status || 'open',
     location: apiJob.location || 'Unknown location',
     workplace_type: apiJob.workplace_type || 'Unknown',
     experience_level: apiJob.experience_level || 'Not specified',
@@ -50,9 +47,6 @@ const CompanyJobsComponent: React.FC<CompanyJobsComponentProps> = ({ companyId }
   const [isLoading, setIsLoading] = useState(false);
   const [jobs, setJobs] = useState<JobsState>({
     open: [],
-    draft: [],
-    inReview: [],
-    paused: [],
     closed: []
   });
 
@@ -66,9 +60,6 @@ const CompanyJobsComponent: React.FC<CompanyJobsComponentProps> = ({ companyId }
         
         const categorizedJobs: JobsState = {
           open: [],
-          draft: [],
-          inReview: [],
-          paused: [],
           closed: []
         };
         
@@ -78,12 +69,6 @@ const CompanyJobsComponent: React.FC<CompanyJobsComponentProps> = ({ companyId }
           const status = processedJob.job_status?.toLowerCase();
           if (status === 'open') {
             categorizedJobs.open.push(processedJob);
-          } else if (status === 'draft') {
-            categorizedJobs.draft.push(processedJob);
-          } else if (status === 'in review') {
-            categorizedJobs.inReview.push(processedJob);
-          } else if (status === 'paused') {
-            categorizedJobs.paused.push(processedJob);
           } else if (status === 'closed') {
             categorizedJobs.closed.push(processedJob);
           }
@@ -116,26 +101,17 @@ const CompanyJobsComponent: React.FC<CompanyJobsComponentProps> = ({ companyId }
 
   const tabNames = {
     open: 'Open',
-    draft: 'Draft',
-    inReview: 'In review',
-    paused: 'Paused',
     closed: 'Closed'
   };
 
   const renderEmptyState = () => {
     const messages = {
       open: "You haven't posted any jobs yet",
-      draft: "You don't have draft jobs yet",
-      inReview: "You don't have jobs in review yet",
-      paused: "You don't have paused jobs yet",
       closed: "You don't have closed jobs yet"
     };
 
     const descriptions = {
       open: "Post a job in minutes and reach qualified candidates you can't find anywhere else.",
-      draft: "Jobs that are in drafts will appear here.",
-      inReview: "Jobs that are in review will appear here.",
-      paused: "Jobs that are paused will appear here.",
       closed: "Jobs that are closed will appear here."
     };
 
@@ -193,7 +169,7 @@ const CompanyJobsComponent: React.FC<CompanyJobsComponentProps> = ({ companyId }
       
       <div className="border-t border-gray-200 dark:border-gray-700 overflow-x-auto">
         <div className="flex whitespace-nowrap min-w-full">
-          {(['open', 'draft', 'inReview', 'paused', 'closed'] as JobStatus[]).map((tab) => (
+          {(['open', 'closed'] as JobStatus[]).map((tab) => (
             <button 
               key={tab}
               id={`job-tab-${tab}`}
