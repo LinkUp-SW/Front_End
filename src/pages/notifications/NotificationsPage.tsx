@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import Cookies from 'js-cookie';
 import styles from './notifications.module.css';
 import { ProfileCard, WithNavBar, LinkUpFooter, WhosHiringImage } from '@/components';
 import { RootState } from '@/store';
