@@ -17,7 +17,7 @@ import {
   setEditingMessageId,
   setEditText,
   setChatData,
-  setOnlineStatus,
+  setFriendOnlineStatus,
 } from "../../slices/messaging/messagingSlice";
 import { toast } from "sonner";
 import { socketService } from "@/services/socket";
@@ -63,13 +63,13 @@ const ChatingScreen = () => {
   const isCurrentConversationStarred =
     starredConversations.includes(selectedConvID);
 
-  const msg = useSelector((state: RootState) => state.messaging.message);
+  const addMsg = useSelector((state: RootState) => state.messaging.message);
   const dataChat = useSelector((state: RootState) => state.messaging.chatData);
   const editedMessageIds = useSelector(
     (state: RootState) => state.messaging.setEditedMessageIds
   );
-  const onlineStatus = useSelector(
-    (state: RootState) => state.messaging.onlineStatus
+  const friendOnlineStatus = useSelector(
+    (state: RootState) => state.messaging.onlineFriends
   );
 
   /*const messages = conversation ? conversation.user1_sent_messages : [];*/
@@ -156,30 +156,7 @@ const ChatingScreen = () => {
     };
   }, [selectedConvID, id]);
 
-  useEffect(() => {
-    const unsubscribeOnline = socketService.on<{ userId: string }>(
-      "user_online",
-      ({ userId }) => {
-        if (userId === id) {
-          dispatch(setOnlineStatus(true));
-        }
-      }
-    );
-
-    const unsubscribeOffline = socketService.on<{ userId: string }>(
-      "user_offline",
-      ({ userId }) => {
-        if (userId === id) {
-          dispatch(setOnlineStatus(false));
-        }
-      }
-    );
-
-    return () => {
-      unsubscribeOnline();
-      unsubscribeOffline();
-    };
-  }, [selectedConvID, id]);
+  
 
   // Update the socket listener for message_read to properly handle read receipts
   useEffect(() => {
@@ -225,7 +202,7 @@ const ChatingScreen = () => {
       markMessagesAsSeen(token, selectedConvID)
         .then(() => {
           // Send read status to socket
-          socketService.markAsRead(selectedConvID);
+          // socketService.markAsRead(selectedConvID);
 
           // Update local state
           dispatch(
@@ -249,9 +226,9 @@ const ChatingScreen = () => {
       "new_message",
       (incoming) => {
         if (incoming.conversationId !== selectedConvID) return;
-
-        const newMsg: MessageChat = {
-          messageId: incoming.messageId,
+  
+        const realMsg: MessageChat = {
+          messageId: incoming.message.messageId,
           senderId: incoming.senderId,
           senderName:
             incoming.senderId === id
@@ -262,40 +239,47 @@ const ChatingScreen = () => {
           timestamp: incoming.message.timestamp,
           reacted: false,
           isSeen: incoming.message.is_seen,
-          isOwnMessage: incoming.senderId === id, // Compare with your user ID
+          isOwnMessage: incoming.senderId === id,
           isDeleted: false,
           isEdited: false,
         };
-
+  
+        let updatedMessages = [...(dataChat?.messages || [])];
+  
+        // 1. Try replacing temporary message
+        const tempIndex = updatedMessages.findIndex(
+          (msg) =>
+            msg.messageId.startsWith("temp-") &&
+            msg.senderId === realMsg.senderId &&
+            msg.message === realMsg.message
+        );
+  
+        if (tempIndex !== -1) {
+          updatedMessages[tempIndex] = realMsg;
+        } else {
+          // 2. If not duplicate, just push
+          const alreadyExists = updatedMessages.some(
+            (msg) => msg.messageId === realMsg.messageId
+          );
+          if (!alreadyExists) updatedMessages.push(realMsg);
+        }
+  
         dispatch(
-          setChatData(
-            dataChat
-              ? {
-                  ...dataChat,
-                  messages: [...(dataChat.messages || []), newMsg],
-                }
-              : dataChat // maintain null-safe fallback
-          )
+          setChatData({
+            ...dataChat!,
+            messages: updatedMessages,
+          })
         );
       }
     );
-
+  
     return () => {
       unsubscribe();
     };
   }, [selectedConvID, dataChat, id]);
+  
 
-  useEffect(() => {
-    if (msg && msg.messageId && selectedConvID && dataChat) {
-      // Only update if this is a valid message and relates to current conversation
-      dispatch(
-        setChatData({
-          ...dataChat,
-          messages: [...(dataChat.messages || []), msg],
-        })
-      );
-    }
-  }, [msg, dataChat, selectedConvID]);
+  
 
   // Add this to your ChatingScreen component
 
@@ -360,10 +344,10 @@ const ChatingScreen = () => {
                 id="userStatuse"
                 className="text-xs text-gray-500 flex items-center gap-1"
               >
-                {onlineStatus && (
+                {friendOnlineStatus[dataChat.otherUser.userId] && (
                   <span className="inline-block w-2 h-2 bg-[#01754f] rounded-full"></span>
                 )}
-                {onlineStatus ? "Online" : "Offline"}
+                {friendOnlineStatus[dataChat.otherUser.userId] ? "Online" : "Offline"}
               </p>
             </div>
           )}
