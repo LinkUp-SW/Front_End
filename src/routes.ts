@@ -1,5 +1,3 @@
-// src/routes.ts
-
 import { RouteObject } from "react-router-dom";
 import {
   LandingPage,
@@ -43,6 +41,8 @@ import {
 import PrimaryEmailPage from "./pages/settings/updateEmail/PrimaryEmailPage";
 import AddEmailPage from "./pages/settings/updateEmail/AddEmailPage";
 import OTP from "./pages/settings/updateEmail/OTP";
+import BlockingListPage from "./pages/settings/BlockingListPage";
+import VisibilityPage from "./pages/settings/VisibilityPage";
 
 import React from "react";
 
@@ -226,6 +226,15 @@ const routes: RouteObject[] = [
   {
     path: "/jobs/create",
     element: React.createElement(CreateJobPage),
+  },
+  
+  {
+    path: "/settings/visibility",
+    element: React.createElement(VisibilityPage),
+  },
+  {
+    path: "/settings/visibility/blocking",
+    element: React.createElement(BlockingListPage),
   },
 ];
 
