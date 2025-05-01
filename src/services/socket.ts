@@ -10,20 +10,27 @@ export interface SocketIncomingMessage {
     is_seen: boolean;
     messageId: string;
   };
-  
 }
+
 export interface incomingTypingIndicator {
   conversationId: string;
   userId: string;
 }
+
 export interface incomingMessageRead {
   conversationId: string;
   readBy: string;
 }
 
-export interface incomingUnreadMessagesCount{
+export interface incomingUnreadMessagesCount {
   conversationId: string;
   count: number;
+}
+
+// Base interface for all socket events
+export interface BaseSocketEvent {
+  type: string;
+  [key: string]: unknown;
 }
 
 export type SocketEventData = 
@@ -31,12 +38,13 @@ export type SocketEventData =
   | incomingTypingIndicator 
   | incomingMessageRead 
   | incomingUnreadMessagesCount 
-  | unknown;
-  export interface PrivateMessagePayload {
-    to: string;
-    message: string;
-    media?: string[];
-  }
+  | BaseSocketEvent;
+
+export interface PrivateMessagePayload {
+  to: string;
+  message: string;
+  media?: string[];
+}
 
 
 class SocketService {
@@ -237,7 +245,7 @@ class SocketService {
   }
 
   // Generic method to add event listeners
-  on<T>(event: string, callback: (data: T) => void): () => void {
+  on<T extends SocketEventData>(event: string, callback: (data: T) => void): () => void {
     if (!this.socket) {
       console.error('Socket not connected');
       return () => {};
@@ -259,7 +267,7 @@ class SocketService {
   }
 
   // Generic method to remove event listeners
-  off<T>(event: string, callback: (data: T) => void): void {
+  off<T extends SocketEventData>(event: string, callback: (data: T) => void): void {
     if (!this.socket) return;
 
     // Remove from our listeners map
