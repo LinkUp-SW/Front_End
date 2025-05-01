@@ -26,13 +26,22 @@ export interface incomingUnreadMessagesCount{
   count: number;
 }
 
-
-
+export type SocketEventData = 
+  | SocketIncomingMessage 
+  | incomingTypingIndicator 
+  | incomingMessageRead 
+  | incomingUnreadMessagesCount 
+  | unknown;
+  export interface PrivateMessagePayload {
+    to: string;
+    message: string;
+    media?: string[];
+  }
 
 
 class SocketService {
   private socket: Socket | null = null;
-  private listeners: Map<string, Set<(data: any) => void>> = new Map();
+  private listeners: Map<string, Set<(data: SocketEventData) => void>> = new Map();
 
   // Initialize socket connection
   connect(token: string): Promise<void> {
@@ -171,7 +180,7 @@ class SocketService {
       return;
     }
 
-    const payload: any = { 
+    const payload: PrivateMessagePayload = { 
       to: receiverId, 
       message 
     };
@@ -238,7 +247,7 @@ class SocketService {
     if (!this.listeners.has(event)) {
       this.listeners.set(event, new Set());
     }
-    this.listeners.get(event)?.add(callback);
+    this.listeners.get(event)?.add(callback as (data: SocketEventData) => void);
 
     // Add the actual socket listener
     this.socket.on(event, callback);
@@ -254,7 +263,7 @@ class SocketService {
     if (!this.socket) return;
 
     // Remove from our listeners map
-    this.listeners.get(event)?.delete(callback);
+    this.listeners.get(event)?.delete(callback as (data: SocketEventData) => void);
     
     // Remove the actual socket listener
     this.socket.off(event, callback);
