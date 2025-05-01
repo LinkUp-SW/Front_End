@@ -14,6 +14,7 @@ interface DatePickerProps {
   onYearChange: (value: string) => void;
   disabled?: boolean;
   id: string;
+  isFutureAllowed?: boolean;
 }
 
 const DatePicker: React.FC<DatePickerProps> = ({
@@ -24,6 +25,7 @@ const DatePicker: React.FC<DatePickerProps> = ({
   onYearChange,
   disabled = false,
   id,
+  isFutureAllowed,
 }) => {
   return (
     <div id={`${id}-container`} className="flex flex-col gap-2 pt-5">
@@ -79,7 +81,8 @@ const DatePicker: React.FC<DatePickerProps> = ({
           >
             {Array.from({ length: 50 }, (_, i) => {
               const currentYear = new Date().getFullYear();
-              const yearOption = currentYear - i;
+              let yearOption = currentYear - i;
+              if (isFutureAllowed) yearOption = yearOption + 10;
               return (
                 <SelectItem
                   id={`${id}-year-item-${yearOption}`}

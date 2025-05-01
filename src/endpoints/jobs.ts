@@ -57,6 +57,7 @@ export interface SearchJobs {
   experience_level: string;
   salary: number;
   timeAgo: string;
+  is_saved: boolean;
   organization: Organization;
 }
 
@@ -174,7 +175,7 @@ export const convertJobDataToJob = (jobData: JobData): Job => {
 
 
 export const getSearchJobs = async (
-  
+  token:string,
   query:string,
   cursor:string | null,
   limit:number |null
@@ -183,6 +184,7 @@ export const getSearchJobs = async (
     "/api/v1/jobs/search-jobs",
     {
       headers: {
+        Authorization: `Bearer ${token}`
       
       },
       params: { query, cursor, limit },

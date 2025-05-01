@@ -45,7 +45,7 @@ const PostList: React.FC<PostListProps> = ({
           key={post._id}
           postData={post}
           viewMore={viewMore}
-          action={post.activityContext}
+          action={post.activity_context}
         />
       ))}
       {isLoading && <PostSkeleton />}

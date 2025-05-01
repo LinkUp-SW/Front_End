@@ -1,4 +1,3 @@
-// src/pages/SearchPage/SearchPage.tsx
 import React, { useEffect, useState } from "react";
 import { WithNavBar } from "../../components";
 import { useSearchParams } from "react-router-dom";

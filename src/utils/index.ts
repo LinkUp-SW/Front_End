@@ -2,6 +2,7 @@
 
 import { openModal } from "@/slices/modal/modalSlice";
 import { SkillResponse, UserStarterInterface } from "@/types";
+import React from "react";
 import type { Area } from "react-easy-crop";
 
 // Example utility function to convert an array of strings to lowercase
@@ -297,3 +298,30 @@ export async function compressDataUrl(
     img.src = dataUrl;
   });
 }
+
+export const validateName = (name: string): boolean => {
+  const regex = /^[a-zA-Z]{1,15}$/;
+  return regex.test(name);
+};
+
+export const splitHeadline = (text: string) => {
+  const words = text.split(" "); // Split by spaces to check each word/substring
+
+  return words.map((word, index) => {
+    if (word.length > 10) {
+      // Apply `break-all` for words longer than 15 characters
+      return React.createElement(
+        "span",
+        { key: index, className: "break-all" },
+        word + " "
+      );
+    } else {
+      // Apply `break-words` for shorter words
+      return React.createElement(
+        "span",
+        { key: index, className: "break-words" },
+        word + " "
+      );
+    }
+  });
+};

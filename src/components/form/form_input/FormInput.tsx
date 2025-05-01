@@ -11,6 +11,7 @@ interface FormInputProps {
   extraClassName?: string;
   id: string;
   name: string;
+  limit?: number;
 }
 const FormInput: React.FC<FormInputProps> = ({
   label,
@@ -23,6 +24,7 @@ const FormInput: React.FC<FormInputProps> = ({
   extraClassName,
   id,
   name,
+  limit,
 }) => (
   <div className={cn("flex flex-col gap-2 pt-5", extraClassName)}>
     <p className="text-sm text-gray-500 dark:text-gray-400">{label}</p>
@@ -33,6 +35,7 @@ const FormInput: React.FC<FormInputProps> = ({
       placeholder={placeholder}
       value={value}
       onChange={onChange}
+      maxLength={limit}
       className="outline-gray-600 border p-2 rounded-md text-sm transition-all duration-300 ease-in-out dark:hover:border-white hover:border-black border-gray-600 focus:outline-0"
     />
     {helperText && (

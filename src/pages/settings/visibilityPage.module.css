@@ -1,0 +1,65 @@
+.visibilityContainer {
+    background-color: white;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    width: 100%;
+    overflow: hidden;
+  }
+  
+  .visibilityHeader {
+    padding: 20px 24px;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  
+  .visibilityTitle {
+    font-size: 20px;
+    font-weight: 600;
+    color: rgba(0, 0, 0, 0.9);
+    margin: 0;
+  }
+  
+  .visibilityItem {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    border-bottom: 1px solid #e0e0e0;
+    transition: background-color 0.2s;
+  }
+  
+  .visibilityItem:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+  }
+  
+  .visibilityItem:last-child {
+    border-bottom: none;
+  }
+  
+  .itemLabel {
+    font-size: 16px;
+    color: rgba(0, 0, 0, 0.9);
+    font-weight: 400;
+  }
+  
+  .itemRight {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  .itemStatus {
+    font-size: 14px;
+    color: rgba(0, 0, 0, 0.6);
+  }
+  
+  .arrowIcon {
+    color: rgba(0, 0, 0, 0.6);
+  }
+  
+  .onOffStatus {
+    font-size: 14px;
+    font-weight: 600;
+    color: rgba(0, 0, 0, 0.6);
+    min-width: 40px;
+    text-align: right;
+  }
