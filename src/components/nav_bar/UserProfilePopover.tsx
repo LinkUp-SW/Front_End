@@ -1,5 +1,6 @@
 import { defaultProfileImage } from "@/constants";
 import { UserProfileBio } from "@/types";
+import { splitHeadline } from "@/utils";
 import Cookies from "js-cookie";
 import { Link } from "react-router-dom";
 
@@ -15,6 +16,8 @@ const UserProfilePopover: React.FC<UserProfilePopoverProps> = ({
   setUserPopOverOpen,
 }) => {
   const userId = Cookies.get("linkup_user_id");
+  const headline = userProfileBioData?.bio.headline || "";
+
   return (
     <div className="grid gap-2 text-gray-700 dark:text-gray-300">
       <section className="grid gap-2">
@@ -29,9 +32,9 @@ const UserProfilePopover: React.FC<UserProfilePopoverProps> = ({
               {userProfileBioData?.bio.first_name}{" "}
               {userProfileBioData?.bio.last_name}
             </h2>
-            {userProfileBioData?.bio.headline && (
-              <p className="break-words whitespace-normal  max-w-[200px]">
-                {userProfileBioData?.bio.headline}
+            {headline && (
+              <p className="max-w-[300px] whitespace-normal">
+                {splitHeadline(headline)}
               </p>
             )}
           </div>
