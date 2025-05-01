@@ -7,6 +7,7 @@ import {
   selectUserId,
   setResponsiveIsSidebar,
 } from "../../slices/messaging/messagingSlice";
+import { incomingUnreadMessagesCount,incomingUserStatus} from "@/services/socket";
 import { toggleStarred } from "../../slices/messaging/messagingSlice";
 import * as Popover from "@radix-ui/react-popover";
 import { FaStar } from "react-icons/fa";
@@ -38,8 +39,10 @@ import { Conversation } from "@/endpoints/messaging";
 import { toast } from "sonner";
 import { socketService } from "@/services/socket";
 import LinkUpLoader from "../../components/linkup_loader/LinkUpLoader";
+import { useParams } from "react-router-dom";
 
 const SideBar = () => {
+  const { id } = useParams();
   const token = Cookies.get("linkup_auth_token");
 
   const dispatch = useDispatch();
@@ -47,7 +50,6 @@ const SideBar = () => {
     (state: RootState) => state.messaging.activeFilter
   );
   const search = useSelector((state: RootState) => state.messaging.search);
-  const onlineStatus=useSelector((state: RootState) => state.messaging.onlineStatus);
 
   /*const [deleted, setDeleted] = useState(false);*/
   const [dotAppearance, setDotAppearance] = useState<string[]>([]);
@@ -64,13 +66,17 @@ const SideBar = () => {
   const openModal = () => setIsOpen(true);
   const closeModal = () => setIsOpen(false);
 
+  const selectedConvID = useSelector(
+    (state: RootState) => state.messaging.selectedMessages
+  );
+
   useEffect(() => {
     const fetchConversations = async () => {
       try {
         if (!token) return;
 
         const data: { conversations: Conversation[] } =
-        await getAllConversations(token);
+          await getAllConversations(token);
         setDataInfo(data.conversations);
         toast.success("Conversations loaded successfully");
       } catch (error) {
@@ -84,6 +90,8 @@ const SideBar = () => {
     fetchConversations();
   }, []);
 
+
+
   useEffect(() => {
     dataInfo.forEach((conversation) => {
       // Dispatch only if the conversation is starred.
@@ -93,73 +101,80 @@ const SideBar = () => {
     });
   }, [dataInfo]);
 
-  // Inside the useEffect hook where you are fetching the conversations
   useEffect(() => {
-    const fetchUnreadCounts = async () => {
-      try {
-        if (!token) return;
-
-        const unreadCounts = await getUnseenMessagesCountByConversation(token);
-
-        // Update the dataInfo state to include unread counts from the API
+    const handleUserOnline = (incoming: { userId: string }) => {
+      if (incoming.userId !== id) {
         setDataInfo((prevData) =>
-          prevData.map((conversation) => {
-            const unreadConversation = unreadCounts.find(
-              (count) => count.conversationId === conversation.conversationId
-            );
-            if (unreadConversation && unreadConversation.unreadCount > 0) {
-              return {
-                ...conversation,
-                unreadCount: unreadConversation.unreadCount,
-                conversationType: [...conversation.conversationType, "Unread"],
-              };
-            }
-            return conversation;
-          })
-        );
-      } catch (error) {
-        console.error("Failed to fetch unread message counts:", error);
-      }
-    };
-
-    fetchUnreadCounts();
-  }, [token]); // Re-run when the token changes (if applicable)
-
-  // Update your socket listener to handle the correct information
-  useEffect(() => {
-    const unsubscribe = socketService.on(
-      "unread_messages_count",
-      (data: { conversationId: string; count: number }) => {
-        console.log("Unread messages count (live):", data);
-
-        setDataInfo((prevData) =>
-          prevData.map((conversation) => {
-            // Check if this is the conversation with new messages
-            if (data.conversationId === conversation.conversationId) {
-              return {
-                ...conversation,
-                unreadCount: data.count,
-                conversationType:
-                  data.count > 0
-                    ? [...new Set([...conversation.conversationType, "Unread"])]
-                    : conversation.conversationType.filter(
-                        (type) => type !== "Unread"
-                      ),
-              };
-            }
-            return conversation;
-          })
+          prevData.map((conversation) =>
+            conversation.otherUser.userId === incoming.userId
+              ? {
+                  ...conversation,
+                  otherUser: {
+                    ...conversation.otherUser,
+                    onlineStatus: true,
+                  },
+                }
+              : conversation
+          )
         );
       }
-    );
-    
-
-    return () => {
-      unsubscribe(); // Clean up
     };
-  }, []);
-
   
+    const handleUserOffline = (incoming: { userId: string }) => {
+      if (incoming.userId !== id) {
+        setDataInfo((prevData) =>
+          prevData.map((conversation) =>
+            conversation.otherUser.userId === incoming.userId
+              ? {
+                  ...conversation,
+                  otherUser: {
+                    ...conversation.otherUser,
+                    onlineStatus: false,
+                  },
+                }
+              : conversation
+          )
+        );
+      }
+    };
+  
+    socketService.on("user_online", handleUserOnline);
+    socketService.on("user_offline", handleUserOffline);
+  
+    return () => {
+      socketService.off("user_online", handleUserOnline);
+      socketService.off("user_offline", handleUserOffline);
+    };
+  }, [id]);
+  
+
+  // useEffect(() => {
+  //   const unsubscribe = socketService.on<incomingUnreadMessagesCount>(
+  //     "conversation_unread_count",
+  //     (incoming) => {
+  //       console.log("haneeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeet")
+  //       setDataInfo((prevData) =>
+  //         prevData.map((message) =>
+  //           message.conversationId === incoming.conversationId
+  //             ? {
+  //                 ...message,
+  //                 unreadCount: incoming.count,
+  //                 conversationType: incoming.count > 0 
+  //                   ? message.conversationType.includes("Unread") 
+  //                     ? message.conversationType 
+  //                     : [...message.conversationType, "Unread"]
+  //                   : message.conversationType
+  //               }
+  //             : message
+  //         )
+  //       );
+  //     }
+  //   );
+  
+  //   return () => {
+  //     unsubscribe();
+  //   };
+  // }, []);
 
   const filterButtonData = {
     Focused: dataInfo,
@@ -177,7 +192,12 @@ const SideBar = () => {
     ),
   };
 
-  if (loading) return <div><LinkUpLoader/></div>;
+  if (loading)
+    return (
+      <div>
+        <LinkUpLoader />
+      </div>
+    );
 
   const filteredMessagesSearch = filterButtonData[activeFilter].filter(
     (info) =>
@@ -185,53 +205,50 @@ const SideBar = () => {
       info.lastMessage.message.toLowerCase().includes(search.toLowerCase())
   );
 
- // In SideBar.tsx, update the handleSelectConversation function
-const handleSelectConversation = async (
-  conversationID: string,
-  dataType: string[],
-  user2Name: string,
-  userStatus: boolean,
-  user2Id: string
-) => {
-  dispatch(selectMessage(conversationID.toString()));
-  dispatch(selectUserName(user2Name));
-  dispatch(selectUserStatus(userStatus));
-  dispatch(selectUserId(user2Id));
-  dispatch(setResponsiveIsSidebar(true));
+  // In SideBar.tsx, update the handleSelectConversation function
+  const handleSelectConversation = async (
+    conversationID: string,
+    dataType: string[],
+    user2Name: string,
+    userStatus: boolean,
+    user2Id: string
+  ) => {
+    dispatch(selectMessage(conversationID.toString()));
+    dispatch(selectUserName(user2Name));
+    dispatch(selectUserStatus(userStatus));
+    dispatch(selectUserId(user2Id));
+    dispatch(setResponsiveIsSidebar(true));
 
-  // If this conversation has unread messages
-  if (dataType.includes("Unread")) {
-    if (token) {
-      try {
-        await markConversationAsRead(token, conversationID); // API call first
+    // If this conversation has unread messages
+    if (dataType.includes("Unread")) {
+      if (token) {
+        try {
+          await markConversationAsRead(token, conversationID); // API call first
 
-        // On success, update local state and show toast
-        setDataInfo((prevData) =>
-          prevData.map((message) =>
-            message.conversationId === conversationID
-              ? {
-                  ...message,
-                  conversationType: message.conversationType.filter((t) => t !== "Unread"),
-                  unreadCount: 0
-                }
-              : message
-          )
-        );
-        toast.success("Conversation marked as read");
-      } catch (err) {
-        console.error("Failed to mark conversation as read:", err);
-        toast.error("Failed to mark conversation as read");
+          // On success, update local state and show toast
+          setDataInfo((prevData) =>
+            prevData.map((message) =>
+              message.conversationId === conversationID
+                ? {
+                    ...message,
+                    conversationType: message.conversationType.filter(
+                      (t) => t !== "Unread"
+                    ),
+                    unreadCount: 0,
+                  }
+                : message
+            )
+          );
+          toast.success("Conversation marked as read");
+        } catch (err) {
+          console.error("Failed to mark conversation as read:", err);
+          toast.error("Failed to mark conversation as read");
+        }
       }
     }
-  }
 
-  setSelectedConversationStyle(conversationID);
- 
-
-  
-
-
-};
+    setSelectedConversationStyle(conversationID);
+  };
 
   const handleHoverEnter = (conversationID: string) => {
     if (!selectedItems.includes(conversationID)) {
@@ -268,7 +285,6 @@ const handleSelectConversation = async (
     );
   };
 
-
   const unreadFiltering = async (conversationID: string) => {
     try {
       await markConversationAsUnread(token!, conversationID);
@@ -280,7 +296,6 @@ const handleSelectConversation = async (
                 conversationType: message.conversationType.includes("Unread")
                   ? message.conversationType.filter((t) => t !== "Unread")
                   : [...message.conversationType, "Unread"],
-              
               }
             : message
         )
@@ -291,7 +306,6 @@ const handleSelectConversation = async (
       toast.error("Failed to mark conversation as unread");
     }
   };
-  
 
   const starredFiltering = (conversationID: string) => {
     dispatch(toggleStarred(conversationID.toString()));
@@ -416,15 +430,16 @@ const handleSelectConversation = async (
                     </div>
                   ) : (
                     <div className="relative w-12 h-12">
-                    <img
-                      id="profile-section"
-                      className="rounded-full w-12 h-12 border  border-gray-200"
-                      src={data.otherUser.profilePhoto}
-                      alt="profile"
-                    />
-                    {onlineStatus && (<span className="absolute bottom-0 right-0 w-3 h-3 bg-[#01754f] border-2 border-white rounded-full"></span>)} 
-                    
-                  </div>
+                      <img
+                        id="profile-section"
+                        className="rounded-full w-12 h-12 border  border-gray-200"
+                        src={data.otherUser.profilePhoto}
+                        alt="profile"
+                      />
+                      {data.otherUser.onlineStatus && (
+                        <span className="absolute bottom-0 right-0 w-3 h-3 bg-[#01754f] border-2 border-white rounded-full"></span>
+                      )}
+                    </div>
                   )}
                 </div>
 
@@ -577,11 +592,12 @@ const handleSelectConversation = async (
                   <FaStar id="star" size={15} className="text-[#c37d16]" />
                 )}
 
-                {data.conversationType.includes("Unread") && (
-                  <span className="flex items-center justify-center text-xs rounded-full text-white w-4 h-4 bg-blue-600 font-medium">
-                    
-                  </span>
-                )}
+                {data.conversationType.includes("Unread") &&
+                  data.unreadCount > 0 && (
+                    <span className="flex items-center justify-center text-xs rounded-full text-white w-4 h-4 bg-blue-600 font-medium">
+                      {data.unreadCount}
+                    </span>
+                  )}
               </div>
             </div>
           ))}
