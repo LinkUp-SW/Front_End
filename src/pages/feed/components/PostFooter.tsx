@@ -42,6 +42,7 @@ interface PostFooterProps {
   comment_privacy: string;
   connection_degree: string;
   loadMoreComments?: () => Promise<void>;
+  existingComment?: CommentType;
 }
 
 const PostFooter: React.FC<PostFooterProps> = ({
@@ -51,6 +52,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
   loadMoreComments,
   comment_privacy,
   connection_degree,
+  existingComment,
 }) => {
   // Create a ref for the horizontally scrollable container
   const [commentInput, setCommentInput] = useState("");

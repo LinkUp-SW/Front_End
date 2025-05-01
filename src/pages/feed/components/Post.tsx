@@ -73,6 +73,7 @@ import CommentSkeleton from "./CommentSkeleton";
 import { usePostModal } from "@/hooks/usePostModal";
 import { RootState } from "@/store";
 import { FaCommentSlash } from "react-icons/fa";
+import CommentWithReplies from "./CommentWithReplies";
 
 interface PostProps {
   postData: PostType;
@@ -997,6 +998,9 @@ const Post: React.FC<PostProps> = ({
                   ? comments_data.comments
                   : [],
               }}
+              existingComment={
+                action?.type === "comment" ? action?.comment : undefined
+              }
               loadMoreComments={handleLoadComments}
               comment_privacy={postData.comments_disabled}
               connection_degree={postData.author.connection_degree}
@@ -1018,6 +1022,19 @@ const Post: React.FC<PostProps> = ({
             </div>
           </div>
         )}
+        {postData?.activity_context?.comment &&
+          !commentsOpen &&
+          postData?.activity_context?.type == "comment" && (
+            <div className="w-full pb-5">
+              <CommentWithReplies
+                comment={postData.activity_context.comment}
+                disableReplies={true}
+                handleCreateComment={() => {}}
+                postId={postData._id}
+                disableControls
+              />
+            </div>
+          )}
       </CardFooter>
     </Card>
   );

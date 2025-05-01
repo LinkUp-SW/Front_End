@@ -60,6 +60,7 @@ export interface CommentProps {
   setIsReplyActive: React.Dispatch<React.SetStateAction<boolean>>;
   postId: string;
   disableReplies: boolean;
+  disableControls?: boolean;
 }
 
 const token = Cookies.get("linkup_auth_token");
@@ -69,6 +70,7 @@ const Comment: React.FC<CommentProps> = ({
   setIsReplyActive,
   postId,
   disableReplies,
+  disableControls,
 }) => {
   const {
     profile_picture,
@@ -432,106 +434,107 @@ const Comment: React.FC<CommentProps> = ({
           </Dialog>
         )}
       </div>
-      <footer className="flex pl-10 justify-start items-center gap-0.5 ">
-        {/* <div className="flex justify-start w-full items-center pt-4 gap-0"> */}
-        <Popover open={reactionsOpen} onOpenChange={setReactionsOpen}>
-          <PopoverTrigger
-            asChild
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
-          >
-            <Button
-              variant="ghost"
-              size="lg"
-              onClick={() => {
-                if (selectedReaction === "None") handleReact("Like");
-                else handleReact("None");
-              }}
-              className={`flex dark:hover:bg-zinc-800 dark:hover:text-neutral-200 ${
-                selectedReaction === "Like"
-                  ? "text-blue-700 dark:text-blue-500 hover:text-blue-700 dark:hover:text-blue-400"
-                  : selectedReaction === "Insightful"
-                  ? "text-yellow-700 dark:text-yellow-500 hover:text-yellow-700 dark:hover:text-yellow-400"
-                  : selectedReaction === "Love"
-                  ? "text-red-700 dark:text-red-500 hover:text-red-700 dark:hover:text-red-400"
-                  : selectedReaction === "Funny"
-                  ? "text-cyan-700 dark:text-cyan-500 hover:text-cyan-700 dark:hover:text-cyan-400"
-                  : selectedReaction === "Celebrate"
-                  ? "text-green-700 dark:text-green-500 hover:text-green-700 dark:hover:text-green-400"
-                  : selectedReaction === "Support"
-                  ? "text-purple-700 dark:text-purple-500 hover:text-purple-700 dark:hover:text-purple-400"
-                  : ""
-              } items-center hover:cursor-pointer transition-all`}
-            >
-              {selectedReaction != "None" ? (
-                <img
-                  src={
-                    reactionIcons.find(
-                      (reaction) => reaction.name === selectedReaction
-                    )?.icon
-                  }
-                  alt={selectedReaction}
-                  className="w-4 h-4"
-                />
-              ) : (
-                <div className="flex gap-2 items-center">
-                  <LikeEmoji /> Like{" "}
-                </div>
-              )}
-              {selectedReaction == "None"
-                ? viewMore
-                  ? "Like"
-                  : ""
-                : selectedReaction}
-            </Button>
-          </PopoverTrigger>
-          <TooltipProvider>
-            <PopoverContent
+      {!disableControls && (
+        <footer className="flex pl-10 justify-start items-center gap-0.5 ">
+          {/* <div className="flex justify-start w-full items-center pt-4 gap-0"> */}
+          <Popover open={reactionsOpen} onOpenChange={setReactionsOpen}>
+            <PopoverTrigger
+              asChild
               onMouseEnter={handleMouseEnter}
               onMouseLeave={handleMouseLeave}
-              align="start"
-              className="absolute w-fit bottom-10 dark:bg-gray-900 rounded-full border-gray-700 shadow-2xl transition-transform duration-300 ease-in-out transform"
             >
-              <div className="flex">
-                {[
-                  { icon: LikeIcon, alt: "Like" },
-                  { icon: CelebrateIcon, alt: "Celebrate" },
-                  { icon: SupportIcon, alt: "Support" },
-                  { icon: LoveIcon, alt: "Love" },
-                  { icon: InsightfulIcon, alt: "Insightful" },
-                  { icon: FunnyIcon, alt: "Funny" },
-                ].map((reaction, index) => (
-                  <Tooltip key={`reaction-${reaction.alt}`}>
-                    <IconButton
-                      className={`hover:scale-200 hover:bg-gray-200 w-12 h-12 dark:hover:bg-zinc-800 duration-300 ease-in-out transform transition-all mx-0 hover:mx-7 hover:-translate-y-5`}
-                      style={{
-                        animation: `bounceIn 0.5s ease-in-out ${
-                          index * 0.045
-                        }s forwards`,
-                        opacity: 0,
-                      }}
-                      onClick={() => {
-                        handleReact(reaction.alt);
+              <Button
+                variant="ghost"
+                size="lg"
+                onClick={() => {
+                  if (selectedReaction === "None") handleReact("Like");
+                  else handleReact("None");
+                }}
+                className={`flex dark:hover:bg-zinc-800 dark:hover:text-neutral-200 ${
+                  selectedReaction === "Like"
+                    ? "text-blue-700 dark:text-blue-500 hover:text-blue-700 dark:hover:text-blue-400"
+                    : selectedReaction === "Insightful"
+                    ? "text-yellow-700 dark:text-yellow-500 hover:text-yellow-700 dark:hover:text-yellow-400"
+                    : selectedReaction === "Love"
+                    ? "text-red-700 dark:text-red-500 hover:text-red-700 dark:hover:text-red-400"
+                    : selectedReaction === "Funny"
+                    ? "text-cyan-700 dark:text-cyan-500 hover:text-cyan-700 dark:hover:text-cyan-400"
+                    : selectedReaction === "Celebrate"
+                    ? "text-green-700 dark:text-green-500 hover:text-green-700 dark:hover:text-green-400"
+                    : selectedReaction === "Support"
+                    ? "text-purple-700 dark:text-purple-500 hover:text-purple-700 dark:hover:text-purple-400"
+                    : ""
+                } items-center hover:cursor-pointer transition-all`}
+              >
+                {selectedReaction != "None" ? (
+                  <img
+                    src={
+                      reactionIcons.find(
+                        (reaction) => reaction.name === selectedReaction
+                      )?.icon
+                    }
+                    alt={selectedReaction}
+                    className="w-4 h-4"
+                  />
+                ) : (
+                  <div className="flex gap-2 items-center">
+                    <LikeEmoji /> Like{" "}
+                  </div>
+                )}
+                {selectedReaction == "None"
+                  ? viewMore
+                    ? "Like"
+                    : ""
+                  : selectedReaction}
+              </Button>
+            </PopoverTrigger>
+            <TooltipProvider>
+              <PopoverContent
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
+                align="start"
+                className="absolute w-fit bottom-10 dark:bg-gray-900 rounded-full border-gray-700 shadow-2xl transition-transform duration-300 ease-in-out transform"
+              >
+                <div className="flex">
+                  {[
+                    { icon: LikeIcon, alt: "Like" },
+                    { icon: CelebrateIcon, alt: "Celebrate" },
+                    { icon: SupportIcon, alt: "Support" },
+                    { icon: LoveIcon, alt: "Love" },
+                    { icon: InsightfulIcon, alt: "Insightful" },
+                    { icon: FunnyIcon, alt: "Funny" },
+                  ].map((reaction, index) => (
+                    <Tooltip key={`reaction-${reaction.alt}`}>
+                      <IconButton
+                        className={`hover:scale-200 hover:bg-gray-200 w-12 h-12 dark:hover:bg-zinc-800 duration-300 ease-in-out transform transition-all mx-0 hover:mx-7 hover:-translate-y-5`}
+                        style={{
+                          animation: `bounceIn 0.5s ease-in-out ${
+                            index * 0.045
+                          }s forwards`,
+                          opacity: 0,
+                        }}
+                        onClick={() => {
+                          handleReact(reaction.alt);
 
-                        setReactionsOpen(false);
-                      }}
-                    >
-                      <TooltipTrigger asChild>
-                        <img
-                          src={reaction.icon}
-                          alt={reaction.alt}
-                          className="w-full h-full"
-                        />
-                      </TooltipTrigger>
-                    </IconButton>
+                          setReactionsOpen(false);
+                        }}
+                      >
+                        <TooltipTrigger asChild>
+                          <img
+                            src={reaction.icon}
+                            alt={reaction.alt}
+                            className="w-full h-full"
+                          />
+                        </TooltipTrigger>
+                      </IconButton>
 
-                    <TooltipContent>
-                      <p>{reaction.alt}</p>
-                    </TooltipContent>
-                  </Tooltip>
-                ))}
-                <style>
-                  {`
+                      <TooltipContent>
+                        <p>{reaction.alt}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  ))}
+                  <style>
+                    {`
                     @keyframes bounceIn {
                     0% {
                     transform: scale(0.5) translateY(50px);
@@ -547,9 +550,9 @@ const Comment: React.FC<CommentProps> = ({
                     }
                     }
                   `}
-                </style>
-                <style>
-                  {`
+                  </style>
+                  <style>
+                    {`
                     @keyframes popUp {
                     0% {
                     transform: scale(0.5);
@@ -561,82 +564,83 @@ const Comment: React.FC<CommentProps> = ({
                     }
                     }
                   `}
-                </style>
-              </div>
-            </PopoverContent>
-          </TooltipProvider>
-        </Popover>
+                  </style>
+                </div>
+              </PopoverContent>
+            </TooltipProvider>
+          </Popover>
 
-        {stats.total != 0 && (
-          <>
-            {" "}
-            {stats.total > 0 ? (
-              <p className="text-xs text-gray-500 dark:text-neutral-400 font-bold">
-                {" "}
-                ·
-              </p>
-            ) : (
-              <></>
-            )}
-            <Dialog>
-              <DialogTrigger asChild>
-                <button className="flex pr-3 relative items-end text-gray-500 dark:text-neutral-400 text-xs hover:underline hover:cursor-pointer hover:text-blue-600 dark:hover:text-blue-400">
-                  {topStats.map((stat, index) => (
-                    <span
-                      key={index}
-                      className="flex items-center text-black dark:text-neutral-200 text-lg"
-                    >
-                      {stat}
-                    </span>
-                  ))}
-                  {stats.total}
-                </button>
-              </DialogTrigger>
-              <DialogContent className="dark:bg-gray-900 min-w-[20rem] sm:min-w-[35rem] w-auto dark:border-gray-700">
-                <DialogTitle className=" px-2 text-xl font-medium">
-                  Reactions
-                </DialogTitle>
-                <DialogDescription />
-                <ReactionsModal postId={postId} commentId={comment._id} />
-              </DialogContent>
-            </Dialog>
-          </>
-        )}
-        <p className="text-gray-500">| </p>
-        {disableReplies && (
-          <>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-gray-400 text-xs hover:cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-400 p-1"
-              onClick={() => {
-                setIsReplyActive(true);
-              }}
-            >
-              Reply
-            </Button>
-          </>
-        )}
-        {comment.children_count ? (
-          comment.children_count != 0 && (
+          {stats.total != 0 && (
             <>
-              <p className="text-xs  text-gray-500 dark:text-neutral-400 font-bold">
-                {" "}
-                ·
-              </p>
-              <p className="hover:underlinetext-xs text-xs text-gray-500 line-clamp-1 text-ellipsis dark:text-neutral-400 hover:text-blue-600 hover:underline dark:hover:text-blue-400 hover:cursor-pointer">
-                {comment.children_count &&
-                comment.children_count != 0 &&
-                comment.children_count == 1
-                  ? "1 Reply"
-                  : `${comment.children_count} Replies`}
-              </p>
+              {" "}
+              {stats.total > 0 ? (
+                <p className="text-xs text-gray-500 dark:text-neutral-400 font-bold">
+                  {" "}
+                  ·
+                </p>
+              ) : (
+                <></>
+              )}
+              <Dialog>
+                <DialogTrigger asChild>
+                  <button className="flex pr-3 relative items-end text-gray-500 dark:text-neutral-400 text-xs hover:underline hover:cursor-pointer hover:text-blue-600 dark:hover:text-blue-400">
+                    {topStats.map((stat, index) => (
+                      <span
+                        key={index}
+                        className="flex items-center text-black dark:text-neutral-200 text-lg"
+                      >
+                        {stat}
+                      </span>
+                    ))}
+                    {stats.total}
+                  </button>
+                </DialogTrigger>
+                <DialogContent className="dark:bg-gray-900 min-w-[20rem] sm:min-w-[35rem] w-auto dark:border-gray-700">
+                  <DialogTitle className=" px-2 text-xl font-medium">
+                    Reactions
+                  </DialogTitle>
+                  <DialogDescription />
+                  <ReactionsModal postId={postId} commentId={comment._id} />
+                </DialogContent>
+              </Dialog>
             </>
-          )
-        ) : (
-          <></>
-        )}
-      </footer>
+          )}
+          <p className="text-gray-500">| </p>
+          {disableReplies && (
+            <>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-gray-400 text-xs hover:cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-400 p-1"
+                onClick={() => {
+                  setIsReplyActive(true);
+                }}
+              >
+                Reply
+              </Button>
+            </>
+          )}
+          {comment.children_count ? (
+            comment.children_count != 0 && (
+              <>
+                <p className="text-xs  text-gray-500 dark:text-neutral-400 font-bold">
+                  {" "}
+                  ·
+                </p>
+                <p className="hover:underlinetext-xs text-xs text-gray-500 line-clamp-1 text-ellipsis dark:text-neutral-400 hover:text-blue-600 hover:underline dark:hover:text-blue-400 hover:cursor-pointer">
+                  {comment.children_count &&
+                  comment.children_count != 0 &&
+                  comment.children_count == 1
+                    ? "1 Reply"
+                    : `${comment.children_count} Replies`}
+                </p>
+              </>
+            )
+          ) : (
+            <></>
+          )}
+        </footer>
+      )}
     </div>
   );
 };

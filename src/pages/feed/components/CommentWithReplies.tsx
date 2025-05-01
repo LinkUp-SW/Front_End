@@ -29,6 +29,7 @@ interface CommentWithRepliesProps {
   comment: CommentType;
   postId: string;
   disableReplies: boolean;
+  disableControls?: boolean;
 }
 
 const user_token = Cookies.get("linkup_auth_token");
@@ -38,6 +39,7 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
   comment,
   postId,
   disableReplies,
+  disableControls = false,
 }) => {
   const replies = comment.children || [];
   const hasMoreReplies = replies.length < (comment.children_count || 0);
@@ -186,6 +188,7 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
           setIsReplyActive={setIsReplyActive}
           postId={postId}
           disableReplies={disableReplies}
+          disableControls={disableControls}
         />
       </div>
 

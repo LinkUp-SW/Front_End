@@ -170,6 +170,7 @@ export interface ActivityContextType {
     | "comment"
     | "repost";
   actor_picture: string;
+  comment?: CommentType;
 }
 
 export interface PostUserType {
