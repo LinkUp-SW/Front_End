@@ -10,6 +10,7 @@ import { LiaEllipsisHSolid as EllipsisIcon } from "react-icons/lia";
 import { IoMdClose as CloseIcon } from "react-icons/io";
 import { Button, Dialog, DialogTrigger, DialogContent } from "@/components";
 import ReportPostModal from "./modals/ReportPostModal";
+import { FaPeopleGroup as PeopleIcon } from "react-icons/fa6";
 import { ActivityContextType, MenuAction, PostUserType } from "@/types";
 import moment from "moment";
 
@@ -157,11 +158,18 @@ const PostHeader: React.FC<PostHeaderProps> = ({
                 <span>Edited </span>
               </>
             )}
-            {publicPost && (
+            {publicPost ? (
               <>
                 <p className="text-lg font-bold"> · </p>
                 <span className="text-lg">
                   <GlobeIcon />
+                </span>
+              </>
+            ) : (
+              <>
+                <p className="text-lg font-bold"> · </p>
+                <span className="text-lg">
+                  <PeopleIcon />
                 </span>
               </>
             )}
