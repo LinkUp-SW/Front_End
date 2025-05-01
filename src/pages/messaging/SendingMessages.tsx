@@ -1,7 +1,6 @@
 import { useDispatch } from "react-redux";
 import {
   setEditingMessageId,
-  addMessage,
 } from "../../slices/messaging/messagingSlice";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
@@ -41,7 +40,6 @@ const SendingMessages = () => {
   );
 
   const editText = useSelector((state: RootState) => state.messaging.editText);
-  const msg = useSelector((state: RootState) => state.messaging.message);
   const dataChat = useSelector((state: RootState) => state.messaging.chatData);
   const editedMessageIds = useSelector(
     (state: RootState) => state.messaging.setEditedMessageIds

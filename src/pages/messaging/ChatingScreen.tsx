@@ -8,10 +8,8 @@ import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import {
   getConversation,
-  chattingMessages,
   deleteMessages,
   MessageChat,
-  markMessagesAsSeen,
 } from "@/endpoints/messaging";
 import {
   setEditingMessageId,
@@ -63,7 +61,6 @@ const ChatingScreen = () => {
   const isCurrentConversationStarred =
     starredConversations.includes(selectedConvID);
 
-  const addMsg = useSelector((state: RootState) => state.messaging.message);
   const dataChat = useSelector((state: RootState) => state.messaging.chatData);
   const dataInfo = useSelector(
     (state: RootState) => state.messaging.setDataInfo

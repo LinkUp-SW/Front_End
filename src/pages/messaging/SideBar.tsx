@@ -31,7 +31,6 @@ import {
 import {
   getAllConversations,
   deleteConversation,
-  getUnseenMessagesCountByConversation,
   markConversationAsRead,
   markConversationAsUnread,
 } from "@/endpoints/messaging";
@@ -67,9 +66,6 @@ const SideBar = () => {
   const openModal = () => setIsOpen(true);
   const closeModal = () => setIsOpen(false);
 
-  const selectedConvID = useSelector(
-    (state: RootState) => state.messaging.selectedMessages
-  );
   const dataInfo = useSelector((state: RootState) => state.messaging.setDataInfo);
 
   useEffect(() => {

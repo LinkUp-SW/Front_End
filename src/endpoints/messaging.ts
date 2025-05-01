@@ -1,5 +1,4 @@
 import axiosInstance from "@/services/axiosInstance";
-import { promises } from "dns";
 
 export interface User {
   userId: string;
