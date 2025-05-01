@@ -193,9 +193,7 @@ export const fetchSinglePost = async (
     });
     return {
       ...response.data.post,
-      author: {
-        connection_degree: "3rd+",
-      },
+
       comments_data: {
         comments: commentsArray, // Include comments from API response
         count: comments_count,
