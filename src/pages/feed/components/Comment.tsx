@@ -424,6 +424,8 @@ const Comment: React.FC<CommentProps> = ({
                 className="max-h-60 self-start object-contain rounded-lg ml-11 mt-2 cursor-pointer"
               />
             </DialogTrigger>
+            <DialogTitle />
+            <DialogDescription />
             <DialogContent className="max-w-[90vw] max-h-[90vh] p-0 border-0 bg-transparent">
               <img
                 src={media.link}
