@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { FaPlus } from 'react-icons/fa';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
@@ -52,41 +52,41 @@ const CompanyJobsComponent: React.FC<CompanyJobsComponentProps> = ({ companyId }
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
   const [showApplicants, setShowApplicants] = useState(false);
 
-  useEffect(() => {
-    const fetchJobs = async () => {
-      if (!companyId) return;
+  const fetchJobs = useCallback(async () => {
+    if (!companyId) return;
+    
+    try {
+      setIsLoading(true);
+      const response = await getJobsFromCompany(companyId);
       
-      try {
-        setIsLoading(true);
-        const response = await getJobsFromCompany(companyId);
+      const categorizedJobs: JobsState = {
+        open: [],
+        closed: []
+      };
+      
+      (response.jobs as ApiJob[]).forEach((apiJob) => {
+        const processedJob = sanitizeJob(apiJob);
         
-        const categorizedJobs: JobsState = {
-          open: [],
-          closed: []
-        };
-        
-        (response.jobs as ApiJob[]).forEach((apiJob) => {
-          const processedJob = sanitizeJob(apiJob);
-          
-          const status = processedJob.job_status?.toLowerCase();
-          if (status === 'open') {
-            categorizedJobs.open.push(processedJob);
-          } else if (status === 'closed') {
-            categorizedJobs.closed.push(processedJob);
-          }
-        });
-        
-        setJobs(categorizedJobs);
-      } catch (err) {
-        console.error('Failed to fetch jobs:', err);
-        toast.error('Failed to load job listings');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchJobs();
+        const status = processedJob.job_status?.toLowerCase();
+        if (status === 'open') {
+          categorizedJobs.open.push(processedJob);
+        } else if (status === 'closed') {
+          categorizedJobs.closed.push(processedJob);
+        }
+      });
+      
+      setJobs(categorizedJobs);
+    } catch (err) {
+      console.error('Failed to fetch jobs:', err);
+      toast.error('Failed to load job listings');
+    } finally {
+      setIsLoading(false);
+    }
   }, [companyId]);
+
+  useEffect(() => {
+    fetchJobs();
+  }, [fetchJobs]);
 
   const handlePostJob = () => {
     if (!companyId) {
@@ -96,7 +96,6 @@ const CompanyJobsComponent: React.FC<CompanyJobsComponentProps> = ({ companyId }
     navigate(`/company-manage/${companyId}/jobs/create`);
   };
 
-
   const handleViewApplicants = (jobId: string) => {
     setSelectedJobId(jobId);
     setShowApplicants(true);
@@ -105,6 +104,11 @@ const CompanyJobsComponent: React.FC<CompanyJobsComponentProps> = ({ companyId }
   const handleBackToJobs = () => {
     setShowApplicants(false);
     setSelectedJobId(null);
+  };
+
+  const handleJobStatusChanged = () => {
+    // Refresh the job listings after status change
+    fetchJobs();
   };
 
   const tabNames = {
@@ -209,7 +213,9 @@ const CompanyJobsComponent: React.FC<CompanyJobsComponentProps> = ({ companyId }
               <JobCard 
                 key={job._id} 
                 job={job} 
+                companyId={companyId}
                 onViewApplicants={handleViewApplicants}
+                onStatusChanged={handleJobStatusChanged}
               />
             ))}
           </div>

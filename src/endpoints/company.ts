@@ -280,3 +280,11 @@ export const updateApplicationStatus = async (applicantId: string, status: JobAp
   const response = await axiosInstance.put(url, { status }, getAuthHeader(token));
   return response.data;
 };
+
+export const changeJobStatus = async (jobId: string, organizationId: string, status: 'Open' | 'Closed'): Promise<{ success: boolean; message: string }> => {
+  const token = getAuthToken();
+  const url = `/api/v1/company/change-job-status/${jobId}/${organizationId}`;
+  
+  const response = await axiosInstance.put(url, { job_status: status }, getAuthHeader(token));
+  return response.data;
+};

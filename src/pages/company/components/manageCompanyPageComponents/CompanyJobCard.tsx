@@ -1,4 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { toast } from 'sonner';
+import { changeJobStatus } from '@/endpoints/company';
 
 export interface Job {
   _id: string;
@@ -14,9 +16,39 @@ export interface Job {
 interface JobCardProps {
   job: Job;
   onViewApplicants: (jobId: string) => void;
+  companyId?: string;
+  onStatusChanged?: () => void;
 }
 
-export const JobCard: React.FC<JobCardProps> = ({ job, onViewApplicants }) => {
+export const JobCard: React.FC<JobCardProps> = ({ job, onViewApplicants, companyId, onStatusChanged }) => {
+  const [isLoading, setIsLoading] = useState(false);
+  
+  const handleToggleStatus = async () => {
+    if (!companyId) {
+      toast.error('Company ID is required to change job status');
+      return;
+    }
+    
+    try {
+      setIsLoading(true);
+      const newStatus = job.job_status.toLowerCase() === 'open' ? 'Closed' : 'Open';
+      
+      await changeJobStatus(job._id, companyId, newStatus);
+      
+      toast.success(`Job successfully ${newStatus.toLowerCase()}`);
+      
+      // Refresh the job list if callback is provided
+      if (onStatusChanged) {
+        onStatusChanged();
+      }
+    } catch (error) {
+      console.error('Failed to change job status:', error);
+      toast.error('Failed to update job status');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
   return (
     <div 
       id={`job-card-${job._id}`} 
@@ -58,10 +90,15 @@ export const JobCard: React.FC<JobCardProps> = ({ job, onViewApplicants }) => {
         </button>
         <div className="flex space-x-2">
           <button 
-            id={`job-edit-btn-${job._id}`}
-            className="text-red-600 dark:text-red-400 text-sm hover:underline"
+            id={`job-toggle-status-btn-${job._id}`}
+            onClick={handleToggleStatus}
+            disabled={isLoading}
+            className={`text-sm hover:underline ${
+              isLoading ? 'text-gray-400 dark:text-gray-500 cursor-not-allowed' :
+              job.job_status.toLowerCase() === 'open' ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'
+            }`}
           >
-            Close
+            {isLoading ? 'Updating...' : job.job_status.toLowerCase() === 'open' ? 'Close' : 'Open'}
           </button>
         </div>
       </div>
