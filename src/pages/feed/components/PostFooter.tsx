@@ -224,8 +224,8 @@ const PostFooter: React.FC<PostFooterProps> = ({
             </div>
           </div>
         )}
-      {(comment_privacy !== "Connections only" || connection_degree) ===
-        "1st" && (
+      {(comment_privacy !== "Connections only" ||
+        connection_degree === "1st") && (
         <>
           <div className="flex w-full items-center justify-between h-full">
             <div className="flex space-x-3 justify-start items-center w-full h-full">
