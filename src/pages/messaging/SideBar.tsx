@@ -145,7 +145,7 @@ const SideBar = () => {
       socketService.off("user_online", handleUserOnline);
       socketService.off("user_offline", handleUserOffline);
     };
-  }, [id]);
+  }, [id,dataInfo]);
   
 
   useEffect(() => {
@@ -222,9 +222,8 @@ const SideBar = () => {
     if (dataType.includes("Unread")) {
       if (token) {
         try {
-          await markConversationAsRead(token, conversationID); // API call first
+          await markConversationAsRead(token, conversationID); 
 
-          // On success, update local state and show toast
           const updatedData = dataInfo.map((message) =>
             message.conversationId === conversationID
               ? {
@@ -590,9 +589,9 @@ const SideBar = () => {
                 )}
 
                 {data.conversationType.includes("Unread") &&
-                  data.unreadCount > 0 && (
+                   (
                     <span className="flex items-center justify-center text-xs rounded-full text-white w-4 h-4 bg-blue-600 font-medium">
-                      {data.unreadCount}
+                      
                     </span>
                   )}
               </div>
