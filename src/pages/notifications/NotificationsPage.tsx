@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useSelector } from "react-redux";
 import styles from "./notifications.module.css";
 import {
@@ -14,6 +14,8 @@ import {
   markNotificationAsRead,
   getUnreadNotificationsCount,
 } from "@/endpoints/notifications";
+// Import the notifications socket service
+import notificationsSocket from "@/services/notificationsSocket"; 
 import { Notification } from "@/types";
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
@@ -93,7 +95,7 @@ const NotificationsPage: React.FC = () => {
     (state: RootState) => state.theme.theme === "dark"
   );
   const token = Cookies.get("linkup_auth_token");
-  const userId=Cookies.get('linkup_user_id')
+  const userId = Cookies.get("linkup_user_id");
 
   const fetchNotifications = async () => {
     if (!token) {
@@ -132,9 +134,45 @@ const NotificationsPage: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    fetchNotifications();
+  // Handler for new notifications received via socket
+  const handleNewNotification = useCallback((notification: Notification) => {
+    setNotifications(prev => {
+      // Check if this notification is already in our list
+      const exists = prev.some(n => n.id === notification.id);
+      if (exists) return prev;
+      
+      // Add the new notification at the beginning of the list
+      return [notification, ...prev];
+    });
+    
+    // Update unread count
+    setUnreadCount(prev => prev + 1);
   }, []);
+
+  // Handler for unread count updates via socket
+  const handleUnreadCountUpdate = useCallback((count: number) => {
+    setUnreadCount(count);
+  }, []);
+
+  // Connect to socket when component mounts
+  useEffect(() => {
+    // Initialize socket connection
+    notificationsSocket.connect();
+    
+    // Set up listeners for socket events
+    notificationsSocket.on('new_notification', handleNewNotification);
+    notificationsSocket.on('unread_notifications_count', handleUnreadCountUpdate);
+    
+    // Fetch initial notifications
+    fetchNotifications();
+    
+    // Clean up socket listeners when component unmounts
+    return () => {
+      notificationsSocket.off('new_notification', handleNewNotification);
+      notificationsSocket.off('unread_notifications_count', handleUnreadCountUpdate);
+      // Don't disconnect - other components might be using the socket
+    };
+  }, [handleNewNotification, handleUnreadCountUpdate]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -204,6 +242,10 @@ const NotificationsPage: React.FC = () => {
     });
 
     try {
+      // Use the socket to mark notification as read
+      notificationsSocket.markNotificationAsRead(notification.id);
+      
+      // Also update via REST API for reliability
       await markNotificationAsRead(token as string, notification.id);
 
       // Update the notifications array to mark this notification as read
@@ -215,9 +257,6 @@ const NotificationsPage: React.FC = () => {
 
       // Decrement the unread count
       setUnreadCount((prevCount) => Math.max(0, prevCount - 1));
-
-      // Also fetch the updated count from the server to ensure consistency
-      await updateUnreadCount();
     } catch (error) {
       console.error("Error marking notification as read:", error);
 
@@ -240,6 +279,10 @@ const NotificationsPage: React.FC = () => {
     setActiveOptionsDropdown(null);
 
     try {
+      // Use socket to mark notification as read
+      notificationsSocket.markNotificationAsRead(notification.id);
+      
+      // Also update via REST API for reliability
       await markNotificationAsRead(token as string, notification.id);
 
       // Update the notifications array
@@ -251,11 +294,31 @@ const NotificationsPage: React.FC = () => {
 
       // Decrement the unread count
       setUnreadCount((prevCount) => Math.max(0, prevCount - 1));
-
-      // Also fetch the updated count from the server
-      await updateUnreadCount();
     } catch (error) {
       console.error("Error marking notification as read:", error);
+    }
+  };
+
+  // New function to mark all notifications as read
+  const handleMarkAllAsRead = () => {
+    if (unReadCount === 0) return;
+    
+    try {
+      // Use socket to mark all notifications as read
+      notificationsSocket.markAllNotificationsAsRead();
+      
+      // Update local state
+      setNotifications(prevNotifications =>
+        prevNotifications.map(item => ({ ...item, isRead: true }))
+      );
+      
+      // Reset unread count
+      setUnreadCount(0);
+      
+      // Clear clicked notifications
+      setClickedNotifications(new Set());
+    } catch (error) {
+      console.error("Error marking all notifications as read:", error);
     }
   };
 
@@ -321,7 +384,7 @@ const NotificationsPage: React.FC = () => {
     return format(date, "MMM d, yyyy h:mm a");
   };
 
-  const handleNavigation = (type: Notification["type"],refId:string) => {
+  const handleNavigation = (type: Notification["type"], refId: string) => {
     if (type === "connection_request") {
       return navigate(`/my-network`);
     }
@@ -331,11 +394,11 @@ const NotificationsPage: React.FC = () => {
     if (type === "message") {
       return navigate("/messaging");
     }
-    if(type==='comment'||type==='reacted'){
-      return navigate(`/feed/posts/${refId}`)
+    if (type === "comment" || type === "reacted") {
+      return navigate(`/feed/posts/${refId}`);
     }
-    if(type==='connection_accepted'){
-      return navigate(`/connections/${userId}`)
+    if (type === "connection_accepted") {
+      return navigate(`/connections/${userId}`);
     }
   };
 
@@ -441,6 +504,18 @@ const NotificationsPage: React.FC = () => {
           </div>
 
           <div className={styles.mainContent}>
+            {/* Mark all as read button - New feature */}
+            {unReadCount > 0 && (
+              <div className={styles.markAllAsReadContainer}>
+                <button 
+                  className={styles.markAllAsReadButton}
+                  onClick={handleMarkAllAsRead}
+                >
+                  Mark all as read
+                </button>
+              </div>
+            )}
+            
             <div className={styles.notificationsList}>
               {loading ? (
                 <div className={styles.loading}>Loading notifications...</div>
@@ -483,7 +558,7 @@ const NotificationsPage: React.FC = () => {
                           className={styles.actionButton}
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleNavigation(notification.type,notification.referenceId);
+                            handleNavigation(notification.type, notification.referenceId);
                           }}
                         >
                           View {notification.type}
