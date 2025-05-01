@@ -29,24 +29,24 @@ const ReasonPage: React.FC = () => {
 
   return (
     <SettingsLayoutPage>
-      <div className="bg-white rounded-lg shadow-[0_1px_3px_rgba(0,0,0,0.1)] p-6 mx-auto w-[800px]">
+      <div className="bg-white dark:bg-[#111827] rounded-lg shadow-[0_1px_3px_rgba(0,0,0,0.1)] dark:shadow-[0_1px_3px_rgba(255,255,255,0.1)] p-6 mx-auto w-[800px]">
         <div className="mb-6">
           <button 
             onClick={() => navigate(-1)} 
-            className="bg-transparent border-0 text-[#666666] cursor-pointer text-sm p-0 mb-4 flex items-center hover:text-[#0891b2]"
+            className="bg-transparent border-0 text-[#666666] dark:text-[rgba(255,255,255,0.6)] cursor-pointer text-sm p-0 mb-4 flex items-center hover:text-[#0891b2] dark:hover:text-[#0891b2]"
           >
             ← Back
           </button>
-          <h1 className="text-xl font-semibold m-0 text-black">
+          <h1 className="text-xl font-semibold m-0 text-black dark:text-[rgba(255,255,255,0.87)]">
             Close account
           </h1>
-          <p className="text-base text-[#666666] mt-2 mb-0">
+          <p className="text-base text-[#666666] dark:text-[rgba(255,255,255,0.6)] mt-2 mb-0">
             Malak, we're sorry to see you go
           </p>
         </div>
 
         <div className="mt-4">
-          <p className="text-sm text-[#333333] mb-4">
+          <p className="text-sm text-[#333333] dark:text-[rgba(255,255,255,0.87)] mb-4">
             Tell us the reason for closing your account:
           </p>
 
@@ -61,7 +61,7 @@ const ReasonPage: React.FC = () => {
                   onChange={() => handleReasonChange(reason)}
                   className="mr-3 cursor-pointer"
                 />
-                <span className="text-sm text-[#333333]">{reason}</span>
+                <span className="text-sm text-[#333333] dark:text-[rgba(255,255,255,0.87)]">{reason}</span>
               </label>
             ))}
           </div>
