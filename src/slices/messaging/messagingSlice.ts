@@ -96,8 +96,7 @@ interface MessageState {
   responsiveIsSidebar:boolean;
   chatData:chattingMessages;
   setEditedMessageIds: string[];
-  onlineFriends: Record<string, boolean>;
-  onlineStatus: boolean;
+  setDataInfo:Conversation[];
 
 
 
@@ -142,8 +141,8 @@ const initialState: MessageState = {
     messages: []
 },
 setEditedMessageIds:[],
-onlineFriends: {},
-onlineStatus: false,
+setDataInfo:[],
+
 
 
 };
@@ -219,13 +218,13 @@ const MessagingSlice = createSlice({
       state.responsiveIsSidebar = action.payload;
     },
 
-    /*onlineStatus*/
-    setFriendOnlineStatus: (state, action: PayloadAction<{userId: string, isOnline: boolean}>) => {
-      state.onlineFriends[action.payload.userId] = action.payload.isOnline;
-      if (action.payload.userId === state.user2Id) {
-        state.onlineStatus = action.payload.isOnline;
-      }
-    }
+    /*setDataInfon 3ashan a print el data ely bta3 el conversation*/
+    setDataInfo: (state, action: PayloadAction<Conversation[]>) => {
+      state.setDataInfo = action.payload; 
+    },
+
+    
+
 
     
     
@@ -235,5 +234,5 @@ const MessagingSlice = createSlice({
   },
 });
 
-export const {toggleStarred, activeButton, searchFiltering, selectMessage,selectUserName,selectUserStatus,setEditingMessageId,setEditText,clearEditingState,selectUserId,addMessage,setResponsiveIsSidebar,setChatData,setEditedMessageIds,setFriendOnlineStatus} = MessagingSlice.actions;
+export const {toggleStarred, activeButton, searchFiltering, selectMessage,selectUserName,selectUserStatus,setEditingMessageId,setEditText,clearEditingState,selectUserId,addMessage,setResponsiveIsSidebar,setChatData,setEditedMessageIds,setDataInfo} = MessagingSlice.actions;
 export default MessagingSlice.reducer;
