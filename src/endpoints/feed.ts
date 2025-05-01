@@ -349,11 +349,15 @@ export const createPost = async (postPayload: PostDBObject, token: string) => {
 };
 
 export const editPost = async (postPayload: PostDBObject, token: string) => {
-  const response = await axiosInstance.patch("api/v2/post/posts", postPayload, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  const response = await axiosInstance.patch(
+    `api/v2/post/posts/${postPayload._id}`,
+    postPayload,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
   return response.data;
 };
 
