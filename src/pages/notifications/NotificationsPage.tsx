@@ -14,12 +14,28 @@ import {
   markNotificationAsRead,
   getUnreadNotificationsCount,
 } from "@/endpoints/notifications";
-// Import the notifications socket service
-import notificationsSocket from "@/services/notificationsSocket"; 
 import { Notification } from "@/types";
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
+// MODIFIED: Import socket service
+import { socketService, IncomingNotification, IncomingNotificationCount } from "@/services/socket";
+
+// MODIFIED: Helper function to validate notification types
+const validateNotificationType = (type: string): Notification['type'] => {
+  const validTypes: Notification['type'][] = [
+    'reacted', 'message', 'connection_request', 
+    'comment', 'follow', 'connection_accepted'
+  ];
+  
+  if (validTypes.includes(type as any)) {
+    return type as Notification['type'];
+  }
+  
+  // Default to 'message' if type is invalid
+  console.warn(`Invalid notification type received: ${type}, defaulting to 'message'`);
+  return 'message';
+};
 
 export type Tab = "all" | "posts" | "messages";
 export type PostFilter = "all" | "comments" | "reactions";
@@ -95,7 +111,7 @@ const NotificationsPage: React.FC = () => {
     (state: RootState) => state.theme.theme === "dark"
   );
   const token = Cookies.get("linkup_auth_token");
-  const userId = Cookies.get("linkup_user_id");
+  const userId = Cookies.get('linkup_user_id');
 
   const fetchNotifications = async () => {
     if (!token) {
@@ -134,45 +150,91 @@ const NotificationsPage: React.FC = () => {
     }
   };
 
-  // Handler for new notifications received via socket
-  const handleNewNotification = useCallback((notification: Notification) => {
-    setNotifications(prev => {
-      // Check if this notification is already in our list
-      const exists = prev.some(n => n.id === notification.id);
-      if (exists) return prev;
-      
-      // Add the new notification at the beginning of the list
-      return [notification, ...prev];
-    });
+  // MODIFIED: Added a function to handle new notifications from socket
+  const handleNewNotification = useCallback((data: IncomingNotification) => {
+    console.log("Socket received new notification:", data);
     
-    // Update unread count
-    setUnreadCount(prev => prev + 1);
+    // Convert the socket notification to the app's Notification type
+    // Ensure we're using the correct type from the union type
+    const notificationType = validateNotificationType(data.type);
+    
+    const newNotification: Notification = {
+      id: data.id,
+      type: notificationType,
+      content: data.content,
+      createdAt: data.createdAt,
+      isRead: false,
+      referenceId: data.referenceId,
+      sender: {
+        id: data.senderId,
+        firstName: data.senderName.split(' ')[0] || '',
+        lastName: data.senderName.split(' ')[1] || '',
+        profilePhoto: data.senderPhoto || '/api/placeholder/50/50' // Default if null
+      }
+    };
+    
+    // Add it to the notifications list (at the beginning since it's newest)
+    setNotifications(prev => [newNotification, ...prev]);
+    
+    // Increment unread count
+    setUnreadCount(prevCount => prevCount + 1);
   }, []);
 
-  // Handler for unread count updates via socket
-  const handleUnreadCountUpdate = useCallback((count: number) => {
-    setUnreadCount(count);
+  // MODIFIED: Added function to handle unread notification count updates from socket
+  const handleUnreadNotificationsCount = useCallback((data: IncomingNotificationCount) => {
+    console.log("Socket received unread notifications count:", data);
+    setUnreadCount(data.count);
   }, []);
 
-  // Connect to socket when component mounts
   useEffect(() => {
-    // Initialize socket connection
-    notificationsSocket.connect();
-    
-    // Set up listeners for socket events
-    notificationsSocket.on('new_notification', handleNewNotification);
-    notificationsSocket.on('unread_notifications_count', handleUnreadCountUpdate);
-    
-    // Fetch initial notifications
     fetchNotifications();
     
-    // Clean up socket listeners when component unmounts
-    return () => {
-      notificationsSocket.off('new_notification', handleNewNotification);
-      notificationsSocket.off('unread_notifications_count', handleUnreadCountUpdate);
-      // Don't disconnect - other components might be using the socket
-    };
-  }, [handleNewNotification, handleUnreadCountUpdate]);
+    // MODIFIED: Setup socket event listeners for notifications
+    if (token && socketService.isConnected()) {
+      // Register socket event listeners
+      const removeNewNotificationListener = socketService.on<IncomingNotification>(
+        'new_notification', 
+        handleNewNotification
+      );
+      
+      const removeUnreadCountListener = socketService.on<IncomingNotificationCount>(
+        'unread_notifications_count', 
+        handleUnreadNotificationsCount
+      );
+      
+      // Cleanup listeners when component unmounts
+      return () => {
+        removeNewNotificationListener();
+        removeUnreadCountListener();
+      };
+    } else if (token && !socketService.isConnected()) {
+      // Try to connect socket if we have a token but socket isn't connected
+      socketService.connect(token)
+        .then(() => {
+          console.log("Socket connected for notifications");
+          
+          // Register listeners after successful connection
+          const removeNewNotificationListener = socketService.on<IncomingNotification>(
+            'new_notification', 
+            handleNewNotification
+          );
+          
+          const removeUnreadCountListener = socketService.on<IncomingNotificationCount>(
+            'unread_notifications_count', 
+            handleUnreadNotificationsCount
+          );
+          
+          // Update cleanup function
+          return () => {
+            removeNewNotificationListener();
+            removeUnreadCountListener();
+          };
+        })
+        .catch(error => {
+          console.error("Failed to connect socket for notifications:", error);
+        });
+    }
+  }, [token, handleNewNotification, handleUnreadNotificationsCount]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -230,6 +292,7 @@ const NotificationsPage: React.FC = () => {
     );
   };
 
+  // MODIFIED: Updated to use socket for marking as read when possible
   const handleNotificationClick = async (notification: Notification) => {
     // Don't mark as read if already read
     if (!notification.id || notification.isRead) return;
@@ -242,11 +305,12 @@ const NotificationsPage: React.FC = () => {
     });
 
     try {
-      // Use the socket to mark notification as read
-      notificationsSocket.markNotificationAsRead(notification.id);
-      
-      // Also update via REST API for reliability
-      await markNotificationAsRead(token as string, notification.id);
+      // MODIFIED: Use socket if connected, fallback to API call
+      if (socketService.isConnected()) {
+        socketService.markNotificationAsRead(notification.id);
+      } else {
+        await markNotificationAsRead(token as string, notification.id);
+      }
 
       // Update the notifications array to mark this notification as read
       setNotifications((prevNotifications) =>
@@ -257,6 +321,14 @@ const NotificationsPage: React.FC = () => {
 
       // Decrement the unread count
       setUnreadCount((prevCount) => Math.max(0, prevCount - 1));
+
+      // Also fetch the updated count from the server to ensure consistency
+      if (!socketService.isConnected()) {
+        await updateUnreadCount();
+      }
+      
+      // Navigate to the appropriate page based on notification type
+      handleNavigation(notification.type, notification.referenceId);
     } catch (error) {
       console.error("Error marking notification as read:", error);
 
@@ -269,6 +341,7 @@ const NotificationsPage: React.FC = () => {
     }
   };
 
+  // MODIFIED: Updated to use socket for marking as read when possible
   const handleMarkAsRead = async (
     e: React.MouseEvent,
     notification: Notification
@@ -279,11 +352,12 @@ const NotificationsPage: React.FC = () => {
     setActiveOptionsDropdown(null);
 
     try {
-      // Use socket to mark notification as read
-      notificationsSocket.markNotificationAsRead(notification.id);
-      
-      // Also update via REST API for reliability
-      await markNotificationAsRead(token as string, notification.id);
+      // MODIFIED: Use socket if connected, fallback to API call
+      if (socketService.isConnected()) {
+        socketService.markNotificationAsRead(notification.id);
+      } else {
+        await markNotificationAsRead(token as string, notification.id);
+      }
 
       // Update the notifications array
       setNotifications((prevNotifications) =>
@@ -294,29 +368,34 @@ const NotificationsPage: React.FC = () => {
 
       // Decrement the unread count
       setUnreadCount((prevCount) => Math.max(0, prevCount - 1));
+
+      // Also fetch the updated count from the server if socket not connected
+      if (!socketService.isConnected()) {
+        await updateUnreadCount();
+      }
     } catch (error) {
       console.error("Error marking notification as read:", error);
     }
   };
 
-  // New function to mark all notifications as read
+  // MODIFIED: Added function to mark all notifications as read using socket
   const handleMarkAllAsRead = () => {
-    if (unReadCount === 0) return;
+    if (!notifications.length || !token) return;
     
     try {
-      // Use socket to mark all notifications as read
-      notificationsSocket.markAllNotificationsAsRead();
-      
-      // Update local state
-      setNotifications(prevNotifications =>
-        prevNotifications.map(item => ({ ...item, isRead: true }))
-      );
-      
-      // Reset unread count
-      setUnreadCount(0);
-      
-      // Clear clicked notifications
-      setClickedNotifications(new Set());
+      if (socketService.isConnected()) {
+        socketService.markAllNotificationsAsRead();
+        
+        // Optimistically update UI
+        setNotifications(prevNotifications => 
+          prevNotifications.map(item => ({ ...item, isRead: true }))
+        );
+        setUnreadCount(0);
+      } else {
+        // If socket isn't connected, we'd need an API fallback
+        // This would need to be implemented on the server side
+        console.warn("Socket not connected, can't mark all as read");
+      }
     } catch (error) {
       console.error("Error marking all notifications as read:", error);
     }
@@ -394,11 +473,11 @@ const NotificationsPage: React.FC = () => {
     if (type === "message") {
       return navigate("/messaging");
     }
-    if (type === "comment" || type === "reacted") {
-      return navigate(`/feed/posts/${refId}`);
+    if (type === 'comment' || type === 'reacted') {
+      return navigate(`/feed/posts/${refId}`)
     }
-    if (type === "connection_accepted") {
-      return navigate(`/connections/${userId}`);
+    if (type === 'connection_accepted') {
+      return navigate(`/connections/${userId}`)
     }
   };
 
@@ -412,6 +491,15 @@ const NotificationsPage: React.FC = () => {
             <a href="/settings/notifications" className={styles.settingsLink}>
               View settings
             </a>
+            {/* MODIFIED: Added mark all as read button */}
+            {unReadCount > 0 && (
+              <button 
+                className={styles.markAllReadButton}
+                onClick={handleMarkAllAsRead}
+              >
+                Mark all as read
+              </button>
+            )}
           </div>
         </div>
 
@@ -504,18 +592,6 @@ const NotificationsPage: React.FC = () => {
           </div>
 
           <div className={styles.mainContent}>
-            {/* Mark all as read button - New feature */}
-            {unReadCount > 0 && (
-              <div className={styles.markAllAsReadContainer}>
-                <button 
-                  className={styles.markAllAsReadButton}
-                  onClick={handleMarkAllAsRead}
-                >
-                  Mark all as read
-                </button>
-              </div>
-            )}
-            
             <div className={styles.notificationsList}>
               {loading ? (
                 <div className={styles.loading}>Loading notifications...</div>
