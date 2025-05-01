@@ -189,7 +189,7 @@ const ChatingScreen = () => {
           isEdited: false,
         };
 
-        let updatedMessages = [...(dataChat?.messages || [])];
+        const updatedMessages = [...(dataChat?.messages || [])];
 
         // 1. Try replacing temporary message
         const tempIndex = updatedMessages.findIndex(
