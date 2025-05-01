@@ -21,6 +21,13 @@ export interface incomingMessageRead {
   readBy: string;
 }
 
+export interface incomingUnreadMessagesCount{
+  conversationId: string;
+  count: number;
+}
+
+
+
 
 
 class SocketService {
@@ -151,6 +158,9 @@ class SocketService {
 
     this.socket.on('user_offline', (data) => {
       console.log('User offline:', data);
+    });
+    this.socket.on('conversation_unread_count', (data) => {
+      console.log('Count for each conversation:', data);
     });
   }
 
