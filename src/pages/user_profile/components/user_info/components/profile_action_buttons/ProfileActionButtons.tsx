@@ -52,6 +52,8 @@ export interface ProfileActionButtonsProps {
   connectionCount: number;
   isAllowingMessage: boolean;
   isViewerSubscribed: boolean;
+  setOpenSubscribeNowDialog: React.Dispatch<React.SetStateAction<boolean>>;
+  isPremium: boolean;
 }
 
 const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
@@ -65,6 +67,8 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
   resume,
   isAllowingMessage,
   isViewerSubscribed,
+  setOpenSubscribeNowDialog,
+  isPremium,
 }) => {
   const { id } = useParams();
   const userBioState = useSelector((state: RootState) => state.userBio);
@@ -287,9 +291,10 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
     ) {
       alert("You Can Send Message Directly");
     } else {
-      alert("You Cant Send Message Directly, please subscribe to send");
+      setOpenSubscribeNowDialog(true);
     }
   }, []);
+
   const handleBlock = useCallback(async () => {
     let resolveDelay: (result: string) => void;
     // Create a promise that resolves after 4000ms or when cancel is clicked
@@ -333,10 +338,9 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
       }
     }
   }, []);
-  const handleEnhanceProfile = useCallback(
-    () => alert("Enhance Profile clicked"),
-    []
-  );
+  const handleEnhanceProfile = useCallback(() => {
+    setOpenSubscribeNowDialog(true);
+  }, []);
   const handleOpenToWork = useCallback(() => alert("Open to Work clicked"), []);
   const handleAboutProfile = useCallback(
     () => alert("About Profile clicked"),
@@ -362,13 +366,16 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
           Open to work
         </CustomButton>
         <AddSectionModal />
-        <CustomButton
-          id="enhance-profile-button"
-          variant="secondary"
-          onClick={handleEnhanceProfile}
-        >
-          Enhance Profile
-        </CustomButton>
+        {!isPremium && (
+          <CustomButton
+            id="enhance-profile-button"
+            variant="secondary"
+            onClick={handleEnhanceProfile}
+          >
+            Enhance Profile
+          </CustomButton>
+        )}
+
         <ResourcesPopover
           title="Resources"
           isOwner

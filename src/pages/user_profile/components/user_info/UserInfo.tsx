@@ -15,8 +15,13 @@ import { RootState } from "@/store";
 import { getErrorMessage } from "@/utils/errorHandler";
 import { AxiosError } from "axios";
 import { useEffect, useState } from "react";
+import { Dialog, DialogContent, SubscribeNowCard } from "@/components";
 
-const UserInfo = () => {
+interface UserInfoProps {
+  setIsProfileVisible: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const UserInfo: React.FC<UserInfoProps> = ({ setIsProfileVisible }) => {
   const token = Cookies.get("linkup_auth_token");
   const myUserId = Cookies.get("linkup_user_id");
 
@@ -44,10 +49,17 @@ const UserInfo = () => {
   const [isInConnections, setIsInConnections] = useState<boolean | undefined>(
     undefined
   );
+  const [openSubscribeNowDialog, setOpenSubscribeNowDialog] = useState(false);
   useEffect(() => {
     if (data) {
       setNumOfConnections(data.number_of_connections);
       setIsInConnections(data.isInConnections);
+      setIsProfileVisible(
+        data.is_me ||
+          (data.profile_visibility === "Connections only" &&
+            !!data.isInConnections) ||
+          data.profile_visibility === "Public"
+      );
     }
   }, [data]);
   if (!id || getErrorMessage(error).toLocaleLowerCase() === "user not found") {
@@ -62,7 +74,10 @@ const UserInfo = () => {
   return (
     <section className="bg-white dark:bg-gray-900 rounded-lg shadow-md overflow-hidden">
       <CoverPhoto src={data.cover_photo} isOwner={data.is_me}>
-        <ProfileAvatar src={data.profile_photo} isOwner={data.is_me} />
+        <ProfileAvatar
+          src={data.profile_photo}
+          isOwner={data.is_me}
+        />
       </CoverPhoto>
 
       <div className="pt-20 px-6 pb-6">
@@ -76,6 +91,7 @@ const UserInfo = () => {
           connectionsCount={numOfConnections}
           isOwner={data.is_me}
           isInConnection={isInConnections}
+          isPremium={data.isSubscribed}
         />
 
         <ProfileActionButtons
@@ -86,6 +102,7 @@ const UserInfo = () => {
           connectionCount={numOfConnections}
           email={data.email}
           resume={data.resume}
+          setOpenSubscribeNowDialog={setOpenSubscribeNowDialog}
           isAllowingMessage={data.allow_messaging}
           isViewerSubscribed={data.viewer_user_is_subscribed}
           followStatus={{
@@ -95,8 +112,17 @@ const UserInfo = () => {
             isInConnection: data.isInConnections,
             isInRecievedConnections: data.is_in_received_connections,
           }}
+          isPremium={data.isSubscribed}
         />
       </div>
+      <Dialog
+        open={openSubscribeNowDialog}
+        onOpenChange={setOpenSubscribeNowDialog}
+      >
+        <DialogContent className="bg-white dark:bg-gray-900 dark:border-gray-500">
+          <SubscribeNowCard />
+        </DialogContent>
+      </Dialog>
     </section>
   );
 };

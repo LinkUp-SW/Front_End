@@ -17,15 +17,15 @@ export interface JobData {
     name: string;
     logo: string;
     description: string;
-    linkup_presence: string;
     size: string;
     industry: string;
     followers: string;
+    followers_count:number;
   };
   job_title: string;
   location: string;
   workplace_type: "On-site" | "Remote" | "Hybrid";
-  experience_level: 'Internship' | 'Entry level' | 'Associate' | 'Mid-Senior level' | 'Director' | 'Executive';
+  experience_level: 'Internship' | 'Entry Level' | 'Associate' | 'Mid-Senior' | 'Director' | 'Executive';
   salary: string;
   posted_time: string;
   timeAgo: string;
@@ -70,6 +70,16 @@ interface JobSearchResponse {
   nextCursor: string;
 }
 
+// Token helper function
+const getAuthToken = () => {
+  const token = Cookies.get('linkup_auth_token');
+  if (!token) {
+    throw new Error('Authentication required');
+  }
+  return token;
+};
+
+
 // Helper function to add auth header
 const getAuthHeader = (token: string) => ({
   headers: { Authorization: `Bearer ${token}` }
@@ -102,14 +112,7 @@ export const fetchSingleJob = async (token: string, jobId: string): Promise<{ da
   return response.data;
 };
 
-// Token helper function
-const getAuthToken = () => {
-  const token = Cookies.get('linkup_auth_token');
-  if (!token) {
-    throw new Error('Authentication required');
-  }
-  return token;
-};
+
 
 // Saved jobs functions
 export const fetchSavedJobs = async (): Promise<JobData[]> => {
@@ -136,6 +139,7 @@ export const removeFromSaved = async (jobId: string): Promise<{ message: string 
 // Helper to convert JobData to Job interface
 export const convertJobDataToJob = (jobData: JobData): Job => {
   return {
+    _id: jobData._id, 
     id: jobData._id,
     title: jobData.job_title,
     company: jobData.organization?.name || '',
@@ -154,14 +158,18 @@ export const convertJobDataToJob = (jobData: JobData): Job => {
     benefits: jobData.benefits,
     salary: jobData.salary,
     companyInfo: jobData.organization ? {
+      _id: jobData.organization._id,
       name: jobData.organization.name,
       logo: jobData.organization.logo,
-      followers: jobData.organization.followers,
+      description: jobData.organization.description,
+      industry: jobData.organization.industry,
+      size: jobData.organization.size,
+      followers: jobData.organization.followers ? [jobData.organization.followers] : [],
+      followers_count: jobData.organization.followers_count,
       industryType: jobData.organization.industry,
-      employeeCount: jobData.organization.size,
-      linkupPresence: jobData.organization.linkup_presence,
-      description: jobData.organization.description
-    } : undefined
+      employeeCount: jobData.organization.size
+    } : undefined,
+    job_status: 'open',  
   };
 };
 

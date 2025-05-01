@@ -28,10 +28,22 @@ import UserExperiencesPage from "./user_profile/user_experiences/UserExperiences
 import SignInAndSecurityPage from "./settings/SignInAndSecurityPage";
 import ChangePasswordPage from "./settings/ChangePasswordPage";
 import MyItemsPage from "./my_items/MyItemsPage";
+import AccountPreferencePage from "./settings/AccountPreferencePage";
+// Import new close account pages
+import InstructionPage from "./settings/InstructionPage";
+import ReasonPage from "./settings/ReasonPage";
+import OtherOptionPage from "./settings/OtherOptionPage";
+import LastPage from "./settings/LastPage";
 import PrimaryEmailPage from "./settings/updateEmail/PrimaryEmailPage";
 import OTP from "./settings/updateEmail/OTP";
 import AddEmailPage from "./settings/updateEmail/AddEmailPage";
 import AllPeoplePage from "./search/AllPeoplePage";
+import CompanyCreationPage from "./company/CompanyCreationPage";
+import ManageCompanyPage from "./company/ManageCompanyPage";
+import CreateJobPage from "./company/CreateJobPage";
+// Import new visibility pages
+import VisibilityPage from "./settings/VisibilityPage";
+import BlockingListPage from "./settings/BlockingListPage";
 import AdminPanelSidebar from "./admin/components/AdminPanel";
 import DashboardPage from "./admin/DashboardPage";
 import SettingsPage from "./admin/SettingsPage";
@@ -70,10 +82,22 @@ export {
   SignInAndSecurityPage,
   ChangePasswordPage,
   MyItemsPage,
+  AccountPreferencePage,
+  // Export new close account pages
+  InstructionPage,
+  ReasonPage,
+  OtherOptionPage,
+  LastPage,
   PrimaryEmailPage,
   OTP,
   AddEmailPage,
   AllPeoplePage,
+  CompanyCreationPage,
+  ManageCompanyPage,
+  CreateJobPage,
+  // Export new visibility pages
+  VisibilityPage,
+  BlockingListPage,
   AdminPanelSidebar,
   DashboardPage,
   SettingsPage,
@@ -81,4 +105,5 @@ export {
   AnalyticsPage,
   JobPostingsPage,
   ContentModerationPage
+
 };

@@ -1,0 +1,209 @@
+.blockingContainer {
+    background-color: white;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    width: 100%;
+    overflow: hidden;
+  }
+  
+  .headerContainer {
+    padding: 20px 24px;
+    border-bottom: 1px solid #e0e0e0;
+    display: flex;
+    align-items: center;
+  }
+  
+  .backButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    padding: 0;
+    margin-right: 16px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  
+  .pageTitle {
+    font-size: 20px;
+    font-weight: 600;
+    color: rgba(0, 0, 0, 0.9);
+    margin: 0;
+    flex-grow: 1;
+  }
+  
+  .blockCount {
+    font-size: 14px;
+    color: rgba(0, 0, 0, 0.6);
+    margin: 6px 24px;
+  }
+  
+  .blockedList {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  
+  .blockedItem {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    border-top: 1px solid #e0e0e0;
+  }
+  
+  .userInfo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  .blockIcon {
+    color: rgba(0, 0, 0, 0.6);
+    font-size: 18px;
+  }
+  
+  .userName {
+    font-size: 16px;
+    font-weight: 600;
+    color: rgba(0, 0, 0, 0.9);
+  }
+  
+  .blockTime {
+    font-size: 14px;
+    color: rgba(0, 0, 0, 0.6);
+  }
+  
+  .unblockButton {
+    background: none;
+    border: none;
+    color: #0a66c2;
+    font-weight: 600;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 6px 8px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+  }
+  
+  .unblockButton:hover {
+    background-color: rgba(10, 102, 194, 0.1);
+    text-decoration: underline;
+  }
+  
+  /* Modal Styles */
+  .modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .modalContent {
+    background-color: white;
+    border-radius: 8px;
+    width: 350px;
+    max-width: 90%;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    position: relative;
+  }
+  
+  .modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px 0;
+  }
+  
+  .modalTitle {
+    font-size: 18px;
+    font-weight: 600;
+    color: rgba(0, 0, 0, 0.9);
+    margin: 0;
+  }
+  
+  .closeButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 20px;
+    color: rgba(0, 0, 0, 0.6);
+  }
+  
+  .modalBody {
+    padding: 16px 24px;
+  }
+  
+  .modalText {
+    font-size: 14px;
+    color: rgba(0, 0, 0, 0.9);
+    margin-bottom: 16px;
+  }
+  
+  .passwordInput {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+    font-size: 14px;
+    margin-bottom: 16px;
+  }
+  
+  .passwordInput:focus {
+    outline: none;
+    border-color: #0a66c2;
+    box-shadow: 0 0 0 1px #0a66c2;
+  }
+  
+  .passwordLabel {
+    display: block;
+    font-size: 14px;
+    color: rgba(0, 0, 0, 0.9);
+    margin-bottom: 8px;
+  }
+  
+  .passwordLabel::after {
+    content: " *";
+    color: #b24020;
+  }
+  
+  .modalFooter {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 24px 20px;
+  }
+  
+  .unblockMemberButton {
+    background-color: rgba(0, 0, 0, 0.08);
+    color: rgba(0, 0, 0, 0.6);
+    font-weight: 600;
+    border: none;
+    border-radius: 16px;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .unblockMemberButton:hover {
+    background-color: rgba(0, 0, 0, 0.12);
+  }
+  
+  .forgotPasswordLink {
+    color: #0a66c2;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  
+  .forgotPasswordLink:hover {
+    text-decoration: underline;
+  }

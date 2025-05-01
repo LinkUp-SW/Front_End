@@ -1,5 +1,3 @@
-// src/routes.ts
-
 import { RouteObject } from "react-router-dom";
 import {
   LandingPage,
@@ -29,25 +27,31 @@ import {
   SignInAndSecurityPage,
   ChangePasswordPage,
   MyItemsPage,
+  AccountPreferencePage,
+  InstructionPage,
+  ReasonPage,
+  OtherOptionPage,
+  LastPage,
   AllPeoplePage,
-
+  CompanyCreationPage,
+  ManageCompanyPage,
+  CreateJobPage,
   DashboardPage,
   SettingsPage,
   UsersPage,
   AnalyticsPage,
   ContentModerationPage,
 
-  
-
 } from "./pages";
 
 import PrimaryEmailPage from "./pages/settings/updateEmail/PrimaryEmailPage";
 import AddEmailPage from "./pages/settings/updateEmail/AddEmailPage";
 import OTP from "./pages/settings/updateEmail/OTP";
+import BlockingListPage from "./pages/settings/BlockingListPage";
+import VisibilityPage from "./pages/settings/VisibilityPage";
 
 import React from "react";
 import JobPostingsPage from "./pages/admin/JobPostingsPage";
-
 
 // Define your routes as an array of RouteObject (compatible with React Router v6)
 const routes: RouteObject[] = [
@@ -95,6 +99,10 @@ const routes: RouteObject[] = [
     path: "/feed/posts/:id",
     element: React.createElement(FeedPage, { single: true }),
   },
+  {
+    path: "/user-profile/:id/posts",
+    element: React.createElement(FeedPage, { profile: ":id" }),
+  },
 
   {
     path: "/manage-invitations",
@@ -113,7 +121,6 @@ const routes: RouteObject[] = [
     path: "/my-items/saved-posts",
     element: React.createElement(MyItemsPage),
   },
-
   {
     path: "/login",
     element: React.createElement(SignInPage),
@@ -175,6 +182,27 @@ const routes: RouteObject[] = [
     element: React.createElement(ChangePasswordPage),
   },
   {
+    path: "/settings/preference",
+    element: React.createElement(AccountPreferencePage),
+  },
+  // New routes for account closing flow
+  {
+    path: "/settings/close-account",
+    element: React.createElement(InstructionPage),
+  },
+  {
+    path: "/settings/close-account/reason",
+    element: React.createElement(ReasonPage),
+  },
+  {
+    path: "/settings/close-account/other-option",
+    element: React.createElement(OtherOptionPage),
+  },
+  {
+    path: "/settings/close-account/confirm",
+    element: React.createElement(LastPage),
+  },
+  {
     path: "/settings/security/email",
     element: React.createElement(PrimaryEmailPage),
   },
@@ -189,6 +217,31 @@ const routes: RouteObject[] = [
   {
     path: "/search/users",
     element: React.createElement(AllPeoplePage),
+  },
+  {
+    path: "/company-creation",
+    element: React.createElement(CompanyCreationPage),
+  },
+  {
+    path: "/company-manage/:companyId",
+    element: React.createElement(ManageCompanyPage),
+  },
+  {
+    path: "/company-manage/:companyId/jobs/create",
+    element: React.createElement(CreateJobPage),
+  },
+  {
+    path: "/jobs/create",
+    element: React.createElement(CreateJobPage),
+  },
+  
+  {
+    path: "/settings/visibility",
+    element: React.createElement(VisibilityPage),
+  },
+  {
+    path: "/settings/visibility/blocking",
+    element: React.createElement(BlockingListPage),
   },
   {
     path:"/admin/dashboard",
@@ -216,6 +269,7 @@ const routes: RouteObject[] = [
     element: React.createElement(JobPostingsPage)
   }
  
+
 ];
 
 export default routes;

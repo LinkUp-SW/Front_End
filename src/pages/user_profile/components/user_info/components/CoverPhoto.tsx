@@ -6,7 +6,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FaPencilAlt } from "react-icons/fa";
 import CoverPictureModal from "../../modals/picture_modal/CoverPictureModal";
 import { defaultProfileImage } from "@/constants";
@@ -20,7 +20,9 @@ type CoverPhotoProps = {
 export const CoverPhoto = ({ src, isOwner, children }: CoverPhotoProps) => {
   const [cover, setCover] = useState(src);
   const [isOpen, setIsOpen] = useState(false);
-
+  useEffect(()=>{
+    setCover(src)
+  },[src])
   return (
     <div className="relative h-48 bg-gray-200">
       <img
