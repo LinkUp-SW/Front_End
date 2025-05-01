@@ -2,9 +2,6 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { socketService } from "@/services/socket";
 import Cookies from "js-cookie";
 import { useDispatch } from "react-redux";
-import {
-  setFriendOnlineStatus,
-} from "../../slices/messaging/messagingSlice";
 
 interface SocketContextType {
   connected: boolean;
