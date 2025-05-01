@@ -68,36 +68,35 @@ export interface ProfileCardType {
 
 export interface PostType {
   author: PostUserType;
-
+  postType: string;
+  reposts: string[];
   content: string;
   media: {
     link: string[];
     media_type: "image" | "images" | "video" | "link" | "pdf" | "post" | "none";
   };
-  commentsData?: {
+  comments_data?: {
     comments: CommentType[];
     count: number;
     nextCursor: number | null;
     isLoading?: boolean;
     hasInitiallyLoaded?: boolean;
   };
-  commentsCount?: number;
-  topReactions?: string[];
-  commentsDisabled: string;
-  publicPost: boolean;
-  taggedUsers: string[];
+  comments_count?: number;
+  top_reactions?: string[];
+  comments_disabled: string;
+  public_post: boolean;
+  tagged_users: string[];
   date: number;
   reacts: string[];
-  isEdited?: boolean;
+  is_edited?: boolean;
   _id: string;
-  userReaction?: string | null;
+  user_reaction?: string | null;
   user_id: string;
   comments: string[];
-  isSaved?: boolean;
-  reactions: {
-    reaction: string;
-  }[];
-  reactionsCount: number;
+  is_saved?: boolean;
+  reactions: string[];
+  reactions_count: number;
 
   stats?: {
     likes?: number;
@@ -111,38 +110,36 @@ export interface PostType {
     reposts?: number;
   };
 
-  activityContext?: ActivityContextType;
+  activity_context?: ActivityContextType;
 }
 
 export interface CommentType {
   author: {
     username: string;
-    firstName: string;
-    lastName: string;
+    first_name: string;
+    last_name: string;
     headline: string;
-    profilePicture: string;
-    connectionDegree: string;
+    profile_picture: string;
+    connection_degree: string;
   };
   content: string;
   media: {
     link: string;
-    mediaType: "image" | "video" | "none";
+    media_type: "image" | "video" | "none";
   };
   reacts: string[];
   tagged_users: string[];
   is_edited: boolean;
-  userReaction?: string | null;
-  childrenCount?: number;
-  topReactions?: string[];
+  user_reaction?: string | null;
+  children_count?: number;
+  top_reactions?: string[];
   date: number;
-  reactions: {
-    reaction: string;
-  }[];
-  reactionsCount: number;
+  reactions: string[];
+  reactions_count: number;
   children?: CommentType[];
 
-  userId?: string;
-  parentId: string;
+  user_id?: string;
+  parent_id: string;
   _id: string;
 }
 
@@ -157,7 +154,7 @@ export interface CommentObjectType {
 export interface CommentDBType {
   post_id: string;
   content: string;
-  media: string;
+  media: string[];
   parent_id: string | null;
   tagged_users: string[];
 }
@@ -175,9 +172,9 @@ export interface StatsType {
 }
 
 export interface ActivityContextType {
-  actorId: string;
-  actorName: string;
-  actorUsername: string;
+  actor_id: string;
+  actor_name: string;
+  actor_username: string;
   type:
     | "like"
     | "love"
@@ -187,15 +184,16 @@ export interface ActivityContextType {
     | "funny"
     | "comment"
     | "repost";
-  actorPicture: string;
+  actor_picture: string;
+  comment?: CommentType;
 }
 
 export interface PostUserType {
-  firstName: string;
-  lastName: string;
+  first_name: string;
+  last_name: string;
   username: string;
-  profilePicture: string;
-  connectionDegree: string;
+  profile_picture: string;
+  connection_degree: string;
   headline: string;
 }
 
@@ -408,6 +406,7 @@ export interface PostDBObject {
   commentsDisabled: string; // Indicates if comments are disabled (e.g., "true" or "false")
   publicPost: boolean; // Whether the post is public or not
   taggedUsers: string[]; // Array of user IDs tagged in the post
+  _id?: string;
 }
 
 export interface BioFormData {

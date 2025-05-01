@@ -28,6 +28,8 @@ interface CommentWithRepliesProps {
   ) => void;
   comment: CommentType;
   postId: string;
+  disableReplies: boolean;
+  disableControls?: boolean;
 }
 
 const user_token = Cookies.get("linkup_auth_token");
@@ -36,9 +38,11 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
   handleCreateComment,
   comment,
   postId,
+  disableReplies,
+  disableControls = false,
 }) => {
   const replies = comment.children || [];
-  const hasMoreReplies = replies.length < (comment.childrenCount || 0);
+  const hasMoreReplies = replies.length < (comment.children_count || 0);
   console.log("Has more replies:", hasMoreReplies);
   console.log("Comment:", comment);
   console.log("Replies:", replies);
@@ -130,10 +134,10 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
           postId,
           parentCommentId: comment._id,
           replies: response.replies,
-          nextCursor: response.nextCursor,
+          nextCursor: response.next_cursor,
         })
       );
-      setNextCursor(response.nextCursor);
+      setNextCursor(response.next_cursor);
     } catch (error) {
       console.error("Error loading more replies:", error);
       toast.error("Failed to load more replies");
@@ -149,6 +153,17 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    const maxFileSizeInMB = 10;
+    const maxFileSize = maxFileSizeInMB * 1048576; // 10 MB
+
+    if (file) {
+      if (file.size > maxFileSize) {
+        toast.error(
+          `File "${file.name}" exceeds the maximum size of ${maxFileSizeInMB} MB.`
+        );
+        return false;
+      }
+    }
     if (file) {
       setSelectedImage(file);
     }
@@ -170,8 +185,11 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
       <div ref={commentRef}>
         <Comment
           comment={comment}
+          isReplyActive={isReplyActive}
           setIsReplyActive={setIsReplyActive}
           postId={postId}
+          disableReplies={disableReplies}
+          disableControls={disableControls}
         />
       </div>
 
@@ -202,8 +220,10 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
                   <div className="w-12 h-full rounded-full absolute bg-white dark:bg-gray-900 left-8" />
                   <Reply
                     comment={reply}
+                    isReplyActive={isReplyActive}
                     setIsReplyActive={setIsReplyActive}
                     postId={postId}
+                    disableReplies={disableReplies}
                   />
                 </div>
               ))}

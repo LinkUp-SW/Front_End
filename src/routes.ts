@@ -36,6 +36,12 @@ import {
   CompanyCreationPage,
   ManageCompanyPage,
   CreateJobPage,
+  DashboardPage,
+  SettingsPage,
+  UsersPage,
+  AnalyticsPage,
+  ContentModerationPage,
+
 } from "./pages";
 
 import PrimaryEmailPage from "./pages/settings/updateEmail/PrimaryEmailPage";
@@ -45,6 +51,7 @@ import BlockingListPage from "./pages/settings/BlockingListPage";
 import VisibilityPage from "./pages/settings/VisibilityPage";
 
 import React from "react";
+import JobPostingsPage from "./pages/admin/JobPostingsPage";
 
 // Define your routes as an array of RouteObject (compatible with React Router v6)
 const routes: RouteObject[] = [
@@ -236,6 +243,33 @@ const routes: RouteObject[] = [
     path: "/settings/visibility/blocking",
     element: React.createElement(BlockingListPage),
   },
+  {
+    path:"/admin/dashboard",
+    element: React.createElement(DashboardPage)
+  },
+  {
+    path:"/admin/settings",
+    element: React.createElement(SettingsPage)
+
+  },
+  {
+    path:"/admin/users",
+    element: React.createElement(UsersPage)
+  },
+  {
+    path:"/admin/analytics",
+    element: React.createElement(AnalyticsPage)
+  },
+  {
+    path:"/admin/content-moderation",
+    element: React.createElement(ContentModerationPage)
+  },
+  {
+    path:"/admin/job-postings",
+    element: React.createElement(JobPostingsPage)
+  }
+ 
+
 ];
 
 export default routes;
