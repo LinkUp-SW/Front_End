@@ -265,7 +265,7 @@ const TruncatedText: React.FC<TruncatedTextProps> = ({
           <div
             key={`url-${index}`}
             rel="noopener noreferrer"
-            className="text-blue-600 dark:text-blue-400 hover:underline break-all"
+            className="text-blue-600 dark:text-blue-400 hover:underline break-words"
             onClick={(e) => e.stopPropagation()}
           >
             {segment.content}
@@ -372,7 +372,7 @@ const TruncatedText: React.FC<TruncatedTextProps> = ({
         {content}
       </p>
 
-      <p className="text-sm whitespace-pre-wrap break-all w-full">
+      <p className="text-sm whitespace-pre-wrap break-all max-w-full w-full">
         {expanded || !isTruncated
           ? formatText(content)
           : formatText(truncatedText)}

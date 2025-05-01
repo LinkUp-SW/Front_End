@@ -39,7 +39,7 @@ const PrimaryEmailPage: React.FC = () => {
   };
   
   const handleAddEmail = () => {
-    navigate('/settings/security/email/verify');
+    navigate('/settings/security/email/add');
   };
 
   if (isLoading) {

@@ -31,7 +31,7 @@ const AddEmailPage: React.FC = () => {
 
       await updateEmail(token, newEmail, password);
       toast.success('Email updated successfully');
-      navigate('/settings/security/email');
+      navigate('/settings/security/email/verify');
     } catch (error) {
       toast.error(getErrorMessage(error));
     } finally {

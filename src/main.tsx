@@ -5,6 +5,7 @@ import App from './App.tsx'
 import { Provider } from 'react-redux';
 import { store } from './store'; 
 import { worker } from './mocks/browser';
+import SocketProvider  from './components/hoc/SocketProvider.tsx'
 
 async function enableMocking() {
   if (import.meta.env.VITE_NODE_ENV === 'DEV') {
@@ -18,7 +19,9 @@ await enableMocking();
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <Provider store={store}>
-      <App />
+      <SocketProvider>
+        <App />
+      </SocketProvider>
     </Provider>
   </StrictMode>
 )

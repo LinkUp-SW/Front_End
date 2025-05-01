@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Modal, WithNavBar } from "../../components";
 import {
   AboutSection,
@@ -12,18 +13,23 @@ import {
 import Activity from "./components/Activity";
 
 const UserProfilePage = () => {
+  const [isProfileVisible, setIsProfileVisible] = useState(true);
   return (
     <main className="max-w-7xl mx-auto  lg:px-8">
       <div className="grid lg:grid-cols-3 gap-4 mt-4">
         {/* Main Content Column */}
         <div className="lg:col-span-2 space-y-4">
-          <UserInfo />
-          <AboutSection />
-          <Activity />
-          <ExperienceSection />
-          <EducationSection />
-          <LicenseSection />
-          <SkillsSection />
+          <UserInfo setIsProfileVisible={setIsProfileVisible} />
+          {isProfileVisible && (
+            <>
+              <AboutSection />
+              <Activity />
+              <ExperienceSection />
+              <EducationSection />
+              <LicenseSection />
+              <SkillsSection />
+            </>
+          )}
         </div>
 
         {/* Right Sidebar */}

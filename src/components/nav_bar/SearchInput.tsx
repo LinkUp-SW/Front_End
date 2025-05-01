@@ -10,7 +10,9 @@ const SearchInput = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [searchTerm, setSearchTerm] = useState("");
-  const [filteredResults, setFilteredResults] = useState<SearchSuggestion[]>([]);
+  const [filteredResults, setFilteredResults] = useState<SearchSuggestion[]>(
+    []
+  );
   const [open, setOpen] = useState(false);
   const token = Cookies.get("linkup_auth_token");
 
@@ -90,7 +92,7 @@ const SearchInput = () => {
                       <img
                         src={result.profile_photo}
                         alt={result.name}
-                        className="w-12 h-12 rounded-full object-cover"
+                        className="w-12 h-12 rounded-full object-contain"
                       />
                     ) : (
                       <div className="w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
@@ -121,7 +123,7 @@ const SearchInput = () => {
                       <img
                         src={result.logo}
                         alt={result.name}
-                        className="w-12 h-12 rounded object-cover"
+                        className="w-12 h-12 rounded object-contain"
                       />
                     ) : (
                       <div className="w-12 h-12 rounded bg-gray-200 dark:bg-gray-700 flex items-center justify-center">

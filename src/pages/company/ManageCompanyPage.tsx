@@ -111,6 +111,13 @@ const ManageCompanyPage = () => {
     followerCount: 0
   });
 
+  const handleFollowerCountChange = (newCount: number) => {
+    setCompanyData(prevData => ({
+      ...prevData,
+      followerCount: newCount
+    }));
+  };
+
   // Fetch company data on component mount or when companyId changes
   useEffect(() => {
     const fetchCompanyData = async () => {
@@ -446,6 +453,8 @@ const ManageCompanyPage = () => {
           <SettingsComponent 
             companyName={companyData.name} 
             companyId={companyId} 
+            followerCount={companyData.followerCount}
+            onFollowerCountChange={handleFollowerCountChange}
           />
         ) : activeTab === 'jobs' ? (
           <CompanyJobsComponent

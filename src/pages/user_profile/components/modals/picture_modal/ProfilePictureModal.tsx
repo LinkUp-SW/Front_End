@@ -9,7 +9,7 @@ import { LuImageUp } from "react-icons/lu";
 import { LiaSaveSolid } from "react-icons/lia";
 import { toast } from "sonner";
 import { getErrorMessage } from "@/utils/errorHandler";
-import fileToBase64, { getDataBlob } from "@/utils";
+import fileToBase64, { compressDataUrl, getDataBlob } from "@/utils";
 import ImageEditor from "@/components/image_editor/ImageEditor";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store"; // Adjust the import path to your store type
@@ -73,7 +73,11 @@ const ProfilePictureModal = ({
 
     fileInput.onchange = async (event) => {
       const file = (event.target as HTMLInputElement).files?.[0];
-      if (file) handleFileSelect(file);
+      if (file) {
+        if (file.size > 2 * 1024 * 1024)
+          return toast.error("Image is larger than 2MB");
+        handleFileSelect(file);
+      }
     };
 
     fileInput.click();
@@ -89,9 +93,12 @@ const ProfilePictureModal = ({
         return;
       }
 
-      // Convert base64 to File
-      const blob = await fetch(imageToSave).then((r) => r.blob());
-      const file = new File([blob], "profile.jpg", { type: "image/jpeg" });
+      const compressedBlob = await compressDataUrl(imageToSave, 800, 800, 0.7);
+
+      // 2. wrap in a File
+      const file = new File([compressedBlob], "profile.jpg", {
+        type: "image/jpeg",
+      });
 
       // Wrap the signin method with toast.promise for success/error handling
       const toastResult = toast.promise(

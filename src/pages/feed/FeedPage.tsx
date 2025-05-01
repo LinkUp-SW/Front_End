@@ -25,6 +25,7 @@ const FeedPage: React.FC<FeedPageProps> = ({
 }) => {
   const screenWidth = useSelector((state: RootState) => state.screen.width);
   const [viewMore, setViewMore] = useState(screenWidth >= 768);
+  const userBio = useSelector((state: RootState) => state.userBio.data);
 
   const { posts, observerRef, isLoading, initialLoading } = useFeedPosts(
     single,
@@ -62,7 +63,7 @@ const FeedPage: React.FC<FeedPageProps> = ({
           </Button>
           {viewMore && (
             <>
-              <PremiumBanner />
+              {userBio && !userBio.isSubscribed && <PremiumBanner />}
               <Shortcuts />
             </>
           )}

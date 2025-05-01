@@ -9,9 +9,8 @@ import {
 import { FcAddImage } from "react-icons/fc";
 import Header from "../../modals/components/Header";
 import ProfilePictureModal from "../../modals/picture_modal/ProfilePictureModal";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { defaultProfileImage } from "@/constants";
-
 type ProfileAvatarProps = {
   src: string;
   isOwner: boolean;
@@ -20,6 +19,9 @@ type ProfileAvatarProps = {
 export const ProfileAvatar = ({ src, isOwner }: ProfileAvatarProps) => {
   const [pic, setPic] = useState(src);
   const [isOpen, setIsOpen] = useState(false);
+  useEffect(() => {
+    setPic(src);
+  }, [src]);
   return (
     <div className="absolute -bottom-16 left-4">
       <img
