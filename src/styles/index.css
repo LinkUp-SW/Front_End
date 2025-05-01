@@ -234,17 +234,15 @@ body {
 
 @layer components {
 
-    .selectMainButton {
+    .selectButton {
         @apply text-center appearance-none hover:bg-green-900 hover:cursor-pointer font-semibold bg-[#01754f] rounded-2xl text-white pr-2 pl-2 pt-1 pb-1 m-5 mt-3 mb-3
     }
 
-    .selectMainButton option {
+    .selectButton option {
         @apply bg-white text-black
     }
 
-    .buttonStyle {
-        @apply text-center hover:bg-gray-100 hover:border-1 hover:border-gray-800 hover:cursor-pointer text-black rounded-2xl border-1 border-gray-400 border-1 pr-2 pl-2 pt-1 pb-1 mr-3
-    }
+    
 
 }
 
