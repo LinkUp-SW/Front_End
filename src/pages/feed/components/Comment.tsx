@@ -3,7 +3,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { LiaEllipsisHSolid as EllipsisIcon } from "react-icons/lia";
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,7 @@ import LoveIcon from "@/assets/Love.svg";
 import InsightfulIcon from "@/assets/Insightful.svg";
 import SupportIcon from "@/assets/Support.svg";
 import TruncatedText from "@/components/truncate_text/TruncatedText";
+import { GoFileMedia as MediaIcon } from "react-icons/go";
 import {
   removeComment,
   removeReply,
@@ -54,6 +55,11 @@ import BlueButton from "./buttons/BlueButton";
 import { toast } from "sonner";
 import IconButton from "./buttons/IconButton";
 import { getReactionIcons } from "./Post";
+import { editComment } from "@/endpoints/feed";
+import { updateComment } from "@/slices/feed/postsSlice";
+import { FormattedContentText } from "./modals/CreatePostModal";
+import { hasRichFormatting } from "@/utils";
+import UserTagging from "./UserTagging";
 
 export interface CommentProps {
   comment: CommentType;
@@ -99,6 +105,11 @@ const Comment: React.FC<CommentProps> = ({
   const [topStats, setTopStats] = useState(
     getReactionIcons(comment.top_reactions || [])
   );
+  const [isEditing, setIsEditing] = useState(false);
+  const [editInput, setEditInput] = useState(content);
+  const [editingImage, setEditingImage] = useState<File | null>(null);
+  const editInputRef = useRef<HTMLTextAreaElement>(null);
+  const editFileInputRef = useRef<HTMLInputElement>(null);
 
   const handleMouseEnter = () => {
     setReactionsOpen(true);
@@ -141,7 +152,6 @@ const Comment: React.FC<CommentProps> = ({
   const navigate = useNavigate();
 
   const copyLink = () => {};
-  const editComment = () => {};
   const deleteCommentModal = () => {
     setDeleteModal(true);
   };
@@ -155,6 +165,109 @@ const Comment: React.FC<CommentProps> = ({
       handleCreateReaction(value);
     } else {
       handleDeleteReaction(value);
+    }
+  };
+
+  const handleEditComment = () => {
+    setIsEditing(true);
+    setEditInput(content);
+    setCommentMenuOpen(false);
+  };
+
+  const handleEditSubmit = async () => {
+    if (!token) {
+      toast.error("You must be logged in to edit a comment.");
+      navigate("/login", { replace: true });
+      return;
+    }
+
+    const toastId = toast.loading("Updating your comment...");
+
+    try {
+      console.log({
+        post_id: postId,
+        comment_id: comment._id,
+        content: editInput,
+        media: editingImage
+          ? URL.createObjectURL(editingImage)
+          : media?.link || "",
+        tagged_users: [], // Add tagged users handling if needed
+      });
+      if (editingImage)
+        console.log("Editing Image", URL.createObjectURL(editingImage));
+      let mediaData: string | undefined = media?.link;
+      if (editingImage) {
+        // Convert image to base64
+        const reader = new FileReader();
+        const base64Data = await new Promise<string>((resolve) => {
+          reader.onload = () => resolve(reader.result as string);
+          reader.readAsDataURL(editingImage);
+        });
+        mediaData = base64Data;
+      } else {
+        mediaData = "";
+      }
+      console.log("Sending:", {
+        post_id: postId,
+        comment_id: comment._id,
+        content: editInput,
+        media: mediaData.length === 0 ? null : mediaData,
+        tagged_users: [], // Add tagged users handling if needed
+      });
+      const result = await editComment(
+        {
+          post_id: postId,
+          comment_id: comment._id,
+          content: editInput,
+          media: mediaData,
+          tagged_users: [], // Add tagged users handling if needed
+        },
+        token
+      );
+      console.log("Updated comment", {
+        postId,
+        commentId: comment._id,
+        content: editInput,
+        media: {
+          link: result.comment.media.link,
+          media_type: "image",
+        },
+        is_edited: true,
+      });
+
+      if (result.comment.media.length != 0) {
+        dispatch(
+          updateComment({
+            postId,
+            commentId: comment._id,
+            content: editInput,
+            media: {
+              link: result.comment.media,
+              media_type: "image",
+            },
+            is_edited: true,
+          })
+        );
+      } else {
+        dispatch(
+          updateComment({
+            postId,
+            commentId: comment._id,
+            content: editInput,
+            media: {
+              link: "",
+              media_type: "none",
+            },
+            is_edited: true,
+          })
+        );
+      }
+
+      setIsEditing(false);
+      toast.success("Comment updated successfully!", { id: toastId });
+    } catch (error) {
+      console.error("Error updating comment:", error);
+      toast.error("Failed to update comment", { id: toastId });
     }
   };
 
@@ -278,7 +391,11 @@ const Comment: React.FC<CommentProps> = ({
 
   const menuActions =
     comment.author.username === myUserId
-      ? getPrivateCommentActions(copyLink, editComment, deleteCommentModal)
+      ? getPrivateCommentActions(
+          copyLink,
+          handleEditComment,
+          deleteCommentModal
+        )
       : getCommentActions(copyLink, reportComment, hideComment);
 
   const timeAgo = moment(date * 1000).fromNow();
@@ -407,14 +524,123 @@ const Comment: React.FC<CommentProps> = ({
         </div>
       </header>
       <div className="flex flex-col justify-start">
-        <div className="p-1 pl-11 text-xs md:text-sm whitespace-pre-wrap">
-          <TruncatedText
-            content={content}
-            lineCount={3}
-            id={`comment-${comment._id}`}
-            className="  ml-0 relative -left-5"
-          />
-        </div>
+        {isEditing ? (
+          <div className="flex w-full items-center justify-between h-full pl-11">
+            <div className="w-full relative flex-col flex dark:focus:ring-0 dark:focus:border-0 border p-2 focus:ring-black focus:ring-2 transition-colors dark:hover:bg-gray-800 hover:text-gray-950 dark:hover:text-neutral-300 rounded-xl border-gray-400 font-normal text-sm text-black text-left dark:text-neutral-300">
+              <div className="relative w-full">
+                <textarea
+                  ref={editInputRef}
+                  id="edit-comment-input"
+                  placeholder="Edit your comment..."
+                  value={editInput}
+                  autoFocus
+                  onChange={(e) => setEditInput(e.target.value)}
+                  className="w-full h-auto resize-none py-0 placeholder:text-neutral-500 dark:placeholder:text-neutral-300 focus:ring-0 focus:border-0 active:border-0"
+                />
+
+                <UserTagging
+                  text={editInput}
+                  onTextChange={setEditInput}
+                  inputRef={editInputRef}
+                  className="absolute inset-0 z-20"
+                />
+              </div>
+
+              {hasRichFormatting(editInput) && editInput.trim().length > 0 && (
+                <div className="mt-3 p-3 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                    Preview:
+                  </p>
+                  <div className="text-sm text-gray-900 dark:text-gray-100">
+                    <FormattedContentText text={editInput} />
+                  </div>
+                </div>
+              )}
+
+              {(editingImage || media?.link) && (
+                <div className="relative mt-2">
+                  <img
+                    src={
+                      editingImage
+                        ? URL.createObjectURL(editingImage)
+                        : media?.link
+                    }
+                    alt="Comment media"
+                    className="w-32 h-32 object-cover rounded-lg"
+                  />
+                  <button
+                    onClick={() => {
+                      setEditingImage(null);
+                      if (editFileInputRef.current) {
+                        editFileInputRef.current.value = "";
+                      }
+                      // Clear the media object to indicate removal of existing image
+                      dispatch(
+                        updateComment({
+                          postId,
+                          commentId: comment._id,
+                          content: editInput,
+                          media: {
+                            link: "",
+                            media_type: "none",
+                          },
+                          is_edited: true,
+                        })
+                      );
+                    }}
+                    className="absolute top-1 left-0 bg-gray-600 text-white rounded-full m-1 p-1 px-2 aspect-square hover:bg-gray-700 transition-colors"
+                    aria-label="Remove image"
+                  >
+                    ×
+                  </button>
+                </div>
+              )}
+
+              <div className="flex justify-between mt-2">
+                <div className="flex gap-2">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    ref={editFileInputRef}
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) setEditingImage(file);
+                    }}
+                    className="hidden"
+                  />
+                  <Button
+                    variant="ghost"
+                    onClick={() => editFileInputRef.current?.click()}
+                    className="hover:cursor-pointer rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 dark:hover:text-neutral-200"
+                  >
+                    <MediaIcon />
+                  </Button>
+                </div>
+                <div className="flex gap-2">
+                  <TransparentButton onClick={() => setIsEditing(false)}>
+                    Cancel
+                  </TransparentButton>
+                  <BlueButton
+                    onClick={handleEditSubmit}
+                    disabled={editInput.trim().length === 0}
+                  >
+                    Save
+                  </BlueButton>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          // Your existing comment content display
+          <div className="p-1 pl-11 text-xs md:text-sm whitespace-pre-wrap">
+            <TruncatedText
+              content={content}
+              lineCount={3}
+              id={`comment-${comment._id}`}
+              className="ml-0 relative -left-5"
+            />
+          </div>
+        )}
         {media && media.link && (
           <Dialog>
             <DialogTrigger asChild>

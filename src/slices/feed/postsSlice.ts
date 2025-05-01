@@ -9,6 +9,15 @@ interface PostsState {
   initialLoading: boolean;
 }
 
+type UpdatedCommentData = {
+  content?: string;
+  media?: {
+    link: string;
+    media_type: "image" | "video" | "none";
+  };
+  is_edited?: boolean;
+};
+
 const initialState: PostsState = {
   list: [],
   hasMore: true,
@@ -40,6 +49,51 @@ const postsSlice = createSlice({
       const index = state.list.findIndex((post) => post._id === postId);
       if (index !== -1) {
         state.list[index] = { ...state.list[index], ...updatedPost };
+      }
+    },
+    updateComment: (
+      state,
+      action: PayloadAction<{
+        postId: string;
+        commentId: string;
+        content?: string;
+        media?: {
+          link: string;
+          media_type: "video" | "image" | "none";
+        };
+        is_edited?: boolean;
+      }>
+    ) => {
+      const { postId, commentId, ...updatedData } = action.payload;
+      const post = state.list.find((post) => post._id === postId);
+
+      if (post?.comments_data) {
+        const updateCommentRecursively = (
+          comments: CommentType[]
+        ): CommentType[] => {
+          return comments.map((comment) => {
+            if (comment._id === commentId) {
+              return {
+                ...comment,
+                ...updatedData,
+                is_edited: true,
+              };
+            }
+
+            if (comment.children && comment.children.length > 0) {
+              return {
+                ...comment,
+                children: updateCommentRecursively(comment.children),
+              };
+            }
+
+            return comment;
+          });
+        };
+
+        post.comments_data.comments = updateCommentRecursively(
+          post.comments_data.comments
+        );
       }
     },
 
@@ -440,7 +494,7 @@ export const {
   addNewCommentToPost,
   addReplyToComment,
   addRepliesToComment, // Add this export
-
+  updateComment,
   setNextCursor,
   setHasMore,
   setLoading,
