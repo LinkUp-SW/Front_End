@@ -221,6 +221,7 @@ const AddEducationModal: React.FC<AddEducationModalProps> = ({
           onMonthChange={(v) => handleChange("endMonth", v)}
           onYearChange={(v) => handleChange("endYear", v)}
           id="end-date"
+          isFutureAllowed={true}
         />
 
         <FormInput
