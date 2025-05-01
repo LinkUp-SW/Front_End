@@ -23,6 +23,7 @@ import { getErrorMessage } from "@/utils/errorHandler";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { editUserBio } from "@/slices/user_profile/userBioSlice";
+import { validateName } from "@/utils";
 
 type EditUserBioModalProps = {
   userId: string;
@@ -117,6 +118,13 @@ const EditUserBioModal: React.FC<EditUserBioModalProps> = ({
       return "Please choose a country!";
     }
 
+    if (!validateName(formData.first_name)) {
+      return "Please enter a valid first name (up to 15 characters, no special characters).";
+    }
+    if (!validateName(formData.last_name)) {
+      return "Please enter a valid last name (up to 15 characters, no special characters).";
+    }
+
     return null;
   };
 
@@ -146,6 +154,7 @@ const EditUserBioModal: React.FC<EditUserBioModalProps> = ({
         name="first_name"
         value={formData.first_name}
         onChange={handleInputChange}
+        limit={15}
       />
       <FormInput
         label="Last Name*"
@@ -154,6 +163,7 @@ const EditUserBioModal: React.FC<EditUserBioModalProps> = ({
         name="last_name"
         value={formData.last_name}
         onChange={handleInputChange}
+        limit={15}
       />
       <FormTextarea
         label="Headline*"

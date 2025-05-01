@@ -74,10 +74,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ setIsProfileVisible }) => {
   return (
     <section className="bg-white dark:bg-gray-900 rounded-lg shadow-md overflow-hidden">
       <CoverPhoto src={data.cover_photo} isOwner={data.is_me}>
-        <ProfileAvatar
-          src={data.profile_photo}
-          isOwner={data.is_me}
-        />
+        <ProfileAvatar src={data.profile_photo} isOwner={data.is_me} />
       </CoverPhoto>
 
       <div className="pt-20 px-6 pb-6">

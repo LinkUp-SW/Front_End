@@ -41,7 +41,7 @@ const PostPreview: React.FC<PostPreviewProps> = ({
     <div
       className={`border-t dark:border-t-gray-600 w-full p-4 ${
         compact ? "" : "mb-4"
-      } h-[320px] max-w-[20rem] min-w-[20rem] ${className}`}
+      } h-[320px] w-full ${className}`}
       style={{
         display: "flex",
         flexDirection: "column",

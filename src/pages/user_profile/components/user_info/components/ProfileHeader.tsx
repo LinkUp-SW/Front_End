@@ -14,6 +14,7 @@ import { FaPencilAlt } from "react-icons/fa";
 import EditUserBioModal from "../../modals/edit_user_bio_modal/EditUserBioModal";
 import { useState } from "react";
 import premiumLogo from "@/assets/linkup_premium.png";
+import { splitHeadline } from "@/utils";
 
 type ProfileHeaderProps = {
   userid: string;
@@ -36,69 +37,79 @@ export const ProfileHeader = ({
   isOwner,
   isInConnection,
   isPremium,
-}: ProfileHeaderProps) => (
-  <div className="mb-4 grid gap-1 relative">
-    <h1 className="text-2xl font-bold text-gray-800 dark:text-white">
-      {user.first_name} {user.last_name}
-    </h1>
-    <p className="text-gray-600 dark:text-gray-200">{user.headline}</p>
-    <div className="inline-flex items-center gap-2 mt-1">
-      <p className="text-sm text-gray-500 dark:text-gray-200">
-        {user.location.city}, {user.location.country_region}
-      </p>
-      <ContactInfoModal user={user} triggerLabel={`Contact Info`} />
-    </div>
-    {isOwner || isInConnection ? (
-      <Link
-        to={`/connections/${userid}`}
-        className="text-blue-600 hover:underline w-fit font-semibold dark:text-blue-400"
-      >
-        {connectionsCount} connections
-      </Link>
-    ) : (
-      <p className="text-gray-600  w-fit font-semibold dark:text-gray-400">
-        {connectionsCount} connections
-      </p>
-    )}
+}: ProfileHeaderProps) => {
+  return (
+    <div className="flex items-start relative gap-2">
+      <div className="mb-4 grid gap-1 flex-grow">
+        <h1 className="text-2xl font-bold text-gray-800 dark:text-white">
+          {user.first_name} {user.last_name}
+        </h1>
+        <p className="text-gray-600 dark:text-gray-200">
+          {splitHeadline(user.headline)}
+        </p>
+        <div className="inline-flex items-center gap-2 mt-1">
+          <p className="text-sm text-gray-500 dark:text-gray-200">
+            {user.location.city}, {user.location.country_region}
+          </p>
+          <ContactInfoModal user={user} triggerLabel={`Contact Info`} />
+        </div>
+        {isOwner || isInConnection ? (
+          <Link
+            to={`/connections/${userid}`}
+            className="text-blue-600 hover:underline w-fit font-semibold dark:text-blue-400"
+          >
+            {connectionsCount} connections
+          </Link>
+        ) : (
+          <p className="text-gray-600  w-fit font-semibold dark:text-gray-400">
+            {connectionsCount} connections
+          </p>
+        )}
 
-    {isPremium && (
-      <img
-        src={premiumLogo}
-        className={`absolute hover:opacity-85 transition-all duration-300 cursor-pointer rounded-md z-20 w-7 h-7 ${
-          isOwner
-            ? "right-[2rem] top-[-4.1rem]"
-            : "right-[-0.7rem] top-[-4.2rem]"
-        }`}
-      />
-    )}
-    {isOwner && <EditUserBio user={user} userid={userid} intros={intros} />}
-    <div className="sm:grid gap-2 absolute right-0 hidden">
-      {intros.work_experience && (
-        <Link
-          to={"#"}
-          className="flex gap-2 items-center hover:text-blue-500 dark:hover:text-blue-300 hover:underline transition-all duration-300 ease-in-out"
-        >
+        {isPremium && (
           <img
-            src={intros.work_experience.logo}
-            alt=""
-            className="w-8 aspect-auto"
+            src={premiumLogo}
+            className={`absolute hover:opacity-85 transition-all duration-300 cursor-pointer rounded-md z-20 w-7 h-7 ${
+              isOwner
+                ? "right-[2rem] top-[-4.1rem]"
+                : "right-[-0.7rem] top-[-4.2rem]"
+            }`}
           />
-          <p className="text-sm">{intros.work_experience.name}</p>
-        </Link>
-      )}
+        )}
+        {isOwner && <EditUserBio user={user} userid={userid} intros={intros} />}
+      </div>
+      <div className="sm:grid gap-2  hidden flex-grow min-w-fit max-w-fit">
+        {intros.work_experience && (
+          <Link
+            to={"#"}
+            className="flex gap-2 items-center hover:text-blue-500 dark:hover:text-blue-300 hover:underline transition-all duration-300 ease-in-out"
+          >
+            <img
+              src={intros.work_experience.logo}
+              alt=""
+              className="w-8 aspect-auto"
+            />
+            <p className="text-sm">{intros.work_experience.name}</p>
+          </Link>
+        )}
 
-      {intros.education && (
-        <Link
-          to={"#"}
-          className="flex gap-2 items-center hover:text-blue-500 dark:hover:text-blue-300 hover:underline transition-all duration-300 ease-in-out"
-        >
-          <img src={intros.education.logo} alt="" className="w-8 aspect-auto" />
-          <p>{intros.education.name}</p>
-        </Link>
-      )}
+        {intros.education && (
+          <Link
+            to={"#"}
+            className="flex gap-2 items-center hover:text-blue-500 dark:hover:text-blue-300 hover:underline transition-all duration-300 ease-in-out"
+          >
+            <img
+              src={intros.education.logo}
+              alt=""
+              className="w-8 aspect-auto"
+            />
+            <p>{intros.education.name}</p>
+          </Link>
+        )}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 const EditUserBio: React.FC<Partial<ProfileHeaderProps>> = ({
   user,
