@@ -74,6 +74,7 @@ import { usePostModal } from "@/hooks/usePostModal";
 import { RootState } from "@/store";
 import { FaCommentSlash } from "react-icons/fa";
 import CommentWithReplies from "./CommentWithReplies";
+import { openEditPostDialog } from "@/slices/feed/createPostSlice";
 
 interface PostProps {
   postData: PostType;
@@ -446,9 +447,8 @@ const Post: React.FC<PostProps> = ({
 
   // Post action functions
   const handleEditPostButton = () => {
-    setPostMenuOpen(false); // Close the menu if it's open
+    setPostMenuOpen(false);
 
-    // Create the post object in the format expected by your modal
     const postForEdit: PostDBObject = {
       content: postData.content,
       mediaType: (postData.media?.media_type as MediaType) || "none",
@@ -456,10 +456,14 @@ const Post: React.FC<PostProps> = ({
       commentsDisabled: postData.comments_disabled || "Anyone",
       publicPost: postData.public_post !== false,
       taggedUsers: postData.tagged_users || [],
+      _id: postData._id, // Make sure to include the post ID
     };
 
-    // Open the global edit modal with this post
-    postModal.openEdit(postForEdit);
+    // Use the createPostSlice action instead of modal
+    dispatch(openEditPostDialog(postForEdit));
+
+    // Remove this line since we're using Redux now
+    // postModal.openEdit(postForEdit);
   };
 
   const deleteModal = () => {

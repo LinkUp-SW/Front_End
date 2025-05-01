@@ -391,6 +391,7 @@ export interface PostDBObject {
   commentsDisabled: string; // Indicates if comments are disabled (e.g., "true" or "false")
   publicPost: boolean; // Whether the post is public or not
   taggedUsers: string[]; // Array of user IDs tagged in the post
+  _id?: string;
 }
 
 export interface BioFormData {
