@@ -134,6 +134,7 @@ export const markConversationAsRead = async (token: string, conversationId: stri
     );
     return response.data;  // This will contain the success message from the backend
   } catch (error) {
+    console.error("Error marking conversation as unread:", error);
     throw new Error('Error marking conversation as read');
   }
 };

@@ -9,7 +9,6 @@ import { toast } from "sonner";
 import { initiateGoogleAuth, signin } from "@/endpoints/userAuth";
 import { validateEmail } from "@/utils";
 import { getErrorMessage } from "@/utils/errorHandler";
-import {socketService} from "@/services/socket"
 import Cookies from "js-cookie";
 
 

@@ -8,7 +8,7 @@ import {
   setResponsiveIsSidebar,
   setDataInfo
 } from "../../slices/messaging/messagingSlice";
-import { incomingUnreadMessagesCount} from "@/services/socket";
+import { incomingUnreadMessagesCount,SocketEventData} from "@/services/socket";
 import { toggleStarred } from "../../slices/messaging/messagingSlice";
 import * as Popover from "@radix-ui/react-popover";
 import { FaStar } from "react-icons/fa";
@@ -100,10 +100,13 @@ const SideBar = () => {
   }, [dataInfo]);
 
   useEffect(() => {
-    const handleUserOnline = (incoming: { userId: string }) => {
-      if (incoming.userId !== id) {
+    const handleUserOnline = (incoming: SocketEventData) => {
+      // Type assertion to cast the incoming data to { userId: string }
+      const { userId } = incoming as { userId: string };
+  
+      if (userId !== id) {
         const updatedData = dataInfo.map((conversation) =>
-          conversation.otherUser.userId === incoming.userId
+          conversation.otherUser.userId === userId
             ? {
                 ...conversation,
                 otherUser: {
@@ -117,10 +120,13 @@ const SideBar = () => {
       }
     };
   
-    const handleUserOffline = (incoming: { userId: string }) => {
-      if (incoming.userId !== id) {
+    const handleUserOffline = (incoming: SocketEventData) => {
+      // Type assertion to cast the incoming data to { userId: string }
+      const { userId } = incoming as { userId: string };
+  
+      if (userId !== id) {
         const updatedData = dataInfo.map((conversation) =>
-          conversation.otherUser.userId === incoming.userId
+          conversation.otherUser.userId === userId
             ? {
                 ...conversation,
                 otherUser: {
@@ -141,7 +147,8 @@ const SideBar = () => {
       socketService.off("user_online", handleUserOnline);
       socketService.off("user_offline", handleUserOffline);
     };
-  }, [id,dataInfo]);
+  }, [id, dataInfo]);
+  
   
 
   useEffect(() => {
