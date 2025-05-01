@@ -17,7 +17,6 @@ import {
   setEditingMessageId,
   setEditText,
   setChatData,
-  setFriendOnlineStatus,
 } from "../../slices/messaging/messagingSlice";
 import { toast } from "sonner";
 import { socketService } from "@/services/socket";
@@ -37,8 +36,12 @@ const ChatingScreen = () => {
   const selectedConvID = useSelector(
     (state: RootState) => state.messaging.selectedMessages
   );
+  const userBioState = useSelector((state: RootState) => state.userBio.data);
+  const starredConversations = useSelector(
+    (state: RootState) => state.messaging.starredConversations
+  );
 
-  const user2Name = "testUser";
+  const user2Name = `${userBioState?.bio.first_name || ""} ${userBioState?.bio.last_name || ""}`.trim();
   const user2Img =
     "https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg";
   /* const user2Name = useSelector(
@@ -55,21 +58,18 @@ const ChatingScreen = () => {
     )
   );*/
 
-  const userBioState = useSelector((state: RootState) => state.userBio.data);
-  const starredConversations = useSelector(
-    (state: RootState) => state.messaging.starredConversations
-  );
+ 
 
   const isCurrentConversationStarred =
     starredConversations.includes(selectedConvID);
 
   const addMsg = useSelector((state: RootState) => state.messaging.message);
   const dataChat = useSelector((state: RootState) => state.messaging.chatData);
+  const dataInfo = useSelector(
+    (state: RootState) => state.messaging.setDataInfo
+  );
   const editedMessageIds = useSelector(
     (state: RootState) => state.messaging.setEditedMessageIds
-  );
-  const friendOnlineStatus = useSelector(
-    (state: RootState) => state.messaging.onlineFriends
   );
 
   /*const messages = conversation ? conversation.user1_sent_messages : [];*/
@@ -77,10 +77,8 @@ const ChatingScreen = () => {
 
   const [deletedMessageIds, setDeletedMessageIds] = useState<string[]>([]);
 
-  const [isTyping, setIsTyping] =useState<boolean>(false); /*related to typing indicator (sockets) */
-
-  const [lastOwnMessageId, setLastOwnMessageId] = useState<string | null>(null);
-
+  const [isTyping, setIsTyping] =
+    useState<boolean>(false); /*related to typing indicator (sockets) */
 
   useEffect(() => {
     const fetchChatting = async () => {
@@ -90,6 +88,7 @@ const ChatingScreen = () => {
 
         const res = await getConversation(token, selectedConvID);
         dispatch(setChatData(res));
+        socketService.markAsRead(selectedConvID);
         toast.success("Messages loaded successfully");
       } catch (error) {
         console.error("Failed to fetch conversations:", error);
@@ -135,16 +134,15 @@ const ChatingScreen = () => {
 
   useEffect(() => {
     if (!selectedConvID) return;
-  
+
     const interval = setInterval(() => {
       socketService.markAsRead(selectedConvID);
     }, 3000); // every 3 seconds (adjust as needed)
-  
+
     return () => {
       clearInterval(interval); // cleanup on unmount or selectedConvID change
     };
   }, [selectedConvID]);
-  
 
   useEffect(() => {
     const unsubscribe = socketService.on<incomingMessageRead>(
@@ -152,7 +150,7 @@ const ChatingScreen = () => {
       (incoming) => {
         if (
           incoming.conversationId === selectedConvID &&
-          incoming.readBy !== id 
+          incoming.readBy !== id
         ) {
           dispatch(
             setChatData({
@@ -165,28 +163,24 @@ const ChatingScreen = () => {
         }
       }
     );
-  
+
     return () => {
       unsubscribe();
     };
   }, [selectedConvID, id, dataChat]);
-  
-
-
-
 
   useEffect(() => {
     const unsubscribe = socketService.on<SocketIncomingMessage>(
       "new_message",
       (incoming) => {
         if (incoming.conversationId !== selectedConvID) return;
-  
+
         const realMsg: MessageChat = {
           messageId: incoming.message.messageId,
           senderId: incoming.senderId,
           senderName:
             incoming.senderId === id
-              ? "You"
+              ? (userBioState?.bio.first_name || "") + " " + (userBioState?.bio.last_name || "")
               : dataChat?.otherUser?.firstName || "",
           message: incoming.message.message,
           media: incoming.message.media || [],
@@ -197,9 +191,9 @@ const ChatingScreen = () => {
           isDeleted: false,
           isEdited: false,
         };
-  
+
         let updatedMessages = [...(dataChat?.messages || [])];
-  
+
         // 1. Try replacing temporary message
         const tempIndex = updatedMessages.findIndex(
           (msg) =>
@@ -207,7 +201,7 @@ const ChatingScreen = () => {
             msg.senderId === realMsg.senderId &&
             msg.message === realMsg.message
         );
-  
+
         if (tempIndex !== -1) {
           updatedMessages[tempIndex] = realMsg;
         } else {
@@ -217,7 +211,7 @@ const ChatingScreen = () => {
           );
           if (!alreadyExists) updatedMessages.push(realMsg);
         }
-  
+
         dispatch(
           setChatData({
             ...dataChat!,
@@ -226,14 +220,11 @@ const ChatingScreen = () => {
         );
       }
     );
-  
+
     return () => {
       unsubscribe();
     };
   }, [selectedConvID, dataChat, id]);
-  
-
-  
 
   // Add this to your ChatingScreen component
 
@@ -298,10 +289,15 @@ const ChatingScreen = () => {
                 id="userStatuse"
                 className="text-xs text-gray-500 flex items-center gap-1"
               >
-                {dataChat.otherUser.onlineStatus && (
+                {/* Replace the existing online status code with this */}
+                {dataInfo.find((conv) => conv.conversationId === selectedConvID)
+                  ?.otherUser.onlineStatus && (
                   <span className="inline-block w-2 h-2 bg-[#01754f] rounded-full"></span>
                 )}
-                {dataChat.otherUser.onlineStatus ? "Online" : "Offline"}
+                {dataInfo.find((conv) => conv.conversationId === selectedConvID)
+                  ?.otherUser.onlineStatus
+                  ? "Online"
+                  : "Offline"}
               </p>
             </div>
           )}
@@ -461,20 +457,18 @@ const ChatingScreen = () => {
                   </div>
 
                   {/* Seen indicator */}
-                  {msg.isOwnMessage &&
-                    msg.isSeen &&
-                     (
-                      <div className="pl-14 mt-1 flex items-center gap-2">
-                        <div className="w-5 h-5 rounded-full overflow-hidden border border-gray-300">
-                          <img
-                            src={dataChat.otherUser.profilePhoto}
-                            alt="Read by"
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                        <span className="text-xs text-gray-500">Seen</span>
+                  {msg.isOwnMessage && msg.isSeen && (
+                    <div className="pl-14 mt-1 flex items-center gap-2">
+                      <div className="w-5 h-5 rounded-full overflow-hidden border border-gray-300">
+                        <img
+                          src={dataChat.otherUser.profilePhoto}
+                          alt="Read by"
+                          className="w-full h-full object-cover"
+                        />
                       </div>
-                    )}
+                      <span className="text-xs text-gray-500">Seen</span>
+                    </div>
+                  )}
                 </div>
               );
             })
