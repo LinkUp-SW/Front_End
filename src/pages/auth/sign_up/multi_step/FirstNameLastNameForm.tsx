@@ -2,6 +2,7 @@ import { FormInput } from "@/components";
 import React from "react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { validateName } from "@/utils";
 
 type FirstNameLastNameData = {
   firstName: string;
@@ -25,6 +26,16 @@ const FirstNameLastNameForm = ({
       return toast.error("Please enter you First Name");
     if (lastName.length === 0)
       return toast.error("Please enter your Last Name");
+    if (!validateName(firstName)) {
+      return toast.error(
+        "Please enter a valid first name (up to 15 characters, no special characters)."
+      );
+    }
+    if (!validateName(lastName)) {
+      return toast.error(
+        "Please enter a valid last name (up to 15 characters, no special characters)."
+      );
+    }
     saveCredentials();
     return navigate("/signup/location");
   };
@@ -41,6 +52,7 @@ const FirstNameLastNameForm = ({
           type="text"
           id="first-name"
           name="firstName"
+          limit={15}
         />
         <div className="w-full relative">
           <FormInput
@@ -52,6 +64,7 @@ const FirstNameLastNameForm = ({
             }}
             id="last-name"
             name="lastName"
+            limit={15}
           />
         </div>
         <div>
