@@ -6,8 +6,9 @@ import {
   selectUserStatus,
   selectUserId,
   setResponsiveIsSidebar,
+  setDataInfo
 } from "../../slices/messaging/messagingSlice";
-import { incomingUnreadMessagesCount,incomingUserStatus} from "@/services/socket";
+import { incomingUnreadMessagesCount} from "@/services/socket";
 import { toggleStarred } from "../../slices/messaging/messagingSlice";
 import * as Popover from "@radix-ui/react-popover";
 import { FaStar } from "react-icons/fa";
@@ -59,7 +60,7 @@ const SideBar = () => {
   const [SelectedConversationStyle, setSelectedConversationStyle] =
     useState<string>();
 
-  const [dataInfo, setDataInfo] = useState<Conversation[]>([]);
+  // const [dataInfo, setDataInfo] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -69,6 +70,7 @@ const SideBar = () => {
   const selectedConvID = useSelector(
     (state: RootState) => state.messaging.selectedMessages
   );
+  const dataInfo = useSelector((state: RootState) => state.messaging.setDataInfo);
 
   useEffect(() => {
     const fetchConversations = async () => {
@@ -77,7 +79,7 @@ const SideBar = () => {
 
         const data: { conversations: Conversation[] } =
           await getAllConversations(token);
-        setDataInfo(data.conversations);
+          dispatch(setDataInfo(data.conversations));
         toast.success("Conversations loaded successfully");
       } catch (error) {
         console.error("Failed to fetch conversations:", error);
@@ -104,37 +106,35 @@ const SideBar = () => {
   useEffect(() => {
     const handleUserOnline = (incoming: { userId: string }) => {
       if (incoming.userId !== id) {
-        setDataInfo((prevData) =>
-          prevData.map((conversation) =>
-            conversation.otherUser.userId === incoming.userId
-              ? {
-                  ...conversation,
-                  otherUser: {
-                    ...conversation.otherUser,
-                    onlineStatus: true,
-                  },
-                }
-              : conversation
-          )
+        const updatedData = dataInfo.map((conversation) =>
+          conversation.otherUser.userId === incoming.userId
+            ? {
+                ...conversation,
+                otherUser: {
+                  ...conversation.otherUser,
+                  onlineStatus: true,
+                },
+              }
+            : conversation
         );
+        dispatch(setDataInfo(updatedData));
       }
     };
   
     const handleUserOffline = (incoming: { userId: string }) => {
       if (incoming.userId !== id) {
-        setDataInfo((prevData) =>
-          prevData.map((conversation) =>
-            conversation.otherUser.userId === incoming.userId
-              ? {
-                  ...conversation,
-                  otherUser: {
-                    ...conversation.otherUser,
-                    onlineStatus: false,
-                  },
-                }
-              : conversation
-          )
+        const updatedData = dataInfo.map((conversation) =>
+          conversation.otherUser.userId === incoming.userId
+            ? {
+                ...conversation,
+                otherUser: {
+                  ...conversation.otherUser,
+                  onlineStatus: false,
+                },
+              }
+            : conversation
         );
+        dispatch(setDataInfo(updatedData));
       }
     };
   
@@ -148,33 +148,32 @@ const SideBar = () => {
   }, [id]);
   
 
-  // useEffect(() => {
-  //   const unsubscribe = socketService.on<incomingUnreadMessagesCount>(
-  //     "conversation_unread_count",
-  //     (incoming) => {
-  //       console.log("haneeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeet")
-  //       setDataInfo((prevData) =>
-  //         prevData.map((message) =>
-  //           message.conversationId === incoming.conversationId
-  //             ? {
-  //                 ...message,
-  //                 unreadCount: incoming.count,
-  //                 conversationType: incoming.count > 0 
-  //                   ? message.conversationType.includes("Unread") 
-  //                     ? message.conversationType 
-  //                     : [...message.conversationType, "Unread"]
-  //                   : message.conversationType
-  //               }
-  //             : message
-  //         )
-  //       );
-  //     }
-  //   );
+  useEffect(() => {
+    const unsubscribe = socketService.on<incomingUnreadMessagesCount>(
+      "conversation_unread_count",
+      (incoming) => {
+        console.log("haneeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeet")
+          const updatedData = dataInfo.map((message) =>
+            message.conversationId === incoming.conversationId
+              ? {
+                  ...message,
+                  unreadCount: incoming.count,
+                  conversationType: incoming.count > 0 
+                    ? message.conversationType.includes("Unread") 
+                      ? message.conversationType 
+                      : [...message.conversationType, "Unread"]
+                    : message.conversationType
+                }
+              : message
+          );
+          dispatch(setDataInfo(updatedData));
+      }
+    );
   
-  //   return () => {
-  //     unsubscribe();
-  //   };
-  // }, []);
+    return () => {
+      unsubscribe();
+    };
+  }, []);
 
   const filterButtonData = {
     Focused: dataInfo,
@@ -226,19 +225,18 @@ const SideBar = () => {
           await markConversationAsRead(token, conversationID); // API call first
 
           // On success, update local state and show toast
-          setDataInfo((prevData) =>
-            prevData.map((message) =>
-              message.conversationId === conversationID
-                ? {
-                    ...message,
-                    conversationType: message.conversationType.filter(
-                      (t) => t !== "Unread"
-                    ),
-                    unreadCount: 0,
-                  }
-                : message
-            )
+          const updatedData = dataInfo.map((message) =>
+            message.conversationId === conversationID
+              ? {
+                  ...message,
+                  conversationType: message.conversationType.filter(
+                    (t) => t !== "Unread"
+                  ),
+                  unreadCount: 0,
+                }
+              : message
           );
+          dispatch(setDataInfo(updatedData));
           toast.success("Conversation marked as read");
         } catch (err) {
           console.error("Failed to mark conversation as read:", err);
@@ -288,18 +286,17 @@ const SideBar = () => {
   const unreadFiltering = async (conversationID: string) => {
     try {
       await markConversationAsUnread(token!, conversationID);
-      setDataInfo((prevData) =>
-        prevData.map((message) =>
-          message.conversationId === conversationID
-            ? {
-                ...message,
-                conversationType: message.conversationType.includes("Unread")
-                  ? message.conversationType.filter((t) => t !== "Unread")
-                  : [...message.conversationType, "Unread"],
-              }
-            : message
-        )
+      const updatedData = dataInfo.map((message) =>
+        message.conversationId === conversationID
+          ? {
+              ...message,
+              conversationType: message.conversationType.includes("Unread")
+                ? message.conversationType.filter((t) => t !== "Unread")
+                : [...message.conversationType, "Unread"],
+            }
+          : message
       );
+      dispatch(setDataInfo(updatedData));
       toast.success("Conversation marked as unread");
     } catch (err) {
       console.error("Error marking as unread:", err);
@@ -310,26 +307,26 @@ const SideBar = () => {
   const starredFiltering = (conversationID: string) => {
     dispatch(toggleStarred(conversationID.toString()));
 
-    setDataInfo((prevData) =>
-      prevData.map((message) =>
-        message.conversationId === conversationID
-          ? {
-              ...message,
-              conversationType: message.conversationType.includes("starred")
-                ? message.conversationType.filter((t) => t !== "starred")
-                : [...message.conversationType, "starred"],
-            }
-          : message
-      )
+    const updatedData = dataInfo.map((message) =>
+      message.conversationId === conversationID
+        ? {
+            ...message,
+            conversationType: message.conversationType.includes("starred")
+              ? message.conversationType.filter((t) => t !== "starred")
+              : [...message.conversationType, "starred"],
+          }
+        : message
     );
+    dispatch(setDataInfo(updatedData));
   };
 
   const handlingDeleteConv = async (conversationID: string) => {
     try {
       await deleteConversation(token!, conversationID);
-      setDataInfo((prevData) =>
-        prevData.filter((conv) => conversationID !== conv.conversationId)
+      const updatedData = dataInfo.filter(
+        (conv) => conversationID !== conv.conversationId
       );
+      dispatch(setDataInfo(updatedData));
       toast.success("Conversation deleted");
     } catch (err) {
       console.error("Error deleting:", err);
