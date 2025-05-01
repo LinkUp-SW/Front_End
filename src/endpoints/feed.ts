@@ -154,7 +154,13 @@ export const getPostsFeed = async (
   });
 
   return {
-    posts: transformedPosts,
+    posts: transformedPosts.map((post: PostType) => ({
+      ...post,
+      author: {
+        ...post.author,
+        connection_degree: "1st",
+      },
+    })),
     next_cursor: response.data.next_cursor,
   };
 };
@@ -183,6 +189,10 @@ export const fetchSinglePost = async (
     // Return post with embedded comments
     console.log("Here:", {
       ...response.data.post,
+      author: {
+        ...response.data.post.author,
+        connection_degree: "1st",
+      },
       comments_data: {
         comments: commentsArray, // Include comments from API response
         count: comments_count,
@@ -193,7 +203,10 @@ export const fetchSinglePost = async (
     });
     return {
       ...response.data.post,
-
+      author: {
+        ...response.data.post.author,
+        connection_degree: "1st",
+      },
       comments_data: {
         comments: commentsArray, // Include comments from API response
         count: comments_count,
@@ -330,12 +343,17 @@ export const editComment = async (
   },
   token: string
 ) => {
-  const response = await axiosInstance.patch(`api/v2/post/comment`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-    data: postPayload,
-  });
+  console.log("Payload:", postPayload);
+  const response = await axiosInstance.patch(
+    `api/v2/post/comment/${postPayload.post_id}/${postPayload.comment_id}`,
+    postPayload,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      data: postPayload,
+    }
+  );
   return response.data;
 };
 

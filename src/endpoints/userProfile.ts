@@ -119,6 +119,10 @@ export const getUserPosts = async (
   return {
     posts: response.data.posts.map((post: PostType) => ({
       ...post,
+      author: {
+        ...post.author,
+        connection_degree: "1st",
+      },
       comments_data: {
         comments: [], // Empty initially
         count: post.comments_count || 0,
