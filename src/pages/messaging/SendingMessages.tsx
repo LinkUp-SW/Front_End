@@ -87,7 +87,6 @@ const SendingMessages = () => {
       isEdited: false,
     };
 
-    // dispatch(addMessage(newMsg));
     dispatch(
       setChatData({
         ...dataChat!,
