@@ -185,6 +185,7 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
           comment={comment}
           setIsReplyActive={setIsReplyActive}
           postId={postId}
+          disableReplies={disableReplies}
         />
       </div>
 
@@ -217,6 +218,7 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
                     comment={reply}
                     setIsReplyActive={setIsReplyActive}
                     postId={postId}
+                    disableReplies={disableReplies}
                   />
                 </div>
               ))}
