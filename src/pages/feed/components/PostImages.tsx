@@ -1,5 +1,10 @@
 import React, { useState } from "react";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { FaArrowLeft, FaArrowRight, FaTimes } from "react-icons/fa";
 
 interface PostImagesProps {
@@ -92,6 +97,8 @@ const PostImages: React.FC<PostImagesProps> = ({
 
       {/* Image Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogTitle />
+        <DialogDescription />
         <DialogContent className="max-w-7xl w-screen h-screen p-0 dark:bg-black/95 border-none">
           <div className="relative w-full h-full flex items-center justify-center">
             {/* Close Button */}

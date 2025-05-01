@@ -42,6 +42,51 @@ const postsSlice = createSlice({
         state.list[index] = { ...state.list[index], ...updatedPost };
       }
     },
+    updateComment: (
+      state,
+      action: PayloadAction<{
+        postId: string;
+        commentId: string;
+        content?: string;
+        media?: {
+          link: string;
+          media_type: "video" | "image" | "none";
+        };
+        is_edited?: boolean;
+      }>
+    ) => {
+      const { postId, commentId, ...updatedData } = action.payload;
+      const post = state.list.find((post) => post._id === postId);
+
+      if (post?.comments_data) {
+        const updateCommentRecursively = (
+          comments: CommentType[]
+        ): CommentType[] => {
+          return comments.map((comment) => {
+            if (comment._id === commentId) {
+              return {
+                ...comment,
+                ...updatedData,
+                is_edited: true,
+              };
+            }
+
+            if (comment.children && comment.children.length > 0) {
+              return {
+                ...comment,
+                children: updateCommentRecursively(comment.children),
+              };
+            }
+
+            return comment;
+          });
+        };
+
+        post.comments_data.comments = updateCommentRecursively(
+          post.comments_data.comments
+        );
+      }
+    },
 
     // For adding comments to a post (lazy loading)
     addCommentsToPost: (
@@ -55,13 +100,13 @@ const postsSlice = createSlice({
       const { postId, comments, nextCursor } = action.payload;
       const post = state.list.find((post) => post._id === postId);
 
-      if (post && post.commentsData) {
+      if (post && post.comments_data) {
         // Append new comments
-        post.commentsData.comments = [
-          ...post.commentsData.comments,
+        post.comments_data.comments = [
+          ...post.comments_data.comments,
           ...comments,
         ];
-        post.commentsData.nextCursor = nextCursor;
+        post.comments_data.nextCursor = nextCursor;
       }
     },
 
@@ -79,16 +124,19 @@ const postsSlice = createSlice({
 
       if (post) {
         // Increment the post's comment count
-        post.commentsCount = (post.commentsCount || 0) + 1;
+        post.comments_count = (post.comments_count || 0) + 1;
 
-        if (post.commentsData) {
+        if (post.comments_data) {
           // Add new comment to the beginning of the array
-          post.commentsData.comments = [comment, ...post.commentsData.comments];
-          // Increment the commentsData count
-          post.commentsData.count = (post.commentsData.count || 0) + 1;
+          post.comments_data.comments = [
+            comment,
+            ...post.comments_data.comments,
+          ];
+          // Increment the comments_data count
+          post.comments_data.count = (post.comments_data.count || 0) + 1;
         } else {
-          // Initialize commentsData if it doesn't exist
-          post.commentsData = {
+          // Initialize comments_data if it doesn't exist
+          post.comments_data = {
             comments: [comment],
             count: 1,
             nextCursor: null,
@@ -108,7 +156,7 @@ const postsSlice = createSlice({
       const { postId, commentId } = action.payload;
       const post = state.list.find((post) => post._id === postId);
 
-      if (post && post.commentsData) {
+      if (post && post.comments_data) {
         let commentRemoved = false;
 
         // Function to recursively find and remove comments or replies
@@ -121,8 +169,8 @@ const postsSlice = createSlice({
           // If we found and removed a comment at this level
           if (filteredComments.length < comments.length) {
             commentRemoved = true;
-            // Update post and commentsData counts
-            if (post.commentsCount !== undefined) post.commentsCount -= 1;
+            // Update post and comments_data counts
+            if (post.comments_count !== undefined) post.comments_count -= 1;
 
             return filteredComments;
           }
@@ -146,8 +194,8 @@ const postsSlice = createSlice({
         };
 
         // Update comments array with the comment/reply removed
-        post.commentsData.comments = removeCommentById(
-          post.commentsData.comments
+        post.comments_data.comments = removeCommentById(
+          post.comments_data.comments
         );
       }
     },
@@ -163,7 +211,7 @@ const postsSlice = createSlice({
       const { postId, parentCommentId, replies, nextCursor } = action.payload;
       const postIndex = state.list.findIndex((post) => post._id === postId);
 
-      if (postIndex === -1 || !state.list[postIndex].commentsData) {
+      if (postIndex === -1 || !state.list[postIndex].comments_data) {
         return;
       }
 
@@ -209,9 +257,9 @@ const postsSlice = createSlice({
       };
 
       // Update the comments array
-      state.list[postIndex].commentsData.comments =
+      state.list[postIndex].comments_data.comments =
         updateCommentsWithNewReplies(
-          state.list[postIndex].commentsData.comments
+          state.list[postIndex].comments_data.comments
         );
     },
     removeReply: (
@@ -225,7 +273,7 @@ const postsSlice = createSlice({
       const { postId, commentId, replyId } = action.payload;
       const postIndex = state.list.findIndex((post) => post._id === postId);
 
-      if (postIndex !== -1 && state.list[postIndex].commentsData) {
+      if (postIndex !== -1 && state.list[postIndex].comments_data) {
         const post = state.list[postIndex];
 
         // More direct approach to update nested comments
@@ -252,23 +300,23 @@ const postsSlice = createSlice({
 
                 // If we actually removed something, update counts
                 if (updatedComment.children.length < originalLength) {
-                  // ADDED: Update childrenCount
-                  updatedComment.childrenCount = Math.max(
+                  // ADDED: Update children_count
+                  updatedComment.children_count = Math.max(
                     0,
-                    (updatedComment.childrenCount || 0) - 1
+                    (updatedComment.children_count || 0) - 1
                   );
 
                   // Update post comment count
-                  if (post.commentsCount !== undefined) {
-                    post.commentsCount -= 1;
+                  if (post.comments_count !== undefined) {
+                    post.comments_count -= 1;
                   }
 
-                  // Update commentsData count
+                  // Update comments_data count
                   if (
-                    post.commentsData &&
-                    post.commentsData.count !== undefined
+                    post.comments_data &&
+                    post.comments_data.count !== undefined
                   ) {
-                    post.commentsData.count -= 1;
+                    post.comments_data.count -= 1;
                   }
 
                   console.log(
@@ -299,9 +347,9 @@ const postsSlice = createSlice({
         };
 
         // Update the comments array
-        if (post.commentsData?.comments) {
-          post.commentsData.comments = updateCommentsWithoutReply(
-            post.commentsData.comments
+        if (post.comments_data?.comments) {
+          post.comments_data.comments = updateCommentsWithoutReply(
+            post.comments_data.comments
           );
         }
       }
@@ -312,15 +360,15 @@ const postsSlice = createSlice({
         postId: string;
         commentId: string;
         reactions: string[]; // Use proper type here based on your API response
-        reactionsCount: number;
-        userReaction: string | null;
+        reactions_count: number;
+        user_reaction: string | null;
       }>
     ) => {
-      const { postId, commentId, reactions, reactionsCount, userReaction } =
+      const { postId, commentId, reactions, reactions_count, user_reaction } =
         action.payload;
       const postIndex = state.list.findIndex((post) => post._id === postId);
 
-      if (postIndex !== -1 && state.list[postIndex].commentsData) {
+      if (postIndex !== -1 && state.list[postIndex].comments_data) {
         // Helper function to recursively find and update the comment
         const updateCommentReactions = (
           comments: CommentType[]
@@ -330,10 +378,10 @@ const postsSlice = createSlice({
             if (comment._id === commentId) {
               return {
                 ...comment,
-                reactions: reactions.map((r) => ({ reaction: r })),
-                reactionsCount: reactionsCount,
-                userReaction: userReaction,
-                topReactions: reactions, // Simply use the reactions array directly
+                reactions: reactions,
+                reactions_count: reactions_count,
+                user_reaction: user_reaction,
+                top_reactions: reactions, // Simply use the reactions array directly
               };
             }
 
@@ -351,9 +399,9 @@ const postsSlice = createSlice({
         };
 
         // Update the comments
-        if (state.list[postIndex].commentsData.comments) {
-          state.list[postIndex].commentsData.comments = updateCommentReactions(
-            state.list[postIndex].commentsData.comments
+        if (state.list[postIndex].comments_data.comments) {
+          state.list[postIndex].comments_data.comments = updateCommentReactions(
+            state.list[postIndex].comments_data.comments
           );
         }
       }
@@ -370,7 +418,7 @@ const postsSlice = createSlice({
       const post = state.list.find((post) => post._id === postId);
       let replyAdded = false;
 
-      if (post && post.commentsData) {
+      if (post && post.comments_data) {
         // Find the parent comment
         const findAndAddReply = (comments: CommentType[]): boolean => {
           for (let i = 0; i < comments.length; i++) {
@@ -380,9 +428,10 @@ const postsSlice = createSlice({
               comments[i].children?.push(reply);
 
               // Increment the reply count on the parent comment
-              comments[i].childrenCount = comments[i].childrenCount || 0;
+              comments[i].children_count = comments[i].children_count || 0;
 
-              comments[i].childrenCount = (comments[i].childrenCount ?? 0) + 1;
+              comments[i].children_count =
+                (comments[i].children_count ?? 0) + 1;
 
               return true;
             }
@@ -398,14 +447,14 @@ const postsSlice = createSlice({
           return false;
         };
 
-        replyAdded = findAndAddReply(post.commentsData.comments);
+        replyAdded = findAndAddReply(post.comments_data.comments);
 
         // Only increment counts if reply was successfully added
         if (replyAdded) {
           // Increment both the total post comment count
-          post.commentsCount = (post.commentsCount || 0) + 1;
-          // And the commentsData count
-          post.commentsData.count = (post.commentsData.count || 0) + 1;
+          post.comments_count = (post.comments_count || 0) + 1;
+          // And the comments_data count
+          post.comments_data.count = (post.comments_data.count || 0) + 1;
         }
       }
     },
@@ -436,7 +485,7 @@ export const {
   addNewCommentToPost,
   addReplyToComment,
   addRepliesToComment, // Add this export
-
+  updateComment,
   setNextCursor,
   setHasMore,
   setLoading,
