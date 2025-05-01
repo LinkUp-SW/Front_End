@@ -25,13 +25,7 @@ const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =
           console.log("Socket connected from provider");
           socketService.setOnlineStatus(true);
           setConnected(true);
-          socketService.on<{ userId: string }>("user_online", ({ userId }) => {
-            dispatch(setFriendOnlineStatus({ userId, isOnline: true }));
-          });
-    
-          socketService.on<{ userId: string }>("user_offline", ({ userId }) => {
-            dispatch(setFriendOnlineStatus({ userId, isOnline: false }));
-          });
+
         })
         .catch((err) => {
           console.error("Socket connection failed:", err);
