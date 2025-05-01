@@ -134,10 +134,10 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
           postId,
           parentCommentId: comment._id,
           replies: response.replies,
-          nextCursor: response.nextCursor,
+          nextCursor: response.next_cursor,
         })
       );
-      setNextCursor(response.nextCursor);
+      setNextCursor(response.next_cursor);
     } catch (error) {
       console.error("Error loading more replies:", error);
       toast.error("Failed to load more replies");
