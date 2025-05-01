@@ -15,7 +15,7 @@ import {
 const UserProfilePage = () => {
   const [isProfileVisible, setIsProfileVisible] = useState(true);
   return (
-    <main className="max-w-7xl mx-auto lg:px-8">
+    <main className="max-w-7xl mx-auto  lg:px-8">
       <div className="grid lg:grid-cols-3 gap-4 mt-4">
         {/* Main Content Column */}
         <div className="lg:col-span-2 space-y-4">

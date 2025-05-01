@@ -10,6 +10,7 @@ import { LiaEllipsisHSolid as EllipsisIcon } from "react-icons/lia";
 import { IoMdClose as CloseIcon } from "react-icons/io";
 import { Button, Dialog, DialogTrigger, DialogContent } from "@/components";
 import ReportPostModal from "./modals/ReportPostModal";
+import { FaPeopleGroup as PeopleIcon } from "react-icons/fa6";
 import { ActivityContextType, MenuAction, PostUserType } from "@/types";
 import moment from "moment";
 
@@ -42,7 +43,7 @@ const PostHeader: React.FC<PostHeaderProps> = ({
     <header className="flex items-center space-x-3 w-full pl-4 pt-1 pb-4">
       <Link to={`/user-profile/${user.username}`}>
         <img
-          src={user.profilePicture}
+          src={user.profile_picture}
           alt={user.username}
           className="w-8 h-8 md:w-12 md:h-12 rounded-full"
         />
@@ -54,7 +55,7 @@ const PostHeader: React.FC<PostHeaderProps> = ({
             className="flex gap-1 items-center"
           >
             <h2 className="text-xs md:text-sm font-semibold sm:text-base hover:cursor-pointer hover:underline hover:text-blue-600 dark:hover:text-blue-400">
-              {user.firstName + " " + user.lastName}
+              {user.first_name + " " + user.last_name}
             </h2>
             <p className="text-lg text-gray-500 dark:text-neutral-400 font-bold">
               {" "}
@@ -62,7 +63,7 @@ const PostHeader: React.FC<PostHeaderProps> = ({
             </p>
             <p className="text-xs text-gray-500 dark:text-neutral-400">
               {" "}
-              {user.connectionDegree}
+              {user.connection_degree}
             </p>
           </Link>
           <nav
@@ -157,11 +158,18 @@ const PostHeader: React.FC<PostHeaderProps> = ({
                 <span>Edited </span>
               </>
             )}
-            {publicPost && (
+            {publicPost ? (
               <>
                 <p className="text-lg font-bold"> · </p>
                 <span className="text-lg">
                   <GlobeIcon />
+                </span>
+              </>
+            ) : (
+              <>
+                <p className="text-lg font-bold"> · </p>
+                <span className="text-lg">
+                  <PeopleIcon />
                 </span>
               </>
             )}

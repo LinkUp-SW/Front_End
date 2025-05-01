@@ -49,7 +49,7 @@ const SavedPostsDashboard: React.FC = () => {
 
       const response = await getSavedPosts(postPayload, token);
       setSavedPosts((prevPosts) => [...prevPosts, ...response.posts]);
-      setNextCursor(response.nextCursor);
+      setNextCursor(response.next_cursor);
     } catch (err) {
       console.error("Error fetching saved posts:", err);
       setError("Failed to fetch saved posts.");

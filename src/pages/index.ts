@@ -28,13 +28,29 @@ import UserExperiencesPage from "./user_profile/user_experiences/UserExperiences
 import SignInAndSecurityPage from "./settings/SignInAndSecurityPage";
 import ChangePasswordPage from "./settings/ChangePasswordPage";
 import MyItemsPage from "./my_items/MyItemsPage";
+import AccountPreferencePage from "./settings/AccountPreferencePage";
+// Import new close account pages
+import InstructionPage from "./settings/InstructionPage";
+import ReasonPage from "./settings/ReasonPage";
+import OtherOptionPage from "./settings/OtherOptionPage";
+import LastPage from "./settings/LastPage";
 import PrimaryEmailPage from "./settings/updateEmail/PrimaryEmailPage";
 import OTP from "./settings/updateEmail/OTP";
 import AddEmailPage from "./settings/updateEmail/AddEmailPage";
-import AllPeoplePage from "./search/AllPeoplePage";import CompanyCreationPage from "./company/CompanyCreationPage";
-import ManageCompanyPage from "./company/ManageCompanyPage"
-import  CreateJobPage from "./company/CreateJobPage"
-
+import AllPeoplePage from "./search/AllPeoplePage";
+import CompanyCreationPage from "./company/CompanyCreationPage";
+import ManageCompanyPage from "./company/ManageCompanyPage";
+import CreateJobPage from "./company/CreateJobPage";
+// Import new visibility pages
+import VisibilityPage from "./settings/VisibilityPage";
+import BlockingListPage from "./settings/BlockingListPage";
+import AdminPanelSidebar from "./admin/components/AdminPanel";
+import DashboardPage from "./admin/DashboardPage";
+import SettingsPage from "./admin/SettingsPage";
+import UsersPage from "./admin/UsersPage";
+import AnalyticsPage from "./admin/AnalyticsPage";
+import JobPostingsPage from "./admin/JobPostingsPage";
+import ContentModerationPage from "./admin/ContentModerationPage";
 //Export the Imported Pages
 export {
   LandingPage,
@@ -66,11 +82,28 @@ export {
   SignInAndSecurityPage,
   ChangePasswordPage,
   MyItemsPage,
+  AccountPreferencePage,
+  // Export new close account pages
+  InstructionPage,
+  ReasonPage,
+  OtherOptionPage,
+  LastPage,
   PrimaryEmailPage,
   OTP,
   AddEmailPage,
   AllPeoplePage,
   CompanyCreationPage,
   ManageCompanyPage,
-  CreateJobPage
+  CreateJobPage,
+  // Export new visibility pages
+  VisibilityPage,
+  BlockingListPage,
+  AdminPanelSidebar,
+  DashboardPage,
+  SettingsPage,
+  UsersPage,
+  AnalyticsPage,
+  JobPostingsPage,
+  ContentModerationPage
+
 };

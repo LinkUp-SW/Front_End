@@ -13,6 +13,7 @@ interface PostPreviewProps {
   compact?: boolean;
   showHeader?: boolean;
   showFooter?: boolean;
+  className?: string;
 }
 
 const PostPreview: React.FC<PostPreviewProps> = ({
@@ -22,6 +23,7 @@ const PostPreview: React.FC<PostPreviewProps> = ({
   compact = false,
   showHeader = true,
   showFooter = false,
+  className = "",
 }) => {
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -37,15 +39,15 @@ const PostPreview: React.FC<PostPreviewProps> = ({
 
   return (
     <div
-      className={`border-t dark:border-t-gray-600 shrink-0 p-4 ${
+      className={`border-t dark:border-t-gray-600 w-full p-4 ${
         compact ? "" : "mb-4"
-      } h-[320px]`}
+      } h-[320px] max-w-[20rem] min-w-[20rem] ${className}`}
       style={{
         display: "flex",
         flexDirection: "column",
       }}
     >
-      <div className="flex flex-col gap-3 h-full">
+      <div className="flex flex-col gap-3  h-full">
         {showHeader && (
           <div className="relative -left-7">
             <PostHeader
@@ -111,12 +113,12 @@ const PostPreview: React.FC<PostPreviewProps> = ({
               </>
             )}
 
-            <div className="flex flex-col">
+            <div className="flex flex-col ">
               <TruncatedText
-                id={`post-content-${post._id}`}
                 content={post.content}
-                lineCount={3}
                 hideLinks={true}
+                lineCount={3}
+                id={`post-${post._id}`}
               />
 
               {post.media.media_type === "pdf" && (
