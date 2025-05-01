@@ -28,6 +28,7 @@ interface CommentWithRepliesProps {
   ) => void;
   comment: CommentType;
   postId: string;
+  disableReplies: boolean;
 }
 
 const user_token = Cookies.get("linkup_auth_token");
@@ -36,6 +37,7 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
   handleCreateComment,
   comment,
   postId,
+  disableReplies,
 }) => {
   const replies = comment.children || [];
   const hasMoreReplies = replies.length < (comment.children_count || 0);

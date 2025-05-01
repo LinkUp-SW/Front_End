@@ -59,6 +59,7 @@ export interface CommentProps {
   comment: CommentType;
   setIsReplyActive: React.Dispatch<React.SetStateAction<boolean>>;
   postId: string;
+  disableReplies: boolean;
 }
 
 const token = Cookies.get("linkup_auth_token");
@@ -67,6 +68,7 @@ const Comment: React.FC<CommentProps> = ({
   comment,
   setIsReplyActive,
   postId,
+  disableReplies,
 }) => {
   const {
     profile_picture,
@@ -600,17 +602,21 @@ const Comment: React.FC<CommentProps> = ({
             </Dialog>
           </>
         )}
-
-        <Button
-          variant="ghost"
-          size="sm"
-          className="text-gray-400 text-xs hover:cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-400 p-1"
-          onClick={() => {
-            setIsReplyActive(true);
-          }}
-        >
-          | Reply
-        </Button>
+        <p className="text-gray-500">| </p>
+        {disableReplies && (
+          <>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-gray-400 text-xs hover:cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-400 p-1"
+              onClick={() => {
+                setIsReplyActive(true);
+              }}
+            >
+              Reply
+            </Button>
+          </>
+        )}
         {comment.children_count ? (
           comment.children_count != 0 && (
             <>
