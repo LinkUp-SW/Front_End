@@ -58,7 +58,7 @@ const SeeMorePage: React.FC = () => {
   const handleJobSelection = (job: Job) => {
     // Update URL with selected job ID
     const newParams = new URLSearchParams(location.search);
-    newParams.set('selected', job.id);
+    newParams.set('selected', job.id!);
     navigate(`${location.pathname}?${newParams.toString()}`, { replace: true });
     
     // Update selected job state

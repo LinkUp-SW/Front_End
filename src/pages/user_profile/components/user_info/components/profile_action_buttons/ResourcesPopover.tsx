@@ -2,11 +2,14 @@ import React from "react";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components";
 import CustomButton from "./CustomButton";
 import { FaUsersSlash, FaUserPlus, FaUserMinus } from "react-icons/fa";
-import { IoCloseCircle } from "react-icons/io5";
+import { IoCloseCircle, IoCheckmarkSharp } from "react-icons/io5";
 import { CiCirclePlus, CiClock2 } from "react-icons/ci";
 import { BsInfoSquareFill } from "react-icons/bs";
 import { ImBlocked } from "react-icons/im";
 import { PiNewspaperBold } from "react-icons/pi";
+import { TbFileCv } from "react-icons/tb";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store";
 
 export interface ResourcesPopoverProps {
   title: string;
@@ -27,6 +30,9 @@ export interface ResourcesPopoverProps {
   email: string;
   isConnectByEmail: boolean;
   setOpenEmailDialog(open: boolean): void;
+  isInRecievedConnection?: boolean;
+  onAccept?: () => void;
+  resume?: string | null;
 }
 
 const ResourcesPopover: React.FC<ResourcesPopoverProps> = (props) => {
@@ -49,6 +55,9 @@ const ResourcesPopover: React.FC<ResourcesPopoverProps> = (props) => {
     email,
     isConnectByEmail,
     setOpenEmailDialog,
+    isInRecievedConnection,
+    onAccept,
+    resume,
   } = props;
 
   return (
@@ -71,6 +80,8 @@ const ResourcesPopover: React.FC<ResourcesPopoverProps> = (props) => {
             isFollowing={isFollowing}
             isPendingConnection={isPendingConnection}
             isInConnection={isInConnection}
+            isInRecievedConnection={isInRecievedConnection}
+            onAccept={onAccept}
             onFollow={onFollow}
             onUnfollow={onUnfollow}
             onConnect={onConnect}
@@ -81,6 +92,7 @@ const ResourcesPopover: React.FC<ResourcesPopoverProps> = (props) => {
             isConnectByEmail={isConnectByEmail}
             email={email}
             setOpenEmailDialog={setOpenEmailDialog}
+            resume={resume}
           />
         )}
       </PopoverContent>
@@ -98,34 +110,50 @@ const OwnerPopoverContent: React.FC<OwnerPopoverContentProps> = ({
   onViewBlockedUsers,
   onViewActivity,
   onAboutProfile,
-}) => (
-  <div className="grid gap-2">
-    <button
-      id="owner-popover-blocked-users-button"
-      onClick={onViewBlockedUsers}
-      className="w-full dark:hover:bg-gray-700 inline-flex text-xs font-semibold cursor-pointer transition-all duration-300 ease-in-out hover:bg-gray-200 p-2 rounded items-center gap-2"
-    >
-      <FaUsersSlash size={16} />
-      <span>Blocked users</span>
-    </button>
-    <button
-      id="owner-popover-activity"
-      onClick={onViewActivity}
-      className="w-full dark:hover:bg-gray-700 inline-flex text-xs font-semibold cursor-pointer transition-all duration-300 ease-in-out hover:bg-gray-200 p-2 rounded items-center gap-2"
-    >
-      <PiNewspaperBold size={16} />
-      <span>Activity</span>
-    </button>
-    <button
-      id="owner-popover-about-profile-button"
-      onClick={onAboutProfile}
-      className="w-full dark:hover:bg-gray-700 inline-flex text-xs font-semibold cursor-pointer transition-all duration-300 ease-in-out hover:bg-gray-200 p-2 rounded items-center gap-2"
-    >
-      <BsInfoSquareFill size={16} />
-      <span>About this profile</span>
-    </button>
-  </div>
-);
+}) => {
+  const userBio = useSelector((state: RootState) => state.userBio.data);
+  console.log(userBio);
+  return (
+    <div className="grid gap-2">
+      <button
+        id="owner-popover-blocked-users-button"
+        onClick={onViewBlockedUsers}
+        className="w-full dark:hover:bg-gray-700 inline-flex text-xs font-semibold cursor-pointer transition-all duration-300 ease-in-out hover:bg-gray-200 p-2 rounded items-center gap-2"
+      >
+        <FaUsersSlash size={16} />
+        <span>Blocked users</span>
+      </button>
+      <button
+        id="owner-popover-activity"
+        onClick={onViewActivity}
+        className="w-full dark:hover:bg-gray-700 inline-flex text-xs font-semibold cursor-pointer transition-all duration-300 ease-in-out hover:bg-gray-200 p-2 rounded items-center gap-2"
+      >
+        <PiNewspaperBold size={16} />
+        <span>Activity</span>
+      </button>
+      {userBio?.resume && (
+        <a
+          href={userBio.resume}
+          target="_blank"
+          id="view-resume"
+          className="w-full dark:hover:bg-gray-700 inline-flex text-xs font-semibold cursor-pointer transition-all duration-300 ease-in-out hover:bg-gray-200 p-2 rounded items-center gap-2"
+        >
+          <TbFileCv size={16} />
+          <span>View Resume</span>
+        </a>
+      )}
+
+      <button
+        id="owner-popover-about-profile-button"
+        onClick={onAboutProfile}
+        className="w-full dark:hover:bg-gray-700 inline-flex text-xs font-semibold cursor-pointer transition-all duration-300 ease-in-out hover:bg-gray-200 p-2 rounded items-center gap-2"
+      >
+        <BsInfoSquareFill size={16} />
+        <span>About this profile</span>
+      </button>
+    </div>
+  );
+};
 
 interface NonOwnerPopoverContentProps {
   followPrimary?: boolean;
@@ -139,10 +167,12 @@ interface NonOwnerPopoverContentProps {
   onRemoveConnection?: () => void;
   onBlock?: () => void;
   onAboutProfile?: () => void;
-
+  isInRecievedConnection?: boolean;
+  onAccept?: () => void;
   email: string;
   isConnectByEmail: boolean;
   setOpenEmailDialog(open: boolean): void;
+  resume?: string | null;
 }
 
 const NonOwnerPopoverContent: React.FC<NonOwnerPopoverContentProps> = ({
@@ -157,10 +187,12 @@ const NonOwnerPopoverContent: React.FC<NonOwnerPopoverContentProps> = ({
   onRemoveConnection,
   onBlock,
   onAboutProfile,
-
+  isInRecievedConnection,
+  onAccept,
   email,
   isConnectByEmail,
   setOpenEmailDialog,
+  resume,
 }) => (
   <div className="grid gap-2">
     {!followPrimary ? (
@@ -189,6 +221,8 @@ const NonOwnerPopoverContent: React.FC<NonOwnerPopoverContentProps> = ({
             ? onCancelRequest
             : isInConnection
             ? onRemoveConnection
+            : isInRecievedConnection
+            ? onAccept
             : isConnectByEmail
             ? () => setOpenEmailDialog(true)
             : onConnect
@@ -207,6 +241,11 @@ const NonOwnerPopoverContent: React.FC<NonOwnerPopoverContentProps> = ({
             <FaUserMinus size={14} />
             <span>Remove Connection</span>
           </>
+        ) : isInRecievedConnection ? (
+          <>
+            <IoCheckmarkSharp size={14} />
+            <span>Accept Request</span>
+          </>
         ) : (
           <>
             <FaUserPlus size={14} />
@@ -223,6 +262,17 @@ const NonOwnerPopoverContent: React.FC<NonOwnerPopoverContentProps> = ({
       <ImBlocked size={14} />
       <span>Report/Block</span>
     </button>
+    {resume && (
+      <a
+        href={resume}
+        target="_blank"
+        id="view-resume"
+        className="w-full dark:hover:bg-gray-700 inline-flex text-xs font-semibold cursor-pointer transition-all duration-300 ease-in-out hover:bg-gray-200 p-2 rounded items-center gap-2"
+      >
+        <TbFileCv size={16} />
+        <span>View Resume</span>
+      </a>
+    )}
     <button
       id="non-owner-about-button"
       onClick={onAboutProfile}

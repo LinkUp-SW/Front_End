@@ -21,7 +21,12 @@ import { v4 as uuid } from "uuid";
 import { useFormStatus } from "@/hooks/useFormStatus";
 import { getErrorMessage } from "@/utils/errorHandler";
 import FormSpinner from "@/components/form/form_spinner/FormSpinner";
-import { extractMonthAndYear } from "@/utils";
+import { extractMonthAndYear, isSkillResponse } from "@/utils";
+import { useDispatch } from "react-redux";
+import {
+  removeOrganizationFromSkills,
+  updateExperienceSkills,
+} from "@/slices/skills/skillsSlice";
 
 interface EditExperienceModalProps {
   /** The existing experience to edit. */
@@ -67,6 +72,7 @@ const EditExperienceModal: React.FC<EditExperienceModalProps> = ({
 
   // Auth token check
   const authToken = Cookies.get("linkup_auth_token");
+  const dispatch = useDispatch();
 
   const { isSubmitting, startSubmitting, stopSubmitting } = useFormStatus();
 
@@ -219,6 +225,30 @@ const EditExperienceModal: React.FC<EditExperienceModalProps> = ({
 
       // Let the parent component update the local experiences list
       onSuccess?.(updatedExperience);
+
+      if (res.experience.skills.length === 0) {
+        dispatch(
+          removeOrganizationFromSkills({ orgId: res.experience._id as string })
+        );
+      } else {
+        res.experience.skills.forEach((skill) => {
+          if (isSkillResponse(skill)) {
+            dispatch(
+              updateExperienceSkills({
+                experience: {
+                  _id: res.experience._id as string,
+                  name: res.experience.title,
+                  logo: res.experience.organization.logo,
+                },
+                newSkills: res.experience.skills as unknown as {
+                  _id: string;
+                  name: string;
+                }[],
+              })
+            );
+          }
+        });
+      }
 
       // Close the modal
       onClose?.();

@@ -91,9 +91,16 @@ const SignInPage: React.FC = () => {
    
 
       toast.success("Signed in successfully!");
-      setTimeout(() => {
-        window.location.replace("/feed");
-      }, 2000);
+      Cookies.set("linkup_user_type", data.user.isAdmin ? "admin" : "user");
+      if (data.user.isAdmin) {
+        setTimeout(() => {
+          window.location.replace("/admin/dashboard");
+        }, 2000);
+      } else {
+        setTimeout(() => {
+          window.location.replace("/feed");
+        }, 2000);
+      }
     } catch (error) {
       const err = getErrorMessage(error);
       setTimeout(() => {

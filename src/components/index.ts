@@ -71,10 +71,12 @@ import {
   TooltipProvider,
 } from "@/components/ui/tooltip";
 import LeftSidebar from "@/components/my_items/LeftSideBar";
-import JobsDashboard from "@/components/my_items/SavedJobsDashboard";
+import SavedJobsDashboard from "@/components/my_items/SavedJobsDashboard";
 import InterviewTipsPanel from "@/components/my_items/InterviewTipsPanel";
 import Footer from "@/components/my_items/Footer";
 import SavedPostsDashboard from "@/components/my_items/SavedPostsDashboard";
+import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
+import SubscribeNowCard from "./subscribe_now/SubscribeNowCard";
 
 export {
   UserList,
@@ -144,8 +146,12 @@ export {
   TooltipProvider,
   TooltipTrigger,
   LeftSidebar,
-  JobsDashboard,
+  SavedJobsDashboard,
   InterviewTipsPanel,
   Footer,
   SavedPostsDashboard,
+  Alert,
+  AlertTitle,
+  AlertDescription,
+  SubscribeNowCard,
 };

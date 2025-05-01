@@ -14,52 +14,47 @@ export interface WithdrawInvitationType {
   userId: string;
   userName: string;
 }
-
+export interface NotificationSender {
+  id: string;
+  firstName: string;
+  lastName: string;
+  profilePhoto: string;
+}
 export interface Notification {
   id: string;
-  type: "job" | "post" | "recommendation" | "message" | "connection";
+  sender: NotificationSender;
+  createdAt: string;
   content: string;
-  time: string;
-  profileImg?: string;
-  action?: string;
-  actionLink?: string;
-  location?: string;
-  count?: number;
-  isNew: boolean; // Make isNew non-optional to avoid undefined checks
+  referenceId: string;
+  type: 'reacted'|'message'|'connection_request'|'comment'|'follow'|'connection_accepted';
+  isRead: boolean;
 }
 
-export interface PostType {
-  user: {
-    name: string;
-    profileImage: string;
-    headline?: string;
-    followers?: string;
-    degree: string;
+export interface NotificationResponse {
+  notifications: Notification[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
   };
-  post: {
-    content: string;
-    date: number;
-    images?: string[];
-    video?: string;
-    pdf?: string;
-    public: boolean;
-    edited?: boolean;
-  };
-  stats: {
-    likes?: number;
-    comments?: number;
-    celebrate?: number;
-    love?: number;
-    insightful?: number;
-    support?: number;
-    funny?: number;
-    person?: string;
-  };
-  action?: {
-    name?: string;
-    profileImage?: string;
-    action?: "like" | "comment" | "repost" | "love";
-  };
+  unReadCount: number;
+}
+
+export interface ReactionType {
+  id: number;
+  name: string;
+  title: string;
+  profileImage: string;
+  reactionType:
+    | "like"
+    | "love"
+    | "celebrate"
+    | "insightful"
+    | "support"
+    | "funny";
 }
 
 export interface ProfileCardType {
@@ -71,29 +66,137 @@ export interface ProfileCardType {
   university: string;
 }
 
-export interface CommentType {
-  user: {
-    profileImage: string;
-    name: string;
-    degree: string;
-    followers?: string;
-    headline?: string;
+export interface PostType {
+  author: PostUserType;
+
+  content: string;
+  media: {
+    link: string[];
+    media_type: "image" | "images" | "video" | "link" | "pdf" | "post" | "none";
   };
-  comment: {
-    text: string;
-    image?: string;
-    edited?: boolean;
+  commentsData?: {
+    comments: CommentType[];
+    count: number;
+    nextCursor: number | null;
+    isLoading?: boolean;
+    hasInitiallyLoaded?: boolean;
   };
-  stats: {
+  commentsCount?: number;
+  topReactions?: string[];
+  commentsDisabled: string;
+  publicPost: boolean;
+  taggedUsers: string[];
+  date: number;
+  reacts: string[];
+  isEdited?: boolean;
+  _id: string;
+  userReaction?: string | null;
+  user_id: string;
+  comments: string[];
+  isSaved?: boolean;
+  reactions: {
+    reaction: string;
+  }[];
+  reactionsCount: number;
+
+  stats?: {
     likes?: number;
-    replies?: number;
+    comments?: number;
     celebrate?: number;
     love?: number;
     insightful?: number;
     support?: number;
     funny?: number;
     person?: string;
+    reposts?: number;
   };
+
+  activityContext?: ActivityContextType;
+}
+
+export interface CommentType {
+  author: {
+    username: string;
+    firstName: string;
+    lastName: string;
+    headline: string;
+    profilePicture: string;
+    connectionDegree: string;
+  };
+  content: string;
+  media: {
+    link: string;
+    mediaType: "image" | "video" | "none";
+  };
+  reacts: string[];
+  tagged_users: string[];
+  is_edited: boolean;
+  userReaction?: string | null;
+  childrenCount?: number;
+  topReactions?: string[];
+  date: number;
+  reactions: {
+    reaction: string;
+  }[];
+  reactionsCount: number;
+  children?: CommentType[];
+
+  userId?: string;
+  parentId: string;
+  _id: string;
+}
+
+export interface CommentObjectType {
+  comments: CommentType[];
+  count: number;
+  nextCursor: number;
+  hasInitiallyLoaded?: boolean;
+  isLoading?: boolean;
+}
+
+export interface CommentDBType {
+  post_id: string;
+  content: string;
+  media: string;
+  parent_id: string | null;
+  tagged_users: string[];
+}
+
+export interface StatsType {
+  likes?: number;
+  love?: number;
+  support?: number;
+  celebrate?: number;
+  insightful?: number;
+  funny?: number;
+  comments?: number;
+  reposts?: number;
+  person?: string;
+}
+
+export interface ActivityContextType {
+  actorId: string;
+  actorName: string;
+  actorUsername: string;
+  type:
+    | "like"
+    | "love"
+    | "support"
+    | "insightful"
+    | "celebrate"
+    | "funny"
+    | "comment"
+    | "repost";
+  actorPicture: string;
+}
+
+export interface PostUserType {
+  firstName: string;
+  lastName: string;
+  username: string;
+  profilePicture: string;
+  connectionDegree: string;
+  headline: string;
 }
 
 export type PostFilter = "all" | "comments" | "reactions" | "reposts";
@@ -101,6 +204,10 @@ export type PostFilter = "all" | "comments" | "reactions" | "reposts";
 export interface Organization {
   _id: string;
   logo: string;
+  name: string;
+}
+export interface SkillResponse {
+  _id: string;
   name: string;
 }
 
@@ -140,6 +247,7 @@ export interface UserLoginResponse {
     email: string;
     id: string;
     isVerified: boolean;
+    isAdmin: boolean;
   };
 }
 
@@ -203,10 +311,16 @@ export interface UserProfileBio {
   isInConnections?: boolean;
   isConnectByEmail: boolean;
   isAlreadyFollowing?: boolean;
+  number_of_saved_jobs?: number;
+  number_of_saved_posts?: number;
   is_default_profile_photo: boolean;
   education: Organization | null;
   work_experience: Organization | null;
   is_defult_cover_photo: boolean;
+  profile_visibility: string;
+  allow_messaging: boolean;
+  resume: string | null;
+  viewer_user_is_subscribed: boolean;
 }
 
 // Add to types.ts
@@ -300,6 +414,7 @@ export interface BioFormData {
   first_name: string;
   last_name: string;
   headline: string;
+  website: "";
   location: {
     country_region: string;
     city: string;
@@ -309,6 +424,6 @@ export interface BioFormData {
     address: string;
     birthday: string;
     website: string;
-    country_code:string
+    country_code: string;
   };
 }

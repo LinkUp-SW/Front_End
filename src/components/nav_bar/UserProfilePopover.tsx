@@ -44,14 +44,20 @@ const UserProfilePopover: React.FC<UserProfilePopoverProps> = ({
           View Profile
         </Link>
       </section>
-      <section>
+      <section className="flex flex-col">
         <div className="h-[0.05rem] w-full bg-gray-500 dark:bg-gray-300" />
         <h2 className="pt-1 font-semibold">Account</h2>
         <Link
-          to={"/settings/account"}
+          to={"/settings/preference"}
           className="text-sm capitalize text-gray-500 dark:text-gray-400 p-2 hover:underline"
         >
           settings & privacy
+        </Link>
+        <Link
+          to={"/settings/subscription-billing"}
+          className="text-sm capitalize text-gray-500 dark:text-gray-400 p-2 hover:underline"
+        >
+          Manage Subscription
         </Link>
       </section>
       <section className="flex flex-col">
