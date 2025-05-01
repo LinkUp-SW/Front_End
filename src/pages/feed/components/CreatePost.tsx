@@ -17,7 +17,7 @@ import { Link, useNavigate } from "react-router-dom";
 import CreatePostModal from "./modals/CreatePostModal";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import PostSettingsModal from "./modals/PostSettingsModal";
 import UploadMediaModal from "./modals/UploadMediaModal";
 import AddDocumentModal from "./modals/AddDocumentModal";
@@ -27,7 +27,8 @@ import Cookies from "js-cookie";
 import { toast } from "sonner";
 import { createPost, fetchSinglePost } from "@/endpoints/feed";
 import { DialogDescription } from "@radix-ui/react-dialog";
-
+import { editPost } from "@/endpoints/feed";
+import { updatePost } from "@/slices/feed/postsSlice";
 import React from "react";
 import { closeCreatePostDialog } from "@/slices/feed/createPostSlice";
 import { openCreatePostDialog } from "@/slices/feed/createPostSlice";
@@ -69,9 +70,54 @@ const CreatePost: React.FC<CreatePostProps> = ({ className }) => {
   const isDialogOpen = useSelector(
     (state: RootState) => state.createPost.createPostOpen
   );
+  const editMode = useSelector((state: RootState) => state.createPost.editMode);
+  const postToEdit = useSelector(
+    (state: RootState) => state.createPost.postToEdit
+  );
 
   const navigate = useNavigate();
   const user_token = Cookies.get("linkup_auth_token");
+
+  useEffect(() => {
+    if (editMode && postToEdit) {
+      setPostText(postToEdit.content || "");
+      setPrivacySetting(postToEdit.publicPost ? "Anyone" : "Connections only");
+      setCommentSetting(postToEdit.commentsDisabled || "Anyone");
+      console.log(postToEdit);
+
+      // Handle media if exists
+      if (postToEdit.media && postToEdit.media.length > 0) {
+        // For URLs, we'll need to fetch the images and convert them to Files
+        const fetchImages = async () => {
+          try {
+            const files = await Promise.all(
+              postToEdit.media.map(async (url) => {
+                const response = await fetch(url);
+                const blob = await response.blob();
+                return new File([blob], `image.${blob.type.split("/")[1]}`, {
+                  type: blob.type,
+                });
+              })
+            );
+            setSelectedMedia(files);
+          } catch (error) {
+            console.error("Error fetching media:", error);
+          }
+        };
+
+        fetchImages();
+      }
+
+      if (postToEdit.taggedUsers) {
+        setTaggedUsers(
+          postToEdit.taggedUsers.map((id) => ({
+            id,
+            name: "", // You might need to fetch user names
+          }))
+        );
+      }
+    }
+  }, [editMode, postToEdit]);
 
   const clearFields = () => {
     setPrivacySetting("Anyone");
@@ -202,45 +248,76 @@ const CreatePost: React.FC<CreatePostProps> = ({ className }) => {
       commentsDisabled: commentSetting,
       publicPost: privacySetting === "Anyone",
       taggedUsers: taggedUsers.map((user) => user.id),
+      _id: editMode ? postToEdit?._id : undefined,
     };
 
     try {
       dismiss();
       clearFields();
-      const toastId = toast.loading("Submitting your post...");
-      const response = await createPost(postObject, user_token);
-      console.log(response);
-      toast.success(
-        <span>
-          {response.message}{" "}
-          <a
-            href={`/feed/posts/${response.postId}`}
-            className="text-blue-600 dark:text-blue-300 hover:underline"
-            onClick={() => toast.dismiss(toastId)}
-          >
-            View post
-          </a>
-        </span>,
-        {
-          id: toastId,
-          duration: 15000,
-        }
+      const toastId = toast.loading(
+        editMode ? "Updating your post..." : "Submitting your post..."
       );
-      const post = await fetchSinglePost(response.postId, user_token);
-      if (post) {
-        // Prepare the post with comments-related fields
-        const postWithComments = {
-          ...post,
-          commentsCount: 0,
-          commentsData: {
-            comments: [],
-            count: 0,
-            nextCursor: null,
-          },
-        };
 
-        // Add the new post to the Redux store at the beginning of the list
-        dispatch(unshiftPosts([postWithComments]));
+      if (editMode && postToEdit?._id) {
+        // Handle edit
+        const response = await editPost(postObject, user_token);
+        console.log("RESPONSE:", response);
+
+        dispatch(
+          updatePost({
+            postId: postToEdit._id,
+            updatedPost: {
+              content: postObject.content,
+              media: {
+                media_type: postObject.mediaType,
+                link: postObject.media,
+              },
+              comments_disabled: postObject.commentsDisabled,
+              public_post: postObject.publicPost,
+              tagged_users: postObject.taggedUsers,
+              is_edited: true,
+            },
+          })
+        );
+
+        toast.success("Post updated successfully", { id: toastId });
+        dispatch(closeCreatePostDialog());
+      } else {
+        const response = await createPost(postObject, user_token);
+        console.log(response);
+        toast.success(
+          <span>
+            {response.message}{" "}
+            <a
+              href={`/feed/posts/${response.postId}`}
+              className="text-blue-600 dark:text-blue-300 hover:underline"
+              onClick={() => toast.dismiss(toastId)}
+            >
+              View post
+            </a>
+          </span>,
+          {
+            id: toastId,
+            duration: 15000,
+          }
+        );
+        const post = await fetchSinglePost(response.postId, user_token);
+        if (post) {
+          // Prepare the post with comments-related fields
+          const postWithComments = {
+            ...post,
+            commentsCount: 0,
+            commentsData: {
+              comments: [],
+              count: 0,
+              nextCursor: null,
+            },
+          };
+
+          // Add the new post to the Redux store at the beginning of the list
+          dispatch(unshiftPosts([postWithComments]));
+        }
+        dispatch(closeCreatePostDialog());
       }
     } catch {
       toast.error("Error creating post. Please try again.");
