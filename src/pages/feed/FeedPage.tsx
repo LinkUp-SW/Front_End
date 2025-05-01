@@ -6,7 +6,7 @@ import {
   LinkUpFooter,
   WhosHiringImage,
 } from "../../components";
-import { PremiumBanner, Shortcuts, CreatePost } from "./components";
+import { PremiumBanner, Shortcuts } from "./components";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { useFeedPosts } from "@/hooks/useFeedPosts";
 import PostList from "./components/PostList"; // <-- Import PostList

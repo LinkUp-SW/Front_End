@@ -70,7 +70,6 @@ import DocumentPreview from "./modals/DocumentPreview";
 import LinkPreview from "./LinkPreview";
 import PostSkeleton from "./PostSkeleton";
 import CommentSkeleton from "./CommentSkeleton";
-import { usePostModal } from "@/hooks/usePostModal";
 import { RootState } from "@/store";
 import { FaCommentSlash } from "react-icons/fa";
 import CommentWithReplies from "./CommentWithReplies";
@@ -125,7 +124,6 @@ const Post: React.FC<PostProps> = ({
   };
 
   // useEffect hooks
-  const postModal = usePostModal();
 
   useEffect(() => {
     if (

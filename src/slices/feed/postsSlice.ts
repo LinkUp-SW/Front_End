@@ -9,15 +9,6 @@ interface PostsState {
   initialLoading: boolean;
 }
 
-type UpdatedCommentData = {
-  content?: string;
-  media?: {
-    link: string;
-    media_type: "image" | "video" | "none";
-  };
-  is_edited?: boolean;
-};
-
 const initialState: PostsState = {
   list: [],
   hasMore: true,

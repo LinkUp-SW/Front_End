@@ -7,48 +7,16 @@ import {
 import { Button } from "../../../components/ui/button";
 // import { useDispatch } from "react-redux";
 // import { handleOpenModalType } from "@/utils";
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components";
-import { Link, useNavigate } from "react-router-dom";
-import CreatePostModal from "./modals/CreatePostModal";
+
+import { Link } from "react-router-dom";
+
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
-import { useState } from "react";
-import PostSettingsModal from "./modals/PostSettingsModal";
-import UploadMediaModal from "./modals/UploadMediaModal";
-import AddDocumentModal from "./modals/AddDocumentModal";
-import CommentControlModal from "./modals/CommentControlModal";
-import { MediaType, PostDBObject } from "@/types";
-import Cookies from "js-cookie";
-import { toast } from "sonner";
-import { createPost, fetchSinglePost } from "@/endpoints/feed";
-import { DialogDescription } from "@radix-ui/react-dialog";
 
 import React from "react";
-import { closeCreatePostDialog } from "@/slices/feed/createPostSlice";
+
 import { openCreatePostDialog } from "@/slices/feed/createPostSlice";
-import { unshiftPosts } from "@/slices/feed/postsSlice";
 
-const useDismissModal = () => {
-  const dismiss = () => {
-    // Select the close button using its classes
-    const closeButton = document.querySelector(
-      "#modal-close-button"
-    ) as HTMLButtonElement;
-
-    if (closeButton) {
-      closeButton.click(); // Simulate a click on the close button
-    }
-  };
-
-  return {
-    dismiss,
-  };
-};
 interface CreatePostProps {
   className?: string;
 }

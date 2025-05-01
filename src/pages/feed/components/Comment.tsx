@@ -63,6 +63,7 @@ import UserTagging from "./UserTagging";
 
 export interface CommentProps {
   comment: CommentType;
+  isReplyActive: boolean;
   setIsReplyActive: React.Dispatch<React.SetStateAction<boolean>>;
   postId: string;
   disableReplies: boolean;
@@ -73,6 +74,7 @@ const token = Cookies.get("linkup_auth_token");
 
 const Comment: React.FC<CommentProps> = ({
   comment,
+  isReplyActive,
   setIsReplyActive,
   postId,
   disableReplies,
@@ -834,7 +836,7 @@ const Comment: React.FC<CommentProps> = ({
             </>
           )}
           <p className="text-gray-500">| </p>
-          {disableReplies && (
+          {disableReplies && isReplyActive && (
             <>
               <Button
                 variant="ghost"

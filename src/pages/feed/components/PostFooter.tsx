@@ -52,7 +52,6 @@ const PostFooter: React.FC<PostFooterProps> = ({
   loadMoreComments,
   comment_privacy,
   connection_degree,
-  existingComment,
 }) => {
   // Create a ref for the horizontally scrollable container
   const [commentInput, setCommentInput] = useState("");
@@ -408,10 +407,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
               postId={postId}
               comment={comment}
               handleCreateComment={handleCreateComment}
-              disableReplies={
-                comment_privacy === "Connections only" &&
-                connection_degree !== "1st"
-              }
+              disableReplies={false}
             />
           ))}
 

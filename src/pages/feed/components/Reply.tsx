@@ -12,14 +12,13 @@ type ReplyProps = CommentProps;
 
 const Reply: React.FC<ReplyProps> = ({ comment, postId, disableReplies }) => {
   const [isReplyActive, setIsReplyActive] = useState(false);
-  if (isReplyActive) {
-  }
 
   return (
     // Example: adding left padding and a border to indicate a reply
     <div className="pl-10">
       <Comment
         comment={comment}
+        isReplyActive={isReplyActive}
         setIsReplyActive={setIsReplyActive}
         postId={postId}
         disableReplies={disableReplies}
