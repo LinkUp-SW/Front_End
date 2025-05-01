@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Modal, WithNavBar } from "../../components";
 import {
-  // AboutSection,
+  AboutSection,
   EducationSection,
   ExperienceSection,
   LicenseSection,
@@ -10,7 +10,7 @@ import {
   UserInfo,
   ViewedSection,
 } from "./components";
-// import Activity from "./components/Activity";
+import Activity from "./components/Activity";
 
 const UserProfilePage = () => {
   const [isProfileVisible, setIsProfileVisible] = useState(true);
@@ -22,8 +22,8 @@ const UserProfilePage = () => {
           <UserInfo setIsProfileVisible={setIsProfileVisible} />
           {isProfileVisible && (
             <>
-              {/* <AboutSection /> */}
-              {/* <Activity /> */}
+              <AboutSection />
+              <Activity />
               <ExperienceSection />
               <EducationSection />
               <LicenseSection />
