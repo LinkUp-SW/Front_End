@@ -575,7 +575,6 @@ const Post: React.FC<PostProps> = ({
           handleSaveButton,
           blockPost,
           reportPost,
-          unfollow,
           postData._id,
           isSaved
         );

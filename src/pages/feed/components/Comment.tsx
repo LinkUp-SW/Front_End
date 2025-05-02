@@ -836,7 +836,7 @@ const Comment: React.FC<CommentProps> = ({
             </>
           )}
           <p className="text-gray-500">| </p>
-          {disableReplies && isReplyActive && (
+          {!disableReplies && (
             <>
               <Button
                 variant="ghost"
@@ -857,7 +857,7 @@ const Comment: React.FC<CommentProps> = ({
                   {" "}
                   ·
                 </p>
-                <p className="hover:underlinetext-xs text-xs text-gray-500 line-clamp-1 text-ellipsis dark:text-neutral-400 hover:text-blue-600 hover:underline dark:hover:text-blue-400 hover:cursor-pointer">
+                <p className=" text-xs text-gray-500 line-clamp-1 text-ellipsis dark:text-neutral-400 ">
                   {comment.children_count &&
                   comment.children_count != 0 &&
                   comment.children_count == 1

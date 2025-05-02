@@ -1,10 +1,27 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import { MenuAction, PostType } from "@/types";
+import { Link, useNavigate } from "react-router-dom";
+import { MediaType, MenuAction, PostDBObject, PostType } from "@/types";
 import PostHeader from "@/pages/feed/components/PostHeader";
 import TruncatedText from "@/components/truncate_text/TruncatedText";
 import DocumentPreview from "@/pages/feed/components/modals/DocumentPreview";
 import CompactLinkPreview from "./CompactLinkPreview";
+import { getMenuActions, getPersonalMenuActions } from "./Menus";
+import { openEditPostDialog } from "@/slices/feed/createPostSlice";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components";
+import TransparentButton from "./buttons/TransparentButton";
+import BlueButton from "./buttons/BlueButton";
+import Cookies from "js-cookie";
+import { toast } from "sonner";
+import { deletePost, savePost, unsavePost } from "@/endpoints/feed";
+import { setPosts, updatePost } from "@/slices/feed/postsSlice";
+import { RootState } from "@/store";
 
 interface PostPreviewProps {
   post: PostType;
@@ -16,9 +33,11 @@ interface PostPreviewProps {
   className?: string;
 }
 
+const userId = Cookies.get("linkup_user_id");
+const token = Cookies.get("linkup_auth_token");
+
 const PostPreview: React.FC<PostPreviewProps> = ({
   post,
-  menuActions,
   onMenuOpenChange,
   compact = false,
   showHeader = true,
@@ -26,6 +45,12 @@ const PostPreview: React.FC<PostPreviewProps> = ({
   className = "",
 }) => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const dispatch = useDispatch();
+  const [willDelete, setWillDelete] = useState(false);
+  const [isSaved, setIsSaved] = useState<boolean>(post?.is_saved || false);
+
+  const navigate = useNavigate();
+  const posts = useSelector((state: RootState) => state.posts.list);
 
   // Handle menu open state with callback to parent if provided
   const handleMenuOpenChange = (isOpen: boolean) => {
@@ -35,18 +60,171 @@ const PostPreview: React.FC<PostPreviewProps> = ({
     }
   };
 
+  const handleEditPostButton = () => {
+    const postForEdit: PostDBObject = {
+      content: post.content,
+      mediaType: (post.media?.media_type as MediaType) || "none",
+      media: post.media?.link || [],
+      commentsDisabled: post.comments_disabled || "Anyone",
+      publicPost: post.public_post !== false,
+      taggedUsers: post.tagged_users || [],
+      _id: post._id, // Make sure to include the post ID
+    };
+
+    // Use the createPostSlice action instead of modal
+    dispatch(openEditPostDialog(postForEdit));
+
+    // Remove this line since we're using Redux now
+    // postModal.openEdit(postForEdit);
+  };
+
+  const deleteModal = () => {
+    setWillDelete(true);
+  };
+
+  const blockPost = () => {
+    // To be implemented
+  };
+
+  const reportPost = () => {
+    // To be implemented
+  };
+
+  const unfollow = () => {
+    // To be implemented
+  };
+
+  const handleDeletePost = async () => {
+    if (!token) {
+      toast.error("You must be logged in to delete a post.");
+      navigate("/login", { replace: true });
+      return;
+    }
+
+    const loadingToastId = toast.loading("Deleting your post...");
+
+    try {
+      setWillDelete(false);
+      await deletePost(post._id, token);
+
+      dispatch(setPosts(posts.filter((p: PostType) => p._id !== post._id)));
+      toast.success("Post deleted successfully!");
+    } catch (error) {
+      console.error("Error deleting post:", error);
+      toast.error("Failed to delete the post. Please try again.");
+    } finally {
+      toast.dismiss(loadingToastId);
+      setWillDelete(false);
+    }
+  };
+
+  const handleSaveButton = async () => {
+    if (!token) {
+      toast.error("You must be logged in to save or unsave a post.");
+      navigate("/login", { replace: true });
+      return;
+    }
+
+    const newSavedState = !isSaved;
+    setIsSaved(newSavedState);
+
+    try {
+      const loading = toast.loading(
+        isSaved ? "Unsaving post..." : "Saving post..."
+      );
+
+      await (isSaved ? unsavePost(post._id, token) : savePost(post._id, token));
+
+      dispatch(
+        updatePost({
+          postId: post._id,
+          updatedPost: {
+            is_saved: newSavedState,
+          },
+        })
+      );
+
+      toast.success(
+        isSaved ? (
+          "Post unsaved."
+        ) : (
+          <span>
+            Post saved.{" "}
+            <span
+              onClick={() =>
+                navigate("/my-items/saved-posts/", { replace: true })
+              }
+              className="text-blue-600 dark:text-blue-300 hover:underline hover:cursor-pointer"
+            >
+              View saved posts
+            </span>
+          </span>
+        )
+      );
+      toast.dismiss(loading);
+    } catch (error) {
+      console.error(`Error ${isSaved ? "unsaving" : "saving"} post:`, error);
+      toast.error(
+        `Failed to ${isSaved ? "unsave" : "save"} the post. Please try again.`
+      );
+      setIsSaved(!newSavedState); // Revert on error
+    }
+  };
+
+  // UI helpers
+  const menuActions =
+    userId === post.author.username
+      ? getPersonalMenuActions(
+          handleSaveButton,
+          handleEditPostButton,
+          deleteModal,
+          post._id,
+          isSaved
+        )
+      : getMenuActions(
+          handleSaveButton,
+          blockPost,
+          reportPost,
+
+          post._id,
+          isSaved
+        );
+
   // Handle unsave directly if the function is provided
 
   return (
     <div
       className={`border-t dark:border-t-gray-600 w-full p-4 ${
         compact ? "" : "mb-4"
-      } h-[320px] max-w-[20rem] min-w-[20rem] ${className}`}
+      } h-[320px] w-full ${className}`}
       style={{
         display: "flex",
         flexDirection: "column",
       }}
     >
+      <Dialog open={willDelete} onOpenChange={() => setWillDelete(!willDelete)}>
+        <DialogContent className="dark:bg-gray-900 border-0 ">
+          <DialogHeader>
+            <DialogTitle className="dark:text-white">
+              Are you absolutely sure?
+            </DialogTitle>
+            <DialogDescription className="dark:text-neutral-300">
+              This action cannot be undone. This will permanently delete this
+              post from LinkUp.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex w-full justify-end gap-4">
+            <TransparentButton
+              onClick={() => {
+                setWillDelete(false);
+              }}
+            >
+              Back
+            </TransparentButton>
+            <BlueButton onClick={() => handleDeletePost()}>Delete</BlueButton>
+          </div>
+        </DialogContent>
+      </Dialog>
       <div className="flex flex-col gap-3  h-full">
         {showHeader && (
           <div className="relative -left-7">

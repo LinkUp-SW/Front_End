@@ -26,7 +26,13 @@ export interface Notification {
   createdAt: string;
   content: string;
   referenceId: string;
-  type: 'reacted'|'message'|'connection_request'|'comment'|'follow'|'connection_accepted';
+  type:
+    | "reacted"
+    | "message"
+    | "connection_request"
+    | "comment"
+    | "follow"
+    | "connection_accepted";
   isRead: boolean;
 }
 
@@ -47,8 +53,8 @@ export interface ReactionType {
   id: number;
   name: string;
   title: string;
-  profileImage: string;
-  reactionType:
+  profile_image: string;
+  reaction_type:
     | "like"
     | "love"
     | "celebrate"

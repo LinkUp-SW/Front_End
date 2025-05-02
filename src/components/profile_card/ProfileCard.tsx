@@ -10,6 +10,7 @@ import { RootState, AppDispatch } from "@/store"; // Ensure AppDispatch is expor
 import { getErrorMessage } from "@/utils/errorHandler";
 import { BiSolidBriefcase } from "react-icons/bi";
 import { defaultProfileImage } from "@/constants";
+import { splitHeadline } from "@/utils";
 
 const ProfileCard: React.FC = () => {
   // Use the correctly typed dispatch
@@ -158,12 +159,15 @@ const ProfileCard: React.FC = () => {
             <h1 id="profile-card-name" className="text-xl font-medium">
               {data?.bio.first_name} {data?.bio.last_name}
             </h1>
-            <h2
-              id="profile-card-headline"
-              className="text-xs text-ellipsis line-clamp-2"
-            >
-              {data?.bio.headline}
-            </h2>
+            {data?.bio.headline && (
+              <h2
+                id="profile-card-headline"
+                className="text-xs text-ellipsis line-clamp-2"
+              >
+                {splitHeadline(data?.bio.headline)}
+              </h2>
+            )}
+
             <h3
               id="profile-card-location"
               className="text-xs text-gray-500 dark:text-neutral-400"
