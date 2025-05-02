@@ -203,6 +203,7 @@ export interface PostUserType {
   profile_picture: string;
   connection_degree: string;
   headline: string;
+  followers_count?: number;
 }
 
 export type PostFilter = "all" | "comments" | "reactions" | "reposts";
@@ -413,7 +414,7 @@ export interface PostDBObject {
   media: string[]; // Array of media URLs or Base64 strings
   commentsDisabled: string; // Indicates if comments are disabled (e.g., "true" or "false")
   publicPost: boolean; // Whether the post is public or not
-  taggedUsers: string[]; // Array of user IDs tagged in the post
+  taggedUsers?: string[]; // Array of user IDs tagged in the post
   _id?: string;
   repostedPost?: PostType;
 }
