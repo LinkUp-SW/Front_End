@@ -362,7 +362,7 @@ const TruncatedText: React.FC<TruncatedTextProps> = ({
   };
 
   return (
-    <div className={`pl-4 w-full ${className || ""}`}>
+    <div className={`pl-4 w-full max-h-30 overflow-y-auto ${className || ""}`}>
       {/* Hidden element for measurement (off-screen) */}
       <p
         ref={textRef}
@@ -372,7 +372,7 @@ const TruncatedText: React.FC<TruncatedTextProps> = ({
         {content}
       </p>
 
-      <p className="text-sm whitespace-pre-wrap break-all max-w-full w-full">
+      <p className="text-sm whitespace-pre-wrap break-all max-w-full  w-full">
         {expanded || !isTruncated
           ? formatText(content)
           : formatText(truncatedText)}
