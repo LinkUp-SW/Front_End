@@ -134,6 +134,7 @@ export const DismissReport = async (
   ): Promise<{ message: string; success: boolean }> => {
     const response = await axiosInstance.patch(
       `/api/v1/admin/report/resolve/${contentType}/${contentRef}`,
+      {},
       
       {
         headers: {
