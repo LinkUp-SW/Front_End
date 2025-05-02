@@ -23,6 +23,7 @@ interface ReportResponse {
   success: boolean;
   data: ReportData;
 }
+
 interface ReportData {
   reports: Report[];
   total_count: number;
@@ -55,7 +56,20 @@ export interface ReportDetailsCommentData {
 }
 
 export interface ReportDetailsJobData {
-  content: any;
+  content: {
+    _id: string;
+    type: string;
+    title: string;
+    description: string;
+    qualifications: string[];
+    responsibilities: string[];
+    benefits: string[];
+    organization: {
+      _id: string;
+      name: string;
+      logo: string;
+    };
+  };
   parent_post?: PostType;
   total_count: number;
   reasons_summary: {
@@ -93,3 +107,42 @@ export const getReportDetails = async (
   );
   return response.data;
 };
+
+export const DeleteContent = async (
+  token: string,
+  contentType: string,
+  contentRef: string,
+  
+): Promise<{ message: string; success: boolean }> => {
+  const response = await axiosInstance.delete(
+    `/api/v1/admin/report/resolve/${contentType}/${contentRef}`,
+    
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
+
+export const DismissReport = async (
+    token: string,
+    contentType: string,
+    contentRef: string,
+    
+  ): Promise<{ message: string; success: boolean }> => {
+    const response = await axiosInstance.patch(
+      `/api/v1/admin/report/resolve/${contentType}/${contentRef}`,
+      {},
+      
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  };
+  
+

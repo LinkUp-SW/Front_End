@@ -1,3 +1,4 @@
+// ContentModeration.tsx
 import { useEffect, useRef, useState, useCallback } from "react";
 import Cookies from "js-cookie";
 import { FiSearch } from "react-icons/fi";
@@ -7,6 +8,8 @@ import {
   ReportDetailsPostData,
   ReportDetailsJobData,
   ReportDetailsCommentData,
+  DeleteContent,
+  DismissReport,
 } from "@/endpoints/admin";
 import {
   Dialog,
@@ -19,6 +22,7 @@ import {
 import PostPreview from "@/pages/feed/components/PostPreview";
 import PostPreviewSkeleton from "@/pages/feed/components/PostPreviewSkeleton";
 import CommentWithReplies from "@/pages/feed/components/CommentWithReplies";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 interface Report {
   content_id: string;
@@ -44,11 +48,12 @@ const ContentModeration = () => {
   const token = Cookies.get("linkup_auth_token") ?? "";
 
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
-
   const [postReportDetails, setPostReportDetails] =
     useState<ReportDetailsPostData>();
   const [commentReportDetails, setCommentReportDetails] =
     useState<ReportDetailsCommentData>();
+  const [jobReportDetails, setJobReportDetails] =
+    useState<ReportDetailsJobData>();
 
   const fetchReports = useCallback(async () => {
     if (!token || loading || !hasMore) return;
@@ -58,7 +63,6 @@ const ContentModeration = () => {
       const res = await getreports(token, activeTab, cursor, 5);
       if (res.success) {
         const newReports: Report[] = res.data.reports || [];
-
         setReports((prev) => {
           const existingIds = new Set(prev.map((r) => r.content_id));
           const filtered = newReports.filter(
@@ -93,40 +97,41 @@ const ContentModeration = () => {
     fetchReports();
   }, [fetchReports]);
 
-  const fetchPostReportDetails = async () => {
-    //This is for posts OR comments
-    if (selectedReport) {
-      if (selectedReport.content_id) {
+  useEffect(() => {
+    const fetchDetails = async () => {
+      if (!selectedReport) return;
+      setDetailsLoading(true);
+
+      try {
+        console.log(selectedReport.type);
         const result = await getReportDetails(
           token,
           selectedReport.type,
           selectedReport.content_ref
         );
 
-        if (result.data.content.type === "Post") {
+        if (selectedReport.type === "Post") {
           setPostReportDetails(result.data as ReportDetailsPostData);
-        } else {
+          setCommentReportDetails(undefined);
+          setJobReportDetails(undefined);
+        } else if (selectedReport.type === "Comment") {
           setCommentReportDetails(result.data as ReportDetailsCommentData);
+          setPostReportDetails(undefined);
+          setJobReportDetails(undefined);
+        } else if (selectedReport.type === "Job") {
+          setJobReportDetails(result.data as ReportDetailsJobData);
+          setPostReportDetails(undefined);
+          setCommentReportDetails(undefined);
         }
+      } catch (error) {
+        console.error("Error fetching report details:", error);
+      } finally {
+        setDetailsLoading(false);
       }
-    }
+    };
 
-    setDetailsLoading(false);
-  };
-
-  const fetchJobReportDetails = async () => {
-    //Implement fetch job report details here
-    setDetailsLoading(false);
-  };
-
-  useEffect(() => {
-    setDetailsLoading(true);
-    if (selectedReport?.type === "Post" || selectedReport?.type === "Comment") {
-      fetchPostReportDetails();
-    } else {
-      fetchJobReportDetails();
-    }
-  }, [selectedReport]);
+    fetchDetails();
+  }, [selectedReport, token]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -155,14 +160,46 @@ const ContentModeration = () => {
     );
   });
 
-  const handleDeleteContent = (report: Report) => {
-    console.log("Delete content for", report.content_id);
-    // Add actual delete logic here
+  const handleDeleteContent = async (report: Report) => {
+    try {
+      const res = await DeleteContent(token, report.type, report.content_ref);
+      if (res.success) {
+        setReports((prev) =>
+          prev.map((r) =>
+            r.content_id === report.content_id
+              ? { ...r, status: "resolved" }
+              : r
+          )
+        );
+        alert("Content deleted and report resolved.");
+      } else {
+        alert("Failed to delete content.");
+      }
+    } catch (error) {
+      console.error("Delete content error:", error);
+      alert("An error occurred while deleting content.");
+    }
   };
 
-  const handleDismissReport = (report: Report) => {
-    console.log("Dismiss report for", report.content_id);
-    // Add actual dismiss logic here
+  const handleDismissReport = async (report: Report) => {
+    try {
+      const res = await DismissReport(token, report.type, report.content_ref);
+      if (res.success) {
+        setReports((prev) =>
+          prev.map((r) =>
+            r.content_id === report.content_id
+              ? { ...r, status: "resolved" }
+              : r
+          )
+        );
+        alert("Report dismissed successfully.");
+      } else {
+        alert("Failed to dismiss report.");
+      }
+    } catch (error) {
+      console.error("Dismiss report error:", error);
+      alert("An error occurred while dismissing report.");
+    }
   };
 
   return (
@@ -264,7 +301,7 @@ const ContentModeration = () => {
                             Manage
                           </button>
                         </DialogTrigger>
-                        <DialogContent className="dark:bg-gray-900 dark:border-0">
+                        <DialogContent className="dark:bg-gray-900 dark:border-0 max-w-3xl">
                           <DialogHeader>
                             <DialogTitle>Manage Report</DialogTitle>
                             <DialogDescription className="dark:text-neutral-300">
@@ -273,72 +310,172 @@ const ContentModeration = () => {
                                 : "No report selected."}
                             </DialogDescription>
                           </DialogHeader>
-                          <div className="flex flex-col gap-3 mt-4 ">
-                            {!detailsLoading ? (
-                              selectedReport?.type === "Post" ||
-                              selectedReport?.type === "Comment" ? (
-                                selectedReport.type == "Post" ? (
-                                  <PostPreview
-                                    post={postReportDetails?.content}
-                                    hideActions={true}
-                                    menuActions={[]}
-                                  />
-                                ) : (
-                                  <>
-                                    <PostPreview
-                                      post={commentReportDetails?.parent_post}
-                                      menuActions={[]}
-                                      hideActions={true}
-                                    />
-                                    <div className="w-full pb-5 px-4">
-                                      <CommentWithReplies
-                                        comment={commentReportDetails?.content}
-                                        disableReplies
-                                        handleCreateComment={() => {}}
-                                        postId={
-                                          commentReportDetails?.parent_post
-                                            ?._id || ""
-                                        }
-                                        disableControls
-                                        disableActions
-                                      />
-                                    </div>
-                                  </>
-                                )
-                              ) : (
-                                <div>This is a job preview</div>
-                              )
-                            ) : (
+
+                          <div className="flex flex-col gap-4 mt-4">
+                            {detailsLoading ? (
                               <PostPreviewSkeleton />
+                            ) : selectedReport?.type === "Post" ? (
+                              <PostPreview
+                                post={postReportDetails?.content}
+                                hideActions
+                                menuActions={[]}
+                              />
+                            ) : selectedReport?.type === "Comment" ? (
+                              <>
+                                <PostPreview
+                                  post={commentReportDetails?.parent_post}
+                                  menuActions={[]}
+                                  hideActions
+                                />
+                                <div className="w-full pb-5 px-4">
+                                  <CommentWithReplies
+                                    comment={commentReportDetails?.content}
+                                    disableReplies
+                                    handleCreateComment={() => {}}
+                                    postId={
+                                      commentReportDetails?.parent_post?._id ||
+                                      ""
+                                    }
+                                    disableControls
+                                    disableActions
+                                  />
+                                </div>
+                              </>
+                            ) : selectedReport?.type === "Job" &&
+                              jobReportDetails?.content ? (
+                              <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg space-y-4">
+                                <div className="flex items-start space-x-4">
+                                  <img
+                                    src={
+                                      jobReportDetails.content.organization
+                                        ?.logo || "/default-company.png"
+                                    }
+                                    alt="Company Logo"
+                                    className="w-16 h-16 object-contain rounded-lg border dark:border-gray-700"
+                                    onError={(e) => {
+                                      (e.target as HTMLImageElement).src =
+                                        "/default-company.png";
+                                    }}
+                                  />
+                                  <div className="flex-1">
+                                    <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                                      {jobReportDetails.content.title}
+                                    </h3>
+                                    <h4 className="text-lg font-semibold text-gray-700 dark:text-gray-300">
+                                      {
+                                        jobReportDetails.content.organization
+                                          ?.name
+                                      }
+                                    </h4>
+                                    <div className="flex flex-wrap gap-2 mt-2">
+                                      <span className="px-3 py-1 bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 rounded-full text-sm">
+                                        {jobReportDetails.content.type}
+                                      </span>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                                  <div></div>
+                                  <div></div>
+                                </div>
+
+                                <Tabs
+                                  defaultValue="description"
+                                  className="w-full mt-4"
+                                >
+                                  <TabsList className="grid w-full grid-cols-3">
+                                    <TabsTrigger value="description">
+                                      Description
+                                    </TabsTrigger>
+                                    <TabsTrigger value="responsibilities">
+                                      Responsibilities
+                                    </TabsTrigger>
+                                    <TabsTrigger value="Qualifications">
+                                      Qualifications
+                                    </TabsTrigger>
+                                  </TabsList>
+                                  <TabsContent
+                                    value="description"
+                                    className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg"
+                                  >
+                                    <p className="text-gray-700 dark:text-gray-300 whitespace-pre-line">
+                                      {jobReportDetails.content.description ||
+                                        "No description provided."}
+                                    </p>
+                                  </TabsContent>
+                                  <TabsContent
+                                    value="responsibilities"
+                                    className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg"
+                                  >
+                                    {jobReportDetails.content.responsibilities
+                                      ?.length ? (
+                                      <ul className="list-disc pl-6 space-y-1 text-gray-700 dark:text-gray-300">
+                                        {jobReportDetails.content.responsibilities.map(
+                                          (item, i) => (
+                                            <li key={i}>{item}</li>
+                                          )
+                                        )}
+                                      </ul>
+                                    ) : (
+                                      <p className="text-gray-500 dark:text-gray-400">
+                                        No responsibilities listed.
+                                      </p>
+                                    )}
+                                  </TabsContent>
+                                  <TabsContent
+                                    value="Qualifications"
+                                    className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg"
+                                  >
+                                    {jobReportDetails.content.qualifications
+                                      ?.length ? (
+                                      <ul className="list-disc pl-6 space-y-1 text-gray-700 dark:text-gray-300">
+                                        {jobReportDetails.content.qualifications.map(
+                                          (item, i) => (
+                                            <li key={i}>{item}</li>
+                                          )
+                                        )}
+                                      </ul>
+                                    ) : (
+                                      <p className="text-gray-500 dark:text-gray-400">
+                                        No qualifications listed.
+                                      </p>
+                                    )}
+                                  </TabsContent>
+                                </Tabs>
+                              </div>
+                            ) : (
+                              <p className="text-center text-gray-500">
+                                No details available for this report.
+                              </p>
                             )}
-                            <button
-                              className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-xl"
-                              onClick={() => {
-                                if (selectedReport)
-                                  handleDeleteContent(selectedReport);
-                              }}
-                            >
-                              Delete Content
-                            </button>
-                            <button
+
+                            
+                              <button
+                                  className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-xl"
+                                onClick={() =>
+                                  selectedReport &&
+                                  handleDeleteContent(selectedReport)
+                                }
+                              >
+                                Delete Content
+                              </button>
+                              <button
+                             
                               className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-4 rounded-xl"
-                              onClick={() => {
-                                if (selectedReport)
-                                  handleDismissReport(selectedReport);
-                              }}
-                            >
-                              Dismiss Report
-                            </button>
-                            <button className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-xl">
-                              Cancel
-                            </button>
+                                onClick={() =>
+                                  selectedReport &&
+                                  handleDismissReport(selectedReport)
+                                }
+                              >
+                                Dismiss Report
+                              </button>
+                            
                           </div>
                         </DialogContent>
                       </Dialog>
                     ) : (
-                      <button className="text-green-500 hover:text-green-700">
-                        ✓
-                      </button>
+                      <span className="text-green-500">✓</span>
                     )}
                   </td>
                 </tr>
@@ -352,11 +489,6 @@ const ContentModeration = () => {
           )}
           {!loading && !hasMore && filteredReports.length === 0 && (
             <p className="text-center text-gray-500 py-4">No reports found.</p>
-          )}
-          {!loading && !hasMore && filteredReports.length > 0 && (
-            <p className="text-center text-gray-500 py-4">
-              No more reports to show.
-            </p>
           )}
         </div>
       </div>
