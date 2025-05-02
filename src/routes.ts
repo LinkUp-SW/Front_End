@@ -33,6 +33,7 @@ import {
   CompanyCreationPage,
   ManageCompanyPage,
   CreateJobPage,
+  CompanyProfileView
 } from "./pages";
 
 import PrimaryEmailPage from "./pages/settings/updateEmail/PrimaryEmailPage";
@@ -201,6 +202,11 @@ const routes: RouteObject[] = [
     path: "/jobs/create",
     element: React.createElement(CreateJobPage),
   },
+  {
+    path: "/company/:companyId",
+    element: React.createElement(CompanyProfileView),
+  },
+
 ];
 
 export default routes;

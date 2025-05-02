@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import JobHeader from "./JobHeader";
 import JobContent from "./JobContent";
 import { Job } from "../../types";
@@ -10,9 +11,11 @@ interface JobDetailProps {
 }
 
 const JobDetail: React.FC<JobDetailProps> = ({ job, isLoading = false }) => {
+  const navigate = useNavigate();
   const [isFollowing, setIsFollowing] = useState<boolean>(false);
   const [followLoading, setFollowLoading] = useState<boolean>(false);
   const [showFullDescription, setShowFullDescription] = useState<boolean>(false);
+  const [followersCount, setFollowersCount] = useState<number>(0);
 
   useEffect(() => {
     // Check if user is following when job changes
@@ -22,6 +25,8 @@ const JobDetail: React.FC<JobDetailProps> = ({ job, isLoading = false }) => {
         try {
           const { isFollower } = await checkIsFollowing(job.companyInfo._id);
           setIsFollowing(isFollower);
+          // Initialize followers count from job data
+          setFollowersCount(job.companyInfo.followers_count || 0);
         } catch (error) {
           console.error("Error checking follow status:", error);
           setIsFollowing(false); // Default to not following on error
@@ -36,6 +41,17 @@ const JobDetail: React.FC<JobDetailProps> = ({ job, isLoading = false }) => {
     // Reset show full description when job changes
     setShowFullDescription(false);
   }, [job]);
+
+  // Handle navigation to company page
+  const handleVisitCompany = () => {
+    if (!job || !job.companyInfo || !job.companyInfo._id) {
+      console.error("Cannot navigate: Missing company ID");
+      return;
+    }
+    
+    // Navigate to the company page using the company ID
+    navigate(`/company/${job.companyInfo._id}`);
+  };
 
   const handleFollowToggle = async () => {
     // Use direct ID instead of companyInfo.organizationId
@@ -54,9 +70,13 @@ const JobDetail: React.FC<JobDetailProps> = ({ job, isLoading = false }) => {
       if (isFollowing) {
         await unfollowOrganization(organizationId);
         setIsFollowing(false);
+        // Decrease the followers count immediately in UI
+        setFollowersCount(prevCount => Math.max(0, prevCount - 1));
       } else {
         await followOrganization(organizationId);
         setIsFollowing(true);
+        // Increase the followers count immediately in UI
+        setFollowersCount(prevCount => prevCount + 1);
       }
     } catch (error) {
       console.error("Error toggling follow status:", error);
@@ -147,7 +167,7 @@ const JobDetail: React.FC<JobDetailProps> = ({ job, isLoading = false }) => {
             <div>
               <h3 className="font-medium dark:text-white">{job.company}</h3>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                {job.companyInfo?.followers_count} followers
+                {followersCount} followers
               </p>
             </div>
           </div>
@@ -191,6 +211,7 @@ const JobDetail: React.FC<JobDetailProps> = ({ job, isLoading = false }) => {
         <button 
           id="btn-show-more-company"
           className="block w-full text-center border border-blue-600 dark:border-blue-500 text-blue-600 dark:text-blue-400 rounded-full py-2 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
+          onClick={() => handleVisitCompany()}
         >
           Visit company page
         </button>

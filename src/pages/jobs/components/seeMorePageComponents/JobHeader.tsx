@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Job } from "../../types";
 import Cookies from 'js-cookie';
 import { saveJob, removeFromSaved, fetchSavedJobs } from "../../../../endpoints/jobs";
+import JobApplicationDialog from './JobApplicationDialog';
 
 interface JobHeaderProps {
   job: Job;
@@ -11,6 +12,7 @@ const JobHeader: React.FC<JobHeaderProps> = ({ job }) => {
   const [isSaved, setIsSaved] = useState<boolean>(job.isSaved || false);
   const [saveInProgress, setSaveInProgress] = useState<boolean>(false);
   const [isChecking, setIsChecking] = useState<boolean>(true); // New state for tracking initial check
+  const [isDialogOpen, setIsDialogOpen] = useState(false); // Added dialog state
   
   // Check if the job is in the saved jobs list on component mount and prop change
   useEffect(() => {
@@ -93,6 +95,11 @@ const JobHeader: React.FC<JobHeaderProps> = ({ job }) => {
   // Determine button state
   const buttonIsLoading = saveInProgress || isChecking;
 
+  // Handler for Easy Apply button
+  const handleEasyApply = () => {
+    setIsDialogOpen(true);
+  };
+
   return (
     <>
       <div className="flex justify-between items-start mb-2">
@@ -151,6 +158,7 @@ const JobHeader: React.FC<JobHeaderProps> = ({ job }) => {
           <button 
             id="btn-easy-apply"
             className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 md:px-6 rounded-full flex items-center text-sm font-medium transition-colors"
+            onClick={handleEasyApply}
           >
             <span className="bg-white text-blue-600 rounded px-1 mr-2 text-xs">Up</span>
             <span>Easy Apply</span>
@@ -197,6 +205,13 @@ const JobHeader: React.FC<JobHeaderProps> = ({ job }) => {
           )}
         </button>
       </div>
+      
+      {/* Add the JobApplicationDialog component */}
+      <JobApplicationDialog 
+        open={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+        job={job}
+      />
     </>
   );
 };

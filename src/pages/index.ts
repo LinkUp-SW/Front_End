@@ -34,6 +34,7 @@ import AddEmailPage from "./settings/updateEmail/AddEmailPage";
 import AllPeoplePage from "./search/AllPeoplePage";import CompanyCreationPage from "./company/CompanyCreationPage";
 import ManageCompanyPage from "./company/ManageCompanyPage"
 import  CreateJobPage from "./company/CreateJobPage"
+import CompanyProfileView from "./company/CompanyProfile"
 
 //Export the Imported Pages
 export {
@@ -72,5 +73,6 @@ export {
   AllPeoplePage,
   CompanyCreationPage,
   ManageCompanyPage,
-  CreateJobPage
+  CreateJobPage,
+  CompanyProfileView
 };
