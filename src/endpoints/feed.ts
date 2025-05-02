@@ -578,3 +578,52 @@ export const reportContent = async (
     throw error;
   }
 };
+
+export const repostInstant = async (
+  postPayload: { mediaType: string; media: string[]; postType: string },
+  token: string
+): Promise<{ message: string; report: string }> => {
+  try {
+    const response = await axiosInstance.post(
+      `api/v2/post/posts`,
+      postPayload,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
+export const repostWithThoughts = async (
+  postPayload: {
+    content: string;
+    comments_disabled: string;
+    public_post: boolean;
+    mediaType: string;
+    media: string[];
+    postType: string;
+  },
+  token: string
+): Promise<{ message: string; report: string }> => {
+  try {
+    const response = await axiosInstance.post(
+      `api/v2/post/posts`,
+      postPayload,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
