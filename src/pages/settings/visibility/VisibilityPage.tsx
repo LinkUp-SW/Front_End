@@ -19,7 +19,7 @@ const VisibilityPage: React.FC = () => {
           <h2 className="py-4 px-6 m-0 text-xl font-semibold text-[rgba(0,0,0,0.9)] dark:text-[rgba(255,255,255,0.87)] border-b border-[rgba(0,0,0,0.08)] dark:border-[rgba(255,255,255,0.12)]">
             Visibility of your profile and Messaging
           </h2>
-          <AllowMessagingToggler/>
+          <AllowMessagingToggler />
           <div
             className="flex justify-between items-center py-4 px-6 border-b border-[rgba(0,0,0,0.08)] last:border-b-0 transition-colors duration-200 ease-in-out hover:bg-[rgba(0,0,0,0.03)] dark:border-[rgba(255,255,255,0.12)] dark:hover:bg-[rgba(255,255,255,0.12)]  cursor-pointer"
             onClick={() => navigate("/settings/visibility/profile")}
