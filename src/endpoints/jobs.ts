@@ -94,7 +94,7 @@ export interface JobApplicationData {
   first_name: string;
   last_name: string;
   profile_photo: string;
-  resume: string;
+  resume: string; // Will now contain base64 data if newly uploaded
   is_uploaded: boolean;
 }
 

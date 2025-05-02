@@ -1,5 +1,3 @@
-// Update the JobApplicationDialog component to include is_uploaded in the form state
-
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent } from '@/components';
 import { toast } from 'sonner';
@@ -50,7 +48,8 @@ const JobApplicationDialog: React.FC<JobApplicationDialogProps> = ({
   const [profilePhoto, setProfilePhoto] = useState('');
   const [email, setEmail] = useState('');
   const [resumeFile, setResumeFile] = useState<File | null>(null);
-  const [isResumeUploaded, setIsResumeUploaded] = useState(false); // New state to track if resume was uploaded
+  const [isResumeUploaded, setIsResumeUploaded] = useState(false);
+  const [resumeBase64, setResumeBase64] = useState<string | null>(null); // New state for base64 encoded resume
 
   // Fetch user info on dialog open
   useEffect(() => {
@@ -60,7 +59,8 @@ const JobApplicationDialog: React.FC<JobApplicationDialogProps> = ({
       // Reset state when dialog closes
       setCurrentStep('info');
       setProgress(0);
-      setIsResumeUploaded(false); // Reset uploaded state
+      setIsResumeUploaded(false);
+      setResumeBase64(null); // Reset base64 data when dialog closes
     }
   }, [open]);
 
@@ -98,8 +98,26 @@ const JobApplicationDialog: React.FC<JobApplicationDialogProps> = ({
     }
   };
 
+  // Function to convert file to base64
+  const convertFileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        if (typeof reader.result === 'string') {
+          // Remove the data URL prefix (e.g., "data:application/pdf;base64,")
+          const base64 = reader.result.split(',')[1];
+          resolve(base64);
+        } else {
+          reject(new Error('Failed to convert file to base64'));
+        }
+      };
+      reader.onerror = error => reject(error);
+    });
+  };
+
   // Function to handle resume upload
-  const handleResumeUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleResumeUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       if (file.size > 2 * 1024 * 1024) { // 2MB limit
@@ -107,9 +125,17 @@ const JobApplicationDialog: React.FC<JobApplicationDialogProps> = ({
         return;
       }
       
-      setResumeFile(file);
-      setResumeUrl(URL.createObjectURL(file));
-      setIsResumeUploaded(true); // Set to true when user uploads a new resume
+      try {
+        // Convert file to base64
+        const base64Data = await convertFileToBase64(file);
+        setResumeBase64(base64Data);
+        setResumeFile(file);
+        setResumeUrl(URL.createObjectURL(file)); // For preview purposes
+        setIsResumeUploaded(true);
+      } catch (error) {
+        console.error('Error converting file to base64:', error);
+        toast.error('Failed to process resume file');
+      }
     }
   };
 
@@ -131,8 +157,8 @@ const JobApplicationDialog: React.FC<JobApplicationDialogProps> = ({
         first_name: firstName,
         last_name: lastName,
         profile_photo: profilePhoto,
-        resume: resumeUrl,
-        is_uploaded: isResumeUploaded // Add the new field
+        resume: resumeBase64 || resumeUrl, // Use base64 string if available, otherwise use URL
+        is_uploaded: isResumeUploaded,
       };
 
       // Submit application using the API function
@@ -362,7 +388,7 @@ const JobApplicationDialog: React.FC<JobApplicationDialogProps> = ({
                         Email*
                       </label>
                       <input
-                        type="tel"
+                        type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-gray-400 dark:focus:ring-gray-500 dark:bg-gray-800 dark:text-white"
