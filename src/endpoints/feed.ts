@@ -603,14 +603,14 @@ export const repostInstant = async (
 export const repostWithThoughts = async (
   postPayload: {
     content: string;
-    comments_disabled: string;
-    public_post: boolean;
+    commentsDisabled: string;
+    publicPost: boolean;
     mediaType: string;
     media: string[];
     postType: string;
   },
   token: string
-): Promise<{ message: string; report: string }> => {
+) => {
   try {
     const response = await axiosInstance.post(
       `api/v2/post/posts`,

@@ -141,6 +141,7 @@ const CreatePost: React.FC<CreatePostProps> = ({ className }) => {
   // Add a useMemo for handling text changes
 
   const submitPost = async (link?: string) => {
+    dispatch(closeCreatePostDialog());
     if (!user_token) {
       toast.error("Please sign in again.");
       setTimeout(() => {
@@ -154,16 +155,16 @@ const CreatePost: React.FC<CreatePostProps> = ({ className }) => {
         content: string;
         mediaType: string;
         media: string[];
-        comments_disabled: string;
-        public_post: boolean;
+        commentsDisabled: string;
+        publicPost: boolean;
         postType: string;
       } = {
         media: [postToEdit.repostedPost._id],
         mediaType: "post",
-        comments_disabled: postToEdit.commentsDisabled,
+        commentsDisabled: postToEdit.commentsDisabled,
         content: postText,
         postType: "Repost thought",
-        public_post: postToEdit.publicPost,
+        publicPost: postToEdit.publicPost,
       };
 
       handleRepostWithThoughts(postPayload);
@@ -400,8 +401,8 @@ const CreatePost: React.FC<CreatePostProps> = ({ className }) => {
     content: string;
     mediaType: string;
     media: string[];
-    comments_disabled: string;
-    public_post: boolean;
+    commentsDisabled: string;
+    publicPost: boolean;
     postType: string;
   }) => {
     if (!user_token) {
@@ -415,9 +416,25 @@ const CreatePost: React.FC<CreatePostProps> = ({ className }) => {
       const loadingToastId = toast.loading("Reposting...");
 
       const result = await repostWithThoughts(postPayload, user_token);
+      const post = await fetchSinglePost(result.postId, user_token);
+      if (post) {
+        // Prepare the post with comments-related fields
+        const postWithComments = {
+          ...post,
+          commentsCount: 0,
+          commentsData: {
+            comments: [],
+            count: 0,
+            nextCursor: null,
+          },
+        };
 
+        // Add the new post to the Redux store at the beginning of the list
+        dispatch(unshiftPosts([postWithComments]));
+      }
       toast.success("Repost successful!");
       toast.dismiss(loadingToastId);
+
       return;
     } catch (error) {
       console.error("Error reposting:", error);
