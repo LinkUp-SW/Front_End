@@ -4,7 +4,9 @@ import { FiSearch } from "react-icons/fi";
 import {
   getReportDetails,
   getreports,
-  ReportDetailsData,
+  ReportDetailsPostData,
+  ReportDetailsJobData,
+  ReportDetailsCommentData,
 } from "@/endpoints/admin";
 import {
   Dialog,
@@ -42,7 +44,11 @@ const ContentModeration = () => {
   const token = Cookies.get("linkup_auth_token") ?? "";
 
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
-  const [reportDetails, setReportDetails] = useState<ReportDetailsData>();
+
+  const [postReportDetails, setPostReportDetails] =
+    useState<ReportDetailsPostData>();
+  const [commentReportDetails, setCommentReportDetails] =
+    useState<ReportDetailsCommentData>();
 
   const fetchReports = useCallback(async () => {
     if (!token || loading || !hasMore) return;
@@ -87,23 +93,39 @@ const ContentModeration = () => {
     fetchReports();
   }, [fetchReports]);
 
-  useEffect(() => {
-    const fetchReportDetails = async () => {
-      if (selectedReport) {
-        if (selectedReport.content_id) {
-          const result = await getReportDetails(
-            token,
-            selectedReport.type,
-            selectedReport.content_ref
-          );
-          console.log("Result:", result);
-          setReportDetails(result.data);
+  const fetchPostReportDetails = async () => {
+    //This is for posts OR comments
+    if (selectedReport) {
+      if (selectedReport.content_id) {
+        const result = await getReportDetails(
+          token,
+          selectedReport.type,
+          selectedReport.content_ref
+        );
+
+        if (result.data.content.type === "Post") {
+          setPostReportDetails(result.data as ReportDetailsPostData);
+        } else {
+          setCommentReportDetails(result.data as ReportDetailsCommentData);
         }
       }
-      setDetailsLoading(false);
-    };
+    }
+
+    setDetailsLoading(false);
+  };
+
+  const fetchJobReportDetails = async () => {
+    //Implement fetch job report details here
+    setDetailsLoading(false);
+  };
+
+  useEffect(() => {
     setDetailsLoading(true);
-    fetchReportDetails();
+    if (selectedReport?.type === "Post" || selectedReport?.type === "Comment") {
+      fetchPostReportDetails();
+    } else {
+      fetchJobReportDetails();
+    }
   }, [selectedReport]);
 
   useEffect(() => {
@@ -242,35 +264,50 @@ const ContentModeration = () => {
                             Manage
                           </button>
                         </DialogTrigger>
-                        <DialogContent>
+                        <DialogContent className="dark:bg-gray-900 dark:border-0">
                           <DialogHeader>
                             <DialogTitle>Manage Report</DialogTitle>
-                            <DialogDescription>
+                            <DialogDescription className="dark:text-neutral-300">
                               {selectedReport
                                 ? `Choose an action for content ID: ${selectedReport.content_id}`
                                 : "No report selected."}
                             </DialogDescription>
                           </DialogHeader>
-                          <div className="flex flex-col gap-3 mt-4">
+                          <div className="flex flex-col gap-3 mt-4 ">
                             {!detailsLoading ? (
-                              // reportDetails?.content.type == "Comment" ?
-                              <>
-                                <PostPreview
-                                  post={reportDetails?.content.parent_post}
-                                  menuActions={[]}
-                                  hideActions={true}
-                                />
-
-                                {/* <div className="w-full pb-5">
-                                  <CommentWithReplies
-                                    comment={reportDetails?.content}
-                                    disableReplies={true}
-                                    handleCreateComment={() => {}}
-                                    postId={postData._id}
-                                    disableControls
+                              selectedReport?.type === "Post" ||
+                              selectedReport?.type === "Comment" ? (
+                                selectedReport.type == "Post" ? (
+                                  <PostPreview
+                                    post={postReportDetails?.content}
+                                    hideActions={true}
+                                    menuActions={[]}
                                   />
-                                </div> */}
-                              </> // : <PostPreview but with post not comment>
+                                ) : (
+                                  <>
+                                    <PostPreview
+                                      post={commentReportDetails?.parent_post}
+                                      menuActions={[]}
+                                      hideActions={true}
+                                    />
+                                    <div className="w-full pb-5 px-4">
+                                      <CommentWithReplies
+                                        comment={commentReportDetails?.content}
+                                        disableReplies
+                                        handleCreateComment={() => {}}
+                                        postId={
+                                          commentReportDetails?.parent_post
+                                            ?._id || ""
+                                        }
+                                        disableControls
+                                        disableActions
+                                      />
+                                    </div>
+                                  </>
+                                )
+                              ) : (
+                                <div>This is a job preview</div>
+                              )
                             ) : (
                               <PostPreviewSkeleton />
                             )}
