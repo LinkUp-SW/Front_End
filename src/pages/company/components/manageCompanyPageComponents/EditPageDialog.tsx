@@ -38,7 +38,7 @@ interface EditPageDialogProps {
     description?: string;
     tagline?: string;
     category_type?: string;
-    logo?: string; // Add logo field to receive existing logo
+    logo?: string; 
     location?: {
       country?: string;
       address?: string;

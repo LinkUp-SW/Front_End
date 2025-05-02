@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate  } from 'react-router-dom';
 import { WithNavBar } from '../../components';
 import { FaEye } from "react-icons/fa";
 import EditPageDialog from './components/manageCompanyPageComponents/EditPageDialog';
@@ -90,6 +90,7 @@ interface CompanyUpdateData {
 
 const ManageCompanyPage = () => {
   const { companyId } = useParams<{ companyId: string }>();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<NavigationTab>('jobs');
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -110,6 +111,14 @@ const ManageCompanyPage = () => {
     overview: "",
     followerCount: 0
   });
+
+  const handleViewAsMember = () => {
+    if (companyId) {
+      navigate(`/company/${companyId}`); 
+    } else {
+      toast.error("Company ID not found");
+    }
+  };
 
   const handleFollowerCountChange = (newCount: number) => {
     setCompanyData(prevData => ({
@@ -365,7 +374,10 @@ const ManageCompanyPage = () => {
               <h2 className="text-lg font-medium text-gray-900 dark:text-white">{companyData.name}</h2>
               <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{companyData.followerCount} followers</p>
              
-              <button className="mt-4 w-full border border-gray-300 dark:border-gray-600 rounded-full py-2 text-sm flex justify-center items-center text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+              <button 
+                className="mt-4 w-full border border-gray-300 dark:border-gray-600 rounded-full py-2 text-sm flex justify-center items-center text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                onClick={handleViewAsMember} 
+              >
                 <FaEye className="mr-2" size={16} />
                 View as member
               </button>

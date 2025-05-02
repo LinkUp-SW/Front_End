@@ -36,6 +36,7 @@ import {
   CompanyCreationPage,
   ManageCompanyPage,
   CreateJobPage,
+  CompanyProfileView
   DashboardPage,
   SettingsPage,
   UsersPage,
@@ -234,6 +235,11 @@ const routes: RouteObject[] = [
     path: "/jobs/create",
     element: React.createElement(CreateJobPage),
   },
+  {
+    path: "/company/:companyId",
+    element: React.createElement(CompanyProfileView),
+  },
+
   
   {
     path: "/settings/visibility",

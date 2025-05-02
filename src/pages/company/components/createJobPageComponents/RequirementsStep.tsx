@@ -16,12 +16,12 @@ const RequirementsStep: React.FC<RequirementsStepProps> = ({
 }) => {
   const textareaFields: Array<{label: string, field: ArrayField, placeholder: string}> = [
     {
-      label: "Responsibilities*", 
+      label: "Responsibilities", 
       field: "responsibilities",
       placeholder: "• Lead the development of front-end applications\n• Collaborate with design teams to implement user interface components\n• Ensure the technical feasibility of UI/UX designs\n• Optimize applications for maximum speed and scalability"
     },
     {
-      label: "Qualifications*", 
+      label: "Qualifications", 
       field: "qualifications",
       placeholder: "• Bachelor's degree or equivalent in Computer Science\n• 2+ years' experience in frontend development\n• Familiarity using Scrum/Agile development methodologies\n• Experience building object oriented web applications in JavaScript, HTML5, and CSS3"
     },
