@@ -46,6 +46,7 @@ interface PostLargePreviewProps {
   postData: PostType | undefined;
   action?: ActivityContextType; // used if the post is an action
   className?: string;
+  borders?: boolean;
 }
 
 const userId = Cookies.get("linkup_user_id");
@@ -55,6 +56,7 @@ const PostLargePreview: React.FC<PostLargePreviewProps> = ({
   postData,
   action,
   className,
+  borders,
 }) => {
   // All hooks at the top level
   // State hooks
@@ -244,7 +246,11 @@ const PostLargePreview: React.FC<PostLargePreviewProps> = ({
   };
 
   return (
-    <Card className="p-2 bg-white border-0 mb-4 pl-0 dark:bg-gray-900 dark:text-neutral-200">
+    <Card
+      className={`p-2 bg-white border-0 mb-4 pl-0 dark:bg-gray-900 dark:text-neutral-200 ${
+        borders ? "border dark:border-gray-500" : ""
+      }`}
+    >
       <CardContent className="flex flex-col items-start pl-0 w-full">
         {action && (
           <header className="flex pl-4 justify-start items-center w-full border-b gap-2 pb-2 dark:border-neutral-700">

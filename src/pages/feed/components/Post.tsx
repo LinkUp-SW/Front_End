@@ -461,12 +461,12 @@ const Post: React.FC<PostProps> = ({
       return;
     }
     try {
-      const loadingToastId = toast.loading("Reposting...");
       setRepostMenuOpen(false);
+      const loadingToastId = toast.loading("Reposting...");
       const postPayload = {
-        media: postData.media.link,
-        mediaType: postData.media.media_type,
-        postType: "repost_instant",
+        media: [postData._id],
+        mediaType: "post",
+        postType: "Repost instant",
       };
       const result = await repostInstant(postPayload, token);
       toast.success("Post reposted successfully!");
@@ -478,39 +478,30 @@ const Post: React.FC<PostProps> = ({
     }
   };
 
-  const handleRepostWithThoughts = async () => {
+  const tempFunc = () => {
     setRepostMenuOpen(false);
-    if (!token) {
-      toast.error("You must be logged in to repost.");
-      navigate("/login", { replace: true });
-      return;
-    }
-    try {
-      const loadingToastId = toast.loading("Reposting...");
-      const postPayload: {
-        mediaType: string;
-        media: string[];
-        postType: string;
-      } = {
-        media: postData.media.link,
-        mediaType: postData.media.media_type,
-        postType: "repost_instant",
-      };
-      // const result = await repostInstant(postPayload, token);
-      // toast.success("Post reposted successfully!");
-      console.log("RESULT:");
-      toast.dismiss(loadingToastId);
-    } catch (error) {
-      console.error("Error reposting:", error);
-      toast.error("Failed to repost. Please try again.");
-    }
+    const postForEdit: PostDBObject = {
+      content: "",
+      mediaType: "post" as MediaType,
+      media: [postData._id],
+      commentsDisabled: "Anyone",
+      publicPost: true,
+      taggedUsers: [],
+      repostedPost: postData,
+    };
+
+    // Use the createPostSlice action instead of modal
+    dispatch(openEditPostDialog(postForEdit));
+
+    // Remove this line since we're using Redux now
+    // postModal.openEdit(postForEdit);
   };
 
   const REPOST_MENU = [
     {
       name: "Repost with your thoughts",
       subtext: "Create a new post with this post attached",
-      callback: handleRepostWithThoughts,
+      callback: tempFunc,
       icon: React.createElement(EditIcon, { className: "mr-2" }),
     },
     {
@@ -1038,6 +1029,7 @@ const Post: React.FC<PostProps> = ({
                   ? comments_data.comments
                   : [],
               }}
+              authorName={postData.author.first_name}
               existingComment={
                 action?.type === "comment" ? action?.comment : undefined
               }
