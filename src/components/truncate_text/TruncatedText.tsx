@@ -6,6 +6,7 @@ interface TruncatedTextProps {
   id: string;
   lineCount?: number;
   hideLinks?: boolean;
+  limitHeight?: boolean;
   className?: string;
 }
 
@@ -14,6 +15,7 @@ const TruncatedText: React.FC<TruncatedTextProps> = ({
   id,
   lineCount = 3,
   hideLinks = false,
+  limitHeight = false,
   className,
 }) => {
   const textRef = useRef<HTMLParagraphElement>(null);
@@ -362,7 +364,11 @@ const TruncatedText: React.FC<TruncatedTextProps> = ({
   };
 
   return (
-    <div className={`pl-4 w-full max-h-30 overflow-y-auto ${className || ""}`}>
+    <div
+      className={`pl-4 w-full overflow-y-auto ${
+        limitHeight ? "max-h-30" : ""
+      } ${className || ""}`}
+    >
       {/* Hidden element for measurement (off-screen) */}
       <p
         ref={textRef}

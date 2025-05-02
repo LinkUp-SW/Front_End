@@ -284,6 +284,7 @@ const PostLargePreview: React.FC<PostLargePreviewProps> = ({
           <TruncatedText
             id="post-content"
             content={postData.content}
+            limitHeight
             lineCount={3}
           />
         )}
