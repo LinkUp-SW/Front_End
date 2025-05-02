@@ -17,6 +17,7 @@ import { getReplies } from "@/endpoints/feed";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { addRepliesToComment } from "@/slices/feed/postsSlice";
+import CommentSkeleton from "./CommentSkeleton";
 
 interface CommentWithRepliesProps {
   handleCreateComment: (
@@ -26,10 +27,11 @@ interface CommentWithRepliesProps {
     setCommentInput: React.Dispatch<React.SetStateAction<string>>,
     commentId: string
   ) => void;
-  comment: CommentType;
+  comment: CommentType | undefined;
   postId: string;
   disableReplies: boolean;
   disableControls?: boolean;
+  disableActions?: boolean;
 }
 
 const user_token = Cookies.get("linkup_auth_token");
@@ -40,7 +42,11 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
   postId,
   disableReplies,
   disableControls = false,
+  disableActions = false,
 }) => {
+  if (!comment) {
+    return <CommentSkeleton />;
+  }
   const replies = comment.children || [];
   const hasMoreReplies = replies.length < (comment.children_count || 0);
   console.log("Has more replies:", hasMoreReplies);
@@ -190,6 +196,7 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
           postId={postId}
           disableReplies={disableReplies}
           disableControls={disableControls}
+          disableActions={disableActions}
         />
       </div>
 

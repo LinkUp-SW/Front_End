@@ -68,6 +68,7 @@ export interface CommentProps {
   postId: string;
   disableReplies: boolean;
   disableControls?: boolean;
+  disableActions?: boolean;
 }
 
 const token = Cookies.get("linkup_auth_token");
@@ -78,7 +79,8 @@ const Comment: React.FC<CommentProps> = ({
   setIsReplyActive,
   postId,
   disableReplies,
-  disableControls,
+  disableControls = false,
+  disableActions = false,
 }) => {
   const {
     profile_picture,
@@ -421,14 +423,18 @@ const Comment: React.FC<CommentProps> = ({
               <h2 className="text-xs font-semibold sm:text-sm hover:cursor-pointer hover:underline hover:text-blue-600 dark:hover:text-blue-400">
                 {first_name + " " + last_name}
               </h2>
-              <p className="text-lg text-gray-500 dark:text-neutral-400 font-bold">
-                {" "}
-                ·
-              </p>
-              <p className="text-xs text-gray-500 dark:text-neutral-400">
-                {" "}
-                {connection_degree}
-              </p>
+              {connection_degree && (
+                <>
+                  <p className="text-lg text-gray-500 dark:text-neutral-400 font-bold">
+                    {" "}
+                    ·
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-neutral-400">
+                    {" "}
+                    {connection_degree}
+                  </p>
+                </>
+              )}
             </Link>
             <nav className={`flex relative left-5`}>
               <div className="flex gap-x-1 items-baseline text-xs dark:text-neutral-400 text-gray-500">
@@ -470,23 +476,37 @@ const Comment: React.FC<CommentProps> = ({
                 </DialogContent>
               </Dialog>
               <Dialog>
-                <Popover
-                  open={commentMenuOpen}
-                  onOpenChange={setCommentMenuOpen}
-                >
-                  <PopoverTrigger className="rounded-full relative -top-2 light:hover:bg-gray-100 transition-colors dark:hover:bg-zinc-700 hover:cursor-pointer dark:hover:text-neutral-200 h-8 gap-1.5 px-3 has-[>svg]:px-2.5">
-                    <EllipsisIcon
-                      onClick={() => setCommentMenuOpen(!commentMenuOpen)}
-                    />
-                  </PopoverTrigger>
-                  <PopoverContent className="relative right-30 dark:bg-gray-900 bg-white border-neutral-200 dark:border-gray-700 p-0 pt-1">
-                    <div className="flex flex-col w-full p-0">
-                      {menuActions.map((item, index) =>
-                        item.name == "Report Comment" ? (
-                          <DialogTrigger key={index} asChild>
+                {!disableActions && (
+                  <Popover
+                    open={commentMenuOpen}
+                    onOpenChange={setCommentMenuOpen}
+                  >
+                    <PopoverTrigger className="rounded-full relative -top-2 light:hover:bg-gray-100 transition-colors dark:hover:bg-zinc-700 hover:cursor-pointer dark:hover:text-neutral-200 h-8 gap-1.5 px-3 has-[>svg]:px-2.5">
+                      <EllipsisIcon
+                        onClick={() => setCommentMenuOpen(!commentMenuOpen)}
+                      />
+                    </PopoverTrigger>
+                    <PopoverContent className="relative right-30 dark:bg-gray-900 bg-white border-neutral-200 dark:border-gray-700 p-0 pt-1">
+                      <div className="flex flex-col w-full p-0">
+                        {menuActions.map((item, index) =>
+                          item.name == "Report Comment" ? (
+                            <DialogTrigger key={index} asChild>
+                              <Button
+                                key={index}
+                                onClick={() => {
+                                  setCommentMenuOpen(false);
+                                }}
+                                className="flex justify-start items-center rounded-none h-12 bg-transparent w-full p-0 m-0 hover:bg-neutral-200 text-gray-900 dark:text-neutral-200 dark:hover:bg-gray-600 hover:cursor-pointer"
+                              >
+                                {item.icon}
+                                <span>{item.name}</span>
+                              </Button>
+                            </DialogTrigger>
+                          ) : (
                             <Button
                               key={index}
                               onClick={() => {
+                                item.action();
                                 setCommentMenuOpen(false);
                               }}
                               className="flex justify-start items-center rounded-none h-12 bg-transparent w-full p-0 m-0 hover:bg-neutral-200 text-gray-900 dark:text-neutral-200 dark:hover:bg-gray-600 hover:cursor-pointer"
@@ -494,24 +514,12 @@ const Comment: React.FC<CommentProps> = ({
                               {item.icon}
                               <span>{item.name}</span>
                             </Button>
-                          </DialogTrigger>
-                        ) : (
-                          <Button
-                            key={index}
-                            onClick={() => {
-                              item.action();
-                              setCommentMenuOpen(false);
-                            }}
-                            className="flex justify-start items-center rounded-none h-12 bg-transparent w-full p-0 m-0 hover:bg-neutral-200 text-gray-900 dark:text-neutral-200 dark:hover:bg-gray-600 hover:cursor-pointer"
-                          >
-                            {item.icon}
-                            <span>{item.name}</span>
-                          </Button>
-                        )
-                      )}
-                    </div>
-                  </PopoverContent>
-                </Popover>
+                          )
+                        )}
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                )}
                 <DialogContent>
                   <ReportCommentModal />
                 </DialogContent>
