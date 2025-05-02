@@ -182,7 +182,11 @@ const PostHeader: React.FC<PostHeaderProps> = ({
             to="#"
             className={`text-ellipsis line-clamp-1 ${action ? "pr-20" : ""}`}
           >
-            {`${user.followers_count} followers` || user.headline}
+            {user.followers_count
+              ? user.followers_count === 1
+                ? `1 follower`
+                : ` ${user.followers_count} followers`
+              : user.headline}
           </Link>
 
           <div className="flex gap-x-1 items-center dark:text-neutral-400 text-gray-500">
