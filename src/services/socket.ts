@@ -27,6 +27,34 @@ export interface incomingUnreadMessagesCount {
   count: number;
 }
 
+// ADDED: Notification related interfaces
+export interface NotificationData {
+  id: string;
+  type: string;
+  senderId: string;
+  senderName: string;
+  senderPhoto: string | null;
+  content: string;
+  createdAt: string;
+  referenceId: string;
+  isRead?: boolean;
+}
+
+export interface IncomingNotification {
+  id: string;
+  type: string;
+  senderId: string;
+  senderName: string;
+  senderPhoto: string | null;
+  content: string;
+  createdAt: string;
+  referenceId: string;
+}
+
+export interface IncomingNotificationCount {
+  count: number;
+}
+
 // Base interface for all socket events
 export interface BaseSocketEvent {
   type: string;
@@ -38,6 +66,8 @@ export type SocketEventData =
   | incomingTypingIndicator 
   | incomingMessageRead 
   | incomingUnreadMessagesCount 
+  | IncomingNotification
+  | IncomingNotificationCount
   | BaseSocketEvent;
 
 export interface PrivateMessagePayload {
@@ -176,8 +206,22 @@ class SocketService {
     this.socket.on('user_offline', (data) => {
       console.log('User offline:', data);
     });
+    
     this.socket.on('conversation_unread_count', (data) => {
       console.log('Count for each conversation:', data);
+    });
+
+    // ADDED: Notification related events
+    this.socket.on('new_notification', (data) => {
+      console.log('New notification received:', data);
+    });
+
+    this.socket.on('unread_notifications_count', (data) => {
+      console.log('Unread notifications count:', data);
+    });
+
+    this.socket.on('notification_error', (error) => {
+      console.error('Notification error:', error);
     });
   }
 
@@ -231,6 +275,31 @@ class SocketService {
       conversationId, 
       messageId, 
       reaction 
+    });
+  }
+
+  // ADDED: Notification related methods
+  
+  // Mark a notification as read
+  markNotificationAsRead(notificationId: string): void {
+    if (!this.socket?.connected) return;
+    this.socket.emit("mark_notification_read", { notificationId });
+  }
+
+  // Mark all notifications as read
+  markAllNotificationsAsRead(): void {
+    if (!this.socket?.connected) return;
+    this.socket.emit("mark_all_notifications_read");
+  }
+
+  // Send a notification (for testing or specific use cases)
+  sendNotification(recipientId: string, type: string, content?: string, referenceId?: string): void {
+    if (!this.socket?.connected) return;
+    this.socket.emit("new_notification", {
+      recipientId,
+      type,
+      content,
+      referenceId
     });
   }
 

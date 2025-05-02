@@ -45,7 +45,7 @@ export const ProfileHeader = ({
           {user.first_name} {user.last_name}
         </h1>
         <p className="text-gray-600 dark:text-gray-200">
-          {splitHeadline(user.headline)}
+          {splitHeadline(user.headline||'')}
         </p>
         <div className="inline-flex items-center gap-2 mt-1">
           <p className="text-sm text-gray-500 dark:text-gray-200">

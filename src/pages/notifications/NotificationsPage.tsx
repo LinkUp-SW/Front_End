@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useSelector } from "react-redux";
 import styles from "./notifications.module.css";
 import {
@@ -18,11 +18,30 @@ import { Notification } from "@/types";
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
+// Import socket service and context
+import { socketService, IncomingNotification, IncomingNotificationCount } from "@/services/socket";
+import { useSocketContext } from "@/components/hoc/SocketProvider";
+
+// Helper function to validate notification types
+const validateNotificationType = (type: string): Notification['type'] => {
+  const validTypes: Notification['type'][] = [
+    'reacted', 'message', 'connection_request', 
+    'comment', 'follow', 'connection_accepted'
+  ];
+  
+  if (validTypes.includes(type as Notification['type'])) {
+    return type as Notification['type'];
+  }
+  
+  // Default to 'message' if type is invalid
+  console.warn(`Invalid notification type received: ${type}, defaulting to 'message'`);
+  return 'message';
+};
 
 export type Tab = "all" | "posts" | "messages";
 export type PostFilter = "all" | "comments" | "reactions";
 
-// Update the filtering function to handle null/undefined content
+// Filtering function to handle null/undefined content
 export const filterNotificationsByTab = (
   notifications: Notification[],
   activeTab: Tab,
@@ -88,30 +107,38 @@ const NotificationsPage: React.FC = () => {
   const [isMobile, setIsMobile] = useState<boolean>(window.innerWidth <= 768);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  
+  // Get socket connection status from context
+  const { connected: socketConnected } = useSocketContext();
+  
+  // Ref to track if notifications have been loaded
+  const notificationsLoaded = useRef(false);
 
   const isDarkMode = useSelector(
     (state: RootState) => state.theme.theme === "dark"
   );
   const token = Cookies.get("linkup_auth_token");
-  const userId=Cookies.get('linkup_user_id')
+  const userId = Cookies.get('linkup_user_id');
 
   const fetchNotifications = async () => {
     if (!token) {
+      console.error("Authentication token not found, can't fetch notifications");
       setError("Authentication token not found");
       setLoading(false);
       return;
     }
 
     try {
+      console.log("Fetching notifications from API...");
       const response = await getNotifications(token);
+      
+      console.log(`Received ${response.notifications.length} notifications from server`);
+      console.log(`Unread count from server: ${response.unReadCount}`);
+      
       setNotifications(response.notifications);
-
-      // Set unreadCount from the response
       setUnreadCount(response.unReadCount);
       setError(null);
-
-      console.log("Fetched notifications:", response.notifications);
-      console.log("Unread count:", response.unReadCount);
+      notificationsLoaded.current = true;
     } catch (error) {
       console.error("Error fetching notifications:", error);
       setError("Failed to load notifications");
@@ -124,16 +151,107 @@ const NotificationsPage: React.FC = () => {
   const updateUnreadCount = async () => {
     if (!token) return;
     try {
+      console.log("Updating unread count from API...");
       const count = await getUnreadNotificationsCount(token);
+      console.log(`Updated unread count from API: ${count}`);
       setUnreadCount(count);
-      console.log("Updated unread count:", count);
     } catch (error) {
       console.error("Error updating unread count:", error);
     }
   };
 
+  // Handle new notifications from socket
+  const handleNewNotification = useCallback((data: IncomingNotification) => {
+    console.log("Socket received new notification:", data);
+    
+    // Validate the notification type
+    const notificationType = validateNotificationType(data.type);
+    
+    // Convert the socket notification to the app's Notification type
+    const newNotification: Notification = {
+      id: data.id,
+      type: notificationType,
+      content: data.content,
+      createdAt: data.createdAt,
+      isRead: false,
+      referenceId: data.referenceId,
+      sender: {
+        id: data.senderId,
+        firstName: data.senderName.split(' ')[0] || '',
+        lastName: data.senderName.split(' ')[1] || '',
+        profilePhoto: data.senderPhoto || '/api/placeholder/50/50' // Default if null
+      }
+    };
+    
+    console.log("Processed new notification:", newNotification);
+    
+    // Add it to the notifications list (at the beginning since it's newest)
+    setNotifications(prev => {
+      // Check if this notification already exists in the list
+      const exists = prev.some(n => n.id === newNotification.id);
+      if (exists) {
+        console.log("Notification already exists, not adding duplicate");
+        return prev;
+      }
+      
+      console.log("Adding new notification to state");
+      return [newNotification, ...prev];
+    });
+    
+    // Increment unread count
+    setUnreadCount(prevCount => {
+      const newCount = prevCount + 1;
+      console.log(`Updated unread count: ${newCount}`);
+      return newCount;
+    });
+  }, []);
+
+  // Handle unread notification count updates from socket
+  const handleUnreadNotificationsCount = useCallback((data: IncomingNotificationCount) => {
+    console.log("Socket received unread notifications count:", data);
+    setUnreadCount(data.count);
+  }, []);
+
+  // Connect to socket and register event listeners
   useEffect(() => {
-    fetchNotifications();
+    console.log("Socket connection status:", socketConnected ? "Connected" : "Disconnected");
+    
+    if (token) {
+      // If socket is connected, register listeners
+      if (socketConnected) {
+        console.log("Setting up socket notification listeners");
+        
+        // Register socket event listeners
+        const removeNewNotificationListener = socketService.on<IncomingNotification>(
+          'new_notification', 
+          handleNewNotification
+        );
+        
+        const removeUnreadCountListener = socketService.on<IncomingNotificationCount>(
+          'unread_notifications_count', 
+          handleUnreadNotificationsCount
+        );
+        
+        // Cleanup listeners when component unmounts
+        return () => {
+          console.log("Cleaning up socket notification listeners");
+          removeNewNotificationListener();
+          removeUnreadCountListener();
+        };
+      } else {
+        // If socket is not connected but we have a token, we might want to
+        // attempt reconnection or inform the user
+        console.log("Socket not connected. Using API fallback for notifications.");
+      }
+    }
+  }, [token, socketConnected, handleNewNotification, handleUnreadNotificationsCount]);
+
+  // Fetch notifications when component mounts
+  useEffect(() => {
+    if (!notificationsLoaded.current) {
+      console.log("Initial fetch of notifications");
+      fetchNotifications();
+    }
   }, []);
 
   useEffect(() => {
@@ -166,6 +284,7 @@ const NotificationsPage: React.FC = () => {
   }, []);
 
   const handleTabChange = (tab: Tab): void => {
+    console.log(`Changing to tab: ${tab}`);
     setActiveTab(tab);
     if (tab !== "posts") {
       setShowPostDropdown(false);
@@ -173,6 +292,7 @@ const NotificationsPage: React.FC = () => {
   };
 
   const handlePostFilterSelection = (filter: PostFilter): void => {
+    console.log(`Setting post filter: ${filter}`);
     setActivePostFilter(filter);
     setShowPostDropdown(false);
   };
@@ -192,10 +312,18 @@ const NotificationsPage: React.FC = () => {
     );
   };
 
+  // Handle notification click - mark as read and navigate
   const handleNotificationClick = async (notification: Notification) => {
-    // Don't mark as read if already read
-    if (!notification.id || notification.isRead) return;
+    // Don't mark as read if already read or no ID
+    if (!notification.id || notification.isRead) {
+      console.log("Notification already read or has no ID, skipping mark as read");
+      // Still navigate even if already read
+      handleNavigation(notification.type, notification.referenceId);
+      return;
+    }
 
+    console.log(`Marking notification as read: ${notification.id}`);
+    
     // Optimistically update the UI
     setClickedNotifications((prev) => {
       const newSet = new Set(prev);
@@ -204,7 +332,14 @@ const NotificationsPage: React.FC = () => {
     });
 
     try {
-      await markNotificationAsRead(token as string, notification.id);
+      // Use socket if connected, fallback to API call
+      if (socketConnected) {
+        console.log(`Using socket to mark notification as read: ${notification.id}`);
+        socketService.markNotificationAsRead(notification.id);
+      } else {
+        console.log(`Using API to mark notification as read: ${notification.id}`);
+        await markNotificationAsRead(token as string, notification.id);
+      }
 
       // Update the notifications array to mark this notification as read
       setNotifications((prevNotifications) =>
@@ -214,10 +349,19 @@ const NotificationsPage: React.FC = () => {
       );
 
       // Decrement the unread count
-      setUnreadCount((prevCount) => Math.max(0, prevCount - 1));
+      setUnreadCount((prevCount) => {
+        const newCount = Math.max(0, prevCount - 1);
+        console.log(`Updated unread count after marking as read: ${newCount}`);
+        return newCount;
+      });
 
       // Also fetch the updated count from the server to ensure consistency
-      await updateUnreadCount();
+      if (!socketConnected) {
+        await updateUnreadCount();
+      }
+      
+      // Navigate to the appropriate page based on notification type
+      handleNavigation(notification.type, notification.referenceId);
     } catch (error) {
       console.error("Error marking notification as read:", error);
 
@@ -230,6 +374,7 @@ const NotificationsPage: React.FC = () => {
     }
   };
 
+  // Mark as read from options menu
   const handleMarkAsRead = async (
     e: React.MouseEvent,
     notification: Notification
@@ -237,10 +382,18 @@ const NotificationsPage: React.FC = () => {
     e.stopPropagation();
     if (!notification.id || notification.isRead) return;
 
+    console.log(`Marking notification as read from options menu: ${notification.id}`);
     setActiveOptionsDropdown(null);
 
     try {
-      await markNotificationAsRead(token as string, notification.id);
+      // Use socket if connected, fallback to API call
+      if (socketConnected) {
+        console.log(`Using socket to mark notification as read: ${notification.id}`);
+        socketService.markNotificationAsRead(notification.id);
+      } else {
+        console.log(`Using API to mark notification as read: ${notification.id}`);
+        await markNotificationAsRead(token as string, notification.id);
+      }
 
       // Update the notifications array
       setNotifications((prevNotifications) =>
@@ -250,12 +403,45 @@ const NotificationsPage: React.FC = () => {
       );
 
       // Decrement the unread count
-      setUnreadCount((prevCount) => Math.max(0, prevCount - 1));
+      setUnreadCount((prevCount) => {
+        const newCount = Math.max(0, prevCount - 1);
+        console.log(`Updated unread count after marking as read: ${newCount}`);
+        return newCount;
+      });
 
-      // Also fetch the updated count from the server
-      await updateUnreadCount();
+      // Also fetch the updated count from the server if socket not connected
+      if (!socketConnected) {
+        await updateUnreadCount();
+      }
     } catch (error) {
       console.error("Error marking notification as read:", error);
+    }
+  };
+
+  // Mark all notifications as read
+  const handleMarkAllAsRead = () => {
+    if (!notifications.length || !token) {
+      console.log("No notifications to mark as read or no token");
+      return;
+    }
+    
+    try {
+      if (socketConnected) {
+        console.log("Using socket to mark all notifications as read");
+        socketService.markAllNotificationsAsRead();
+        
+        // Optimistically update UI
+        setNotifications(prevNotifications => 
+          prevNotifications.map(item => ({ ...item, isRead: true }))
+        );
+        setUnreadCount(0);
+        console.log("All notifications marked as read");
+      } else {
+        console.warn("Socket not connected, can't mark all as read");
+        // Could implement an API fallback here
+      }
+    } catch (error) {
+      console.error("Error marking all notifications as read:", error);
     }
   };
 
@@ -321,23 +507,32 @@ const NotificationsPage: React.FC = () => {
     return format(date, "MMM d, yyyy h:mm a");
   };
 
-  const handleNavigation = (type: Notification["type"],refId:string) => {
+  const handleNavigation = (type: Notification["type"], refId: string) => {
+    console.log(`Navigating based on notification type: ${type}, refId: ${refId}`);
+    
     if (type === "connection_request") {
+      console.log("Navigating to /my-network");
       return navigate(`/my-network`);
     }
     if (type === "follow") {
+      console.log("Navigating to /following-followers");
       return navigate("/following-followers");
     }
     if (type === "message") {
+      console.log("Navigating to /messaging");
       return navigate("/messaging");
     }
-    if(type==='comment'||type==='reacted'){
+    if (type === 'comment' || type === 'reacted') {
+      console.log(`Navigating to post: /feed/posts/${refId}`);
       return navigate(`/feed/posts/${refId}`)
     }
-    if(type==='connection_accepted'){
+    if (type === 'connection_accepted') {
+      console.log("Navigating to connections");
       return navigate(`/connections/${userId}`)
     }
   };
+
+  console.log(`Rendering NotificationsPage with ${filteredNotifications.length} notifications, tab: ${activeTab}`);
 
   return (
     <div className={`${styles.container} ${isDarkMode ? styles.darkMode : ""}`}>
@@ -349,6 +544,20 @@ const NotificationsPage: React.FC = () => {
             <a href="/settings/notifications" className={styles.settingsLink}>
               View settings
             </a>
+            {unReadCount > 0 && (
+              <button 
+                className={styles.markAllReadButton}
+                onClick={handleMarkAllAsRead}
+              >
+                Mark all as read
+              </button>
+            )}
+            {/* Display socket connection status for debugging */}
+            <div className={styles.socketStatus}>
+              Socket: {socketConnected ? 
+                <span className={styles.connected}>Connected</span> : 
+                <span className={styles.disconnected}>Disconnected</span>}
+            </div>
           </div>
         </div>
 
@@ -483,7 +692,7 @@ const NotificationsPage: React.FC = () => {
                           className={styles.actionButton}
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleNavigation(notification.type,notification.referenceId);
+                            handleNavigation(notification.type, notification.referenceId);
                           }}
                         >
                           View {notification.type}
