@@ -49,6 +49,8 @@ import {
   BlockingListPage,
   JobPostingsPage,
   DisplayPage,
+  ConnectionRequest,
+  ProfileVisibility,
 } from "./pages";
 
 import React from "react";
@@ -274,6 +276,14 @@ const routes: RouteObject[] = [
   {
     path: "/settings/theme",
     element: React.createElement(DisplayPage),
+  },
+  {
+    path: "/settings/visibility/connection-request",
+    element: React.createElement(ConnectionRequest),
+  },
+  {
+    path: "/settings/visibility/profile",
+    element: React.createElement(ProfileVisibility),
   },
 ];
 

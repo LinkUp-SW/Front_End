@@ -52,6 +52,8 @@ import {
   OtherOptionPage,
   ReasonPage,
   ChangePasswordPage,
+  ConnectionRequest,
+  ProfileVisibility,
 } from "./settings";
 
 //Export the Imported Pages
@@ -108,4 +110,6 @@ export {
   DisplayPage,
   CloseAccountPage,
   ChangePasswordPage,
+  ConnectionRequest,
+  ProfileVisibility,
 };

@@ -11,7 +11,8 @@ import CloseAccountPage from "./close_account/CloseAccountPage";
 import OtherOptionPage from "./close_account/OtherOptionPage";
 import ReasonPage from "./close_account/ReasonPage";
 import ChangePasswordPage from "./change_password/ChangePasswordPage";
-
+import ConnectionRequest from "./visibility/ConnectionRequest";
+import ProfileVisibility from "./visibility/ProfileVisibility";
 export {
   SignInAndSecurityPage,
   AccountPreferencePage,
@@ -26,4 +27,6 @@ export {
   OtherOptionPage,
   ReasonPage,
   ChangePasswordPage,
+  ConnectionRequest,
+  ProfileVisibility,
 };
