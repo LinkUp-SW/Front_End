@@ -38,7 +38,7 @@ import {
   TooltipTrigger,
 } from "@/components";
 import { DialogTrigger } from "@radix-ui/react-dialog";
-import ReportCommentModal from "./modals/ReportCommentModal";
+import ReportModal from "./modals/ReportModal";
 import ReactionsModal from "./modals/ReactionsModal";
 import {
   createReaction,
@@ -115,6 +115,13 @@ const Comment: React.FC<CommentProps> = ({
   const editInputRef = useRef<HTMLTextAreaElement>(null);
   const editFileInputRef = useRef<HTMLInputElement>(null);
 
+  const closeModal = () => {
+    const closeButton = document.getElementById("modal-close-button");
+    if (closeButton instanceof HTMLButtonElement) {
+      closeButton.click();
+    }
+  };
+
   const handleMouseEnter = () => {
     setReactionsOpen(true);
   };
@@ -135,7 +142,6 @@ const Comment: React.FC<CommentProps> = ({
 
     fetchData();
     setIsLoading(false);
-    console.log(isLoading, setViewMore, media);
 
     if (comment.user_reaction)
       setSelectedReaction(
@@ -188,17 +194,6 @@ const Comment: React.FC<CommentProps> = ({
     const toastId = toast.loading("Updating your comment...");
 
     try {
-      console.log({
-        post_id: postId,
-        comment_id: comment._id,
-        content: editInput,
-        media: editingImage
-          ? URL.createObjectURL(editingImage)
-          : media?.link || "",
-        tagged_users: [], // Add tagged users handling if needed
-      });
-      if (editingImage)
-        console.log("Editing Image", URL.createObjectURL(editingImage));
       let mediaData: string | undefined = media?.link;
       if (editingImage) {
         // Convert image to base64
@@ -211,13 +206,7 @@ const Comment: React.FC<CommentProps> = ({
       } else {
         mediaData = "";
       }
-      console.log("Sending:", {
-        post_id: postId,
-        comment_id: comment._id,
-        content: editInput,
-        media: mediaData.length === 0 ? null : mediaData,
-        tagged_users: [], // Add tagged users handling if needed
-      });
+
       const result = await editComment(
         {
           post_id: postId,
@@ -228,16 +217,6 @@ const Comment: React.FC<CommentProps> = ({
         },
         token
       );
-      console.log("Updated comment", {
-        postId,
-        commentId: comment._id,
-        content: editInput,
-        media: {
-          link: result.comment.media.link,
-          media_type: "image",
-        },
-        is_edited: true,
-      });
 
       if (result.comment.media.length != 0) {
         dispatch(
@@ -292,7 +271,6 @@ const Comment: React.FC<CommentProps> = ({
     try {
       // Show loading indicator or toast if needed
       const result = await createReaction(reaction, postId, token);
-      console.log("Adding reaction", result);
       setTopStats(getReactionIcons(result.top_reactions || []));
       dispatch(
         updateCommentReaction({
@@ -360,13 +338,8 @@ const Comment: React.FC<CommentProps> = ({
         { comment_id: comment._id, post_id: postId },
         token
       );
-      console.log("Deleted:", result);
 
-      console.log("Comment:", comment);
       if (comment.parent_id) {
-        console.log(
-          `Removing reply ${comment._id} from parent ${comment.parent_id}`
-        );
         dispatch(
           removeReply({
             postId,
@@ -520,8 +493,12 @@ const Comment: React.FC<CommentProps> = ({
                     </PopoverContent>
                   </Popover>
                 )}
-                <DialogContent>
-                  <ReportCommentModal />
+                <DialogContent className="dark:bg-gray-900 border-0">
+                  <ReportModal
+                    onClose={closeModal}
+                    type="Comment"
+                    contentId={comment._id}
+                  />
                 </DialogContent>
               </Dialog>
             </nav>

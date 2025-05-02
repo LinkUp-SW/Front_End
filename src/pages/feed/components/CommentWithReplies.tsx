@@ -49,9 +49,6 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
   }
   const replies = comment.children || [];
   const hasMoreReplies = replies.length < (comment.children_count || 0);
-  console.log("Has more replies:", hasMoreReplies);
-  console.log("Comment:", comment);
-  console.log("Replies:", replies);
   // State hooks
   const [showReplies, setShowReplies] = useState(true);
   const [mainCommentHeight, setMainCommentHeight] = useState(0);
@@ -61,7 +58,6 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [isLoadingReplies, setIsLoadingReplies] = useState(false);
   const [nextCursor, setNextCursor] = useState(0);
-  console.log("cursor:", nextCursor);
 
   // Refs
   const fileInputRef = useRef<HTMLInputElement>(null);
