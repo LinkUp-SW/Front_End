@@ -416,7 +416,7 @@ const Comment: React.FC<CommentProps> = ({
                     <span>(edited) </span>
                   </>
                 )}
-                <time className="">{timeAgo}</time>
+                <time className="classname pr-2 aw mr-2">{timeAgo}</time>
               </div>
               <Dialog
                 open={deleteModal}
