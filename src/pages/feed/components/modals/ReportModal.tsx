@@ -15,7 +15,7 @@ interface ReportModalProps {
 
 const reportReasons = [
   "Spam",
-  "Harrasment",
+  "Harassment",
   "Nudity",
   "Hate Speech",
   "Scam",
@@ -38,7 +38,7 @@ const ReportModal: React.FC<ReportModalProps> = ({
   const submitReport = async () => {
     onClose();
     if (!token) {
-      toast.error("You must be logged in to view comments.");
+      toast.error("You must be logged in to submit this report.");
       navigate("/login", { replace: true });
       return;
     }
