@@ -440,3 +440,18 @@ export interface BlockedUser {
   profilePicture: string;
   date: string;
 }
+
+export enum AccountStatusEnum {
+  public = "Public",
+  private = "Private",
+  connections = "Connections only",
+}
+
+export enum FollowStatusEnum {
+  everyone = "Everyone",
+  connections = "Connections only",
+}
+export enum InvitationsStatusEnum {
+  everyone = "Everyone",
+  email = "email",
+}
