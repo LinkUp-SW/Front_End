@@ -77,6 +77,7 @@ const CreatePost: React.FC<CreatePostProps> = ({ className }) => {
 
   const navigate = useNavigate();
   const user_token = Cookies.get("linkup_auth_token");
+  const user_id = Cookies.get("linkup_user_id");
 
   useEffect(() => {
     if (editMode && postToEdit) {
@@ -331,7 +332,7 @@ const CreatePost: React.FC<CreatePostProps> = ({ className }) => {
       >
         <CardContent>
           <div className="flex space-x-3 justify-start items-start">
-            <Link to={"#"}>
+            <Link to={`/user-profile/${user_id}`}>
               <Avatar className="h-12 w-12 pl-0">
                 {loading ? (
                   <>

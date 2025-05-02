@@ -16,10 +16,13 @@ import { RootState } from "@/store";
 import React from "react";
 
 import { openCreatePostDialog } from "@/slices/feed/createPostSlice";
+import Cookies from "js-cookie";
 
 interface CreatePostProps {
   className?: string;
 }
+
+const user_id = Cookies.get("linkup_user_id");
 
 const CreatePost: React.FC<CreatePostProps> = ({ className }) => {
   //const posts = useSelector((state: RootState) => state.posts.list);
@@ -33,7 +36,7 @@ const CreatePost: React.FC<CreatePostProps> = ({ className }) => {
       >
         <CardContent>
           <div className="flex space-x-3 justify-start items-start">
-            <Link to={"#"}>
+            <Link to={`/user-profile/${user_id}`}>
               <Avatar className="h-12 w-12 pl-0">
                 {loading ? (
                   <>
