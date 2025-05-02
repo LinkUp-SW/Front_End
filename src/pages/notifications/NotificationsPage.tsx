@@ -29,7 +29,7 @@ const validateNotificationType = (type: string): Notification['type'] => {
     'comment', 'follow', 'connection_accepted'
   ];
   
-  if (validTypes.includes(type as any)) {
+  if (validTypes.includes(type as Notification['type'])) {
     return type as Notification['type'];
   }
   
