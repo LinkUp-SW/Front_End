@@ -399,7 +399,7 @@ export const createComment = async (
 
 export const getReactions = async (
   postPayload: {
-    cursor: number;
+    cursor: number | null;
     limit: number;
     specificReaction: string | null;
     targetType: string;
@@ -553,4 +553,28 @@ export const getSavedPosts = async (
   });
 
   return response.data;
+};
+
+export const reportContent = async (
+  postPayload: { contentRef: string; contentType: string; reason: string },
+  token: string
+): Promise<{ message: string; report: string }> => {
+  try {
+    const response = await axiosInstance.post(
+      `api/v1/admin/report`,
+      postPayload,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error: any) {
+    if (error.response?.status === 400) {
+      return { message: "You already reported this before.", report: "" };
+    }
+    // Re-throw other errors
+    throw error;
+  }
 };
