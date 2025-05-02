@@ -5,7 +5,6 @@ import {
   FaFlag,
   FaLink,
   FaTrash,
-  FaUserSlash,
   FaEyeSlash,
   FaRegBookmark,
 } from "react-icons/fa";
@@ -18,16 +17,15 @@ import {
 import { BsFillSendFill as SendIcon } from "react-icons/bs";
 import { MenuAction } from "@/types";
 import React from "react";
-import { EditIcon } from "lucide-react";
+
 import { toast } from "sonner";
 
 export const getMenuActions: (
   savePost: () => void,
-  blockPost: () => void,
-  reportPost: () => void,
+
   _id: string,
   isSaved?: boolean
-) => MenuAction[] = (savePost, blockPost, reportPost, _id, isSaved) => [
+) => MenuAction[] = (savePost, _id, isSaved) => [
   {
     name: isSaved ? "Unsave" : "Save",
     action: () => savePost(),
@@ -41,13 +39,8 @@ export const getMenuActions: (
     icon: React.createElement(FaLink, { className: "mr-2" }),
   },
   {
-    name: "Block Post",
-    action: () => blockPost(),
-    icon: React.createElement(FaBan, { className: "mr-2" }),
-  },
-  {
     name: "Report Post",
-    action: () => reportPost(),
+    action: () => {},
     icon: React.createElement(FaFlag, { className: "mr-2" }),
   },
 ];
@@ -125,21 +118,6 @@ export const getSaveMenuActions: (
     name: "Report Post",
     action: () => reportPost(),
     icon: React.createElement(FaFlag, { className: "mr-2" }),
-  },
-];
-
-export const REPOST_MENU = [
-  {
-    name: "Repost with your thoughts",
-    subtext: "Create a new post with this post attached",
-    action: () => console.log("Repost 1"),
-    icon: React.createElement(EditIcon, { className: "mr-2" }),
-  },
-  {
-    name: "Repost",
-    subtext: "Instantly bring this post to others' feeds",
-    action: () => console.log("Repost 2"),
-    icon: React.createElement(RepostIcon, { className: "mr-2" }),
   },
 ];
 
