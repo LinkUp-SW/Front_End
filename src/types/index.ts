@@ -103,6 +103,7 @@ export interface PostType {
   is_saved?: boolean;
   reactions: string[];
   reactions_count: number;
+  type?: string;
 
   stats?: {
     likes?: number;
@@ -134,6 +135,7 @@ export interface CommentType {
     media_type: "image" | "video" | "none";
   };
   reacts: string[];
+  type?: string;
   tagged_users: string[];
   is_edited: boolean;
   user_reaction?: string | null;
