@@ -95,7 +95,6 @@ const Post: React.FC<PostProps> = ({
   action,
   className,
 }) => {
-  // All hooks at the top level
   // State hooks
   const [isLandscape, setIsLandscape] = useState<boolean>(false);
   const [isSaved, setIsSaved] = useState<boolean>(postData?.is_saved || false);
@@ -166,6 +165,7 @@ const Post: React.FC<PostProps> = ({
           postData.user_reaction.slice(1).toLowerCase()
       );
   }, [postData.user_reaction]);
+
   if (!postData || !postData._id) {
     return (
       <div className={className}>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import Comment, { CommentProps } from "./Comment";
 
 // Extend CommentProps so Reply can use all the same properties
@@ -14,7 +14,6 @@ const Reply: React.FC<ReplyProps> = ({
   comment,
   postId,
   disableReplies,
-  isReplyActive,
   setIsReplyActive,
 }) => {
   return (
@@ -22,7 +21,6 @@ const Reply: React.FC<ReplyProps> = ({
     <div className="pl-10">
       <Comment
         comment={comment}
-        isReplyActive={isReplyActive}
         setIsReplyActive={setIsReplyActive}
         postId={postId}
         disableReplies={disableReplies}

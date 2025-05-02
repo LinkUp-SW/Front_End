@@ -89,18 +89,6 @@ const PostPreview: React.FC<PostPreviewProps> = ({
     setWillDelete(true);
   };
 
-  const blockPost = () => {
-    // To be implemented
-  };
-
-  const reportPost = () => {
-    // To be implemented
-  };
-
-  const unfollow = () => {
-    // To be implemented
-  };
-
   const handleDeletePost = async () => {
     if (!token) {
       toast.error("You must be logged in to delete a post.");

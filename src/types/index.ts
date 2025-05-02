@@ -74,7 +74,7 @@ export interface ProfileCardType {
 
 export interface PostType {
   author: PostUserType;
-  postType: string;
+  post_type: string;
   reposts: string[];
   content: string;
   media: {

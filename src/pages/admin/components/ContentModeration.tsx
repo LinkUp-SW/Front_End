@@ -19,7 +19,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import PostPreview from "@/pages/feed/components/PostPreview";
 import PostPreviewSkeleton from "@/pages/feed/components/PostPreviewSkeleton";
 import CommentWithReplies from "@/pages/feed/components/CommentWithReplies";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";

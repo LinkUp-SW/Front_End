@@ -69,10 +69,6 @@ const PostLargePreview: React.FC<PostLargePreviewProps> = ({
   const [willDelete, setWillDelete] = useState(false);
 
   const topStats = getReactionIcons(postData?.top_reactions || []);
-  const selectedReaction = postData?.user_reaction
-    ? postData?.user_reaction.charAt(0).toUpperCase() +
-      postData?.user_reaction.slice(1).toLowerCase()
-    : "None";
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
