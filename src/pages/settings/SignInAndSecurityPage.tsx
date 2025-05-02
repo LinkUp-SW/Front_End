@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import SettingsLayoutPage from '../../components/hoc/SettingsLayoutPage';
+import SettingsLayoutPage from '@/components/hoc/SettingsLayoutPage';
 import { FaArrowRight } from 'react-icons/fa';
 
 const SignInAndSecurityPage: React.FC = () => {

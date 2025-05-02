@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaInfoCircle } from "react-icons/fa";
-import SettingsLayoutPage from "../../components/hoc/SettingsLayoutPage";
-import { validatePassword } from "../../utils";
+import SettingsLayoutPage from "@/components/hoc/SettingsLayoutPage";
+import { validatePassword } from "@/utils";
 import { changePassword } from "@/endpoints/settingsEndpoints";
 import Cookies from "js-cookie";
 import { toast } from "sonner";

@@ -25,13 +25,11 @@ import {
   UserExperiencesPage,
   UserLicensesPage,
   SignInAndSecurityPage,
-  ChangePasswordPage,
   MyItemsPage,
   AccountPreferencePage,
   InstructionPage,
   ReasonPage,
   OtherOptionPage,
-  LastPage,
   AllPeoplePage,
   CompanyCreationPage,
   ManageCompanyPage,
@@ -41,17 +39,19 @@ import {
   UsersPage,
   AnalyticsPage,
   ContentModerationPage,
-
+  GoodByePage,
+  ChangePasswordPage,
+  CloseAccountPage,
+  PrimaryEmailPage,
+  OTP,
+  AddEmailPage,
+  VisibilityPage,
+  BlockingListPage,
+  JobPostingsPage,
+  DisplayPage,
 } from "./pages";
 
-import PrimaryEmailPage from "./pages/settings/updateEmail/PrimaryEmailPage";
-import AddEmailPage from "./pages/settings/updateEmail/AddEmailPage";
-import OTP from "./pages/settings/updateEmail/OTP";
-import BlockingListPage from "./pages/settings/BlockingListPage";
-import VisibilityPage from "./pages/settings/VisibilityPage";
-
 import React from "react";
-import JobPostingsPage from "./pages/admin/JobPostingsPage";
 
 // Define your routes as an array of RouteObject (compatible with React Router v6)
 const routes: RouteObject[] = [
@@ -200,7 +200,7 @@ const routes: RouteObject[] = [
   },
   {
     path: "/settings/close-account/confirm",
-    element: React.createElement(LastPage),
+    element: React.createElement(CloseAccountPage),
   },
   {
     path: "/settings/security/email",
@@ -234,7 +234,7 @@ const routes: RouteObject[] = [
     path: "/jobs/create",
     element: React.createElement(CreateJobPage),
   },
-  
+
   {
     path: "/settings/visibility",
     element: React.createElement(VisibilityPage),
@@ -244,32 +244,37 @@ const routes: RouteObject[] = [
     element: React.createElement(BlockingListPage),
   },
   {
-    path:"/admin/dashboard",
-    element: React.createElement(DashboardPage)
+    path: "/admin/dashboard",
+    element: React.createElement(DashboardPage),
   },
   {
-    path:"/admin/settings",
-    element: React.createElement(SettingsPage)
-
+    path: "/admin/settings",
+    element: React.createElement(SettingsPage),
   },
   {
-    path:"/admin/users",
-    element: React.createElement(UsersPage)
+    path: "/admin/users",
+    element: React.createElement(UsersPage),
   },
   {
-    path:"/admin/analytics",
-    element: React.createElement(AnalyticsPage)
+    path: "/admin/analytics",
+    element: React.createElement(AnalyticsPage),
   },
   {
-    path:"/admin/content-moderation",
-    element: React.createElement(ContentModerationPage)
+    path: "/admin/content-moderation",
+    element: React.createElement(ContentModerationPage),
   },
   {
-    path:"/admin/job-postings",
-    element: React.createElement(JobPostingsPage)
-  }
- 
-
+    path: "/admin/job-postings",
+    element: React.createElement(JobPostingsPage),
+  },
+  {
+    path: "/goodbye",
+    element: React.createElement(GoodByePage),
+  },
+  {
+    path: "/settings/theme",
+    element: React.createElement(DisplayPage),
+  },
 ];
 
 export default routes;
