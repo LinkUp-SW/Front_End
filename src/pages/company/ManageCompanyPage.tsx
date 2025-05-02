@@ -539,7 +539,7 @@ const ManageCompanyPage = () => {
                     <PostList
                       posts={posts}
                       viewMore={viewMore}
-                      isLoading={isLoading}
+                      isLoading={postsLoading}
                       initialLoading={initialLoading}
                       observerRef={observerRef}
                     />
