@@ -26,7 +26,7 @@ type NavigationTab =
   | "settings";
 
 // Define types for company data
-interface BasicCompanyData {
+export interface BasicCompanyData {
   _id: string;
   name: string;
   logo: string;
@@ -533,7 +533,7 @@ const ManageCompanyPage = () => {
 
               {activeTab === "page-posts" && (
                 <div className="text-gray-700 dark:text-gray-300 w-full">
-                  <CreatePostButton />
+                  <CreatePostButton company={companyData} />
                   <main className="flex flex-col w-full ">
                     <div className="mt-4" />
                     <PostList

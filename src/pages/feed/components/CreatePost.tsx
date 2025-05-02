@@ -26,6 +26,7 @@ import { MediaType, PostDBObject } from "@/types";
 import Cookies from "js-cookie";
 import { toast } from "sonner";
 import {
+  createCompanyPost,
   createPost,
   fetchSinglePost,
   repostWithThoughts,
@@ -77,6 +78,9 @@ const CreatePost: React.FC<CreatePostProps> = ({ className }) => {
   const editMode = useSelector((state: RootState) => state.createPost.editMode);
   const postToEdit = useSelector(
     (state: RootState) => state.createPost.postToEdit
+  );
+  const companyInfo = useSelector(
+    (state: RootState) => state.createPost.companyInfo
   );
 
   const navigate = useNavigate();
@@ -287,8 +291,46 @@ const CreatePost: React.FC<CreatePostProps> = ({ className }) => {
       const toastId = toast.loading(
         editMode ? "Updating your post..." : "Submitting your post..."
       );
+      if (companyInfo) {
+        // Call company post endpoint
+        const result = await createCompanyPost(
+          postObject,
+          companyInfo._id,
+          user_token
+        );
+        toast.success(
+          <span>
+            {result.message}{" "}
+            <a
+              href={`/feed/posts/${result.postId}`}
+              className="text-blue-600 dark:text-blue-300 hover:underline"
+              onClick={() => toast.dismiss(toastId)}
+            >
+              . View post
+            </a>
+          </span>,
+          {
+            id: toastId,
+            duration: 15000,
+          }
+        );
+        const post = await fetchSinglePost(result.postId, user_token);
+        if (post) {
+          // Prepare the post with comments-related fields
+          const postWithComments = {
+            ...post,
+            commentsCount: 0,
+            commentsData: {
+              comments: [],
+              count: 0,
+              nextCursor: null,
+            },
+          };
 
-      if (editMode && postToEdit?._id) {
+          // Add the new post to the Redux store at the beginning of the list
+          dispatch(unshiftPosts([postWithComments]));
+        }
+      } else if (editMode && postToEdit?._id) {
         // Handle edit
         const response = await editPost(postObject, user_token);
         console.log("RESPONSE:", response);
@@ -460,6 +502,7 @@ const CreatePost: React.FC<CreatePostProps> = ({ className }) => {
                     taggedUsers={taggedUsers}
                     setTaggedUsers={setTaggedUsers}
                     repostedPost={postToEdit?.repostedPost}
+                    company={companyInfo}
                   />
                 ) : activeModal == "add-document" ? (
                   <AddDocumentModal
