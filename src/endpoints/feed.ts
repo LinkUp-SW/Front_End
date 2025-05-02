@@ -639,7 +639,7 @@ export const getCompanyPosts = async (
   }
 ): Promise<{ posts: PostType[]; next_cursor: number | null }> => {
   const response = await axiosInstance.get(
-    `api/v1/company/1get-posts-from-company/${organization_id}`,
+    `api/v1/company/get-posts-from-company/${organization_id}`,
     {
       headers: {
         Authorization: `Bearer ${token}`,
