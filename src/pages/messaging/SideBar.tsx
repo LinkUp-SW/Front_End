@@ -6,9 +6,12 @@ import {
   selectUserStatus,
   selectUserId,
   setResponsiveIsSidebar,
-  setDataInfo
+  setDataInfo,
 } from "../../slices/messaging/messagingSlice";
-import { incomingUnreadMessagesCount,SocketEventData} from "@/services/socket";
+import {
+  incomingUnreadMessagesCount,
+  SocketEventData,
+} from "@/services/socket";
 import { toggleStarred } from "../../slices/messaging/messagingSlice";
 import * as Popover from "@radix-ui/react-popover";
 import { FaStar } from "react-icons/fa";
@@ -41,6 +44,7 @@ import { socketService } from "@/services/socket";
 import LinkUpLoader from "../../components/linkup_loader/LinkUpLoader";
 import { useParams } from "react-router-dom";
 
+
 const SideBar = () => {
   const { id } = useParams();
   const token = Cookies.get("linkup_auth_token");
@@ -66,7 +70,9 @@ const SideBar = () => {
   const openModal = () => setIsOpen(true);
   const closeModal = () => setIsOpen(false);
 
-  const dataInfo = useSelector((state: RootState) => state.messaging.setDataInfo);
+  const dataInfo = useSelector(
+    (state: RootState) => state.messaging.setDataInfo
+  );
 
   useEffect(() => {
     const fetchConversations = async () => {
@@ -75,7 +81,7 @@ const SideBar = () => {
 
         const data: { conversations: Conversation[] } =
           await getAllConversations(token);
-          dispatch(setDataInfo(data.conversations));
+        dispatch(setDataInfo(data.conversations));
         toast.success("Conversations loaded successfully");
       } catch (error) {
         console.error("Failed to fetch conversations:", error);
@@ -87,8 +93,6 @@ const SideBar = () => {
 
     fetchConversations();
   }, []);
-
-
 
   useEffect(() => {
     dataInfo.forEach((conversation) => {
@@ -103,7 +107,7 @@ const SideBar = () => {
     const handleUserOnline = (incoming: SocketEventData) => {
       // Type assertion to cast the incoming data to { userId: string }
       const { userId } = incoming as { userId: string };
-  
+
       if (userId !== id) {
         const updatedData = dataInfo.map((conversation) =>
           conversation.otherUser.userId === userId
@@ -119,11 +123,11 @@ const SideBar = () => {
         dispatch(setDataInfo(updatedData));
       }
     };
-  
+
     const handleUserOffline = (incoming: SocketEventData) => {
       // Type assertion to cast the incoming data to { userId: string }
       const { userId } = incoming as { userId: string };
-  
+
       if (userId !== id) {
         const updatedData = dataInfo.map((conversation) =>
           conversation.otherUser.userId === userId
@@ -139,45 +143,44 @@ const SideBar = () => {
         dispatch(setDataInfo(updatedData));
       }
     };
-  
+
     socketService.on("user_online", handleUserOnline);
     socketService.on("user_offline", handleUserOffline);
-  
+
     return () => {
       socketService.off("user_online", handleUserOnline);
       socketService.off("user_offline", handleUserOffline);
     };
   }, [id, dataInfo]);
-  
-  
 
   useEffect(() => {
+    const handleUnreadCount = (incoming: incomingUnreadMessagesCount) => {
+      console.log("couuuuuuuuuuuuuuuuuuuuunt:", incoming);
+      const updatedData = dataInfo.map((message) =>
+        message.conversationId === incoming.conversationId
+          ? {
+              ...message,
+              unreadCount: incoming.count,
+              conversationType: incoming.count > 0 
+                ? message.conversationType.includes("Unread") 
+                  ? message.conversationType 
+                  : [...message.conversationType, "Unread"]
+                : message.conversationType.filter(type => type !== "Unread")
+            }
+          : message
+      );
+      dispatch(setDataInfo(updatedData));
+    };
+  
     const unsubscribe = socketService.on<incomingUnreadMessagesCount>(
       "conversation_unread_count",
-      (incoming) => {
-        console.log("haneeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeet")
-          const updatedData = dataInfo.map((message) =>
-            message.conversationId === incoming.conversationId
-              ? {
-                  ...message,
-                  unreadCount: incoming.count,
-                  conversationType: incoming.count > 0 
-                    ? message.conversationType.includes("Unread") 
-                      ? message.conversationType 
-                      : [...message.conversationType, "Unread"]
-                    : message.conversationType
-                }
-              : message
-          );
-          dispatch(setDataInfo(updatedData));
-      }
+      handleUnreadCount
     );
   
     return () => {
       unsubscribe();
     };
-  }, []);
-
+  }, [dataInfo, dispatch]);
   const filterButtonData = {
     Focused: dataInfo,
     [FILTER_OPTIONS_MESSAGES.UNREAD]: dataInfo.filter((info) =>
@@ -207,7 +210,6 @@ const SideBar = () => {
       info.lastMessage.message.toLowerCase().includes(search.toLowerCase())
   );
 
-  // In SideBar.tsx, update the handleSelectConversation function
   const handleSelectConversation = async (
     conversationID: string,
     dataType: string[],
@@ -225,7 +227,7 @@ const SideBar = () => {
     if (dataType.includes("Unread")) {
       if (token) {
         try {
-          await markConversationAsRead(token, conversationID); 
+          await markConversationAsRead(token, conversationID);
 
           const updatedData = dataInfo.map((message) =>
             message.conversationId === conversationID
@@ -336,8 +338,12 @@ const SideBar = () => {
     }
   };
 
+
+
+
   return (
     <>
+      
       <div className="flex flex-col h-full overflow-hidden">
         {selectedItems.length != 0 ? (
           <div className="bg-[#f3f6fa] p-3 pl-5 flex justify-between items-center border-b border-gray-200 sticky top-0 z-10 flex-shrink-0">
@@ -364,7 +370,7 @@ const SideBar = () => {
                   onClick={() => setUnread(!unread)}
                 />
               </button>
-              <button className="p-1 mx-1 hover:bg-gray-200 rounded-full">
+              <button  className="p-1 mx-1 hover:bg-gray-200 rounded-full">
                 <MdOutlineDelete size={22} className="text-gray-600" />
               </button>
               <button className="p-1 mx-1 hover:bg-gray-200 rounded-full">
@@ -591,12 +597,11 @@ const SideBar = () => {
                   <FaStar id="star" size={15} className="text-[#c37d16]" />
                 )}
 
-                {data.conversationType.includes("Unread") &&
-                   (
-                    <span className="flex items-center justify-center text-xs rounded-full text-white w-4 h-4 bg-blue-600 font-medium">
-                      
-                    </span>
-                  )}
+                {data.conversationType.includes("Unread") && (
+                  <span className="flex items-center justify-center text-xs rounded-full text-white w-4 h-4 bg-blue-600 font-medium">
+                    {data.unreadCount > 0 ? data.unreadCount : ""}
+                  </span>
+                )}
               </div>
             </div>
           ))}
