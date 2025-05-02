@@ -493,7 +493,12 @@ const Comment: React.FC<CommentProps> = ({
                     </PopoverContent>
                   </Popover>
                 )}
+
                 <DialogContent className="dark:bg-gray-900 border-0">
+                  <DialogTitle className="text-2xl dark:text-neutral-200">
+                    Report this comment
+                  </DialogTitle>
+                  <DialogDescription />
                   <ReportModal
                     onClose={closeModal}
                     type="Comment"

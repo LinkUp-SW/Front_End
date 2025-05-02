@@ -65,10 +65,6 @@ const ReportModal: React.FC<ReportModalProps> = ({
 
   return (
     <div className="flex-col flex py-6  bg-white dark:bg-gray-900">
-      <h1 className="border-b border-gray-200 dark:border-gray-700 pb-4 px-5 text-xl font-medium dark:text-gray-100">
-        Report this post
-      </h1>
-
       <div className="px-5 py-4">
         <h2 className="text-sm text-gray-600 dark:text-gray-400 mb-4">
           Select our policy that applies
@@ -82,8 +78,8 @@ const ReportModal: React.FC<ReportModalProps> = ({
               className={`justify-start text-left rounded-full px-4 py-2 transition-all duration-200
                 ${
                   selectedReason === reason
-                    ? "bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400 hover:bg-green-200 dark:hover:bg-green-900/30"
-                    : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                    ? "bg-green-100  text-green-700 dark:text-green-400 hover:bg-green-200 dark:hover:text-neutral-200 dark:bg-green-500/30 dark:hover:bg-green-400/50"
+                    : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:text-neutral-200 dark:hover:bg-green-500/10"
                 }
               `}
               onClick={() => setSelectedReason(reason)}

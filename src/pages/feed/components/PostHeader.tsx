@@ -8,7 +8,14 @@ import { Link } from "react-router-dom";
 import { HiGlobeEuropeAfrica as GlobeIcon } from "react-icons/hi2";
 import { LiaEllipsisHSolid as EllipsisIcon } from "react-icons/lia";
 import { IoMdClose as CloseIcon } from "react-icons/io";
-import { Button, Dialog, DialogTrigger, DialogContent } from "@/components";
+import {
+  Button,
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+} from "@/components";
 import ReportModal from "./modals/ReportModal";
 import { FaPeopleGroup as PeopleIcon } from "react-icons/fa6";
 import { ActivityContextType, MenuAction, PostUserType } from "@/types";
@@ -134,6 +141,11 @@ const PostHeader: React.FC<PostHeaderProps> = ({
                 </Popover>
               )}
               <DialogContent className="dark:bg-gray-900 border-0">
+                <DialogTitle className="text-2xl dark:text-neutral-200">
+                  Report this post
+                </DialogTitle>
+                <DialogDescription />
+
                 <ReportModal
                   onClose={closeModal}
                   contentId={postId}
