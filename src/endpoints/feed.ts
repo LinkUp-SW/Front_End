@@ -627,3 +627,74 @@ export const repostWithThoughts = async (
     throw error;
   }
 };
+
+export const getCompanyPosts = async (
+  token: string,
+  organization_id: string,
+
+  postPayload?: {
+    cursor: number;
+    limit: number;
+    replyLimit?: number | 3;
+  }
+): Promise<{ posts: PostType[]; next_cursor: number | null }> => {
+  const response = await axiosInstance.get(
+    `api/v1/company/1get-posts-from-company/${organization_id}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      params: postPayload,
+    }
+  );
+  console.log("GetCompanyPosts:", response.data);
+
+  // Filter out null posts and transform the rest
+  const validPosts = (response.data.posts || []).filter(
+    (post: PostType) => post !== null
+  );
+
+  const transformedPosts = validPosts.map((post: PostType) => ({
+    ...post,
+    comments_data: {
+      comments: [], // Empty initially
+      count: post.comments_count || 0,
+      next_cursor: 0,
+      isLoading: false,
+      hasInitiallyLoaded: false,
+    },
+  }));
+
+  console.log("Returned:", {
+    posts: transformedPosts,
+    next_cursor: response.data.next_cursor,
+  });
+
+  return {
+    posts: transformedPosts.map((post: PostType) => ({
+      ...post,
+      author: {
+        ...post.author,
+        connection_degree: "1st",
+      },
+    })),
+    next_cursor: response.data.next_cursor,
+  };
+};
+
+export const createCompanyPost = async (
+  postPayload: PostDBObject,
+  organization_id: string,
+  token: string
+) => {
+  const response = await axiosInstance.post(
+    `api/v1/company/create-post-from-company/${organization_id}`,
+    postPayload,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
