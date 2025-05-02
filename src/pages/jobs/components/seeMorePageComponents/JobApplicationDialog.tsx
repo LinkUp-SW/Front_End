@@ -49,7 +49,7 @@ const JobApplicationDialog: React.FC<JobApplicationDialogProps> = ({
   const [email, setEmail] = useState('');
   const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [isResumeUploaded, setIsResumeUploaded] = useState(false);
-  const [resumeBase64, setResumeBase64] = useState<string | null>(null); // New state for base64 encoded resume
+  const [resumeBase64, setResumeBase64] = useState<string | null>(null);
 
   // Fetch user info on dialog open
   useEffect(() => {
@@ -60,7 +60,7 @@ const JobApplicationDialog: React.FC<JobApplicationDialogProps> = ({
       setCurrentStep('info');
       setProgress(0);
       setIsResumeUploaded(false);
-      setResumeBase64(null); // Reset base64 data when dialog closes
+      setResumeBase64(null);
     }
   }, [open]);
 
@@ -105,9 +105,7 @@ const JobApplicationDialog: React.FC<JobApplicationDialogProps> = ({
       reader.readAsDataURL(file);
       reader.onload = () => {
         if (typeof reader.result === 'string') {
-          // Remove the data URL prefix (e.g., "data:application/pdf;base64,")
-          const base64 = reader.result.split(',')[1];
-          resolve(base64);
+          resolve(reader.result); // Keep the full data URL format
         } else {
           reject(new Error('Failed to convert file to base64'));
         }
@@ -126,7 +124,7 @@ const JobApplicationDialog: React.FC<JobApplicationDialogProps> = ({
       }
       
       try {
-        // Convert file to base64
+        // Convert file to base64 with data URL format
         const base64Data = await convertFileToBase64(file);
         setResumeBase64(base64Data);
         setResumeFile(file);
@@ -157,7 +155,7 @@ const JobApplicationDialog: React.FC<JobApplicationDialogProps> = ({
         first_name: firstName,
         last_name: lastName,
         profile_photo: profilePhoto,
-        resume: resumeBase64 || resumeUrl, // Use base64 string if available, otherwise use URL
+        resume: isResumeUploaded ? resumeBase64 || '' : resumeUrl, // Use full base64 string with data URL prefix
         is_uploaded: isResumeUploaded,
       };
 
