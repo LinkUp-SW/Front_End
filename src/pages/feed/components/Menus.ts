@@ -25,17 +25,9 @@ export const getMenuActions: (
   savePost: () => void,
   blockPost: () => void,
   reportPost: () => void,
-  unfollow: () => void,
   _id: string,
   isSaved?: boolean
-) => MenuAction[] = (
-  savePost,
-  blockPost,
-  reportPost,
-  unfollow,
-  _id,
-  isSaved
-) => [
+) => MenuAction[] = (savePost, blockPost, reportPost, _id, isSaved) => [
   {
     name: isSaved ? "Unsave" : "Save",
     action: () => savePost(),
@@ -57,11 +49,6 @@ export const getMenuActions: (
     name: "Report Post",
     action: () => reportPost(),
     icon: React.createElement(FaFlag, { className: "mr-2" }),
-  },
-  {
-    name: "Unfollow",
-    action: () => unfollow(),
-    icon: React.createElement(FaUserSlash, { className: "mr-2" }),
   },
 ];
 
