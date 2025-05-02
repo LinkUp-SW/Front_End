@@ -9,16 +9,11 @@ import LoveIcon from "@/assets/Love.svg";
 import FunnyIcon from "@/assets/Funny.svg";
 import InsightfulIcon from "@/assets/Insightful.svg";
 import SupportIcon from "@/assets/Support.svg";
+import { PostUserType } from "@/types";
 
 interface Reaction {
   _id: string;
-  author: {
-    username: string;
-    firstName: string;
-    lastName: string;
-    profilePicture: string;
-    headline: string;
-  };
+  author: PostUserType;
   reaction: string;
 }
 
@@ -67,8 +62,8 @@ const ReactionsModal: React.FC<ReactionsModalProps> = ({
           postId,
           token
         );
-        setReactionList(result.topReactions.topReactions || []);
-        setReactionCounts(result.topReactions.reactionCounts || {});
+        setReactionList(result.reactions.reactions || []);
+        setReactionCounts(result.reactions.reaction_counts || {});
       } catch (error) {
         toast.error("Failed to fetch reactions.");
         console.error("Error fetching reactions:", error);
@@ -144,13 +139,13 @@ const ReactionsModal: React.FC<ReactionsModalProps> = ({
             className="flex cursor-pointer items-center gap-4 p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
           >
             <img
-              src={reaction.author.profilePicture}
+              src={reaction.author.profile_picture}
               alt={reaction.author.username}
               className="w-10 h-10 rounded-full"
             />
             <div>
               <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                {reaction.author.firstName} {reaction.author.lastName}
+                {reaction.author.first_name} {reaction.author.last_name}
               </p>
               <p className="text-xs text-gray-500 dark:text-gray-400">
                 {reaction.author.headline}
