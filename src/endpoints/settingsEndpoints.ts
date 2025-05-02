@@ -117,14 +117,135 @@ export const getBlockedUsersList = async (
   return response.data;
 };
 
-export const unBlockUser = async (token: string, userId: string, password: string) => {
+export const unBlockUser = async (
+  token: string,
+  userId: string,
+  password: string
+) => {
   const response = await axiosInstance.delete(
     `/api/v1/user/manage-by-blocked-list/unblock/${userId}`,
     {
       headers: {
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
       },
-      data: { password: password }
+      data: { password: password },
+    }
+  );
+  return response.data;
+};
+
+export const getFollowPrimaryStatus = async (token: string) => {
+  const response = await axiosInstance.get(
+    `/api/v1/user/privacy-settings/follow-primary`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
+
+export const toggleFollowPrimary = async (
+  token: string,
+  isFollowPrimary: boolean
+) => {
+  const response = await axiosInstance.put(
+    `/api/v1/user/privacy-settings/follow-primary`,
+    {
+      isFollowPrimary: isFollowPrimary,
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
+
+export const getInvitationRequestStatus = async (token: string) => {
+  const response = await axiosInstance.get(
+    `/api/v1/user/privacy-settings/invitations-requests`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
+
+export const updateInvitationRequestStatus = async (
+  token: string,
+  status: string
+) => {
+  const response = await axiosInstance.put(
+    `/api/v1/user/privacy-settings/invitations-requests`,
+    {
+      invitationSetting: status,
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
+
+export const getProfileVisibilty = async (token: string) => {
+  const response = await axiosInstance.get(
+    `/api/v1/user/privacy-settings/profile-visibility`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
+
+export const updateProfileVisibilty = async (token: string, status: string) => {
+  const response = await axiosInstance.put(
+    `/api/v1/user/privacy-settings/profile-visibility`,
+    {
+      profileVisibility: status,
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
+
+export const getMessagingRequestStatus = async (token: string) => {
+  const response = await axiosInstance.get(
+    `/api/v1/user/privacy-settings/messaging-requests`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
+
+export const updateMessagingRequestStatus = async (
+  token: string,
+  allowMessaging: boolean
+) => {
+  const response = await axiosInstance.put(
+    `/api/v1/user/privacy-settings/messaging-requests`,
+    {
+      messagingRequests: allowMessaging,
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     }
   );
   return response.data;
