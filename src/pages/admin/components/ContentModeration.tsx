@@ -1,83 +1,124 @@
-import { useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
+import Cookies from "js-cookie";
 import { FiSearch } from "react-icons/fi";
+import { getreports } from "@/endpoints/admin";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 interface Report {
-  id: string;
+  content_id: string;
+  content_mongo_id: string;
+  content_ref: string;
   type: string;
-  reason: string;
-  reported: string;
-  status: "Pending" | "Resolved";
-  reports: number;
+  reasons: string[];
+  created_at: number;
+  status: "pending" | "resolved";
+  admin_action: string;
+  report_count: number;
 }
 
 const ContentModeration = () => {
-  const [activeTab, setActiveTab] = useState<"Pending" | "Resolved" | "All Reports">("Pending");
+  const [activeTab, setActiveTab] = useState<"pending" | "resolved">("pending");
   const [searchQuery, setSearchQuery] = useState("");
+  const [reports, setReports] = useState<Report[]>([]);
+  const [cursor, setCursor] = useState<number | null>(null);
+  const [hasMore, setHasMore] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const observerRef = useRef<HTMLDivElement | null>(null);
+  const token = Cookies.get("linkup_auth_token") ?? "";
 
-  const reports: Report[] = [
-    {
-      id: "REP-001",
-      type: "Comment",
-      reason: "Harassment",
-      reported: "Apr 15, 2023",
-      status: "Pending",
-      reports: 3,
-    },
-    {
-      id: "REP-002",
-      type: "Post",
-      reason: "Inappropriate Content",
-      reported: "Apr 15, 2023",
-      status: "Pending",
-      reports: 5,
-    },
-    {
-      id: "REP-003",
-      type: "Job Listing",
-      reason: "Misleading Information",
-      reported: "Apr 15, 2023",
-      status: "Pending",
-      reports: 2,
-    },
-    {
-      id: "REP-004",
-      type: "Comment",
-      reason: "Spam",
-      reported: "Apr 14, 2023",
-      status: "Resolved",
-      reports: 7,
-    },
-    {
-      id: "REP-005",
-      type: "Post",
-      reason: "Hate Speech",
-      reported: "Apr 14, 2023",
-      status: "Resolved",
-      reports: 12,
-    },
-  ];
+  const [selectedReport, setSelectedReport] = useState<Report | null>(null);
+
+  const fetchReports = useCallback(async () => {
+    if (!token || loading || !hasMore) return;
+
+    setLoading(true);
+    try {
+      const res = await getreports(token, activeTab, cursor, 5);
+      if (res.success) {
+        const newReports: Report[] = res.data.reports || [];
+
+        setReports((prev) => {
+          const existingIds = new Set(prev.map((r) => r.content_id));
+          const filtered = newReports.filter((r) => !existingIds.has(r.content_id));
+          return [...prev, ...filtered];
+        });
+
+        if (!res.data.next_cursor || newReports.length === 0) {
+          setHasMore(false);
+        } else {
+          setCursor(res.data.next_cursor);
+        }
+      } else {
+        setHasMore(false);
+      }
+    } catch (error) {
+      console.error("Failed to fetch reports:", error);
+      setHasMore(false);
+    } finally {
+      setLoading(false);
+    }
+  }, [token, activeTab, cursor, hasMore, loading]);
+
+  useEffect(() => {
+    setReports([]);
+    setCursor(null);
+    setHasMore(true);
+  }, [activeTab]);
+
+  useEffect(() => {
+    fetchReports();
+  }, [fetchReports]);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !loading) {
+          fetchReports();
+        }
+      },
+      { threshold: 1.0 }
+    );
+
+    const currentRef = observerRef.current;
+    if (currentRef) observer.observe(currentRef);
+
+    return () => {
+      if (currentRef) observer.unobserve(currentRef);
+    };
+  }, [fetchReports, hasMore, loading]);
 
   const filteredReports = reports.filter((report) => {
-    const matchesSearch =
-      report.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      report.type.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      report.reason.toLowerCase().includes(searchQuery.toLowerCase());
-
-    if (activeTab === "Pending") return matchesSearch && report.status === "Pending";
-    if (activeTab === "Resolved") return matchesSearch && report.status === "Resolved";
-    return matchesSearch;
+    const q = searchQuery.toLowerCase();
+    return (
+      report.content_id.toLowerCase().includes(q) ||
+      report.type.toLowerCase().includes(q) ||
+      report.reasons.some((r) => r.toLowerCase().includes(q))
+    );
   });
 
-  return (
-    <div className="flex flex-col w-full h-full bg-gradient-to-b from-white via-blue-50 to-blue-100 dark:from-gray-800 dark:via-gray-900 dark:to-gray-950 rounded-2xl shadow-xl p-6 transform transition duration-300 mb-12 overflow-auto">
-      <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6">
-        Content Moderation
-      </h2>
-      <p className="text-gray-600 dark:text-gray-300 mb-4 sm:mb-6">
-        Review and manage reported content across the platform.
-      </p>
+  const handleDeleteContent = (report: Report) => {
+    console.log("Delete content for", report.content_id);
+    // Add actual delete logic here
+  };
 
-      <div className="relative mb-4 sm:mb-6">
+  const handleDismissReport = (report: Report) => {
+    console.log("Dismiss report for", report.content_id);
+    // Add actual dismiss logic here
+  };
+
+  return (
+    <div className="flex flex-col w-full h-full bg-gradient-to-b from-white via-blue-50 to-blue-100 dark:from-gray-800 dark:via-gray-900 dark:to-gray-950 rounded-2xl shadow-xl p-6 mb-12 overflow-auto">
+      <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Content Moderation</h2>
+      <p className="text-gray-600 dark:text-gray-300 mb-4">Review and manage reported content across the platform.</p>
+
+      <div className="relative mb-4">
         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
           <FiSearch className="text-gray-400" />
         </div>
@@ -90,98 +131,128 @@ const ContentModeration = () => {
         />
       </div>
 
-      <div className="flex flex-wrap border-b border-gray-200 dark:border-gray-700 mb-4 sm:mb-6">
-        <button
-          className={`px-4 py-2 font-medium ${
-            activeTab === "Pending"
-              ? "text-blue-500 border-b-2 border-blue-500"
-              : "text-gray-500 dark:text-gray-400"
-          }`}
-          onClick={() => setActiveTab("Pending")}
-        >
-          Pending
-        </button>
-        <button
-          className={`px-4 py-2 font-medium ${
-            activeTab === "Resolved"
-              ? "text-blue-500 border-b-2 border-blue-500"
-              : "text-gray-500 dark:text-gray-400"
-          }`}
-          onClick={() => setActiveTab("Resolved")}
-        >
-          Resolved
-        </button>
-        <button
-          className={`px-4 py-2 font-medium ${
-            activeTab === "All Reports"
-              ? "text-blue-500 border-b-2 border-blue-500"
-              : "text-gray-500 dark:text-gray-400"
-          }`}
-          onClick={() => setActiveTab("All Reports")}
-        >
-          All Reports
-        </button>
+      <div className="flex border-b border-gray-200 dark:border-gray-700 mb-4">
+        {["pending", "resolved"].map((tab) => (
+          <button
+            key={tab}
+            className={`px-4 py-2 font-medium capitalize ${
+              activeTab === tab
+                ? "text-blue-500 border-b-2 border-blue-500"
+                : "text-gray-500 dark:text-gray-400"
+            }`}
+            onClick={() => setActiveTab(tab as "pending" | "resolved")}
+          >
+            {tab}
+          </button>
+        ))}
       </div>
 
-      <div className="flex flex-col flex-grow">
-        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2 sm:mb-4">
-          {activeTab === "Pending" && "Pending Reports"}
-          {activeTab === "Resolved" && "Resolved Reports"}
-          {activeTab === "All Reports" && "All Reports"}
+      <div className="flex-grow">
+        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+          {activeTab === "pending" ? "Pending Reports" : "Resolved Reports"}
         </h3>
-        <p className="text-gray-600 dark:text-gray-300 mb-4 sm:mb-6">
-          {activeTab === "Pending" && "Review and take action on pending content reports."}
-          {activeTab === "Resolved" && "View previously resolved content reports."}
-          {activeTab === "All Reports" && "View all content reports."}
+        <p className="text-gray-600 dark:text-gray-300 mb-4">
+          {activeTab === "pending"
+            ? "Review and take action on pending content reports."
+            : "View previously resolved content reports."}
         </p>
 
         <div className="overflow-auto">
           <table className="min-w-full text-sm text-left text-gray-700 dark:text-gray-300">
             <thead className="text-xs uppercase text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800">
               <tr>
-                <th className="px-4 py-2 whitespace-nowrap">ID</th>
-                <th className="px-4 py-2 whitespace-nowrap">Type</th>
-                <th className="px-4 py-2 whitespace-nowrap">Reason</th>
-                <th className="px-4 py-2 whitespace-nowrap">Reported</th>
-                <th className="px-4 py-2 whitespace-nowrap">Status</th>
-                <th className="px-4 py-2 whitespace-nowrap">Reports</th>
-                <th className="px-4 py-2 whitespace-nowrap">Actions</th>
+                <th className="px-4 py-2">ID</th>
+                <th className="px-4 py-2">Type</th>
+                <th className="px-4 py-2">Reason(s)</th>
+                <th className="px-4 py-2">Reported</th>
+                <th className="px-4 py-2">Status</th>
+                <th className="px-4 py-2">Reports</th>
+                <th className="px-4 py-2">Actions</th>
               </tr>
             </thead>
             <tbody>
               {filteredReports.map((report) => (
-                <tr key={report.id} className="border-t border-gray-200 dark:border-gray-700">
-                  <td className="px-4 py-2 font-semibold whitespace-nowrap">{report.id}</td>
-                  <td className="px-4 py-2 whitespace-nowrap">{report.type}</td>
-                  <td className="px-4 py-2 whitespace-nowrap">{report.reason}</td>
-                  <td className="px-4 py-2 whitespace-nowrap">{report.reported}</td>
-                  <td className="px-4 py-2 whitespace-nowrap">
+                <tr key={`${report.content_id}-${report.created_at}`} className="border-t border-gray-200 dark:border-gray-700">
+                  <td className="px-4 py-2 font-semibold">{report.content_id}</td>
+                  <td className="px-4 py-2">{report.type}</td>
+                  <td className="px-4 py-2">{report.reasons.join(", ")}</td>
+                  <td className="px-4 py-2">
+                    {new Date(report.created_at * 1000).toLocaleDateString()}
+                  </td>
+                  <td className="px-4 py-2">
                     <span
                       className={`px-2 py-1 rounded-full text-xs ${
-                        report.status === "Pending"
+                        report.status === "pending"
                           ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
                           : "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
                       }`}
                     >
-                      {report.status}
+                      {report.status.charAt(0).toUpperCase() + report.status.slice(1)}
                     </span>
                   </td>
-                  <td className="px-4 py-2 whitespace-nowrap">{report.reports}</td>
-                  <td className="px-4 py-2 whitespace-nowrap">
-                    {report.status === "Pending" ? (
-                      <button className="text-gray-700 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400">
-                        €
-                      </button>
+                  <td className="px-4 py-2">{report.report_count}</td>
+                  <td className="px-4 py-2">
+                    {report.status === "pending" ? (
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <button
+                            className="bg-blue-500 hover:bg-blue-600 text-white text-xs font-semibold py-1 px-3 rounded-lg shadow-sm dark:bg-blue-600 dark:hover:bg-blue-700"
+                            onClick={() => setSelectedReport(report)}
+                          >
+                            Manage
+                          </button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Manage Report</DialogTitle>
+                            <DialogDescription>
+                              {selectedReport
+                                ? `Choose an action for content ID: ${selectedReport.content_id}`
+                                : "No report selected."}
+                            </DialogDescription>
+                          </DialogHeader>
+                          <div className="flex flex-col gap-3 mt-4">
+                            <button
+                              className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-xl"
+                              onClick={() => {
+                                if (selectedReport) handleDeleteContent(selectedReport);
+                              }}
+                            >
+                              Delete Content
+                            </button>
+                            <button
+                              className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-4 rounded-xl"
+                              onClick={() => {
+                                if (selectedReport) handleDismissReport(selectedReport);
+                              }}
+                            >
+                              Dismiss Report
+                            </button>
+                            <button
+                              className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-xl"
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        </DialogContent>
+                      </Dialog>
                     ) : (
-                      <button className="text-green-500 hover:text-green-700">
-                        ✓
-                      </button>
+                      <button className="text-green-500 hover:text-green-700">✓</button>
                     )}
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
+
+          <div ref={observerRef} className="h-10" />
+          {loading && <p className="text-center text-gray-500 py-4">Loading...</p>}
+          {!loading && !hasMore && filteredReports.length === 0 && (
+            <p className="text-center text-gray-500 py-4">No reports found.</p>
+          )}
+          {!loading && !hasMore && filteredReports.length > 0 && (
+            <p className="text-center text-gray-500 py-4">No more reports to show.</p>
+          )}
         </div>
       </div>
     </div>
