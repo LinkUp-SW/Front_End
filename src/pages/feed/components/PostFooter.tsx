@@ -398,7 +398,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
         </>
       )}
 
-      {comments.hasInitiallyLoaded && comments.comments.length > 0 && (
+      {comments.comments.length > 0 && (
         <div className="flex flex-col relative -left-1">
           {/* Show existing comments */}
           {comments.comments.map((comment, index) => (

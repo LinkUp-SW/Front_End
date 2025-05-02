@@ -836,7 +836,7 @@ const Comment: React.FC<CommentProps> = ({
             </>
           )}
           <p className="text-gray-500">| </p>
-          {disableReplies && isReplyActive && (
+          {!disableReplies && (
             <>
               <Button
                 variant="ghost"
