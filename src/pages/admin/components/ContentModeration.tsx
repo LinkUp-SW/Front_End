@@ -23,6 +23,7 @@ import PostPreview from "@/pages/feed/components/PostPreview";
 import PostPreviewSkeleton from "@/pages/feed/components/PostPreviewSkeleton";
 import CommentWithReplies from "@/pages/feed/components/CommentWithReplies";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import PostLargePreview from "@/pages/feed/components/PostLargePreview";
 
 interface Report {
   content_id: string;
@@ -315,17 +316,13 @@ const ContentModeration = () => {
                             {detailsLoading ? (
                               <PostPreviewSkeleton />
                             ) : selectedReport?.type === "Post" ? (
-                              <PostPreview
-                                post={postReportDetails?.content}
-                                hideActions
-                                menuActions={[]}
+                              <PostLargePreview
+                                postData={postReportDetails?.content}
                               />
                             ) : selectedReport?.type === "Comment" ? (
                               <>
-                                <PostPreview
-                                  post={commentReportDetails?.parent_post}
-                                  menuActions={[]}
-                                  hideActions
+                                <PostLargePreview
+                                  postData={commentReportDetails?.parent_post}
                                 />
                                 <div className="w-full pb-5 px-4">
                                   <CommentWithReplies
@@ -450,27 +447,24 @@ const ContentModeration = () => {
                               </p>
                             )}
 
-                            
-                              <button
-                                  className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-xl"
-                                onClick={() =>
-                                  selectedReport &&
-                                  handleDeleteContent(selectedReport)
-                                }
-                              >
-                                Delete Content
-                              </button>
-                              <button
-                             
+                            <button
+                              className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-xl"
+                              onClick={() =>
+                                selectedReport &&
+                                handleDeleteContent(selectedReport)
+                              }
+                            >
+                              Delete Content
+                            </button>
+                            <button
                               className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-4 rounded-xl"
-                                onClick={() =>
-                                  selectedReport &&
-                                  handleDismissReport(selectedReport)
-                                }
-                              >
-                                Dismiss Report
-                              </button>
-                            
+                              onClick={() =>
+                                selectedReport &&
+                                handleDismissReport(selectedReport)
+                              }
+                            >
+                              Dismiss Report
+                            </button>
                           </div>
                         </DialogContent>
                       </Dialog>

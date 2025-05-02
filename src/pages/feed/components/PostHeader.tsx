@@ -33,6 +33,7 @@ interface PostHeaderProps {
   publicPost?: boolean;
   date: number;
   hideActions?: boolean;
+  disableLink?: boolean;
 }
 
 const PostHeader: React.FC<PostHeaderProps> = ({
@@ -47,6 +48,7 @@ const PostHeader: React.FC<PostHeaderProps> = ({
   publicPost,
   date,
   hideActions = false,
+  disableLink = false,
 }) => {
   const timeAgo = moment(date * 1000).fromNow();
 

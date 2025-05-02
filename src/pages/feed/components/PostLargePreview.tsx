@@ -42,9 +42,8 @@ import PostSkeleton from "./PostSkeleton";
 import { RootState } from "@/store";
 import { openEditPostDialog } from "@/slices/feed/createPostSlice";
 
-interface PostProps {
-  postData: PostType;
-  viewMore: boolean; // used to hide certain elements for responsive design
+interface PostLargePreviewProps {
+  postData: PostType | undefined;
   action?: ActivityContextType; // used if the post is an action
   className?: string;
 }
@@ -52,42 +51,32 @@ interface PostProps {
 const userId = Cookies.get("linkup_user_id");
 const token = Cookies.get("linkup_auth_token");
 
-const PostLargePreview: React.FC<PostProps> = ({
+const PostLargePreview: React.FC<PostLargePreviewProps> = ({
   postData,
-  viewMore,
   action,
   className,
 }) => {
   // All hooks at the top level
   // State hooks
+  if (!postData) {
+    return <PostSkeleton />;
+  }
   const [isLandscape, setIsLandscape] = useState<boolean>(false);
   const [isSaved, setIsSaved] = useState<boolean>(postData?.is_saved || false);
   const [postMenuOpen, setPostMenuOpen] = useState(false);
-  const [commentsOpen, setCommentsOpen] = useState(false);
   const [willDelete, setWillDelete] = useState(false);
 
-  const [topStats, setTopStats] = useState(
-    getReactionIcons(postData?.top_reactions || [])
-  );
-  const [selectedReaction, setSelectedReaction] = useState<string>(
-    postData?.user_reaction
-      ? postData?.user_reaction.charAt(0).toUpperCase() +
-          postData?.user_reaction.slice(1).toLowerCase()
-      : "None"
-  );
+  const topStats = getReactionIcons(postData?.top_reactions || []);
+  const selectedReaction = postData?.user_reaction
+    ? postData?.user_reaction.charAt(0).toUpperCase() +
+      postData?.user_reaction.slice(1).toLowerCase()
+    : "None";
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const posts = useSelector((state: RootState) => state.posts.list);
   const { author }: { author: PostUserType } = postData;
   const { date, media } = postData;
-  const comments_data = {
-    comments: postData.comments_data?.comments || [],
-    count: postData.comments_data?.count || 0,
-    nextCursor: postData.comments_data?.nextCursor || 0,
-    isLoading: postData.comments_data?.isLoading || false,
-    hasInitiallyLoaded: postData.comments_data?.hasInitiallyLoaded || false,
-  };
 
   useEffect(() => {
     if (
@@ -120,13 +109,6 @@ const PostLargePreview: React.FC<PostProps> = ({
     }
   }, [postData.comments_disabled]);
 
-  useEffect(() => {
-    if (postData.user_reaction)
-      setSelectedReaction(
-        postData.user_reaction.charAt(0).toUpperCase() +
-          postData.user_reaction.slice(1).toLowerCase()
-      );
-  }, [postData.user_reaction]);
   if (!postData || !postData._id) {
     return (
       <div className={className}>
@@ -294,6 +276,9 @@ const PostLargePreview: React.FC<PostProps> = ({
           edited={postData.is_edited}
           publicPost={postData.public_post}
           date={date}
+          hideActions={true}
+          savedPostView={true}
+          disableLink
         />
         {postData.content && (
           <TruncatedText
