@@ -26,7 +26,13 @@ export interface Notification {
   createdAt: string;
   content: string;
   referenceId: string;
-  type: 'reacted'|'message'|'connection_request'|'comment'|'follow'|'connection_accepted';
+  type:
+    | "reacted"
+    | "message"
+    | "connection_request"
+    | "comment"
+    | "follow"
+    | "connection_accepted";
   isRead: boolean;
 }
 
@@ -425,4 +431,12 @@ export interface BioFormData {
     website: string;
     country_code: string;
   };
+}
+
+export interface BlockedUser {
+  user_id: string;
+  name: string;
+  headline: string;
+  profilePicture: string;
+  date: string;
 }

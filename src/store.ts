@@ -48,6 +48,7 @@ export const store = configureStore({
           "education.items",
           "experience.items",
           "skill.items",
+          'messaging.message.timestamp'
         ],
       },
     }),
