@@ -61,7 +61,7 @@ const PostHeader: React.FC<PostHeaderProps> = ({
 
   return (
     <header className="flex items-center space-x-3 w-full pl-4 pt-1 pb-4">
-      <Link to={`/user-profile/${user.username}`}>
+      <Link to={disableLink ? `#` : `/user-profile/${user.username}`}>
         <img
           src={user.profile_picture}
           alt={user.username}
@@ -71,7 +71,7 @@ const PostHeader: React.FC<PostHeaderProps> = ({
       <div className="flex flex-col gap-0 w-full relative">
         <div className="flex justify-between">
           <Link
-            to={`/user-profile/${user.username}`}
+            to={disableLink ? `#` : `/user-profile/${user.username}`}
             className="flex gap-1 items-center"
           >
             <h2 className="text-xs md:text-sm font-semibold sm:text-base hover:cursor-pointer hover:underline hover:text-blue-600 dark:hover:text-blue-400">

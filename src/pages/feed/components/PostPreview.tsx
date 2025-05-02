@@ -188,14 +188,7 @@ const PostPreview: React.FC<PostPreviewProps> = ({
           post._id,
           isSaved
         )
-      : getMenuActions(
-          handleSaveButton,
-          blockPost,
-          reportPost,
-
-          post._id,
-          isSaved
-        );
+      : getMenuActions(handleSaveButton, post._id, isSaved);
 
   // Handle unsave directly if the function is provided
 
