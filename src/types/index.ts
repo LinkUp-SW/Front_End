@@ -415,6 +415,7 @@ export interface PostDBObject {
   publicPost: boolean; // Whether the post is public or not
   taggedUsers: string[]; // Array of user IDs tagged in the post
   _id?: string;
+  repostedPost?: PostType;
 }
 
 export interface BioFormData {
