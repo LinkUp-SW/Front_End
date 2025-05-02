@@ -267,7 +267,11 @@ const FollowingFollowers: React.FC = () => {
                     <DialogTrigger asChild>
                       <button
                         id="unfollow-button-1"
-                        className="w-full sm:w-auto px-4 py-2 border rounded-full text-blue-600 border-blue-600 hover:bg-blue-100 dark:hover:bg-gray-700 flex items-center justify-center gap-2"
+                        className="px-3 py-1.5 text-sm border rounded-full text-blue-600 border-blue-600 
+                        hover:bg-blue-100 dark:hover:bg-gray-700 flex items-center justify-center gap-2 
+                        whitespace-nowrap max-w-full
+                        sm:px-4 sm:py-2 sm:text-base
+                        lg:px-5 lg:py-2.5 lg:text-lg"
                         onClick={() => setOpenDialogUserId(user.user_id)}
                       >
                         Following
@@ -301,7 +305,11 @@ const FollowingFollowers: React.FC = () => {
                     <DialogTrigger asChild>
                       <button
                         id="unfollow-button-2"
-                        className="w-full sm:w-auto px-4 py-2 border rounded-full text-blue-600 border-blue-600 hover:bg-blue-100 dark:hover:bg-gray-700 flex items-center justify-center gap-2"
+                        className="px-3 py-1.5 text-sm border rounded-full text-blue-600 border-blue-600 
+                        hover:bg-blue-100 dark:hover:bg-gray-700 flex items-center justify-center gap-2 
+                        whitespace-nowrap max-w-full
+                        sm:px-4 sm:py-2 sm:text-base
+                        lg:px-5 lg:py-2.5 lg:text-lg"
                         onClick={() => setOpenDialogUserId(user.user_id)}
                       >
                         Following
@@ -327,12 +335,17 @@ const FollowingFollowers: React.FC = () => {
                   </Dialog>
                 ) : (
                   <button
-                    id="follow-button-3"
-                    className="w-full sm:w-auto px-4 py-2 border rounded-full text-green-600 border-green-600 hover:bg-blue-100 dark:hover:bg-gray-700 flex items-center justify-center gap-2"
-                    onClick={() => handleFollowUser(user.user_id)}
-                  >
-                    Follow
-                  </button>
+  id="follow-button-3"
+  className="px-3 py-1.5 text-sm border rounded-full text-green-600 border-green-600 
+             hover:bg-blue-100 dark:hover:bg-gray-700 flex items-center justify-center gap-2 
+             whitespace-nowrap max-w-full
+             sm:px-4 sm:py-2 sm:text-base
+             lg:px-5 lg:py-2.5 lg:text-lg"
+  onClick={() => handleFollowUser(user.user_id)}
+>
+  Follow
+</button>
+
                 )}
               </div>
             ))}
