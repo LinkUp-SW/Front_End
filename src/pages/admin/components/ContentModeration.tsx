@@ -1,7 +1,11 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import Cookies from "js-cookie";
 import { FiSearch } from "react-icons/fi";
-import { getreports } from "@/endpoints/admin";
+import {
+  getReportDetails,
+  getreports,
+  ReportDetailsData,
+} from "@/endpoints/admin";
 import {
   Dialog,
   DialogContent,
@@ -10,6 +14,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import PostPreview from "@/pages/feed/components/PostPreview";
+import PostPreviewSkeleton from "@/pages/feed/components/PostPreviewSkeleton";
+import CommentWithReplies from "@/pages/feed/components/CommentWithReplies";
 
 interface Report {
   content_id: string;
@@ -30,10 +37,12 @@ const ContentModeration = () => {
   const [cursor, setCursor] = useState<number | null>(null);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [detailsLoading, setDetailsLoading] = useState(false);
   const observerRef = useRef<HTMLDivElement | null>(null);
   const token = Cookies.get("linkup_auth_token") ?? "";
 
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
+  const [reportDetails, setReportDetails] = useState<ReportDetailsData>();
 
   const fetchReports = useCallback(async () => {
     if (!token || loading || !hasMore) return;
@@ -46,7 +55,9 @@ const ContentModeration = () => {
 
         setReports((prev) => {
           const existingIds = new Set(prev.map((r) => r.content_id));
-          const filtered = newReports.filter((r) => !existingIds.has(r.content_id));
+          const filtered = newReports.filter(
+            (r) => !existingIds.has(r.content_id)
+          );
           return [...prev, ...filtered];
         });
 
@@ -75,6 +86,25 @@ const ContentModeration = () => {
   useEffect(() => {
     fetchReports();
   }, [fetchReports]);
+
+  useEffect(() => {
+    const fetchReportDetails = async () => {
+      if (selectedReport) {
+        if (selectedReport.content_id) {
+          const result = await getReportDetails(
+            token,
+            selectedReport.type,
+            selectedReport.content_ref
+          );
+          console.log("Result:", result);
+          setReportDetails(result.data);
+        }
+      }
+      setDetailsLoading(false);
+    };
+    setDetailsLoading(true);
+    fetchReportDetails();
+  }, [selectedReport]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -115,8 +145,12 @@ const ContentModeration = () => {
 
   return (
     <div className="flex flex-col w-full h-full bg-gradient-to-b from-white via-blue-50 to-blue-100 dark:from-gray-800 dark:via-gray-900 dark:to-gray-950 rounded-2xl shadow-xl p-6 mb-12 overflow-auto">
-      <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Content Moderation</h2>
-      <p className="text-gray-600 dark:text-gray-300 mb-4">Review and manage reported content across the platform.</p>
+      <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+        Content Moderation
+      </h2>
+      <p className="text-gray-600 dark:text-gray-300 mb-4">
+        Review and manage reported content across the platform.
+      </p>
 
       <div className="relative mb-4">
         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -172,8 +206,13 @@ const ContentModeration = () => {
             </thead>
             <tbody>
               {filteredReports.map((report) => (
-                <tr key={`${report.content_id}-${report.created_at}`} className="border-t border-gray-200 dark:border-gray-700">
-                  <td className="px-4 py-2 font-semibold">{report.content_id}</td>
+                <tr
+                  key={`${report.content_id}-${report.created_at}`}
+                  className="border-t border-gray-200 dark:border-gray-700"
+                >
+                  <td className="px-4 py-2 font-semibold">
+                    {report.content_id}
+                  </td>
                   <td className="px-4 py-2">{report.type}</td>
                   <td className="px-4 py-2">{report.reasons.join(", ")}</td>
                   <td className="px-4 py-2">
@@ -187,7 +226,8 @@ const ContentModeration = () => {
                           : "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
                       }`}
                     >
-                      {report.status.charAt(0).toUpperCase() + report.status.slice(1)}
+                      {report.status.charAt(0).toUpperCase() +
+                        report.status.slice(1)}
                     </span>
                   </td>
                   <td className="px-4 py-2">{report.report_count}</td>
@@ -212,10 +252,33 @@ const ContentModeration = () => {
                             </DialogDescription>
                           </DialogHeader>
                           <div className="flex flex-col gap-3 mt-4">
+                            {!detailsLoading ? (
+                              // reportDetails?.content.type == "Comment" ?
+                              <>
+                                <PostPreview
+                                  post={reportDetails?.content.parent_post}
+                                  menuActions={[]}
+                                  hideActions={true}
+                                />
+
+                                {/* <div className="w-full pb-5">
+                                  <CommentWithReplies
+                                    comment={reportDetails?.content}
+                                    disableReplies={true}
+                                    handleCreateComment={() => {}}
+                                    postId={postData._id}
+                                    disableControls
+                                  />
+                                </div> */}
+                              </> // : <PostPreview but with post not comment>
+                            ) : (
+                              <PostPreviewSkeleton />
+                            )}
                             <button
                               className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-xl"
                               onClick={() => {
-                                if (selectedReport) handleDeleteContent(selectedReport);
+                                if (selectedReport)
+                                  handleDeleteContent(selectedReport);
                               }}
                             >
                               Delete Content
@@ -223,21 +286,22 @@ const ContentModeration = () => {
                             <button
                               className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-4 rounded-xl"
                               onClick={() => {
-                                if (selectedReport) handleDismissReport(selectedReport);
+                                if (selectedReport)
+                                  handleDismissReport(selectedReport);
                               }}
                             >
                               Dismiss Report
                             </button>
-                            <button
-                              className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-xl"
-                            >
+                            <button className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-xl">
                               Cancel
                             </button>
                           </div>
                         </DialogContent>
                       </Dialog>
                     ) : (
-                      <button className="text-green-500 hover:text-green-700">✓</button>
+                      <button className="text-green-500 hover:text-green-700">
+                        ✓
+                      </button>
                     )}
                   </td>
                 </tr>
@@ -246,12 +310,16 @@ const ContentModeration = () => {
           </table>
 
           <div ref={observerRef} className="h-10" />
-          {loading && <p className="text-center text-gray-500 py-4">Loading...</p>}
+          {loading && (
+            <p className="text-center text-gray-500 py-4">Loading...</p>
+          )}
           {!loading && !hasMore && filteredReports.length === 0 && (
             <p className="text-center text-gray-500 py-4">No reports found.</p>
           )}
           {!loading && !hasMore && filteredReports.length > 0 && (
-            <p className="text-center text-gray-500 py-4">No more reports to show.</p>
+            <p className="text-center text-gray-500 py-4">
+              No more reports to show.
+            </p>
           )}
         </div>
       </div>

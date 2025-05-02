@@ -24,6 +24,7 @@ interface PostHeaderProps {
   edited?: boolean;
   publicPost?: boolean;
   date: number;
+  hideActions?: boolean;
 }
 
 const PostHeader: React.FC<PostHeaderProps> = ({
@@ -36,6 +37,7 @@ const PostHeader: React.FC<PostHeaderProps> = ({
   edited,
   publicPost,
   date,
+  hideActions = false,
 }) => {
   const timeAgo = moment(date * 1000).fromNow();
 
@@ -72,50 +74,52 @@ const PostHeader: React.FC<PostHeaderProps> = ({
             }`}
           >
             <Dialog>
-              <Popover open={postMenuOpen} onOpenChange={setPostMenuOpen}>
-                <PopoverTrigger
-                  asChild
-                  className="rounded-full  relative top-1 z-10 w-7 h-7 px-1 aspect-square hover:bg-neutral-200 dark:hover:bg-zinc-700 hover:cursor-pointer dark:hover:text-neutral-200 "
-                >
-                  <EllipsisIcon
-                    onClick={() => setPostMenuOpen(!postMenuOpen)}
-                    className=""
-                  />
-                </PopoverTrigger>
-                <PopoverContent className="relative right-30 dark:bg-gray-900 bg-white border-neutral-200 dark:border-gray-700 p-0 pt-1">
-                  <div className="flex flex-col w-full p-0">
-                    {menuActions.map((item: MenuAction, index: number) =>
-                      item.name == "Report Post" ? (
-                        <DialogTrigger asChild key={index}>
+              {!hideActions && (
+                <Popover open={postMenuOpen} onOpenChange={setPostMenuOpen}>
+                  <PopoverTrigger
+                    asChild
+                    className="rounded-full  relative top-1 z-10 w-7 h-7 px-1 aspect-square hover:bg-neutral-200 dark:hover:bg-zinc-700 hover:cursor-pointer dark:hover:text-neutral-200 "
+                  >
+                    <EllipsisIcon
+                      onClick={() => setPostMenuOpen(!postMenuOpen)}
+                      className=""
+                    />
+                  </PopoverTrigger>
+                  <PopoverContent className="relative right-30 dark:bg-gray-900 bg-white border-neutral-200 dark:border-gray-700 p-0 pt-1">
+                    <div className="flex flex-col w-full p-0">
+                      {menuActions.map((item: MenuAction, index: number) =>
+                        item.name == "Report Post" ? (
+                          <DialogTrigger asChild key={index}>
+                            <Button
+                              onClick={(e) => {
+                                item.action();
+                                e.stopPropagation();
+                                setPostMenuOpen(!postMenuOpen);
+                              }}
+                              className="flex justify-start items-center rounded-none h-12 bg-transparent w-full p-0 m-0 hover:bg-neutral-100 text-gray-900 dark:text-neutral-200 dark:hover:bg-gray-600 hover:cursor-pointer"
+                            >
+                              {item.icon}
+                              <span>{item.name}</span>
+                            </Button>
+                          </DialogTrigger>
+                        ) : (
                           <Button
-                            onClick={(e) => {
+                            key={index}
+                            onClick={() => {
                               item.action();
-                              e.stopPropagation();
                               setPostMenuOpen(!postMenuOpen);
                             }}
-                            className="flex justify-start items-center rounded-none h-12 bg-transparent w-full p-0 m-0 hover:bg-neutral-100 text-gray-900 dark:text-neutral-200 dark:hover:bg-gray-600 hover:cursor-pointer"
+                            className="flex justify-start items-center rounded-none h-12 bg-transparent w-full p-0 m-0 hover:bg-neutral-200 text-gray-900 dark:text-neutral-200 dark:hover:bg-gray-600 hover:cursor-pointer"
                           >
                             {item.icon}
                             <span>{item.name}</span>
                           </Button>
-                        </DialogTrigger>
-                      ) : (
-                        <Button
-                          key={index}
-                          onClick={() => {
-                            item.action();
-                            setPostMenuOpen(!postMenuOpen);
-                          }}
-                          className="flex justify-start items-center rounded-none h-12 bg-transparent w-full p-0 m-0 hover:bg-neutral-200 text-gray-900 dark:text-neutral-200 dark:hover:bg-gray-600 hover:cursor-pointer"
-                        >
-                          {item.icon}
-                          <span>{item.name}</span>
-                        </Button>
-                      )
-                    )}
-                  </div>
-                </PopoverContent>
-              </Popover>
+                        )
+                      )}
+                    </div>
+                  </PopoverContent>
+                </Popover>
+              )}
               <DialogContent>
                 <ReportPostModal />
               </DialogContent>

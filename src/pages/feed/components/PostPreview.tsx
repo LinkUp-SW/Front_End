@@ -5,6 +5,7 @@ import PostHeader from "@/pages/feed/components/PostHeader";
 import TruncatedText from "@/components/truncate_text/TruncatedText";
 import DocumentPreview from "@/pages/feed/components/modals/DocumentPreview";
 import CompactLinkPreview from "./CompactLinkPreview";
+import PostPreviewSkeleton from "./PostPreviewSkeleton";
 import { getMenuActions, getPersonalMenuActions } from "./Menus";
 import { openEditPostDialog } from "@/slices/feed/createPostSlice";
 import { useDispatch, useSelector } from "react-redux";
@@ -24,12 +25,13 @@ import { setPosts, updatePost } from "@/slices/feed/postsSlice";
 import { RootState } from "@/store";
 
 interface PostPreviewProps {
-  post: PostType;
+  post: PostType | undefined;
   menuActions: MenuAction[];
   onMenuOpenChange?: (isOpen: boolean) => void;
   compact?: boolean;
   showHeader?: boolean;
   showFooter?: boolean;
+  hideActions?: boolean;
   className?: string;
 }
 
@@ -42,6 +44,7 @@ const PostPreview: React.FC<PostPreviewProps> = ({
   compact = false,
   showHeader = true,
   showFooter = false,
+  hideActions = false,
   className = "",
 }) => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -51,6 +54,10 @@ const PostPreview: React.FC<PostPreviewProps> = ({
 
   const navigate = useNavigate();
   const posts = useSelector((state: RootState) => state.posts.list);
+
+  if (!post) {
+    return <PostPreviewSkeleton />;
+  }
 
   // Handle menu open state with callback to parent if provided
   const handleMenuOpenChange = (isOpen: boolean) => {
@@ -235,6 +242,7 @@ const PostPreview: React.FC<PostPreviewProps> = ({
               menuActions={menuActions}
               savedPostView
               date={post.date}
+              hideActions={hideActions}
             />
           </div>
         )}
