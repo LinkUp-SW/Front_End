@@ -95,6 +95,7 @@ export interface JobApplicationData {
   last_name: string;
   profile_photo: string;
   resume: string;
+  is_uploaded: boolean;
 }
 
 // Token helper function

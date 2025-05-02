@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { IoIosArrowBack } from "react-icons/io";
 import { getJobApplicants, updateApplicationStatus } from '@/endpoints/company';
+import ResumePreviewComponent from './ResumePreviewComponent';
 
 // Define types for job application data
 interface JobApplicant {
@@ -49,8 +50,17 @@ const JobApplicantsComponent: React.FC<JobApplicantsComponentProps> = ({ jobId, 
       const response = await getJobApplicants(jobId);
       
       if (response && response.data) {
+        // Log the entire applicants data for debugging
+        console.log('Job applicants data:', response.data);
+        
+        // Log specifically the resume URLs
+        response.data.forEach((applicant, index) => {
+          console.log(`Applicant ${index + 1} (${applicant.first_name} ${applicant.last_name}) resume URL:`, applicant.resume);
+        });
+        
         setApplicants(response.data);
       } else {
+        console.log('No applicants data found in response:', response);
         setApplicants([]);
       }
       setError(null);
@@ -199,16 +209,12 @@ const JobApplicantsComponent: React.FC<JobApplicantsComponentProps> = ({ jobId, 
                     </span>
                   </div>
                   
-                  {/* Resume link */}
+                  {/* Resume preview and download */}
                   {applicant.resume && (
-                    <a 
-                      href={applicant.resume} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-blue-600 dark:text-blue-400 text-sm hover:underline mb-3 inline-block"
-                    >
-                      View Resume
-                    </a>
+                    <ResumePreviewComponent 
+                      resumeUrl={applicant.resume}
+                      applicantName={`${applicant.first_name} ${applicant.last_name}`}
+                    />
                   )}
                 </div>
                 

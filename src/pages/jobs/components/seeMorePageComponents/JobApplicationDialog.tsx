@@ -1,3 +1,5 @@
+// Update the JobApplicationDialog component to include is_uploaded in the form state
+
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent } from '@/components';
 import { toast } from 'sonner';
@@ -48,6 +50,7 @@ const JobApplicationDialog: React.FC<JobApplicationDialogProps> = ({
   const [profilePhoto, setProfilePhoto] = useState('');
   const [email, setEmail] = useState('');
   const [resumeFile, setResumeFile] = useState<File | null>(null);
+  const [isResumeUploaded, setIsResumeUploaded] = useState(false); // New state to track if resume was uploaded
 
   // Fetch user info on dialog open
   useEffect(() => {
@@ -57,6 +60,7 @@ const JobApplicationDialog: React.FC<JobApplicationDialogProps> = ({
       // Reset state when dialog closes
       setCurrentStep('info');
       setProgress(0);
+      setIsResumeUploaded(false); // Reset uploaded state
     }
   }, [open]);
 
@@ -83,6 +87,9 @@ const JobApplicationDialog: React.FC<JobApplicationDialogProps> = ({
       setProfilePhoto(userData.profile_photo || '');
       setEmail(userData.email || '');
       
+      // If user already has a resume, it's not considered "uploaded" in this session
+      setIsResumeUploaded(false);
+      
       setIsLoading(false);
     } catch (error) {
       console.error('Failed to fetch user info:', error);
@@ -102,6 +109,7 @@ const JobApplicationDialog: React.FC<JobApplicationDialogProps> = ({
       
       setResumeFile(file);
       setResumeUrl(URL.createObjectURL(file));
+      setIsResumeUploaded(true); // Set to true when user uploads a new resume
     }
   };
 
@@ -119,11 +127,12 @@ const JobApplicationDialog: React.FC<JobApplicationDialogProps> = ({
       const applicationData: JobApplicationData = {
         phone_number: parseInt(phoneNumber),
         country_code: countryCode,
-        email:email,
+        email: email,
         first_name: firstName,
         last_name: lastName,
         profile_photo: profilePhoto,
-        resume: resumeUrl
+        resume: resumeUrl,
+        is_uploaded: isResumeUploaded // Add the new field
       };
 
       // Submit application using the API function
