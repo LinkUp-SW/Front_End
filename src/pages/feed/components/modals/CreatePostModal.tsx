@@ -31,6 +31,7 @@ import UserTagging from "@/pages/feed/components/UserTagging";
 import { processTextFormatting } from "@/components/truncate_text/TruncatedText";
 import { PostDBObject, PostType } from "@/types";
 import PostLargePreview from "../PostLargePreview";
+import { BasicCompanyData } from "@/pages/company/ManageCompanyPage";
 
 interface CreatePostModalProps {
   profileImageUrl: string;
@@ -45,6 +46,7 @@ interface CreatePostModalProps {
   setTaggedUsers: (users: Array<{ name: string; id: string }>) => void;
   post?: PostDBObject | null;
   repostedPost?: PostType;
+  company: BasicCompanyData | null;
 }
 
 const CreatePostModal: React.FC<CreatePostModalProps> = ({
@@ -60,13 +62,13 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
   setTaggedUsers,
   post,
   repostedPost,
+  company,
 }) => {
   const { data } = useSelector((state: RootState) => state.userBio);
   const MemoizedEmojiPicker = memo(EmojiPicker);
   const darkMode = useSelector((state: RootState) => state.theme.theme);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  console.log("selected media:", selectedMedia);
 
   // State to track detected URL
   const [detectedUrl, setDetectedUrl] = useState<string | null>(null);
@@ -142,13 +144,18 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
           className="flex w-fit z-0 p-2  gap-4  hover:cursor-pointer hover:bg-neutral-100 dark:hover:bg-gray-700 rounded-2xl"
         >
           <Avatar className="h-12 w-12 pl-0">
-            <AvatarImage src={profileImageUrl} alt="Profile" />
+            <AvatarImage
+              src={company ? company.logo : profileImageUrl}
+              alt="Profile"
+            />
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
           <div className="flex flex-col  text-black dark:text-neutral-200 ">
             <div className="flex items-center gap-3">
               <p className="text-xl font-medium text-nowrap">
-                {data?.bio.first_name + " " + data?.bio.last_name}
+                {company
+                  ? company.name
+                  : data?.bio.first_name + " " + data?.bio.last_name}
               </p>
               <FaChevronDown />
             </div>
