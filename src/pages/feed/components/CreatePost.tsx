@@ -25,7 +25,11 @@ import CommentControlModal from "./modals/CommentControlModal";
 import { MediaType, PostDBObject } from "@/types";
 import Cookies from "js-cookie";
 import { toast } from "sonner";
-import { createPost, fetchSinglePost } from "@/endpoints/feed";
+import {
+  createPost,
+  fetchSinglePost,
+  repostWithThoughts,
+} from "@/endpoints/feed";
 import { DialogDescription } from "@radix-ui/react-dialog";
 import { editPost } from "@/endpoints/feed";
 import { updatePost } from "@/slices/feed/postsSlice";
@@ -117,6 +121,9 @@ const CreatePost: React.FC<CreatePostProps> = ({ className }) => {
           }))
         );
       }
+      if (postToEdit.repostedPost) {
+        clearFields();
+      }
     }
   }, [editMode, postToEdit]);
 
@@ -130,6 +137,35 @@ const CreatePost: React.FC<CreatePostProps> = ({ className }) => {
   // Add a useMemo for handling text changes
 
   const submitPost = async (link?: string) => {
+    if (!user_token) {
+      toast.error("Please sign in again.");
+      setTimeout(() => {
+        navigate("/login");
+      }, 1000);
+      return;
+    }
+
+    if (postToEdit && postToEdit.repostedPost) {
+      const postPayload: {
+        content: string;
+        mediaType: string;
+        media: string[];
+        comments_disabled: string;
+        public_post: boolean;
+        postType: string;
+      } = {
+        media: [postToEdit.repostedPost._id],
+        mediaType: "post",
+        comments_disabled: postToEdit.commentsDisabled,
+        content: postText,
+        postType: "Repost thought",
+        public_post: postToEdit.publicPost,
+      };
+
+      handleRepostWithThoughts(postPayload);
+      return;
+    }
+
     let media_type: string | undefined;
     const media: string[] = [];
 
@@ -234,13 +270,6 @@ const CreatePost: React.FC<CreatePostProps> = ({ className }) => {
       toast.error("The post must have either content or media.");
       return;
     }
-    if (!user_token) {
-      toast.error("Please sign in again.");
-      setTimeout(() => {
-        navigate("/login");
-      }, 1000);
-      return;
-    }
 
     const postObject: PostDBObject = {
       content: postText,
@@ -325,6 +354,35 @@ const CreatePost: React.FC<CreatePostProps> = ({ className }) => {
     }
   };
 
+  const handleRepostWithThoughts = async (postPayload: {
+    content: string;
+    mediaType: string;
+    media: string[];
+    comments_disabled: string;
+    public_post: boolean;
+    postType: string;
+  }) => {
+    if (!user_token) {
+      toast.error("Please sign in again.");
+      setTimeout(() => {
+        navigate("/login");
+      }, 1000);
+      return;
+    }
+    try {
+      const loadingToastId = toast.loading("Reposting...");
+
+      const result = await repostWithThoughts(postPayload, user_token);
+
+      toast.success("Repost successful!");
+      toast.dismiss(loadingToastId);
+      return;
+    } catch (error) {
+      console.error("Error reposting:", error);
+      toast.error("Failed to repost. Please try again.");
+    }
+  };
+
   return (
     <>
       <Card
@@ -401,6 +459,7 @@ const CreatePost: React.FC<CreatePostProps> = ({ className }) => {
                     setSelectedMedia={setSelectedMedia}
                     taggedUsers={taggedUsers}
                     setTaggedUsers={setTaggedUsers}
+                    repostedPost={postToEdit?.repostedPost}
                   />
                 ) : activeModal == "add-document" ? (
                   <AddDocumentModal
