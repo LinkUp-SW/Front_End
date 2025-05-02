@@ -1,6 +1,6 @@
 import axiosInstance from "@/services/axiosInstance";
 import { CommentDBType, CommentType, PostDBObject, PostType } from "@/types";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 
 // Add this new interface for link preview data
 export interface LinkPreviewData {
@@ -558,7 +558,7 @@ export const getSavedPosts = async (
 export const reportContent = async (
   postPayload: { contentRef: string; contentType: string; reason: string },
   token: string
-): Promise<{ message: string; report: string }> => {
+) => {
   try {
     const response = await axiosInstance.post(
       `api/v1/admin/report`,
@@ -570,12 +570,14 @@ export const reportContent = async (
       }
     );
     return response.data;
-  } catch (error: any) {
-    if (error.response?.status === 400) {
-      return { message: "You already reported this before.", report: "" };
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      if (error.response?.status === 400) {
+        return { message: "You already reported this before.", report: "" };
+      }
+      // Re-throw other errors
+      throw error;
     }
-    // Re-throw other errors
-    throw error;
   }
 };
 

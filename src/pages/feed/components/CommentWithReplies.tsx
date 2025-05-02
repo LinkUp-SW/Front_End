@@ -46,11 +46,8 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
   disableActions = false,
   limitHeight = false,
 }) => {
-  if (!comment) {
-    return <CommentSkeleton />;
-  }
-  const replies = comment.children || [];
-  const hasMoreReplies = replies.length < (comment.children_count || 0);
+  const replies = comment?.children || [];
+  const hasMoreReplies = replies.length < (comment?.children_count || 0);
   // State hooks
   const [showReplies, setShowReplies] = useState(true);
   const [mainCommentHeight, setMainCommentHeight] = useState(0);
@@ -75,7 +72,7 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
   const dispatch = useDispatch();
 
   // Get comments from the comment.children property if replies not provided
-  const commentReplies = replies || comment.children || [];
+  const commentReplies = replies || comment?.children || [];
 
   // Effects
   useEffect(() => {
@@ -109,6 +106,10 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
       setReplyHeights(0);
     }
   }, [commentReplies, showReplies]);
+
+  if (!comment) {
+    return <CommentSkeleton />;
+  }
 
   const handleLoadMoreReplies = async () => {
     if (isLoadingReplies) return;
