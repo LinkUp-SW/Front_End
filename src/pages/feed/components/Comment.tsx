@@ -324,7 +324,7 @@ const Comment: React.FC<CommentProps> = ({
 
   const handleDeleteComment = async () => {
     if (!token) {
-      toast.error("You must be logged in to delete a post.");
+      toast.error("You must be logged in to delete a comment.");
       navigate("/login", { replace: true });
       return;
     }
@@ -670,7 +670,7 @@ const Comment: React.FC<CommentProps> = ({
                   if (selectedReaction === "None") handleReact("Like");
                   else handleReact("None");
                 }}
-                className={`flex dark:hover:bg-zinc-800 dark:hover:text-neutral-200 ${
+                className={`flex dark:hover:bg-gray-700 dark:hover:text-neutral-200 ${
                   selectedReaction === "Like"
                     ? "text-blue-700 dark:text-blue-500 hover:text-blue-700 dark:hover:text-blue-400"
                     : selectedReaction === "Insightful"
@@ -726,7 +726,7 @@ const Comment: React.FC<CommentProps> = ({
                   ].map((reaction, index) => (
                     <Tooltip key={`reaction-${reaction.alt}`}>
                       <IconButton
-                        className={`hover:scale-200 hover:bg-gray-200 w-12 h-12 dark:hover:bg-zinc-800 duration-300 ease-in-out transform transition-all mx-0 hover:mx-7 hover:-translate-y-5`}
+                        className={`hover:scale-200 hover:bg-gray-200 w-12 h-12 dark:hover:bg-gray-700 duration-300 ease-in-out transform transition-all mx-0 hover:mx-7 hover:-translate-y-5`}
                         style={{
                           animation: `bounceIn 0.5s ease-in-out ${
                             index * 0.045
