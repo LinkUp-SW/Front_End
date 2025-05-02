@@ -32,6 +32,7 @@ interface CommentWithRepliesProps {
   disableReplies: boolean;
   disableControls?: boolean;
   disableActions?: boolean;
+  limitHeight?: boolean;
 }
 
 const user_token = Cookies.get("linkup_auth_token");
@@ -43,6 +44,7 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
   disableReplies,
   disableControls = false,
   disableActions = false,
+  limitHeight = false,
 }) => {
   if (!comment) {
     return <CommentSkeleton />;
@@ -193,6 +195,7 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
           disableReplies={disableReplies}
           disableControls={disableControls}
           disableActions={disableActions}
+          limitHeight={limitHeight}
         />
       </div>
 

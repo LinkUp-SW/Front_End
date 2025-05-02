@@ -69,6 +69,7 @@ export interface CommentProps {
   disableReplies: boolean;
   disableControls?: boolean;
   disableActions?: boolean;
+  limitHeight?: boolean;
 }
 
 const token = Cookies.get("linkup_auth_token");
@@ -81,6 +82,7 @@ const Comment: React.FC<CommentProps> = ({
   disableReplies,
   disableControls = false,
   disableActions = false,
+  limitHeight = false,
 }) => {
   const {
     profile_picture,
@@ -630,6 +632,7 @@ const Comment: React.FC<CommentProps> = ({
               lineCount={3}
               id={`comment-${comment._id}`}
               className="ml-0 relative -left-5"
+              limitHeight
             />
           </div>
         )}
