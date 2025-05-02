@@ -365,7 +365,7 @@ const CreatePost: React.FC<CreatePostProps> = ({ className }) => {
               className="text-blue-600 dark:text-blue-300 hover:underline"
               onClick={() => toast.dismiss(toastId)}
             >
-              View post
+              . View post
             </a>
           </span>,
           {
