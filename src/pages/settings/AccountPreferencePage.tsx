@@ -21,7 +21,7 @@ const AccountPreferencePage: React.FC = () => {
           <h2 className="py-4 px-6 m-0 text-[rgba(0,0,0,0.9)] dark:text-[rgba(255,255,255,0.87)] border-b border-[rgba(0,0,0,0.08)] dark:border-[rgba(255,255,255,0.12)]">
             Display
           </h2>
-          <button
+          <div
             id="theme-controller-link"
             className="flex justify-between w-full items-center py-4 px-6 min-h-[48px] text-base text-[rgba(0,0,0,0.9)] dark:text-[rgba(255,255,255,0.87)] border-b border-[rgba(0,0,0,0.08)] dark:border-[rgba(255,255,255,0.12)] cursor-pointer hover:bg-[rgba(0,0,0,0.08)] dark:hover:bg-[rgba(255,255,255,0.12)]"
             onClick={handleDisplaySettings}
@@ -45,7 +45,7 @@ const AccountPreferencePage: React.FC = () => {
                 />
               </svg>
             </button>
-          </button>
+          </div>
         </div>
 
         {/* Account Management Section */}
@@ -53,7 +53,7 @@ const AccountPreferencePage: React.FC = () => {
           <h2 className="py-4 px-6 m-0 text-[rgba(0,0,0,0.9)] dark:text-[rgba(255,255,255,0.87)] border-b border-[rgba(0,0,0,0.08)] dark:border-[rgba(255,255,255,0.12)]">
             Account management
           </h2>
-          <button
+          <div
             id="close-account-link"
             className="flex justify-between w-full items-center py-4 px-6 min-h-[48px] text-base text-[rgba(0,0,0,0.9)] dark:text-[rgba(255,255,255,0.87)] border-b border-[rgba(0,0,0,0.08)] dark:border-[rgba(255,255,255,0.12)] cursor-pointer hover:bg-[rgba(0,0,0,0.08)] dark:hover:bg-[rgba(255,255,255,0.12)]"
             onClick={handleCloseAccount}
@@ -79,7 +79,7 @@ const AccountPreferencePage: React.FC = () => {
                 />
               </svg>
             </button>
-          </button>
+          </div>
         </div>
       </div>
     </SettingsLayoutPage>
