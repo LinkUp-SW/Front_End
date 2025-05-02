@@ -1,5 +1,6 @@
-import axios from 'axios';
-import axiosInstance from '@/services/axiosInstance';
+import axios from "axios";
+import axiosInstance from "@/services/axiosInstance";
+import { BlockedUser } from "@/types";
 
 // Interfaces
 export interface ChangePasswordRequest {
@@ -34,10 +35,10 @@ export const changePassword = async (
 ): Promise<ChangePasswordResponse> => {
   try {
     const response = await axiosInstance.patch(
-      '/api/v1/user/update-password',
+      "/api/v1/user/update-password",
       { old_password: currentPassword, new_password: newPassword },
       {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       }
     );
     return response.data;
@@ -50,9 +51,11 @@ export const changePassword = async (
 };
 
 // Email update endpoints
-export const getCurrentEmail = async (token: string): Promise<GetCurrentEmailResponse> => {
-  const response = await axiosInstance.get('/api/v1/user/get-current-email', {
-    headers: { Authorization: `Bearer ${token}` }
+export const getCurrentEmail = async (
+  token: string
+): Promise<GetCurrentEmailResponse> => {
+  const response = await axiosInstance.get("/api/v1/user/get-current-email", {
+    headers: { Authorization: `Bearer ${token}` },
   });
   return response.data;
 };
@@ -63,22 +66,66 @@ export const updateEmail = async (
   password: string
 ): Promise<UpdateEmailResponse> => {
   const response = await axiosInstance.patch(
-    '/api/v1/user/update-email',
+    "/api/v1/user/update-email",
     { email, password },
     {
-      headers: { Authorization: `Bearer ${token}` }
+      headers: { Authorization: `Bearer ${token}` },
     }
   );
   return response.data;
 };
 
 export const sendEmailVerificationOTP = async (email: string) => {
-  const response = await axiosInstance.post('/api/v1/user/send-otp', { email });
+  const response = await axiosInstance.post("/api/v1/user/send-otp", { email });
   return response.data;
 };
 
-export const verifyEmailOTP = async (otp: string, email: string, update:boolean) => {
-  const response = await axiosInstance.post('/api/v1/user/verify-otp', { otp, email,update });
+export const verifyEmailOTP = async (
+  otp: string,
+  email: string,
+  update: boolean
+) => {
+  const response = await axiosInstance.post("/api/v1/user/verify-otp", {
+    otp,
+    email,
+    update,
+  });
 
+  return response.data;
+};
+
+export const closeAccount = async (token: string) => {
+  const response = await axiosInstance.delete(`api/v1/user/delete-account`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data;
+};
+
+export const getBlockedUsersList = async (
+  token: string
+): Promise<{ blocked_list: BlockedUser[] }> => {
+  const response = await axiosInstance(
+    `/api/v1/user/manage-by-blocked-list/blocked`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
+
+export const unBlockUser = async (token: string, userId: string, password: string) => {
+  const response = await axiosInstance.delete(
+    `/api/v1/user/manage-by-blocked-list/unblock/${userId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+      data: { password: password }
+    }
+  );
   return response.data;
 };
