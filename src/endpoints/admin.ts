@@ -1,5 +1,5 @@
 import axiosInstance from "@/services/axiosInstance";
-import { PostType } from "@/types";
+import { CommentType, PostType } from "@/types";
 
 export interface Report {
   content_id: string;
@@ -33,12 +33,30 @@ interface ReportData {
 interface ReportDetailsReponse {
   message: string;
   success: boolean;
-  data: ReportDetailsData;
+  data: ReportDetailsPostData | ReportDetailsCommentData | ReportDetailsJobData;
 }
-export interface ReportDetailsData {
-  content: {
-    parent_post?: PostType;
+
+export interface ReportDetailsPostData {
+  content: PostType;
+  parent_post?: PostType;
+  total_count: number;
+  reasons_summary: {
+    [key: string]: number;
   };
+}
+
+export interface ReportDetailsCommentData {
+  content: CommentType;
+  parent_post?: PostType;
+  total_count: number;
+  reasons_summary: {
+    [key: string]: number;
+  };
+}
+
+export interface ReportDetailsJobData {
+  content: any;
+  parent_post?: PostType;
   total_count: number;
   reasons_summary: {
     [key: string]: number;
