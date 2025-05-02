@@ -59,14 +59,18 @@ const PostHeader: React.FC<PostHeaderProps> = ({
             <h2 className="text-xs md:text-sm font-semibold sm:text-base hover:cursor-pointer hover:underline hover:text-blue-600 dark:hover:text-blue-400">
               {user.first_name + " " + user.last_name}
             </h2>
-            <p className="text-lg text-gray-500 dark:text-neutral-400 font-bold">
-              {" "}
-              ·
-            </p>
-            <p className="text-xs text-gray-500 dark:text-neutral-400">
-              {" "}
-              {user.connection_degree}
-            </p>
+            {user.connection_degree && (
+              <>
+                <p className="text-lg text-gray-500 dark:text-neutral-400 font-bold">
+                  {" "}
+                  ·
+                </p>
+                <p className="text-xs text-gray-500 dark:text-neutral-400">
+                  {" "}
+                  {user.connection_degree}
+                </p>
+              </>
+            )}
           </Link>
           <nav
             className={`flex relative left-5 gap-2 ${
@@ -121,7 +125,15 @@ const PostHeader: React.FC<PostHeaderProps> = ({
                 </Popover>
               )}
               <DialogContent>
-                <ReportPostModal />
+                <ReportPostModal
+                  onClose={function (): void {
+                    throw new Error("Function not implemented.");
+                  }}
+                  postId={""}
+                  onSubmit={function (reason: string): void {
+                    throw new Error("Function not implemented.");
+                  }}
+                />
               </DialogContent>
             </Dialog>
             {!savedPostView && (
