@@ -4,7 +4,7 @@ import { RootState, AppDispatch } from "../../store";
 import { closeModal } from "../../slices/modal/modalSlice";
 import AddProfileSectionModal from "../../pages/user_profile/components/modals/add_profile_section_modal/AddProfileSectionModal";
 import AddExperienceModal from "@/pages/user_profile/components/modals/experience_modal/AddExperienceModal";
-import ReportPostModal from "../../pages/feed/components/modals/ReportPostModal";
+import ReportModal from "../../pages/feed/components/modals/ReportModal";
 import SendPostModal from "../../pages/feed/components/modals/SendPostModal";
 import RemoveConnectionModal from "@/pages/mynetwork/components/modals/remove_connection_modal/RemoveConnectionModal";
 import { RemoveConnectionData } from "@/types";
@@ -43,8 +43,8 @@ const Modal: React.FC = () => {
     switch (modalType) {
       case "add_profile_section":
         return <AddProfileSectionModal />;
-        case "experience":
-          return <AddExperienceModal />;
+      case "experience":
+        return <AddExperienceModal />;
       case "remove_connection": {
         if (
           !modalData ||
@@ -72,8 +72,6 @@ const Modal: React.FC = () => {
           />
         );
       }
-      case "report_post":
-        return <ReportPostModal />;
       case "send_post":
         return <SendPostModal />;
       default:
