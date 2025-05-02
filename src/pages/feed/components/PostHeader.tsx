@@ -9,7 +9,7 @@ import { HiGlobeEuropeAfrica as GlobeIcon } from "react-icons/hi2";
 import { LiaEllipsisHSolid as EllipsisIcon } from "react-icons/lia";
 import { IoMdClose as CloseIcon } from "react-icons/io";
 import { Button, Dialog, DialogTrigger, DialogContent } from "@/components";
-import ReportPostModal from "./modals/ReportPostModal";
+import ReportModal from "./modals/ReportModal";
 import { FaPeopleGroup as PeopleIcon } from "react-icons/fa6";
 import { ActivityContextType, MenuAction, PostUserType } from "@/types";
 import moment from "moment";
@@ -17,6 +17,7 @@ import moment from "moment";
 interface PostHeaderProps {
   user: PostUserType;
   action?: ActivityContextType;
+  postId: string;
   postMenuOpen: boolean;
   setPostMenuOpen: (isOpen: boolean) => void;
   menuActions: MenuAction[]; // You can replace `any` with a more specific type if available
@@ -30,6 +31,7 @@ interface PostHeaderProps {
 const PostHeader: React.FC<PostHeaderProps> = ({
   user,
   action,
+  postId,
   postMenuOpen,
   setPostMenuOpen,
   menuActions,
@@ -40,6 +42,13 @@ const PostHeader: React.FC<PostHeaderProps> = ({
   hideActions = false,
 }) => {
   const timeAgo = moment(date * 1000).fromNow();
+
+  const closeModal = () => {
+    const closeButton = document.getElementById("modal-close-button");
+    if (closeButton instanceof HTMLButtonElement) {
+      closeButton.click();
+    }
+  };
 
   return (
     <header className="flex items-center space-x-3 w-full pl-4 pt-1 pb-4">
@@ -124,15 +133,11 @@ const PostHeader: React.FC<PostHeaderProps> = ({
                   </PopoverContent>
                 </Popover>
               )}
-              <DialogContent>
-                <ReportPostModal
-                  onClose={function (): void {
-                    throw new Error("Function not implemented.");
-                  }}
-                  postId={""}
-                  onSubmit={function (reason: string): void {
-                    throw new Error("Function not implemented.");
-                  }}
+              <DialogContent className="dark:bg-gray-900 border-0">
+                <ReportModal
+                  onClose={closeModal}
+                  contentId={postId}
+                  type="Post"
                 />
               </DialogContent>
             </Dialog>

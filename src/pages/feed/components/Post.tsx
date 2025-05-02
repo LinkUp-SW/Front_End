@@ -617,7 +617,7 @@ const Post: React.FC<PostProps> = ({
             </Link>
             <span className="text-gray-500 text-xs dark:text-neutral-400">
               <Link
-                to="#"
+                to={`/user-profile/${action.actor_username}`}
                 className="text-xs font-medium text-black dark:text-neutral-200 hover:cursor-pointer hover:underline hover:text-blue-600 dark:hover:text-blue-400"
               >
                 {action.actor_name}
@@ -629,6 +629,7 @@ const Post: React.FC<PostProps> = ({
         <PostHeader
           user={author}
           action={action}
+          postId={postData._id}
           postMenuOpen={postMenuOpen}
           setPostMenuOpen={setPostMenuOpen}
           menuActions={menuActions}

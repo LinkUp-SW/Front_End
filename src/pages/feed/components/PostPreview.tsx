@@ -238,6 +238,7 @@ const PostPreview: React.FC<PostPreviewProps> = ({
             <PostHeader
               user={post.author}
               postMenuOpen={menuOpen}
+              postId={post._id}
               setPostMenuOpen={handleMenuOpenChange}
               menuActions={menuActions}
               savedPostView
