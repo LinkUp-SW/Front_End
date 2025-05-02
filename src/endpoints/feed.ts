@@ -582,7 +582,7 @@ export const reportContent = async (
 export const repostInstant = async (
   postPayload: { mediaType: string; media: string[]; postType: string },
   token: string
-): Promise<{ message: string; report: string }> => {
+) => {
   try {
     const response = await axiosInstance.post(
       `api/v2/post/posts`,

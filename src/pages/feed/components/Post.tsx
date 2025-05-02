@@ -51,6 +51,7 @@ import {
   createReaction,
   deletePost,
   deleteReaction,
+  fetchSinglePost,
   loadPostComments,
   repostInstant,
   savePost,
@@ -64,6 +65,7 @@ import {
   updatePost,
   addNewCommentToPost,
   addCommentsToPost,
+  unshiftPosts,
 } from "@/slices/feed/postsSlice";
 import { useDispatch, useSelector } from "react-redux";
 import DocumentPreview from "./modals/DocumentPreview";
@@ -470,7 +472,22 @@ const Post: React.FC<PostProps> = ({
       };
       const result = await repostInstant(postPayload, token);
       toast.success("Post reposted successfully!");
-      console.log("RESULT:", result);
+      const post = await fetchSinglePost(result.postId, token);
+      if (post) {
+        // Prepare the post with comments-related fields
+        const postWithComments = {
+          ...post,
+          commentsCount: 0,
+          commentsData: {
+            comments: [],
+            count: 0,
+            nextCursor: null,
+          },
+        };
+
+        // Add the new post to the Redux store at the beginning of the list
+        dispatch(unshiftPosts([postWithComments]));
+      }
       toast.dismiss(loadingToastId);
     } catch (error) {
       console.error("Error reposting:", error);
