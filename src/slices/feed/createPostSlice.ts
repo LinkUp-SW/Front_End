@@ -1,11 +1,13 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { PostDBObject } from "@/types";
+import { BasicCompanyData } from "@/pages/company/ManageCompanyPage";
 
 interface CreatePostState {
   createPostOpen: boolean;
   editMode: boolean;
   postToEdit: PostDBObject | null;
   activeModal: string;
+  companyInfo: BasicCompanyData | null;
 }
 
 const initialState: CreatePostState = {
@@ -13,6 +15,7 @@ const initialState: CreatePostState = {
   editMode: false,
   postToEdit: null,
   activeModal: "create-post",
+  companyInfo: null,
 };
 
 export const createPostSlice = createSlice({
@@ -31,8 +34,21 @@ export const createPostSlice = createSlice({
       state.postToEdit = action.payload;
       state.activeModal = "create-post";
     },
+    openCompanyPostDialog: (state, action: PayloadAction<BasicCompanyData>) => {
+      state.createPostOpen = true;
+      state.editMode = false;
+      state.postToEdit = null;
+      state.activeModal = "create-post"; // Keep using the same modal
+      state.companyInfo = action.payload; // Just set company info
+    },
+
+    resetCompanyInfo: (state) => {
+      state.companyInfo = null;
+    },
+
     closeCreatePostDialog: (state) => {
       state.createPostOpen = false;
+      state.companyInfo = null; // Reset company info when closing
     },
     setActiveModal: (state, action: PayloadAction<string>) => {
       state.activeModal = action.payload;
@@ -45,6 +61,8 @@ export const {
   openEditPostDialog,
   closeCreatePostDialog,
   setActiveModal,
+  openCompanyPostDialog,
+  resetCompanyInfo,
 } = createPostSlice.actions;
 
 export default createPostSlice.reducer;

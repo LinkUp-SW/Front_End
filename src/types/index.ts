@@ -26,7 +26,13 @@ export interface Notification {
   createdAt: string;
   content: string;
   referenceId: string;
-  type: 'reacted'|'message'|'connection_request'|'comment'|'follow'|'connection_accepted';
+  type:
+    | "reacted"
+    | "message"
+    | "connection_request"
+    | "comment"
+    | "follow"
+    | "connection_accepted";
   isRead: boolean;
 }
 
@@ -47,8 +53,8 @@ export interface ReactionType {
   id: number;
   name: string;
   title: string;
-  profileImage: string;
-  reactionType:
+  profile_image: string;
+  reaction_type:
     | "like"
     | "love"
     | "celebrate"
@@ -68,7 +74,7 @@ export interface ProfileCardType {
 
 export interface PostType {
   author: PostUserType;
-  postType: string;
+  post_type: string;
   reposts: string[];
   content: string;
   media: {
@@ -97,6 +103,7 @@ export interface PostType {
   is_saved?: boolean;
   reactions: string[];
   reactions_count: number;
+  type?: string;
 
   stats?: {
     likes?: number;
@@ -128,6 +135,7 @@ export interface CommentType {
     media_type: "image" | "video" | "none";
   };
   reacts: string[];
+  type?: string;
   tagged_users: string[];
   is_edited: boolean;
   user_reaction?: string | null;
@@ -195,6 +203,7 @@ export interface PostUserType {
   profile_picture: string;
   connection_degree: string;
   headline: string;
+  followers_count?: number;
 }
 
 export type PostFilter = "all" | "comments" | "reactions" | "reposts";
@@ -405,8 +414,9 @@ export interface PostDBObject {
   media: string[]; // Array of media URLs or Base64 strings
   commentsDisabled: string; // Indicates if comments are disabled (e.g., "true" or "false")
   publicPost: boolean; // Whether the post is public or not
-  taggedUsers: string[]; // Array of user IDs tagged in the post
+  taggedUsers?: string[]; // Array of user IDs tagged in the post
   _id?: string;
+  repostedPost?: PostType;
 }
 
 export interface BioFormData {

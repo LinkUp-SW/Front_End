@@ -25,7 +25,6 @@ import {
   getEngagementButtons,
   getMenuActions,
   getPersonalMenuActions,
-  REPOST_MENU,
 } from "../components/Menus";
 import {
   Dialog,
@@ -52,7 +51,9 @@ import {
   createReaction,
   deletePost,
   deleteReaction,
+  fetchSinglePost,
   loadPostComments,
+  repostInstant,
   savePost,
   unsavePost,
 } from "@/endpoints/feed";
@@ -64,6 +65,7 @@ import {
   updatePost,
   addNewCommentToPost,
   addCommentsToPost,
+  unshiftPosts,
 } from "@/slices/feed/postsSlice";
 import { useDispatch, useSelector } from "react-redux";
 import DocumentPreview from "./modals/DocumentPreview";
@@ -74,6 +76,8 @@ import { RootState } from "@/store";
 import { FaCommentSlash } from "react-icons/fa";
 import CommentWithReplies from "./CommentWithReplies";
 import { openEditPostDialog } from "@/slices/feed/createPostSlice";
+import { EditIcon } from "lucide-react";
+import { BiRepost as RepostIcon } from "react-icons/bi";
 
 interface PostProps {
   postData: PostType;
@@ -89,17 +93,17 @@ const Post: React.FC<PostProps> = ({
   postData,
   viewMore,
   action,
-
   className,
 }) => {
-  // All hooks at the top level
   // State hooks
   const [isLandscape, setIsLandscape] = useState<boolean>(false);
   const [isSaved, setIsSaved] = useState<boolean>(postData?.is_saved || false);
   const [postMenuOpen, setPostMenuOpen] = useState(false);
   const [commentsOpen, setCommentsOpen] = useState(false);
   const [reactionsOpen, setReactionsOpen] = useState(false);
+  const [repostMenuOpen, setRepostMenuOpen] = useState(false);
   const [willDelete, setWillDelete] = useState(false);
+
   const [topStats, setTopStats] = useState(
     getReactionIcons(postData?.top_reactions || [])
   );
@@ -123,8 +127,6 @@ const Post: React.FC<PostProps> = ({
     hasInitiallyLoaded: postData.comments_data?.hasInitiallyLoaded || false,
   };
 
-  // useEffect hooks
-
   useEffect(() => {
     if (
       media &&
@@ -143,11 +145,9 @@ const Post: React.FC<PostProps> = ({
   }, [postData.is_saved]);
 
   useEffect(() => {
-    console.log("New POst:", postData);
     const commentButton = document.getElementById("engagement-Comment");
 
     if (commentButton && postData.comments_disabled === "No one") {
-      // Add disabled attribute and styles
       commentButton.setAttribute("disabled", "true");
       commentButton.classList.add(
         "opacity-50",
@@ -165,6 +165,7 @@ const Post: React.FC<PostProps> = ({
           postData.user_reaction.slice(1).toLowerCase()
       );
   }, [postData.user_reaction]);
+
   if (!postData || !postData._id) {
     return (
       <div className={className}>
@@ -172,10 +173,6 @@ const Post: React.FC<PostProps> = ({
       </div>
     );
   }
-
-  // Extract data needed for early hooks
-
-  // Extract all other data after hooks
 
   // Comment handling functions
   const handleToggleComments = async () => {
@@ -196,15 +193,6 @@ const Post: React.FC<PostProps> = ({
       await handleLoadComments();
     }
   };
-
-  // const postDB: PostDBObject = {
-  //   commentsDisabled: postData.commentsDisabled,
-  //   content: postData.content,
-  //   media: postData.media.link,
-  //   mediaType: postData.media.media_type as MediaType,
-  //   publicPost: postData.publicPost,
-  //   taggedUsers: postData.taggedUsers,
-  // };
 
   const handleLoadComments = async () => {
     if (!token) {
@@ -468,17 +456,78 @@ const Post: React.FC<PostProps> = ({
     setWillDelete(true);
   };
 
-  const blockPost = () => {
-    // To be implemented
+  const handleInstantRepost = async () => {
+    if (!token) {
+      toast.error("You must be logged in to repost.");
+      navigate("/login", { replace: true });
+      return;
+    }
+    try {
+      setRepostMenuOpen(false);
+      const loadingToastId = toast.loading("Reposting...");
+      const postPayload = {
+        media: [postData._id],
+        mediaType: "post",
+        postType: "Repost instant",
+      };
+      const result = await repostInstant(postPayload, token);
+      toast.success("Post reposted successfully!");
+      const post = await fetchSinglePost(result.postId, token);
+      if (post) {
+        // Prepare the post with comments-related fields
+        const postWithComments = {
+          ...post,
+          commentsCount: 0,
+          commentsData: {
+            comments: [],
+            count: 0,
+            nextCursor: null,
+          },
+        };
+
+        // Add the new post to the Redux store at the beginning of the list
+        dispatch(unshiftPosts([postWithComments]));
+      }
+      toast.dismiss(loadingToastId);
+    } catch (error) {
+      console.error("Error reposting:", error);
+      toast.error("Failed to repost. Please try again.");
+    }
   };
 
-  const reportPost = () => {
-    // To be implemented
+  const tempFunc = () => {
+    setRepostMenuOpen(false);
+    const postForEdit: PostDBObject = {
+      content: "",
+      mediaType: "post" as MediaType,
+      media: [postData._id],
+      commentsDisabled: "Anyone",
+      publicPost: true,
+      taggedUsers: [],
+      repostedPost: postData,
+    };
+
+    // Use the createPostSlice action instead of modal
+    dispatch(openEditPostDialog(postForEdit));
+
+    // Remove this line since we're using Redux now
+    // postModal.openEdit(postForEdit);
   };
 
-  const unfollow = () => {
-    // To be implemented
-  };
+  const REPOST_MENU = [
+    {
+      name: "Repost with your thoughts",
+      subtext: "Create a new post with this post attached",
+      callback: tempFunc,
+      icon: React.createElement(EditIcon, { className: "mr-2" }),
+    },
+    {
+      name: "Repost",
+      subtext: "Instantly bring this post to others' feeds",
+      callback: handleInstantRepost,
+      icon: React.createElement(RepostIcon, { className: "mr-2" }),
+    },
+  ];
 
   const handleDeletePost = async () => {
     if (!token) {
@@ -571,14 +620,7 @@ const Post: React.FC<PostProps> = ({
           postData._id,
           isSaved
         )
-      : getMenuActions(
-          handleSaveButton,
-          blockPost,
-          reportPost,
-          unfollow,
-          postData._id,
-          isSaved
-        );
+      : getMenuActions(handleSaveButton, postData._id, isSaved);
 
   const engagementButtons = getEngagementButtons(
     selectedReaction,
@@ -618,7 +660,7 @@ const Post: React.FC<PostProps> = ({
             </Link>
             <span className="text-gray-500 text-xs dark:text-neutral-400">
               <Link
-                to="#"
+                to={`/user-profile/${action.actor_username}`}
                 className="text-xs font-medium text-black dark:text-neutral-200 hover:cursor-pointer hover:underline hover:text-blue-600 dark:hover:text-blue-400"
               >
                 {action.actor_name}
@@ -630,6 +672,7 @@ const Post: React.FC<PostProps> = ({
         <PostHeader
           user={author}
           action={action}
+          postId={postData._id}
           postMenuOpen={postMenuOpen}
           setPostMenuOpen={setPostMenuOpen}
           menuActions={menuActions}
@@ -805,7 +848,7 @@ const Post: React.FC<PostProps> = ({
                             }
                           }}
                           id={`reaction-button-${index}`}
-                          className={`flex dark:hover:bg-zinc-800 dark:hover:text-neutral-200 ${
+                          className={`flex dark:hover:bg-gray-700 dark:hover:text-neutral-200 ${
                             selectedReaction === "Like"
                               ? "text-blue-700 dark:text-blue-500 hover:text-blue-700 dark:hover:text-blue-400"
                               : selectedReaction === "Insightful"
@@ -843,7 +886,10 @@ const Post: React.FC<PostProps> = ({
                         </Button>
                       </PopoverTrigger>
                     ) : button.name === "Repost" ? (
-                      <Popover>
+                      <Popover
+                        open={repostMenuOpen}
+                        onOpenChange={setRepostMenuOpen}
+                      >
                         <PopoverTrigger asChild>
                           <Button
                             key={`repost-${index}`}
@@ -851,7 +897,7 @@ const Post: React.FC<PostProps> = ({
                             size="lg"
                             id="repost-button"
                             onClick={button.callback}
-                            className={`flex dark:hover:bg-zinc-800 dark:hover:text-neutral-200 items-center gap-2 hover:cursor-pointer transition-all`}
+                            className={`flex dark:hover:bg-gray-700 dark:hover:text-neutral-200 items-center gap-2 hover:cursor-pointer transition-all`}
                           >
                             {button.icon}
                             {viewMore && button.name}
@@ -865,8 +911,8 @@ const Post: React.FC<PostProps> = ({
                                 variant="ghost"
                                 size="lg"
                                 id={`repost-button-${index}`}
-                                onClick={button.callback}
-                                className={`flex w-fit h-fit dark:hover:bg-zinc-800 dark:hover:text-neutral-200 items-center gap-2 hover:cursor-pointer transition-all`}
+                                onClick={item.callback}
+                                className={`flex w-fit h-fit dark:hover:bg-gray-700 dark:hover:text-neutral-200 items-center gap-2 hover:cursor-pointer transition-all`}
                               >
                                 <div className="flex justify-start w-full text-gray-600 dark:text-neutral-200">
                                   <div className="p-4 pl-0 ">{item.icon}</div>
@@ -891,7 +937,7 @@ const Post: React.FC<PostProps> = ({
                         id={`engagement-${button.name}`}
                         size="lg"
                         onClick={button.callback}
-                        className={`flex dark:hover:bg-zinc-800 dark:hover:text-neutral-200 items-center gap-2 hover:cursor-pointer transition-all`}
+                        className={`flex dark:hover:bg-gray-700 dark:hover:text-neutral-200 items-center gap-2 hover:cursor-pointer transition-all`}
                       >
                         {button.icon}
                         {viewMore && button.name}
@@ -919,7 +965,7 @@ const Post: React.FC<PostProps> = ({
                   ].map((reaction, index) => (
                     <Tooltip key={`reaction-${reaction.alt}`}>
                       <IconButton
-                        className={`hover:scale-200 hover:bg-gray-200 w-12 h-12 dark:hover:bg-zinc-800 duration-300 ease-in-out transform transition-all mx-0 hover:mx-7 hover:-translate-y-5`}
+                        className={`hover:scale-200 hover:bg-gray-200 w-12 h-12 dark:hover:bg-gray-700 duration-300 ease-in-out transform transition-all mx-0 hover:mx-7 hover:-translate-y-5`}
                         style={{
                           animation: `bounceIn 0.5s ease-in-out ${
                             index * 0.045
@@ -1000,6 +1046,7 @@ const Post: React.FC<PostProps> = ({
                   ? comments_data.comments
                   : [],
               }}
+              authorName={postData.author.first_name}
               existingComment={
                 action?.type === "comment" ? action?.comment : undefined
               }

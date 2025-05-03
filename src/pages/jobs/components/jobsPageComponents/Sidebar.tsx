@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaSortDown } from "react-icons/fa6";
-import { FaEdit } from "react-icons/fa";
+import { FaEdit, FaBookmark } from "react-icons/fa";
 import { FiTarget } from "react-icons/fi";
-import { SIDEBAR_MENU_ITEMS, FOOTER_LINKS } from "../../../../constants/index";
+import { FOOTER_LINKS } from "../../../../constants/index";
 import { getUserCompanies } from "@/endpoints/company"; 
 import { Company } from "../../types"; 
 
@@ -32,10 +32,8 @@ const Sidebar: React.FC = () => {
     fetchUserCompanies();
   }, []);
 
-  const handleMenuItemClick = (label: string) => {
-    if (label === "My jobs") {
-      navigate("/my-items/saved-jobs");
-    }
+  const handleMyJobsClick = () => {
+    navigate("/my-items/saved-jobs");
   };
 
   const handleCompanyClick = (companyId: string) => {
@@ -50,22 +48,19 @@ const Sidebar: React.FC = () => {
   return (
     <div className="w-full md:w-1/4 md:sticky md:top-20 md:self-start">
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow dark:shadow-gray-700 p-4 transition-colors">
-        {SIDEBAR_MENU_ITEMS.map((item, index) => (
-          <div
-            key={index}
-            id={`sidebar-item-${item.label.toLowerCase().replace(/\s+/g, "-")}`}
-            className="flex items-center gap-2 p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded cursor-pointer transition-colors"
-            onClick={() => handleMenuItemClick(item.label)}
-            role="button"
-          >
-            <span className="text-gray-600 dark:text-gray-300">
-              {React.createElement(item.icon, { size: 20 })}
-            </span>
-            <span className="font-medium text-gray-800 dark:text-gray-200">
-              {item.label}
-            </span>
-          </div>
-        ))}
+        <div
+          id="sidebar-item-my-jobs"
+          className="flex items-center gap-2 p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded cursor-pointer transition-colors"
+          onClick={handleMyJobsClick}
+          role="button"
+        >
+          <span className="text-gray-600 dark:text-gray-300">
+            <FaBookmark size={20} />
+          </span>
+          <span className="font-medium text-gray-800 dark:text-gray-200">
+            My jobs
+          </span>
+        </div>
 
         <div className="border-t dark:border-gray-700 my-4"></div>
 
@@ -104,18 +99,21 @@ const Sidebar: React.FC = () => {
                   className="flex items-center justify-between py-3 border-b border-gray-100 dark:border-gray-700 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                   onClick={() => handleCompanyClick(company._id)}
                 >
-                  <div className="flex items-center">
-                    <img 
-                      src={company.logo || "/src/assets/buildings.jpeg"} 
-                      alt={company.name} 
-                      className="w-8 h-8 bg-gray-200 dark:bg-gray-600 rounded mr-3"
-                    />
-                    <div>
-                      <p className="font-medium text-gray-800 dark:text-gray-200">{company.name}</p>
+                  <div className="flex items-center w-full min-w-0">
+                    <div className="flex-shrink-0 mr-3">
+                      <img 
+                        src={company.logo || "/src/assets/buildings.jpeg"} 
+                        alt={company.name} 
+                        className="w-8 h-8 bg-gray-200 dark:bg-gray-600 rounded"
+                      />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="font-medium text-gray-800 dark:text-gray-200 truncate" title={company.name}>
+                        {company.name}
+                      </p>
                       <p className="text-sm text-gray-500 dark:text-gray-400">Activity</p>
                     </div>
                   </div>
-                  <div className="text-blue-500 dark:text-blue-400 font-medium">0</div>
                 </div>
               ))
             )}

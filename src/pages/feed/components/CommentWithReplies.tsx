@@ -17,6 +17,7 @@ import { getReplies } from "@/endpoints/feed";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { addRepliesToComment } from "@/slices/feed/postsSlice";
+import CommentSkeleton from "./CommentSkeleton";
 
 interface CommentWithRepliesProps {
   handleCreateComment: (
@@ -26,10 +27,12 @@ interface CommentWithRepliesProps {
     setCommentInput: React.Dispatch<React.SetStateAction<string>>,
     commentId: string
   ) => void;
-  comment: CommentType;
+  comment: CommentType | undefined;
   postId: string;
   disableReplies: boolean;
   disableControls?: boolean;
+  disableActions?: boolean;
+  limitHeight?: boolean;
 }
 
 const user_token = Cookies.get("linkup_auth_token");
@@ -40,12 +43,11 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
   postId,
   disableReplies,
   disableControls = false,
+  disableActions = false,
+  limitHeight = false,
 }) => {
-  const replies = comment.children || [];
-  const hasMoreReplies = replies.length < (comment.children_count || 0);
-  console.log("Has more replies:", hasMoreReplies);
-  console.log("Comment:", comment);
-  console.log("Replies:", replies);
+  const replies = comment?.children || [];
+  const hasMoreReplies = replies.length < (comment?.children_count || 0);
   // State hooks
   const [showReplies, setShowReplies] = useState(true);
   const [mainCommentHeight, setMainCommentHeight] = useState(0);
@@ -55,7 +57,6 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [isLoadingReplies, setIsLoadingReplies] = useState(false);
   const [nextCursor, setNextCursor] = useState(0);
-  console.log("cursor:", nextCursor);
 
   // Refs
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -71,7 +72,7 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
   const dispatch = useDispatch();
 
   // Get comments from the comment.children property if replies not provided
-  const commentReplies = replies || comment.children || [];
+  const commentReplies = replies || comment?.children || [];
 
   // Effects
   useEffect(() => {
@@ -105,6 +106,10 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
       setReplyHeights(0);
     }
   }, [commentReplies, showReplies]);
+
+  if (!comment) {
+    return <CommentSkeleton />;
+  }
 
   const handleLoadMoreReplies = async () => {
     if (isLoadingReplies) return;
@@ -185,11 +190,12 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
       <div ref={commentRef}>
         <Comment
           comment={comment}
-          isReplyActive={isReplyActive}
           setIsReplyActive={setIsReplyActive}
           postId={postId}
           disableReplies={disableReplies}
           disableControls={disableControls}
+          disableActions={disableActions}
+          limitHeight={limitHeight}
         />
       </div>
 
@@ -220,7 +226,6 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
                   <div className="w-12 h-full rounded-full absolute bg-white dark:bg-gray-900 left-8" />
                   <Reply
                     comment={reply}
-                    isReplyActive={isReplyActive}
                     setIsReplyActive={setIsReplyActive}
                     postId={postId}
                     disableReplies={disableReplies}

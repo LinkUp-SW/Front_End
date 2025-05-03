@@ -24,11 +24,17 @@ import manOnChair from "../../../assets/man_on_chair.svg"; // Import the image
 const LIMIT = 100; // Number of items per page
 
 const FollowingFollowers: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<"following" | "followers">("following");
+  const [activeTab, setActiveTab] = useState<"following" | "followers">(
+    "following"
+  );
   const [following, setFollowing] = useState<Following[]>([]);
   const [followers, setFollowers] = useState<Followers[]>([]);
-  const [nextCursorFollowing, setNextCursorFollowing] = useState<string | null>(null);
-  const [nextCursorFollowers, setNextCursorFollowers] = useState<string | null>(null);
+  const [nextCursorFollowing, setNextCursorFollowing] = useState<string | null>(
+    null
+  );
+  const [nextCursorFollowers, setNextCursorFollowers] = useState<string | null>(
+    null
+  );
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [openDialogUserId, setOpenDialogUserId] = useState<string | null>(null);
@@ -181,9 +187,13 @@ const FollowingFollowers: React.FC = () => {
 
   const renderNoContent = () => (
     <div className="flex flex-col items-center justify-center p-4">
-      <img src={manOnChair} alt="No followers or following" className="w-48 h-48 sm:w-64 sm:h-64 mb-4" />
+      <img
+        src={manOnChair}
+        alt="No followers or following"
+        className="w-48 h-48 sm:w-64 sm:h-64 mb-4"
+      />
       <p className="text-lg sm:text-xl font-semibold text-gray-600 dark:text-gray-300">
-        No users to show yet. 
+        No users to show yet.
       </p>
     </div>
   );
@@ -257,10 +267,14 @@ const FollowingFollowers: React.FC = () => {
                     <DialogTrigger asChild>
                       <button
                         id="unfollow-button-1"
-                        className="destructiveBtn px-2 py-1 sm:px-4 sm:py-2 rounded-lg flex items-center text-xs sm:text-base whitespace-nowrap"
+                        className="px-3 py-1.5 text-sm border rounded-full text-blue-600 border-blue-600 
+                        hover:bg-blue-100 dark:hover:bg-gray-700 flex items-center justify-center gap-2 
+                        whitespace-nowrap max-w-full
+                        sm:px-4 sm:py-2 sm:text-base
+                        lg:px-5 lg:py-2.5 lg:text-lg"
                         onClick={() => setOpenDialogUserId(user.user_id)}
                       >
-                        Unfollow
+                        Following
                       </button>
                     </DialogTrigger>
                     <DialogContent
@@ -291,10 +305,14 @@ const FollowingFollowers: React.FC = () => {
                     <DialogTrigger asChild>
                       <button
                         id="unfollow-button-2"
-                        className="destructiveBtn px-2 py-1 sm:px-4 sm:py-2 rounded-lg flex items-center text-xs sm:text-base whitespace-nowrap"
+                        className="px-3 py-1.5 text-sm border rounded-full text-blue-600 border-blue-600 
+                        hover:bg-blue-100 dark:hover:bg-gray-700 flex items-center justify-center gap-2 
+                        whitespace-nowrap max-w-full
+                        sm:px-4 sm:py-2 sm:text-base
+                        lg:px-5 lg:py-2.5 lg:text-lg"
                         onClick={() => setOpenDialogUserId(user.user_id)}
                       >
-                        Unfollow
+                        Following
                       </button>
                     </DialogTrigger>
                     <DialogContent
@@ -317,12 +335,17 @@ const FollowingFollowers: React.FC = () => {
                   </Dialog>
                 ) : (
                   <button
-                    id="follow-button-3"
-                    className="affirmativeBtn px-2 py-1 sm:px-4 sm:py-2 rounded-lg flex items-center text-xs sm:text-base whitespace-nowrap"
-                    onClick={() => handleFollowUser(user.user_id)}
-                  >
-                    Follow
-                  </button>
+  id="follow-button-3"
+  className="px-3 py-1.5 text-sm border rounded-full text-green-600 border-green-600 
+             hover:bg-blue-100 dark:hover:bg-gray-700 flex items-center justify-center gap-2 
+             whitespace-nowrap max-w-full
+             sm:px-4 sm:py-2 sm:text-base
+             lg:px-5 lg:py-2.5 lg:text-lg"
+  onClick={() => handleFollowUser(user.user_id)}
+>
+  Follow
+</button>
+
                 )}
               </div>
             ))}

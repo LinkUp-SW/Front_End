@@ -50,7 +50,8 @@ import SettingsPage from "./admin/SettingsPage";
 import UsersPage from "./admin/UsersPage";
 import AnalyticsPage from "./admin/AnalyticsPage";
 import JobPostingsPage from "./admin/JobPostingsPage";
-import ContentModerationPage from "./admin/ContentModerationPage";
+import ContentModerationPage from "./admin/ContentModerationPage";import CompanyProfileView from "./company/CompanyProfile"
+
 //Export the Imported Pages
 export {
   LandingPage,
@@ -95,6 +96,7 @@ export {
   CompanyCreationPage,
   ManageCompanyPage,
   CreateJobPage,
+  CompanyProfileView,
   // Export new visibility pages
   VisibilityPage,
   BlockingListPage,

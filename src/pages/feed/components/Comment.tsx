@@ -38,7 +38,7 @@ import {
   TooltipTrigger,
 } from "@/components";
 import { DialogTrigger } from "@radix-ui/react-dialog";
-import ReportCommentModal from "./modals/ReportCommentModal";
+import ReportModal from "./modals/ReportModal";
 import ReactionsModal from "./modals/ReactionsModal";
 import {
   createReaction,
@@ -63,22 +63,24 @@ import UserTagging from "./UserTagging";
 
 export interface CommentProps {
   comment: CommentType;
-  isReplyActive: boolean;
   setIsReplyActive: React.Dispatch<React.SetStateAction<boolean>>;
   postId: string;
   disableReplies: boolean;
   disableControls?: boolean;
+  disableActions?: boolean;
+  limitHeight?: boolean;
 }
 
 const token = Cookies.get("linkup_auth_token");
 
 const Comment: React.FC<CommentProps> = ({
   comment,
-  isReplyActive,
   setIsReplyActive,
   postId,
   disableReplies,
-  disableControls,
+  disableControls = false,
+  disableActions = false,
+  limitHeight = false,
 }) => {
   const {
     profile_picture,
@@ -99,11 +101,9 @@ const Comment: React.FC<CommentProps> = ({
   const myUserId = Cookies.get("linkup_user_id");
 
   const [commentMenuOpen, setCommentMenuOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
   const [selectedReaction, setSelectedReaction] = useState("None"); // Like, Love, etc.
   const [reactionsOpen, setReactionsOpen] = useState(false); // for Popover open state
-  const [viewMore, setViewMore] = useState(false); // if you want to toggle text next to icons
   const [topStats, setTopStats] = useState(
     getReactionIcons(comment.top_reactions || [])
   );
@@ -112,6 +112,13 @@ const Comment: React.FC<CommentProps> = ({
   const [editingImage, setEditingImage] = useState<File | null>(null);
   const editInputRef = useRef<HTMLTextAreaElement>(null);
   const editFileInputRef = useRef<HTMLInputElement>(null);
+
+  const closeModal = () => {
+    const closeButton = document.getElementById("modal-close-button");
+    if (closeButton instanceof HTMLButtonElement) {
+      closeButton.click();
+    }
+  };
 
   const handleMouseEnter = () => {
     setReactionsOpen(true);
@@ -122,7 +129,6 @@ const Comment: React.FC<CommentProps> = ({
   };
 
   useEffect(() => {
-    setIsLoading(true);
     const fetchData = async () => {
       try {
         // Call both endpoints concurrently
@@ -132,8 +138,6 @@ const Comment: React.FC<CommentProps> = ({
     };
 
     fetchData();
-    setIsLoading(false);
-    console.log(isLoading, setViewMore, media);
 
     if (comment.user_reaction)
       setSelectedReaction(
@@ -186,17 +190,6 @@ const Comment: React.FC<CommentProps> = ({
     const toastId = toast.loading("Updating your comment...");
 
     try {
-      console.log({
-        post_id: postId,
-        comment_id: comment._id,
-        content: editInput,
-        media: editingImage
-          ? URL.createObjectURL(editingImage)
-          : media?.link || "",
-        tagged_users: [], // Add tagged users handling if needed
-      });
-      if (editingImage)
-        console.log("Editing Image", URL.createObjectURL(editingImage));
       let mediaData: string | undefined = media?.link;
       if (editingImage) {
         // Convert image to base64
@@ -209,13 +202,7 @@ const Comment: React.FC<CommentProps> = ({
       } else {
         mediaData = "";
       }
-      console.log("Sending:", {
-        post_id: postId,
-        comment_id: comment._id,
-        content: editInput,
-        media: mediaData.length === 0 ? null : mediaData,
-        tagged_users: [], // Add tagged users handling if needed
-      });
+
       const result = await editComment(
         {
           post_id: postId,
@@ -226,16 +213,6 @@ const Comment: React.FC<CommentProps> = ({
         },
         token
       );
-      console.log("Updated comment", {
-        postId,
-        commentId: comment._id,
-        content: editInput,
-        media: {
-          link: result.comment.media.link,
-          media_type: "image",
-        },
-        is_edited: true,
-      });
 
       if (result.comment.media.length != 0) {
         dispatch(
@@ -290,7 +267,6 @@ const Comment: React.FC<CommentProps> = ({
     try {
       // Show loading indicator or toast if needed
       const result = await createReaction(reaction, postId, token);
-      console.log("Adding reaction", result);
       setTopStats(getReactionIcons(result.top_reactions || []));
       dispatch(
         updateCommentReaction({
@@ -344,7 +320,7 @@ const Comment: React.FC<CommentProps> = ({
 
   const handleDeleteComment = async () => {
     if (!token) {
-      toast.error("You must be logged in to delete a post.");
+      toast.error("You must be logged in to delete a comment.");
       navigate("/login", { replace: true });
       return;
     }
@@ -354,17 +330,9 @@ const Comment: React.FC<CommentProps> = ({
     try {
       // Call the API to delete the post
 
-      const result = await deleteComment(
-        { comment_id: comment._id, post_id: postId },
-        token
-      );
-      console.log("Deleted:", result);
+      await deleteComment({ comment_id: comment._id, post_id: postId }, token);
 
-      console.log("Comment:", comment);
       if (comment.parent_id) {
-        console.log(
-          `Removing reply ${comment._id} from parent ${comment.parent_id}`
-        );
         dispatch(
           removeReply({
             postId,
@@ -421,14 +389,18 @@ const Comment: React.FC<CommentProps> = ({
               <h2 className="text-xs font-semibold sm:text-sm hover:cursor-pointer hover:underline hover:text-blue-600 dark:hover:text-blue-400">
                 {first_name + " " + last_name}
               </h2>
-              <p className="text-lg text-gray-500 dark:text-neutral-400 font-bold">
-                {" "}
-                ·
-              </p>
-              <p className="text-xs text-gray-500 dark:text-neutral-400">
-                {" "}
-                {connection_degree}
-              </p>
+              {connection_degree && (
+                <>
+                  <p className="text-lg text-gray-500 dark:text-neutral-400 font-bold">
+                    {" "}
+                    ·
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-neutral-400">
+                    {" "}
+                    {connection_degree}
+                  </p>
+                </>
+              )}
             </Link>
             <nav className={`flex relative left-5`}>
               <div className="flex gap-x-1 items-baseline text-xs dark:text-neutral-400 text-gray-500">
@@ -437,7 +409,7 @@ const Comment: React.FC<CommentProps> = ({
                     <span>(edited) </span>
                   </>
                 )}
-                <time className="">{timeAgo}</time>
+                <time className="pr-2">{timeAgo}</time>
               </div>
               <Dialog
                 open={deleteModal}
@@ -470,23 +442,37 @@ const Comment: React.FC<CommentProps> = ({
                 </DialogContent>
               </Dialog>
               <Dialog>
-                <Popover
-                  open={commentMenuOpen}
-                  onOpenChange={setCommentMenuOpen}
-                >
-                  <PopoverTrigger className="rounded-full relative -top-2 light:hover:bg-gray-100 transition-colors dark:hover:bg-zinc-700 hover:cursor-pointer dark:hover:text-neutral-200 h-8 gap-1.5 px-3 has-[>svg]:px-2.5">
-                    <EllipsisIcon
-                      onClick={() => setCommentMenuOpen(!commentMenuOpen)}
-                    />
-                  </PopoverTrigger>
-                  <PopoverContent className="relative right-30 dark:bg-gray-900 bg-white border-neutral-200 dark:border-gray-700 p-0 pt-1">
-                    <div className="flex flex-col w-full p-0">
-                      {menuActions.map((item, index) =>
-                        item.name == "Report Comment" ? (
-                          <DialogTrigger key={index} asChild>
+                {!disableActions && (
+                  <Popover
+                    open={commentMenuOpen}
+                    onOpenChange={setCommentMenuOpen}
+                  >
+                    <PopoverTrigger className="rounded-full relative -top-2 light:hover:bg-gray-100 transition-colors dark:hover:bg-zinc-700 hover:cursor-pointer dark:hover:text-neutral-200 h-8 gap-1.5 px-3 has-[>svg]:px-2.5">
+                      <EllipsisIcon
+                        onClick={() => setCommentMenuOpen(!commentMenuOpen)}
+                      />
+                    </PopoverTrigger>
+                    <PopoverContent className="relative right-30 dark:bg-gray-900 bg-white border-neutral-200 dark:border-gray-700 p-0 pt-1">
+                      <div className="flex flex-col w-full p-0">
+                        {menuActions.map((item, index) =>
+                          item.name == "Report Comment" ? (
+                            <DialogTrigger key={index} asChild>
+                              <Button
+                                key={index}
+                                onClick={() => {
+                                  setCommentMenuOpen(false);
+                                }}
+                                className="flex justify-start items-center rounded-none h-12 bg-transparent w-full p-0 m-0 hover:bg-neutral-200 text-gray-900 dark:text-neutral-200 dark:hover:bg-gray-600 hover:cursor-pointer"
+                              >
+                                {item.icon}
+                                <span>{item.name}</span>
+                              </Button>
+                            </DialogTrigger>
+                          ) : (
                             <Button
                               key={index}
                               onClick={() => {
+                                item.action();
                                 setCommentMenuOpen(false);
                               }}
                               className="flex justify-start items-center rounded-none h-12 bg-transparent w-full p-0 m-0 hover:bg-neutral-200 text-gray-900 dark:text-neutral-200 dark:hover:bg-gray-600 hover:cursor-pointer"
@@ -494,26 +480,23 @@ const Comment: React.FC<CommentProps> = ({
                               {item.icon}
                               <span>{item.name}</span>
                             </Button>
-                          </DialogTrigger>
-                        ) : (
-                          <Button
-                            key={index}
-                            onClick={() => {
-                              item.action();
-                              setCommentMenuOpen(false);
-                            }}
-                            className="flex justify-start items-center rounded-none h-12 bg-transparent w-full p-0 m-0 hover:bg-neutral-200 text-gray-900 dark:text-neutral-200 dark:hover:bg-gray-600 hover:cursor-pointer"
-                          >
-                            {item.icon}
-                            <span>{item.name}</span>
-                          </Button>
-                        )
-                      )}
-                    </div>
-                  </PopoverContent>
-                </Popover>
-                <DialogContent>
-                  <ReportCommentModal />
+                          )
+                        )}
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                )}
+
+                <DialogContent className="dark:bg-gray-900 border-0">
+                  <DialogTitle className="text-2xl dark:text-neutral-200">
+                    Report this comment
+                  </DialogTitle>
+                  <DialogDescription />
+                  <ReportModal
+                    onClose={closeModal}
+                    type="Comment"
+                    contentId={comment._id}
+                  />
                 </DialogContent>
               </Dialog>
             </nav>
@@ -640,6 +623,7 @@ const Comment: React.FC<CommentProps> = ({
               lineCount={3}
               id={`comment-${comment._id}`}
               className="ml-0 relative -left-5"
+              limitHeight={limitHeight}
             />
           </div>
         )}
@@ -680,7 +664,7 @@ const Comment: React.FC<CommentProps> = ({
                   if (selectedReaction === "None") handleReact("Like");
                   else handleReact("None");
                 }}
-                className={`flex dark:hover:bg-zinc-800 dark:hover:text-neutral-200 ${
+                className={`flex dark:hover:bg-gray-700 dark:hover:text-neutral-200 ${
                   selectedReaction === "Like"
                     ? "text-blue-700 dark:text-blue-500 hover:text-blue-700 dark:hover:text-blue-400"
                     : selectedReaction === "Insightful"
@@ -711,11 +695,7 @@ const Comment: React.FC<CommentProps> = ({
                     <LikeEmoji /> Like{" "}
                   </div>
                 )}
-                {selectedReaction == "None"
-                  ? viewMore
-                    ? "Like"
-                    : ""
-                  : selectedReaction}
+                {selectedReaction == "None" ? "" : selectedReaction}
               </Button>
             </PopoverTrigger>
             <TooltipProvider>
@@ -736,7 +716,7 @@ const Comment: React.FC<CommentProps> = ({
                   ].map((reaction, index) => (
                     <Tooltip key={`reaction-${reaction.alt}`}>
                       <IconButton
-                        className={`hover:scale-200 hover:bg-gray-200 w-12 h-12 dark:hover:bg-zinc-800 duration-300 ease-in-out transform transition-all mx-0 hover:mx-7 hover:-translate-y-5`}
+                        className={`hover:scale-200 hover:bg-gray-200 w-12 h-12 dark:hover:bg-gray-700 duration-300 ease-in-out transform transition-all mx-0 hover:mx-7 hover:-translate-y-5`}
                         style={{
                           animation: `bounceIn 0.5s ease-in-out ${
                             index * 0.045
@@ -836,7 +816,7 @@ const Comment: React.FC<CommentProps> = ({
             </>
           )}
           <p className="text-gray-500">| </p>
-          {disableReplies && isReplyActive && (
+          {!disableReplies && (
             <>
               <Button
                 variant="ghost"
@@ -857,7 +837,7 @@ const Comment: React.FC<CommentProps> = ({
                   {" "}
                   ·
                 </p>
-                <p className="hover:underlinetext-xs text-xs text-gray-500 line-clamp-1 text-ellipsis dark:text-neutral-400 hover:text-blue-600 hover:underline dark:hover:text-blue-400 hover:cursor-pointer">
+                <p className=" text-xs text-gray-500 line-clamp-1 text-ellipsis dark:text-neutral-400 ">
                   {comment.children_count &&
                   comment.children_count != 0 &&
                   comment.children_count == 1
