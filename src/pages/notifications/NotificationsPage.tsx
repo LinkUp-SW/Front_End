@@ -19,23 +19,33 @@ import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 // Import socket service and context
-import { socketService, IncomingNotification, IncomingNotificationCount } from "@/services/socket";
+import {
+  socketService,
+  IncomingNotification,
+  IncomingNotificationCount,
+} from "@/services/socket";
 import { useSocketContext } from "@/components/hoc/SocketProvider";
 
 // Helper function to validate notification types
-const validateNotificationType = (type: string): Notification['type'] => {
-  const validTypes: Notification['type'][] = [
-    'reacted', 'message', 'connection_request', 
-    'comment', 'follow', 'connection_accepted'
+const validateNotificationType = (type: string): Notification["type"] => {
+  const validTypes: Notification["type"][] = [
+    "reacted",
+    "message",
+    "connection_request",
+    "comment",
+    "follow",
+    "connection_accepted",
   ];
-  
-  if (validTypes.includes(type as Notification['type'])) {
-    return type as Notification['type'];
+
+  if (validTypes.includes(type as Notification["type"])) {
+    return type as Notification["type"];
   }
-  
+
   // Default to 'message' if type is invalid
-  console.warn(`Invalid notification type received: ${type}, defaulting to 'message'`);
-  return 'message';
+  console.warn(
+    `Invalid notification type received: ${type}, defaulting to 'message'`
+  );
+  return "message";
 };
 
 export type Tab = "all" | "posts" | "messages";
@@ -107,10 +117,10 @@ const NotificationsPage: React.FC = () => {
   const [isMobile, setIsMobile] = useState<boolean>(window.innerWidth <= 768);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
-  
+
   // Get socket connection status from context
   const { connected: socketConnected } = useSocketContext();
-  
+
   // Ref to track if notifications have been loaded
   const notificationsLoaded = useRef(false);
 
@@ -118,11 +128,13 @@ const NotificationsPage: React.FC = () => {
     (state: RootState) => state.theme.theme === "dark"
   );
   const token = Cookies.get("linkup_auth_token");
-  const userId = Cookies.get('linkup_user_id');
+  const userId = Cookies.get("linkup_user_id");
 
   const fetchNotifications = async () => {
     if (!token) {
-      console.error("Authentication token not found, can't fetch notifications");
+      console.error(
+        "Authentication token not found, can't fetch notifications"
+      );
       setError("Authentication token not found");
       setLoading(false);
       return;
@@ -156,10 +168,9 @@ const NotificationsPage: React.FC = () => {
 
   // Handle new notifications from socket
   const handleNewNotification = useCallback((data: IncomingNotification) => {
-    
     // Validate the notification type
     const notificationType = validateNotificationType(data.type);
-    
+
     // Convert the socket notification to the app's Notification type
     const newNotification: Notification = {
       id: data.id,
@@ -170,52 +181,56 @@ const NotificationsPage: React.FC = () => {
       referenceId: data.referenceId,
       sender: {
         id: data.senderId,
-        firstName: data.senderName.split(' ')[0] || '',
-        lastName: data.senderName.split(' ')[1] || '',
-        profilePhoto: data.senderPhoto || '/api/placeholder/50/50' // Default if null
-      }
+        firstName: data.senderName.split(" ")[0] || "",
+        lastName: data.senderName.split(" ")[1] || "",
+        profilePhoto: data.senderPhoto || "/api/placeholder/50/50", // Default if null
+      },
     };
-    
-    
+
     // Add it to the notifications list (at the beginning since it's newest)
-    setNotifications(prev => {
+    setNotifications((prev) => {
       // Check if this notification already exists in the list
-      const exists = prev.some(n => n.id === newNotification.id);
+      const exists = prev.some((n) => n.id === newNotification.id);
       if (exists) {
         return prev;
       }
-      
+
       return [newNotification, ...prev];
     });
-    
+
     // Increment unread count
-    setUnreadCount(prevCount => {
+    setUnreadCount((prevCount) => {
       const newCount = prevCount + 1;
       return newCount;
     });
   }, []);
 
   // Handle unread notification count updates from socket
-  const handleUnreadNotificationsCount = useCallback((data: IncomingNotificationCount) => {
-    setUnreadCount(data.count);
-  }, []);
+  const handleUnreadNotificationsCount = useCallback(
+    (data: IncomingNotificationCount) => {
+      setUnreadCount(data.count);
+    },
+    []
+  );
 
   // Connect to socket and register event listeners
-  useEffect(() => {    
+  useEffect(() => {
     if (token) {
       // If socket is connected, register listeners
-      if (socketConnected) {        
+      if (socketConnected) {
         // Register socket event listeners
-        const removeNewNotificationListener = socketService.on<IncomingNotification>(
-          'new_notification', 
-          handleNewNotification
-        );
-        
-        const removeUnreadCountListener = socketService.on<IncomingNotificationCount>(
-          'unread_notifications_count', 
-          handleUnreadNotificationsCount
-        );
-        
+        const removeNewNotificationListener =
+          socketService.on<IncomingNotification>(
+            "new_notification",
+            handleNewNotification
+          );
+
+        const removeUnreadCountListener =
+          socketService.on<IncomingNotificationCount>(
+            "unread_notifications_count",
+            handleUnreadNotificationsCount
+          );
+
         // Cleanup listeners when component unmounts
         return () => {
           removeNewNotificationListener();
@@ -226,7 +241,12 @@ const NotificationsPage: React.FC = () => {
         // attempt reconnection or inform the user
       }
     }
-  }, [token, socketConnected, handleNewNotification, handleUnreadNotificationsCount]);
+  }, [
+    token,
+    socketConnected,
+    handleNewNotification,
+    handleUnreadNotificationsCount,
+  ]);
 
   // Fetch notifications when component mounts
   useEffect(() => {
@@ -300,7 +320,6 @@ const NotificationsPage: React.FC = () => {
       return;
     }
 
-    
     // Optimistically update the UI
     setClickedNotifications((prev) => {
       const newSet = new Set(prev);
@@ -333,7 +352,7 @@ const NotificationsPage: React.FC = () => {
       if (!socketConnected) {
         await updateUnreadCount();
       }
-      
+
       // Navigate to the appropriate page based on notification type
       handleNavigation(notification.type, notification.referenceId);
     } catch (error) {
@@ -393,14 +412,14 @@ const NotificationsPage: React.FC = () => {
     if (!notifications.length || !token) {
       return;
     }
-    
+
     try {
       if (socketConnected) {
         socketService.markAllNotificationsAsRead();
-        
+
         // Optimistically update UI
-        setNotifications(prevNotifications => 
-          prevNotifications.map(item => ({ ...item, isRead: true }))
+        setNotifications((prevNotifications) =>
+          prevNotifications.map((item) => ({ ...item, isRead: true }))
         );
         setUnreadCount(0);
       } else {
@@ -475,7 +494,6 @@ const NotificationsPage: React.FC = () => {
   };
 
   const handleNavigation = (type: Notification["type"], refId: string) => {
-    
     if (type === "connection_request") {
       return navigate(`/my-network`);
     }
@@ -485,14 +503,13 @@ const NotificationsPage: React.FC = () => {
     if (type === "message") {
       return navigate("/messaging");
     }
-    if (type === 'comment' || type === 'reacted') {
-      return navigate(`/feed/posts/${refId}`)
+    if (type === "comment" || type === "reacted") {
+      return navigate(`/feed/posts/${refId}`);
     }
-    if (type === 'connection_accepted') {
-      return navigate(`/connections/${userId}`)
+    if (type === "connection_accepted") {
+      return navigate(`/connections/${userId}`);
     }
   };
-
 
   return (
     <div className={`${styles.container} ${isDarkMode ? styles.darkMode : ""}`}>
@@ -505,7 +522,7 @@ const NotificationsPage: React.FC = () => {
               View settings
             </a>
             {unReadCount > 0 && (
-              <button 
+              <button
                 className={styles.markAllReadButton}
                 onClick={handleMarkAllAsRead}
               >
@@ -514,9 +531,12 @@ const NotificationsPage: React.FC = () => {
             )}
             {/* Display socket connection status for debugging */}
             <div className={styles.socketStatus}>
-              Socket: {socketConnected ? 
-                <span className={styles.connected}>Connected</span> : 
-                <span className={styles.disconnected}>Disconnected</span>}
+              Socket:{" "}
+              {socketConnected ? (
+                <span className={styles.connected}>Connected</span>
+              ) : (
+                <span className={styles.disconnected}>Disconnected</span>
+              )}
             </div>
           </div>
         </div>
@@ -652,7 +672,10 @@ const NotificationsPage: React.FC = () => {
                           className={styles.actionButton}
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleNavigation(notification.type, notification.referenceId);
+                            handleNavigation(
+                              notification.type,
+                              notification.referenceId
+                            );
                           }}
                         >
                           View {notification.type}

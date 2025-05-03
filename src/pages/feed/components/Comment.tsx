@@ -60,6 +60,7 @@ import { updateComment } from "@/slices/feed/postsSlice";
 import { FormattedContentText } from "./modals/CreatePostModal";
 import { hasRichFormatting } from "@/utils";
 import UserTagging from "./UserTagging";
+import { socketService } from "@/services/socket";
 
 export interface CommentProps {
   comment: CommentType;
@@ -267,6 +268,8 @@ const Comment: React.FC<CommentProps> = ({
     try {
       // Show loading indicator or toast if needed
       const result = await createReaction(reaction, postId, token);
+      if(username!==myUserId)
+              socketService.sendNotification(username, myUserId as string, 'reacted',undefined,'Someone reacted on a post')
       setTopStats(getReactionIcons(result.top_reactions || []));
       dispatch(
         updateCommentReaction({

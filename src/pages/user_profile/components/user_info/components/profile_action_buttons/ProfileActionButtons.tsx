@@ -32,6 +32,7 @@ import { blockUser } from "@/endpoints/userProfile";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { editUserBio } from "@/slices/user_profile/userBioSlice";
+import { socketService } from "@/services/socket";
 
 export type FollowStatus = {
   isFollowing?: boolean;
@@ -121,6 +122,7 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
         id as string,
         email
       );
+      socketService.sendNotification(id as string, Cookies.get('linkup_user_id') as string, 'connection_request',undefined,'new connection request')
       toast.success(response.message);
       setLocalFollowStatus((prev) => ({
         ...prev,

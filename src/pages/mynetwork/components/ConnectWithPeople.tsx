@@ -17,6 +17,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import axios from "axios";
 import { Button, FormInput } from "@/components";
+import { socketService } from "@/services/socket";
 
 interface PeopleSectionProps {
   token: string;
@@ -113,6 +114,8 @@ const PeopleSection = ({ token, context, title }: PeopleSectionProps) => {
       setConnectingIds((prev) => [...prev, userId]);
 
       await connectWithUser(token, userId, email || "");
+      socketService.sendNotification(userId as string, Cookies.get('linkup_user_id') as string, 'connection_request',undefined,'new connection request')
+      
       // Remove from both main view and all suggestions
       setMainViewSuggestions((prev) =>
         prev.filter((p) => p.user_id !== userId)
