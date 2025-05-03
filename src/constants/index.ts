@@ -1,10 +1,8 @@
 import { GoHomeFill } from "react-icons/go";
 import { FaPeopleGroup } from "react-icons/fa6";
-import { FaBell, FaBriefcase, FaUserAlt, FaBookmark } from "react-icons/fa";
+import { FaBell, FaBriefcase, FaUserAlt} from "react-icons/fa";
 import { BsChatDotsFill } from "react-icons/bs";
-import { BiSliderAlt } from "react-icons/bi";
 import { HiOutlineDocumentText } from "react-icons/hi";
-import { BsBarChartLine } from "react-icons/bs";
 import { CgTimelapse } from "react-icons/cg";
 import { RiMoreLine } from "react-icons/ri";
 

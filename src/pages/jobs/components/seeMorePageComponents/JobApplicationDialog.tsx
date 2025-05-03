@@ -2,14 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent } from '@/components';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
-import { Job } from '@/pages/jobs/types';
 import { IoMdDownload } from 'react-icons/io';
+import { Job } from '@/pages/jobs/types';
 import { 
   UserInfo, 
   JobApplicationData, 
   fetchUserJobApplicationInfo, 
   submitJobApplication 
 } from '@/endpoints/jobs';
+import { COUNTRY_PHONE_CODE_MAP } from "@/constants/index"; 
 
 interface JobApplicationDialogProps {
   open: boolean;
@@ -246,15 +247,14 @@ const JobApplicationDialog: React.FC<JobApplicationDialogProps> = ({
 
   // Get country name from country code
   const getCountryName = (code: string) => {
-    const countries: {[key: string]: string} = {
-      '+20': 'Egypt',
-      '+1': 'United States',
-      '+44': 'United Kingdom',
-      '+971': 'UAE',
-      '+966': 'Saudi Arabia'
-    };
+    // Create a reverse mapping from phone code to country name
+    const reverseMap: {[key: string]: string} = {};
     
-    return countries[code] || '';
+    for (const [country, phoneCode] of Object.entries(COUNTRY_PHONE_CODE_MAP)) {
+      reverseMap[phoneCode] = country;
+    }
+    
+    return reverseMap[code] || '';
   };
 
   return (
@@ -356,11 +356,11 @@ const JobApplicationDialog: React.FC<JobApplicationDialogProps> = ({
                             required
                           >
                             <option value="">Select a country code</option>
-                            <option value="+20">Egypt (+20)</option>
-                            <option value="+1">United States (+1)</option>
-                            <option value="+44">United Kingdom (+44)</option>
-                            <option value="+971">UAE (+971)</option>
-                            <option value="+966">Saudi Arabia (+966)</option>
+                            {Object.entries(COUNTRY_PHONE_CODE_MAP).map(([country, code]) => (
+                              <option key={code} value={code}>
+                                {country} ({code})
+                              </option>
+                            ))}
                           </select>
                           <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700 dark:text-gray-300">
                             <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
