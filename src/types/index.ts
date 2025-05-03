@@ -77,6 +77,7 @@ export interface PostType {
   post_type: string;
   reposts: string[];
   content: string;
+  reposts_count: number;
   media: {
     link: string[];
     media_type: "image" | "images" | "video" | "link" | "pdf" | "post" | "none";
@@ -88,6 +89,7 @@ export interface PostType {
     isLoading?: boolean;
     hasInitiallyLoaded?: boolean;
   };
+  original_post?: PostType;
   comments_count?: number;
   top_reactions?: string[];
   comments_disabled: string;
