@@ -14,7 +14,7 @@ interface PageFormProps {
   isSubmitting: boolean;
 }
 
-export const PageForm: React.FC<PageFormProps> = ({ type, onSubmit, setPreviewData }) => {
+export const PageForm: React.FC<PageFormProps> = ({ type, onSubmit, setPreviewData, isSubmitting }) => {
   const [formData, setFormData] = useState<CompanyProfileData>({
     name: '',
     category_type: type,
@@ -27,7 +27,7 @@ export const PageForm: React.FC<PageFormProps> = ({ type, onSubmit, setPreviewDa
     type: '',
   });
   
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [charCount, setCharCount] = useState(0);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   
@@ -42,13 +42,59 @@ export const PageForm: React.FC<PageFormProps> = ({ type, onSubmit, setPreviewDa
     }
   }, [formData.name, formData.description, logoPreview, setPreviewData]);
 
+  const validateField = (name: string, value: string): string => {
+    switch (name) {
+      case 'name':
+        if (!value.trim()) return 'Name is required';
+        if (value.length > 50) return 'Name must be less than 50 characters';
+        return '';
+      
+      case 'website':
+        if (value && !value.match(/^(https?:\/\/|www\.)/i)) {
+          return 'Website must start with http://, https://, or www.';
+        }
+        return '';
+      
+      case 'industry':
+        if (!value.trim()) return 'Industry is required';
+        if (value.length > 50) return 'Industry must be less than 50 characters';
+        return '';
+      
+      case 'description':
+        if (!value.trim()) return 'Description is required';
+        return '';
+      
+      default:
+        return '';
+    }
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
+    
+    // Validate on change
+    const error = validateField(name, value);
+    
+    setErrors(prev => ({
+      ...prev,
+      [name]: error
+    }));
+    
     setFormData((prevData: CompanyProfileData) => ({ ...prevData, [name]: value }));
     
     if (name === 'description') {
       setCharCount(value.length);
     }
+  };
+  
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    const error = validateField(name, value);
+    
+    setErrors(prev => ({
+      ...prev,
+      [name]: error
+    }));
   };
   
   const handleLogoUpload = (e: ChangeEvent<HTMLInputElement>) => {
@@ -84,28 +130,39 @@ export const PageForm: React.FC<PageFormProps> = ({ type, onSubmit, setPreviewDa
   };
   
   const validateForm = (): boolean => {
-    // Basic validation
-    if (!formData.name.trim()) {
-      toast.error('Name is required.');
-      return false;
+    // Validate all fields
+    const newErrors: Record<string, string> = {};
+    let isValid = true;
+    
+    // Validate required fields
+    Object.entries(formData).forEach(([key, value]) => {
+      if (['name', 'industry', 'size', 'type', 'description'].includes(key)) {
+        const error = validateField(key, value as string);
+        if (error) {
+          newErrors[key] = error;
+          isValid = false;
+        }
+      }
+    });
+    
+    // Validate website if provided
+    if (formData.website) {
+      const websiteError = validateField('website', formData.website);
+      if (websiteError) {
+        newErrors.website = websiteError;
+        isValid = false;
+      }
     }
     
-    if (!formData.industry.trim()) {
-      toast.error('Industry is required.');
-      return false;
+    setErrors(newErrors);
+    
+    if (!isValid) {
+      // Show error for the first invalid field
+      const firstError = Object.values(newErrors)[0];
+      toast.error(firstError);
     }
     
-    if (!formData.size) {
-      toast.error('Organization size is required.');
-      return false;
-    }
-    
-    if (!formData.type) {
-      toast.error('Organization type is required.');
-      return false;
-    }
-    
-    return true;
+    return isValid;
   };
   
   const handleSubmitForm = async (e: FormEvent) => {
@@ -114,8 +171,6 @@ export const PageForm: React.FC<PageFormProps> = ({ type, onSubmit, setPreviewDa
     if (!validateForm()) {
       return;
     }
-    
-    setIsSubmitting(true);
     
     try {
       console.log('Submitting form data:', formData);
@@ -137,11 +192,9 @@ export const PageForm: React.FC<PageFormProps> = ({ type, onSubmit, setPreviewDa
       toast.success(`${type === 'company' ? 'Company' : 'Education'} profile created successfully!`);
       
       onSubmit(e);
-    } catch  {
-      console.error('Error creating company profile:');
-      
-    } finally {
-      setIsSubmitting(false);
+    } catch (error) {
+      console.error('Error creating company profile:', error);
+      toast.error('Failed to create profile. Please try again.');
     }
   };
 
@@ -156,10 +209,13 @@ export const PageForm: React.FC<PageFormProps> = ({ type, onSubmit, setPreviewDa
           name="name"
           value={formData.name}
           onChange={handleChange}
+          onBlur={handleBlur}
           placeholder="Add your organization's name" 
-          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200"
+          className={`w-full px-3 py-2 border ${errors.name ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'} rounded focus:outline-none focus:ring-1 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200`}
           required
         />
+        {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
+        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Maximum 50 characters</p>
       </div>
 
       <div className="mb-6">
@@ -169,9 +225,11 @@ export const PageForm: React.FC<PageFormProps> = ({ type, onSubmit, setPreviewDa
           name="website"
           value={formData.website || ''}
           onChange={handleChange}
+          onBlur={handleBlur}
           placeholder="Begin with http://, https:// or www." 
-          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200"
+          className={`w-full px-3 py-2 border ${errors.website ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'} rounded focus:outline-none focus:ring-1 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200`}
         />
+        {errors.website && <p className="text-red-500 text-xs mt-1">{errors.website}</p>}
       </div>
 
       <div className="mb-6">
@@ -181,10 +239,13 @@ export const PageForm: React.FC<PageFormProps> = ({ type, onSubmit, setPreviewDa
           name="industry"
           value={formData.industry}
           onChange={handleChange}
+          onBlur={handleBlur}
           placeholder="ex: Information Services" 
-          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200"
+          className={`w-full px-3 py-2 border ${errors.industry ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'} rounded focus:outline-none focus:ring-1 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200`}
           required
         />
+        {errors.industry && <p className="text-red-500 text-xs mt-1">{errors.industry}</p>}
+        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Maximum 50 characters</p>
       </div>
 
       <div className="mb-6">
@@ -194,7 +255,8 @@ export const PageForm: React.FC<PageFormProps> = ({ type, onSubmit, setPreviewDa
             name="size"
             value={formData.size}
             onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded appearance-none focus:outline-none focus:ring-1 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200"
+            onBlur={handleBlur}
+            className={`w-full px-3 py-2 border ${errors.size ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'} rounded appearance-none focus:outline-none focus:ring-1 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200`}
             required
           >
             <option value="" className="dark:bg-gray-800 dark:text-gray-200">Select size</option>
@@ -213,6 +275,7 @@ export const PageForm: React.FC<PageFormProps> = ({ type, onSubmit, setPreviewDa
             </svg>
           </div>
         </div>
+        {errors.size && <p className="text-red-500 text-xs mt-1">{errors.size}</p>}
       </div>
 
       <div className="mb-6">
@@ -222,7 +285,8 @@ export const PageForm: React.FC<PageFormProps> = ({ type, onSubmit, setPreviewDa
             name="type"
             value={formData.type}
             onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded appearance-none focus:outline-none focus:ring-1 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200"
+            onBlur={handleBlur}
+            className={`w-full px-3 py-2 border ${errors.type ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'} rounded appearance-none focus:outline-none focus:ring-1 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200`}
             required
           >
             <option value="" className="dark:bg-gray-800 dark:text-gray-200">Select type</option>
@@ -250,6 +314,7 @@ export const PageForm: React.FC<PageFormProps> = ({ type, onSubmit, setPreviewDa
             </svg>
           </div>
         </div>
+        {errors.type && <p className="text-red-500 text-xs mt-1">{errors.type}</p>}
       </div>
 
       <div className="mb-6">
@@ -292,8 +357,9 @@ export const PageForm: React.FC<PageFormProps> = ({ type, onSubmit, setPreviewDa
           name="description"
           value={formData.description || ''}
           onChange={handleChange}
+          onBlur={handleBlur}
           placeholder="ex: An information services firm helping small businesses succeed." 
-          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none dark:bg-gray-800 dark:text-gray-200"
+          className={`w-full px-3 py-2 border ${errors.description ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'} rounded focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none dark:bg-gray-800 dark:text-gray-200`}
           rows={3}
           maxLength={200}
           required
@@ -302,6 +368,7 @@ export const PageForm: React.FC<PageFormProps> = ({ type, onSubmit, setPreviewDa
           <span>Use your tagline to briefly describe what your organization does. This can be changed later.</span>
           <span>{charCount}/200</span>
         </div>
+        {errors.description && <p className="text-red-500 text-xs mt-1">{errors.description}</p>}
       </div>
 
       <div className="mb-6">

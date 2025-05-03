@@ -52,13 +52,18 @@ export const JobCard: React.FC<JobCardProps> = ({ job, onViewApplicants, company
   return (
     <div 
       id={`job-card-${job._id}`} 
-      className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-md dark:hover:shadow-gray-800 transition-shadow bg-white dark:bg-gray-800"
+      className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-md dark:hover:shadow-gray-800 transition-shadow bg-white dark:bg-gray-800 overflow-hidden"
     >
       <div id={`job-card-header-${job._id}`} className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 mb-2">
-        <h3 id={`job-title-${job._id}`} className="font-medium text-lg dark:text-white">{job.job_title}</h3>
+        <h3 
+          id={`job-title-${job._id}`} 
+          className="font-medium text-lg dark:text-white overflow-hidden text-ellipsis line-clamp-2 break-words"
+        >
+          {job.job_title}
+        </h3>
         <span 
           id={`job-status-${job._id}`}
-          className={`px-2 py-1 text-xs rounded-full inline-block w-fit ${
+          className={`px-2 py-1 text-xs rounded-full inline-block whitespace-nowrap flex-shrink-0 ${
             job.job_status.toLowerCase() === 'open' ? 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300' : 
             job.job_status.toLowerCase() === 'closed' ? 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300' :
             'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300'
@@ -69,11 +74,17 @@ export const JobCard: React.FC<JobCardProps> = ({ job, onViewApplicants, company
       </div>
       
       <div id={`job-details-${job._id}`} className="text-sm text-gray-600 dark:text-gray-400 mb-2 flex flex-wrap items-center">
-        <span id={`job-location-${job._id}`} className="mr-2">{job.location}</span>
-        <span className="hidden sm:inline mx-2">•</span>
-        <span id={`job-workplace-type-${job._id}`} className="mr-2">{job.workplace_type}</span>
-        <span className="hidden sm:inline mx-2">•</span>
-        <span id={`job-experience-level-${job._id}`}>{job.experience_level}</span>
+        <span id={`job-location-${job._id}`} className="max-w-full overflow-hidden text-ellipsis break-words mr-2">
+          {job.location}
+        </span>
+        <span className="hidden sm:inline mx-2 flex-shrink-0">•</span>
+        <span id={`job-workplace-type-${job._id}`} className="max-w-full overflow-hidden text-ellipsis break-words mr-2">
+          {job.workplace_type}
+        </span>
+        <span className="hidden sm:inline mx-2 flex-shrink-0">•</span>
+        <span id={`job-experience-level-${job._id}`} className="max-w-full overflow-hidden text-ellipsis break-words">
+          {job.experience_level}
+        </span>
       </div>
       
       <p id={`job-posted-date-${job._id}`} className="text-sm text-gray-500 dark:text-gray-500 mb-3">

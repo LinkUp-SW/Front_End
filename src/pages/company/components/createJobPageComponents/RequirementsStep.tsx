@@ -10,10 +10,27 @@ interface RequirementsStepProps {
   handleArrayFieldChange: (e: React.ChangeEvent<HTMLTextAreaElement>, field: ArrayField) => void;
 }
 
+const MAX_FIELD_LENGTH = 1000; 
+
 const RequirementsStep: React.FC<RequirementsStepProps> = ({
   textareaValues,
   handleArrayFieldChange
 }) => {
+  // Custom handler with validation
+  const handleValidatedChange = (e: React.ChangeEvent<HTMLTextAreaElement>, field: ArrayField) => {
+    const { value } = e.target;
+    
+    // Enforce maximum length
+    if (value.length <= MAX_FIELD_LENGTH) {
+      handleArrayFieldChange(e, field);
+    }
+  };
+
+  // Calculate remaining characters
+  const getRemainingChars = (field: ArrayField): number => {
+    return MAX_FIELD_LENGTH - (textareaValues[field]?.length || 0);
+  };
+
   const textareaFields: Array<{label: string, field: ArrayField, placeholder: string}> = [
     {
       label: "Responsibilities", 
@@ -42,12 +59,18 @@ const RequirementsStep: React.FC<RequirementsStepProps> = ({
           <textarea
             name={field}
             value={textareaValues[field]}
-            onChange={(e) => handleArrayFieldChange(e, field)}
+            onChange={(e) => handleValidatedChange(e, field)}
             placeholder={placeholder}
             className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 min-h-32 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
             rows={5}
+            maxLength={MAX_FIELD_LENGTH}
           />
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Enter each item on a new line</p>
+          <div className="flex justify-between mt-1">
+            <p className="text-xs text-gray-500 dark:text-gray-400">Enter each item on a new line</p>
+            <span className="text-xs text-gray-500 dark:text-gray-400">
+              {getRemainingChars(field)} characters remaining
+            </span>
+          </div>
         </div>
       ))}
     </div>

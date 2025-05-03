@@ -5,6 +5,8 @@ interface ValidationErrors {
   title?: boolean;
   location?: boolean;
   salary?: boolean;
+  salaryNegative?: boolean;
+  salaryInvalid?: boolean;
 }
 
 interface JobDetailsStepProps {
@@ -18,6 +20,7 @@ interface JobDetailsStepProps {
   companySearchQuery: string;
   handleSelectCompany: (company: CompanySearchResult) => void;
   validationErrors: ValidationErrors;
+  validateSalary: (value: string) => void;
 }
 
 const JobDetailsStep: React.FC<JobDetailsStepProps> = ({
@@ -30,8 +33,15 @@ const JobDetailsStep: React.FC<JobDetailsStepProps> = ({
   companySearchResults,
   companySearchQuery,
   handleSelectCompany,
-  validationErrors
+  validationErrors,
+  validateSalary
 }) => {
+  // Handle salary input change with validation
+  const handleSalaryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    handleInputChange(e);
+    validateSalary(e.target.value);
+  };
+
   return (
     <>
       <div className="text-sm text-gray-500 dark:text-gray-400 mb-2">* Indicates required</div>
@@ -59,6 +69,7 @@ const JobDetailsStep: React.FC<JobDetailsStepProps> = ({
                   : 'border-gray-300 dark:border-gray-600'
               } rounded px-3 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100`}
               required
+              maxLength={50}
             />
             {validationErrors.title && (
               <p className="mt-1 text-sm text-red-500">Please enter a job title</p>
@@ -79,6 +90,7 @@ const JobDetailsStep: React.FC<JobDetailsStepProps> = ({
               } text-gray-900 dark:text-gray-300`}
               disabled={!isFreeJob}
               required
+              maxLength={50}
             />
             
             {/* Company search results dropdown */}
@@ -155,6 +167,7 @@ const JobDetailsStep: React.FC<JobDetailsStepProps> = ({
                   : 'border-gray-300 dark:border-gray-600'
               } rounded px-3 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100`}
               required
+              maxLength={50}
             />
             {validationErrors.location && (
               <p className="mt-1 text-sm text-red-500">Please enter a job location</p>
@@ -187,22 +200,35 @@ const JobDetailsStep: React.FC<JobDetailsStepProps> = ({
             {validationErrors.salary && (
               <span className="text-red-500 ml-1">Required</span>
             )}
+            {validationErrors.salaryNegative && (
+              <span className="text-red-500 ml-1">Cannot be negative</span>
+            )}
+            {validationErrors.salaryInvalid && (
+              <span className="text-red-500 ml-1">Invalid format</span>
+            )}
           </label>
           <input
             type="text"
             name="salary"
             value={jobData.salary}
-            onChange={handleInputChange}
+            onChange={handleSalaryChange}
             placeholder="50000"
             className={`w-full border ${
-              validationErrors.salary 
+              validationErrors.salary || validationErrors.salaryNegative || validationErrors.salaryInvalid
                 ? 'border-red-500 dark:border-red-500' 
                 : 'border-gray-300 dark:border-gray-600'
             } rounded px-3 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100`}
             required
+            maxLength={50}
           />
           {validationErrors.salary && (
             <p className="mt-1 text-sm text-red-500">Please enter a salary range</p>
+          )}
+          {validationErrors.salaryNegative && (
+            <p className="mt-1 text-sm text-red-500">Salary cannot be negative</p>
+          )}
+          {validationErrors.salaryInvalid && (
+            <p className="mt-1 text-sm text-red-500">Please enter a valid salary (e.g. "$50,000", "$50k-$70k", or "50000-70000")</p>
           )}
         </div>
       </div>
@@ -217,6 +243,7 @@ const JobDetailsStep: React.FC<JobDetailsStepProps> = ({
             placeholder="The ideal candidate will be responsible for designing, developing, testing, and debugging responsive web and mobile applications..."
             className="w-full border-none focus:ring-0 min-h-32 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
             rows={8}
+            maxLength={500}
           />
         </div>
       </div>
