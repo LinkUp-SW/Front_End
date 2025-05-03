@@ -38,6 +38,7 @@ import AnalyticsPage from "./admin/AnalyticsPage";
 import JobPostingsPage from "./admin/JobPostingsPage";
 import ContentModerationPage from "./admin/ContentModerationPage";
 import GoodByePage from "./goodbye/GoodByePage";
+import PaymentStatusPage from "./payment/PaymentStatusPage";
 import {
   SignInAndSecurityPage,
   AccountPreferencePage,
@@ -113,5 +114,6 @@ export {
   ChangePasswordPage,
   ConnectionRequest,
   ProfileVisibility,
-  SubscriptionBillingPage
+  SubscriptionBillingPage,
+  PaymentStatusPage
 };

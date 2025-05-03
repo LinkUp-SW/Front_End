@@ -52,6 +52,7 @@ import {
   ConnectionRequest,
   ProfileVisibility,
   SubscriptionBillingPage,
+  PaymentStatusPage,
 } from "./pages";
 
 import React from "react";
@@ -289,6 +290,10 @@ const routes: RouteObject[] = [
   {
     path: "/settings/subscription-billing",
     element: React.createElement(SubscriptionBillingPage),
+  },
+  {
+    path: "/payment",
+    element: React.createElement(PaymentStatusPage),
   },
 ];
 
