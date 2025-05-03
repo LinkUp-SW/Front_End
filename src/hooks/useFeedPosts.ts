@@ -13,6 +13,7 @@ import { setPosts } from "@/slices/feed/postsSlice";
 import { RootState } from "@/store";
 import { toast } from "sonner";
 import { PostType } from "@/types";
+import { AxiosError } from "axios";
 
 export function useFeedPosts(
   single: boolean = false,
@@ -84,9 +85,13 @@ export function useFeedPosts(
 
       setNextCursor(response.next_cursor || 0);
       setHasMore(fetchedPosts.length === 5);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Error loading posts:", error);
-      toast.error("Failed to load posts");
+      if ((error as AxiosError)?.response?.status === 403) {
+        toast.error("You do not have permission to view this post");
+      } else {
+        toast.error("Failed to load posts");
+      }
     } finally {
       setIsLoading(false);
       setInitialLoading(false);
