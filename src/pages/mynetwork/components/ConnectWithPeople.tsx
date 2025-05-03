@@ -7,6 +7,8 @@ import {
   DialogTitle,
   DialogTrigger,
   DialogDescription,
+  DialogFooter,
+  DialogClose,
 } from "@/components/ui/dialog";
 import { getPeopleYouMayKnow, PeopleYouMayKnow } from "@/endpoints/myNetwork";
 import { connectWithUser } from "@/endpoints/myNetwork";
@@ -14,6 +16,7 @@ import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import axios from "axios";
+import { Button, FormInput } from "@/components";
 
 interface PeopleSectionProps {
   token: string;
@@ -22,7 +25,9 @@ interface PeopleSectionProps {
 }
 
 const PeopleSection = ({ token, context, title }: PeopleSectionProps) => {
-  const [mainViewSuggestions, setMainViewSuggestions] = useState<PeopleYouMayKnow[]>([]);
+  const [mainViewSuggestions, setMainViewSuggestions] = useState<
+    PeopleYouMayKnow[]
+  >([]);
   const [allSuggestions, setAllSuggestions] = useState<PeopleYouMayKnow[]>([]);
   const [loading, setLoading] = useState(false);
   const [dialogLoading, setDialogLoading] = useState(false);
@@ -32,6 +37,8 @@ const PeopleSection = ({ token, context, title }: PeopleSectionProps) => {
   const navigate = useNavigate();
   const observer = useRef<IntersectionObserver | null>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
+  const [openEmailDialog, setOpenEmailDialog] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<string | null>(null);
 
   const loadInitialPeople = async () => {
     if (!token) return;
@@ -149,6 +156,7 @@ const PeopleSection = ({ token, context, title }: PeopleSectionProps) => {
       }
     } finally {
       setConnectingIds((prev) => prev.filter((id) => id !== userId));
+      setSelectedUser(null);
     }
   };
 
@@ -175,7 +183,7 @@ const PeopleSection = ({ token, context, title }: PeopleSectionProps) => {
     return (
       <div
         ref={isLast ? lastPersonRef : null}
-        className="relative bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 flex flex-col items-center justify-between w-full max-w-[280px] min-h-[300px] mx-auto" 
+        className="relative bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 flex flex-col items-center justify-between w-full max-w-[280px] min-h-[300px] mx-auto"
       >
         <div
           className="h-20 w-full overflow-hidden rounded-t-lg cursor-pointer"
@@ -222,9 +230,17 @@ const PeopleSection = ({ token, context, title }: PeopleSectionProps) => {
           </div>
         </div>
         <div className="mt-4 w-full">
-        <button
+          <button
             id="connect-button"
-            onClick={() => handleConnect(person.user_id)}
+            onClick={
+              person.privacy_settings.flag_who_can_send_you_invitations ===
+              "email"
+                ? () => {
+                    setSelectedUser(person.user_id);
+                    setOpenEmailDialog(true);
+                  }
+                : () => handleConnect(person.user_id)
+            }
             disabled={isConnecting}
             className={`w-full border border-cyan-600 font-medium py-1 rounded-full flex items-center justify-center gap-2 transition ${
               isConnecting
@@ -294,7 +310,7 @@ const PeopleSection = ({ token, context, title }: PeopleSectionProps) => {
             </button>
           </DialogTrigger>
           <DialogContent
-            className="max-w-6xl w-full max-h-[70vh] overflow-y-auto dark:bg-gray-900 bg-white p-6 rounded-lg" 
+            className="max-w-6xl w-full max-h-[70vh] overflow-y-auto dark:bg-gray-900 bg-white p-6 rounded-lg"
             ref={dialogRef}
           >
             <DialogHeader>
@@ -345,6 +361,12 @@ const PeopleSection = ({ token, context, title }: PeopleSectionProps) => {
           ))}
         </div>
       )}
+      <EmailConnectionDialog
+        selectedUserId={selectedUser as string}
+        onOpenChange={setOpenEmailDialog}
+        open={openEmailDialog}
+        handleConnect={handleConnect}
+      />
     </div>
   );
 };
@@ -369,3 +391,65 @@ const ConnectWithPeople = () => {
 };
 
 export default ConnectWithPeople;
+
+const EmailConnectionDialog = ({
+  selectedUserId,
+  open,
+  onOpenChange,
+  handleConnect,
+}: {
+  selectedUserId: string;
+  onOpenChange?(open: boolean): void;
+  open: boolean;
+  handleConnect(userId: string, email?: string): void;
+}) => {
+  const [email, setEmail] = useState("");
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-xl bg-white dark:bg-gray-800">
+        <DialogHeader>
+          <DialogTitle className="text-lg text-black dark:text-white">
+            Does this user know you?
+          </DialogTitle>
+          <DialogDescription className="text-sm text-gray-700 dark:text-gray-300">
+            To verify this member knows you, please enter their email to
+            connect.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="flex items-center space-x-2">
+          <div className="flex-1">
+            <FormInput
+              label="Email"
+              placeholder="Enter your Email"
+              value={email}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                setEmail(e.target.value.toLowerCase());
+              }}
+              type="text"
+              id="email"
+              name="email"
+              extraClassName="pt-0"
+            />
+          </div>
+        </div>
+        <DialogFooter className="sm:justify-start">
+          <Button
+            onClick={() => {
+              handleConnect(selectedUserId, email);
+              onOpenChange?.(false);
+            }}
+            type="submit"
+            className="affirmativeBtn"
+          >
+            send
+          </Button>
+          <DialogClose asChild>
+            <Button type="button" variant="outline" className="destructiveBtn">
+              Close
+            </Button>
+          </DialogClose>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+};
