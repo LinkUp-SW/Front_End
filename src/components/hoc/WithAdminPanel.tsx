@@ -1,16 +1,11 @@
 // components/hoc/WithAdminPanel.tsx
 import { ComponentType, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import {
-  FiHome,
-  FiFlag,
-  FiBriefcase,
-  FiBarChart2,
-  FiUsers,
-  FiSettings,
-} from "react-icons/fi";
+import { FiHome, FiFlag, FiBarChart2, FiUsers } from "react-icons/fi";
+import { CiLogout } from "react-icons/ci";
 import AuthMiddleware from "./AuthMiddleware";
 import Cookies from "js-cookie";
+import axiosInstance from "@/services/axiosInstance";
 
 const WithAdminPanel = <P extends object>(
   WrappedComponent: ComponentType<P>
@@ -26,6 +21,17 @@ const WithAdminPanel = <P extends object>(
       setIsOpen(!isOpen);
     };
 
+    const userLogOut = async () => {
+      try {
+        await axiosInstance.get("/auth/logout");
+        Cookies.remove("linkup_token");
+        Cookies.remove("linkup_user_type");
+        navigate("/login", { replace: true });
+      } catch (error) {
+        console.error("Logout failed:", error);
+      }
+    };
+
     const menuItems = [
       {
         name: "Dashboard",
@@ -38,25 +44,29 @@ const WithAdminPanel = <P extends object>(
         path: "/admin/content-moderation",
       },
       {
-        name: "Job Postings",
-        icon: <FiBriefcase size={20} />,
-        path: "/admin/job-postings",
-      },
-      {
         name: "Analytics",
         icon: <FiBarChart2 size={20} />,
         path: "/admin/analytics",
       },
-      { name: "Users", icon: <FiUsers size={20} />, path: "/admin/users" },
-      {
-        name: "Settings",
-        icon: <FiSettings size={20} />,
-        path: "/admin/settings",
+      { 
+        name: "Users", 
+        icon: <FiUsers size={20} />, 
+        path: "/admin/users" 
+      },
+      { 
+        name: "Logout", 
+        icon: <CiLogout size={20} />, 
+        path: "/logout",
+        action: userLogOut 
       },
     ];
 
-    const handleTabClick = (path: string) => {
-      navigate(path, { replace: true });
+    const handleTabClick = (path: string, action?: () => void) => {
+      if (action) {
+        action();
+      } else {
+        navigate(path, { replace: true });
+      }
       setIsOpen(false);
     };
 
@@ -84,7 +94,7 @@ const WithAdminPanel = <P extends object>(
                 return (
                   <button
                     key={item.name}
-                    onClick={() => handleTabClick(item.path)}
+                    onClick={() => handleTabClick(item.path, item.action)}
                     className={`flex items-center gap-4 w-full px-4 py-3 rounded-xl text-md font-semibold transition-all duration-300 whitespace-nowrap overflow-hidden
                       ${
                         isActive

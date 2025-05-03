@@ -103,6 +103,86 @@ export interface DashboardDataResponse {
       content_posted_today: number;
     };
   }
+  export interface AnalyticsDataResponse {
+    message: string;
+    period: string; 
+    interval: string; 
+    data: {
+      userGrowth: {
+        date: string;
+        count: number;
+      }[];
+      contentCreation: {
+        posts: {
+          date: string;
+          count: number;
+        }[];
+      };
+      engagementMetrics: {
+        reactions: {
+          date: string;
+          type: string; 
+          count: number;
+        }[];
+        connections: {
+          date: string;
+          count: number;
+        }[];
+        comments: {
+          date: string;
+          count: number;
+        }[];
+      };
+      moderationMetrics: {
+        reportsCreated: {
+          date: string;
+          count: number;
+        }[];
+        reportsResolved: {
+          date: string;
+          count: number;
+          avgResolutionHours: number;
+        }[];
+      };
+      jobMetrics: {
+        jobsPosted: {
+          date: string;
+          count: number;
+        }[];
+        applicationOutcomes: {
+          date: string;
+          status: string; 
+          count: number;
+        }[];
+      };
+    };
+  }
+
+  interface User {
+    id: string;
+    user_id: string;
+    short_id: string;
+    first_name: string;
+    last_name: string;
+    email: string;
+    profile_picture: string;
+    is_admin: boolean;
+    created_at: string; // ISO date string
+  }
+  
+  interface UsersResponseData {
+    users: User[];
+    total_count: number;
+    next_cursor: number;
+  }
+  
+  interface UsersAPIResponse {
+    message: string;
+    success: boolean;
+    data: UsersResponseData;
+  }
+  
+  
   
   
 
@@ -187,5 +267,88 @@ export const DismissReport = async (
       },
     
     });
+    return response.data;
+  };
+
+  export const getAnalyticsData = async (
+    token: string,
+    periodParam:string,
+    metricParam:string
+   
+  ): Promise<AnalyticsDataResponse> => {
+    const response = await axiosInstance.get("/api/v1/admin/analytics", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      params: {periodParam, metricParam},
+    
+    });
+    return response.data;
+  };
+
+  export const getAllUsers = async (
+    token: string,
+    cursor: number | null,
+    limit: number | null,
+
+   
+  ): Promise<UsersAPIResponse> => {
+    const response = await axiosInstance.get("/api/v1/admin/users", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      params: {cursor, limit},
+    
+    });
+    return response.data;
+  };
+
+  interface CreateAdminResponse {
+    message: string;
+    success: boolean;
+    admin?: {
+      email: string;
+      first_name: string;
+      last_name: string;
+      id: string;
+    };
+  }
+  
+  export const createAdmin = async (
+    token: string, 
+    adminData: {
+      email: string;
+      password: string;
+      firstName: string;
+      lastName: string;
+    }
+  ): Promise<CreateAdminResponse> => {
+    const response = await axiosInstance.post(
+      "/api/v1/admin/create-admin",
+      adminData,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, 
+        },
+      }
+    );
+    return response.data; 
+  };
+
+
+  export const DeleteUser = async (
+    token: string,
+    userId: string,
+    
+  ): Promise<{ message: string; success: boolean }> => {
+    const response = await axiosInstance.delete(
+      `/api/v1/admin/delete/${userId}`,
+      
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
     return response.data;
   };
