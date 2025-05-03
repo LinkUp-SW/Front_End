@@ -1,5 +1,6 @@
-import NewMessage from "@/pages/messaging/NewMessage";
+
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+
 
 
 
@@ -105,6 +106,8 @@ interface MessageState {
   user2ProfilePicturePop:string;
   user2HeadlinePop:string;
 
+  totalCount:number
+
 
 
 
@@ -155,6 +158,8 @@ user2IdPop:"",
 user2NamePop:"",
 user2ProfilePicturePop:"",
 user2HeadlinePop:"",
+
+totalCount: 0,
 
 
 
@@ -254,7 +259,9 @@ const MessagingSlice = createSlice({
       state.user2HeadlinePop = action.payload; 
     },
 
-    
+    setTotalCount: (state, action: PayloadAction<number>) => {
+      state.totalCount = action.payload; 
+    } 
 
 
     
@@ -265,5 +272,5 @@ const MessagingSlice = createSlice({
   },
 });
 
-export const {toggleStarred, activeButton, searchFiltering, selectMessage,selectUserName,selectUserStatus,setEditingMessageId,setEditText,clearEditingState,selectUserId,addMessage,setResponsiveIsSidebar,setChatData,setEditedMessageIds,setDataInfo,setShowPopup,setUser2IdPop,setUser2NamePop,setUser2ProfilePicturePop,setUser2HeadlinePop} = MessagingSlice.actions;
+export const {toggleStarred, activeButton, searchFiltering, selectMessage,selectUserName,selectUserStatus,setEditingMessageId,setEditText,clearEditingState,selectUserId,addMessage,setResponsiveIsSidebar,setChatData,setEditedMessageIds,setDataInfo,setShowPopup,setUser2IdPop,setUser2NamePop,setUser2ProfilePicturePop,setUser2HeadlinePop,setTotalCount} = MessagingSlice.actions;
 export default MessagingSlice.reducer;
