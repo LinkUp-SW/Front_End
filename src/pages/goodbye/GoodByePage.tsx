@@ -20,7 +20,7 @@ const GoodByePage = () => {
         <div className="space-y-2 grid place-items-center">
           {/* animated sprite */}
           <div className="flex justify-center">
-            <div className="sprite pixel w-32 h-32 animate-bounce" />
+            <div className="sprite cry-pixel w-32 h-32 animate-bounce" />
           </div>
 
           <h1 className="text-2xl font-semibold">Account Deleted</h1>

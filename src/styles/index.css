@@ -285,7 +285,7 @@ button {
 }
 
 /* size of one frame */
-.pixel {
+.cry-pixel {
     width: 190px;
     /* 1218px total ÷ 6 frames */
     height: 205px;
@@ -295,10 +295,10 @@ button {
     background-position: 0 0;
 
     /* animate: 0.5s per cycle → 6 frames @ 12 fps */
-    animation: pixelAnimation 1s steps(6) infinite;
+    animation: cry 1s steps(6) infinite;
 }
 
-@keyframes pixelAnimation {
+@keyframes cry {
     from {
         background-position: 0 0;
     }
@@ -311,16 +311,43 @@ button {
 }
 
 
+
+
+.celebrate-pixel {
+    /* one frame is 1 997px ÷ 6 ≃ 333px wide */
+    width: 333px;
+    /* full sprite height */
+    height: 512px;
+
+    background-image: url('/src/assets/celebrating_man.png');
+    background-position: 0 0;
+
+    /* 6 steps (frames) in 0.5s → 12 fps */
+    animation: pixelCelebrate 2.5s steps(6) infinite;
+}
+
+@keyframes pixelCelebrate {
+    from {
+        background-position: 0 0;
+    }
+
+    /* shift by total width = 333px × 6 = 1 998px */
+    to {
+        background-position: -1998px 0;
+    }
+}
+
+
 /* Hide Edge/IE password reveal button */
 .password::-ms-reveal {
     display: none;
-  }
-  
-  /* Hide Chrome/Safari password reveal button */
-  .password::-webkit-contacts-auto-fill-button,
-  .password::-webkit-credentials-auto-fill-button {
+}
+
+/* Hide Chrome/Safari password reveal button */
+.password::-webkit-contacts-auto-fill-button,
+.password::-webkit-credentials-auto-fill-button {
     visibility: hidden;
     pointer-events: none;
     position: absolute;
     right: 0;
-  }
+}
