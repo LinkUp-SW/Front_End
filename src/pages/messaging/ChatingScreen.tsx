@@ -158,8 +158,7 @@ const ChatingScreen = () => {
   const user2Name = `${userBioState?.bio.first_name || ""} ${
     userBioState?.bio.last_name || ""
   }`.trim();
-  const user2Img =
-    "https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg";
+  const user2Img = userBioState?.profile_photo || "";
   /* const user2Name = useSelector(
     (state: RootState) => state.messaging.user2Name
   );
@@ -340,9 +339,6 @@ const ChatingScreen = () => {
       unsubscribe();
     };
   }, [selectedConvID, dataChat, id]);
-
-  // Add this to your ChatingScreen component
-
   if (loading)
     return (
       <div>
@@ -460,7 +456,6 @@ const ChatingScreen = () => {
 
               return (
                 <div key={index}>
-                  {/* Profile Section - Conditionally rendered */}
                   {showProfile && (
                     <div className="mt-2">
                       <div className="flex items-center">
@@ -496,12 +491,10 @@ const ChatingScreen = () => {
                         <>
                           {msg.message}
                           {/* MEDIA BLOCK GOES HERE */}
-                     
-                
+
                           {msg.media?.length > 0 && (
                             <div className="media-container mt-2">
                               {msg.media.map((mediaUrl, index) => {
-                                // Handle base64 data URLs
                                 const isBase64 = mediaUrl.startsWith("data:");
                                 let mimeType = "";
 
@@ -510,7 +503,6 @@ const ChatingScreen = () => {
                                     .split(";")[0]
                                     .replace("data:", "");
                                 } else {
-                                  // For regular URLs, try to determine mime type from extension
                                   mimeType = getMimeType(mediaUrl);
                                 }
 
@@ -530,8 +522,6 @@ const ChatingScreen = () => {
                         </>
                       )}
                     </div>
-
-                    {/* Three dots menu - always visible */}
                     {!isDeleted && (
                       <div>
                         <Popover.Root>
@@ -597,10 +587,8 @@ const ChatingScreen = () => {
                       </div>
                     )}
                   </div>
-
-                  {/* Seen indicator */}
                   {msg.isOwnMessage && msg.isSeen && (
-                    <div className="pl-14 mt-1 flex items-center gap-2">
+                    <div className="flex justify-end  pr-1">
                       <div className="w-5 h-5 rounded-full overflow-hidden border border-gray-300">
                         <img
                           src={dataChat.otherUser.profilePhoto}
@@ -608,7 +596,6 @@ const ChatingScreen = () => {
                           className="w-full h-full object-cover"
                         />
                       </div>
-                      <span className="text-xs text-gray-500">Seen</span>
                     </div>
                   )}
                 </div>
