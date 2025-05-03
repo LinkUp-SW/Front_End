@@ -1,7 +1,5 @@
 import { useDispatch } from "react-redux";
-import {
-  setEditingMessageId,
-} from "../../slices/messaging/messagingSlice";
+import { setEditingMessageId } from "../../slices/messaging/messagingSlice";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { useState } from "react";
@@ -24,6 +22,32 @@ import { toast } from "sonner";
 import { socketService } from "@/services/socket";
 import { useParams } from "react-router-dom";
 import { MessageChat } from "@/endpoints/messaging";
+function getMimeType(filePath: string): string {
+  const extension = filePath.split(".").pop()?.toLowerCase();
+  switch (extension) {
+    case "png":
+      return "image/png";
+    case "jpg":
+    case "jpeg":
+      return "image/jpeg";
+    case "gif":
+      return "image/gif";
+    case "mp4":
+      return "video/mp4";
+    case "mov":
+      return "video/quicktime";
+    case "pdf":
+      return "application/pdf";
+    case "txt":
+      return "text/plain";
+    case "doc":
+      return "application/msword";
+    case "docx":
+      return "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+    default:
+      return "application/octet-stream";
+  }
+}
 
 const SendingMessages = () => {
   const { id } = useParams();
@@ -51,6 +75,7 @@ const SendingMessages = () => {
   const [text, setText] = useState<string>("");
   const [files, setFiles] = useState<File[]>([]);
   const [selectedFile, setSelectedFile] = useState(false);
+  const [mediaFiles, setMediaFiles] = useState<File[]>([]);
 
   const handleEmojiRequest = (emoji: { emoji: string }) => {
     setText((prevMessage) => prevMessage + emoji.emoji);
@@ -58,25 +83,38 @@ const SendingMessages = () => {
   };
 
   const handleFileRequest = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files;
-    if (file) {
-      setFiles((prevFiles) => [...prevFiles, ...Array.from(file)]);
+    if (event.target.files) {
+      const newFiles = Array.from(event.target.files);
+      setMediaFiles((prevFiles) => [...prevFiles, ...newFiles]);
     }
   };
 
   const removeFile = (index: number) => {
-    setFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
+    setMediaFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
   };
 
-  const handleSendMessage = () => {
-    if (!text.trim()) return;
+  const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleSendMessage = async () => {
+    if (!text.trim() && mediaFiles.length === 0) return;
+
+    const base64Media = await Promise.all(
+      mediaFiles.map((file) => fileToBase64(file))
+    );
 
     const newMsg: MessageChat = {
       messageId: `temp-${Date.now()}`,
       senderId: id!,
       senderName: "YOU",
       message: text,
-      media: [],
+      media: base64Media,
       timestamp: new Date().toISOString(),
       reacted: false,
       isSeen: false,
@@ -91,8 +129,9 @@ const SendingMessages = () => {
         messages: [...(dataChat?.messages || []), newMsg],
       })
     );
-    socketService.sendPrivateMessage(selectedUser2ID, text, []);
+    socketService.sendPrivateMessage(selectedUser2ID, text, base64Media);
     setText("");
+    setMediaFiles([]);
   };
 
   const handleEditingMsgSave = async () => {
@@ -129,28 +168,39 @@ const SendingMessages = () => {
       socketService.sendStopTypingIndicator(selectedConvID);
     }, 3000);
   };
+
   return (
     <>
       {/* File attachments UI */}
-      {files.length > 0 && (
+      {mediaFiles.length > 0 && (
         <div className="px-4 space-y-2 mb-2 flex-shrink-0">
-          {files.map((file, index) => (
+          {mediaFiles.map((file, index) => (
             <div
               key={index}
               className="flex justify-between items-center bg-gray-50 p-2 rounded-md border border-gray-200"
             >
               <div className="flex items-center">
                 <div className="relative inline-block h-10 w-10 mr-2 bg-gray-200 rounded">
-                  <FaFileAlt
-                    size={20}
-                    className="text-gray-600 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
-                  />
+                  {getMimeType(file.name).startsWith("image/") ? (
+                    <img
+                      src={URL.createObjectURL(file)}
+                      alt="Preview"
+                      className="h-10 w-10 object-cover rounded"
+                    />
+                  ) : (
+                    <FaFileAlt
+                      size={20}
+                      className="text-gray-600 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+                    />
+                  )}
                 </div>
                 <div className="inline-block">
                   <p className="text-sm font-medium text-gray-700">
                     {file.name} • {(file.size / 1024).toFixed(1)} KB
                   </p>
-                  <p className="text-xs text-gray-500">Attached</p>
+                  <p className="text-xs text-gray-500">
+                    {getMimeType(file.name)}
+                  </p>
                 </div>
               </div>
 
@@ -196,7 +246,7 @@ const SendingMessages = () => {
                   id="cancel-edit-message"
                   onClick={() => {
                     dispatch(setEditingMessageId(""));
-                    setEditText("");
+                    dispatch(setEditText(""));
                   }}
                   className="px-4 py-1 rounded-full text-sm  border border-blue-700 text-blue-700 hover:bg-gray-100"
                 >
@@ -219,7 +269,7 @@ const SendingMessages = () => {
             </div>
           </div>
         ) : (
-          <div className="bg-white  dark:bg-gray-800 pt-3s">
+          <div className="bg-white dark:bg-gray-800 pt-3s">
             <div className="px-4 pt-2 pb-1">
               <textarea
                 id="text-message"
@@ -232,21 +282,27 @@ const SendingMessages = () => {
 
             <div className="flex items-center justify-between px-4 py-2 border-t border-gray-200">
               <div className="flex space-x-4">
-                <button
-                  id="send-message-image"
-                  className="text-gray-500 hover:text-gray-700"
-                >
-                  <BsImage size={20} />
-                </button>
+                <label htmlFor="upload-image" className="cursor-pointer">
+                  <BsImage
+                    size={20}
+                    className="text-gray-500 hover:text-gray-700"
+                  />
+                  <input
+                    id="upload-image"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileRequest}
+                    className="hidden"
+                  />
+                </label>
 
-                <label htmlFor="upload-folder" className="cursor-pointer">
+                <label htmlFor="upload-file" className="cursor-pointer">
                   <BsPaperclip
                     size={20}
                     className="text-gray-500 hover:text-gray-700"
-                    onClick={() => setSelectedFile(!selectedFile)}
                   />
                   <input
-                    id="upload-folder"
+                    id="upload-file"
                     type="file"
                     multiple
                     onChange={handleFileRequest}
@@ -280,9 +336,9 @@ const SendingMessages = () => {
                 <button
                   id="send-message"
                   onClick={handleSendMessage}
-                  disabled={!text.trim()}
+                  disabled={!(text.trim() || mediaFiles.length > 0)}
                   className={`px-4 py-1 rounded-full text-sm ${
-                    text.trim()
+                    text.trim() || mediaFiles.length > 0
                       ? "bg-gray-200 text-gray-700 hover:bg-gray-300"
                       : "bg-gray-100 text-gray-400 cursor-not-allowed"
                   }`}
