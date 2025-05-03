@@ -87,7 +87,6 @@ const SideBar = () => {
         const data: { conversations: Conversation[] } =
           await getAllConversations(token);
         dispatch(setDataInfo(data.conversations));
-        toast.success("Conversations loaded successfully");
       } catch (error) {
         console.error("Failed to fetch conversations:", error);
         toast.error("Failed to load Conversations");
