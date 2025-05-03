@@ -103,6 +103,61 @@ export interface DashboardDataResponse {
       content_posted_today: number;
     };
   }
+  export interface AnalyticsDataResponse {
+    message: string;
+    period: string; 
+    interval: string; 
+    data: {
+      userGrowth: {
+        date: string;
+        count: number;
+      }[];
+      contentCreation: {
+        posts: {
+          date: string;
+          count: number;
+        }[];
+      };
+      engagementMetrics: {
+        reactions: {
+          date: string;
+          type: string; 
+          count: number;
+        }[];
+        connections: {
+          date: string;
+          count: number;
+        }[];
+        comments: {
+          date: string;
+          count: number;
+        }[];
+      };
+      moderationMetrics: {
+        reportsCreated: {
+          date: string;
+          count: number;
+        }[];
+        reportsResolved: {
+          date: string;
+          count: number;
+          avgResolutionHours: number;
+        }[];
+      };
+      jobMetrics: {
+        jobsPosted: {
+          date: string;
+          count: number;
+        }[];
+        applicationOutcomes: {
+          date: string;
+          status: string; 
+          count: number;
+        }[];
+      };
+    };
+  }
+  
   
   
 
@@ -185,6 +240,22 @@ export const DismissReport = async (
       headers: {
         Authorization: `Bearer ${token}`,
       },
+    
+    });
+    return response.data;
+  };
+
+  export const getAnalyticsData = async (
+    token: string,
+    periodParam:string,
+    metricParam:string
+   
+  ): Promise<AnalyticsDataResponse> => {
+    const response = await axiosInstance.get("/api/v1/admin/analytics", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      params: {periodParam, metricParam},
     
     });
     return response.data;
