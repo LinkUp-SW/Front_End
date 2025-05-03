@@ -255,6 +255,21 @@ export const blockUser = async (token: string, userId: string) => {
   return response.data;
 };
 
+export const checkConversationExists = async (
+  token: string,
+  user2ID: string
+): Promise<{ conversationExists: boolean }> => {
+  const response = await axiosInstance.get(
+    `/api/v1/conversations/check-conversation/${user2ID}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  return response.data;
+};
 
 
 
