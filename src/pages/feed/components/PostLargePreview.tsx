@@ -46,6 +46,7 @@ interface PostLargePreviewProps {
   action?: ActivityContextType; // used if the post is an action
   className?: string;
   borders?: boolean;
+  disableLink?: boolean;
 }
 
 const userId = Cookies.get("linkup_user_id");
@@ -56,6 +57,7 @@ const PostLargePreview: React.FC<PostLargePreviewProps> = ({
   action,
   className,
   borders,
+  disableLink,
 }) => {
   // All hooks at the top level
   // State hooks
@@ -242,7 +244,7 @@ const PostLargePreview: React.FC<PostLargePreviewProps> = ({
 
   return (
     <Card
-      className={`p-2 bg-white border-0 mb-4 pl-0 dark:bg-gray-900 dark:text-neutral-200 ${
+      className={`p-2 bg-white border-0 mb-4 pl-0 dark:bg-gray-900 w-full max-w-[50rem] dark:text-neutral-200 ${
         borders ? "border dark:border-gray-500" : ""
       }`}
     >
@@ -279,7 +281,7 @@ const PostLargePreview: React.FC<PostLargePreviewProps> = ({
           date={postData?.date}
           hideActions={true}
           savedPostView={true}
-          disableLink
+          disableLink={disableLink}
         />
         {postData.content && (
           <TruncatedText
