@@ -455,3 +455,17 @@ export enum InvitationsStatusEnum {
   everyone = "Everyone",
   email = "email",
 }
+
+export interface Subscription {
+  plan: "premium" | "free";
+  status: "active" | "canceled" | "trialing" | "past_due";
+  subscription_id?: string | null; // Stripe subscription ID
+  customer_id?: string | null; // Stripe customer ID
+  current_period_start: Date | null;
+  current_period_end: Date | null;
+  canceled_at?: Date;
+  cancel_at_period_end: boolean;
+  subscription_started_at?: Date | null; // Date when the subscription started
+  subscription_ends_at?: Date | null;
+  subscribed: boolean;
+}
