@@ -28,6 +28,7 @@ import { toast } from "sonner";
 import {
   createCompanyPost,
   createPost,
+  editCompanyPost,
   fetchSinglePost,
   repostWithThoughts,
 } from "@/endpoints/feed";
@@ -292,7 +293,7 @@ const CreatePost: React.FC<CreatePostProps> = ({ className }) => {
       const toastId = toast.loading(
         editMode ? "Updating your post..." : "Submitting your post..."
       );
-      if (companyInfo) {
+      if (companyInfo && !postToEdit) {
         // Call company post endpoint
         const result = await createCompanyPost(
           postObject,
@@ -331,9 +332,39 @@ const CreatePost: React.FC<CreatePostProps> = ({ className }) => {
           // Add the new post to the Redux store at the beginning of the list
           dispatch(unshiftPosts([postWithComments]));
         }
-      } else if (editMode && postToEdit?._id) {
+      } else if (editMode && postToEdit?._id && !(companyInfo === null)) {
+        console.log("Calling normal edit", companyInfo);
         // Handle edit
         const response = await editPost(postObject, user_token);
+        console.log("RESPONSE:", response);
+
+        dispatch(
+          updatePost({
+            postId: postToEdit._id,
+            updatedPost: {
+              content: postObject.content,
+              media: {
+                media_type: postObject.mediaType,
+                link: postObject.media,
+              },
+              comments_disabled: postObject.commentsDisabled,
+              public_post: postObject.publicPost,
+              tagged_users: postObject.taggedUsers,
+              is_edited: true,
+            },
+          })
+        );
+
+        toast.success("Post updated successfully", { id: toastId });
+        dispatch(closeCreatePostDialog());
+      } else if (editMode && postToEdit?._id && companyInfo) {
+        console.log("Calling company edit");
+        // Handle edit
+        const response = await editCompanyPost(
+          postObject,
+          { organization_id: companyInfo._id, post_id: postToEdit._id },
+          user_token
+        );
         console.log("RESPONSE:", response);
 
         dispatch(

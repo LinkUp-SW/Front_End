@@ -749,3 +749,23 @@ export const getSearchPosts = async (
     next_cursor: response.data.next_cursor,
   };
 };
+
+export const editCompanyPost = async (
+  postPayload: PostDBObject,
+  postParams: {
+    organization_id: string;
+    post_id: string;
+  },
+  token: string
+) => {
+  const response = await axiosInstance.patch(
+    `api/v1/company/update-post-from-company/${postParams.organization_id}/${postParams.post_id}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      params: postPayload,
+    }
+  );
+  return response.data;
+};
