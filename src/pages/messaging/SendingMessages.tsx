@@ -73,8 +73,6 @@ const SendingMessages = () => {
   /* const [selectedImage, setSelectedMessages] = useState("");*/
   const [selectedEmoji, setSelectedEmoji] = useState(false);
   const [text, setText] = useState<string>("");
-  const [files, setFiles] = useState<File[]>([]);
-  const [selectedFile, setSelectedFile] = useState(false);
   const [mediaFiles, setMediaFiles] = useState<File[]>([]);
 
   const handleEmojiRequest = (emoji: { emoji: string }) => {

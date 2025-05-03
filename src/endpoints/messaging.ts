@@ -179,15 +179,8 @@ export const startConversation = async (
       }
     );
     return response.data;
-  } catch (error: any) {
-    // Improved error handling
+  } catch (error) {
     console.error("Error starting conversation:", error);
-    
-    // Return more specific error information if available
-    if (error.response) {
-      throw new Error(error.response.data.message || 'Failed to start conversation');
-    }
-    
     throw new Error('Failed to start conversation');
   }
 }
