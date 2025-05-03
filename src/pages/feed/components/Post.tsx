@@ -346,7 +346,15 @@ const Post: React.FC<PostProps> = ({
         dispatch(
           addNewCommentToPost({
             postId: targetPost._id,
-            comment: createdComment.comment,
+            comment: {
+              ...createdComment.comment,
+              media: createdComment.comment.media
+                ? {
+                    link: [createdComment.comment.media],
+                    media_type: createdComment.comment.media ? "image" : "None",
+                  }
+                : null,
+            },
           })
         );
       } else {
@@ -362,7 +370,18 @@ const Post: React.FC<PostProps> = ({
                     return {
                       ...comment,
                       children: Array.isArray(comment.children)
-                        ? [...comment.children, createdComment.comment]
+                        ? [
+                            ...comment.children,
+                            {
+                              ...createdComment.comment,
+                              media: createdComment.comment.media
+                                ? {
+                                    link: [createdComment.comment.media],
+                                    media_type: "image",
+                                  }
+                                : null,
+                            },
+                          ]
                         : [createdComment.comment],
                     };
                   }
