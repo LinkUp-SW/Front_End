@@ -1,5 +1,4 @@
 import {
-  FaBan,
   FaBookmark,
   FaEdit,
   FaFlag,

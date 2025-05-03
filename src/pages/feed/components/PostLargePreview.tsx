@@ -13,7 +13,6 @@ import {
   MediaType,
   PostDBObject,
   PostType,
-  PostUserType,
 } from "@/types";
 import { POST_ACTIONS } from "@/constants";
 import PostHeader from "./PostHeader";
@@ -46,6 +45,7 @@ interface PostLargePreviewProps {
   postData: PostType | undefined;
   action?: ActivityContextType; // used if the post is an action
   className?: string;
+  borders?: boolean;
 }
 
 const userId = Cookies.get("linkup_user_id");
@@ -55,50 +55,44 @@ const PostLargePreview: React.FC<PostLargePreviewProps> = ({
   postData,
   action,
   className,
+  borders,
 }) => {
   // All hooks at the top level
   // State hooks
-  if (!postData) {
-    return <PostSkeleton />;
-  }
+
   const [isLandscape, setIsLandscape] = useState<boolean>(false);
   const [isSaved, setIsSaved] = useState<boolean>(postData?.is_saved || false);
   const [postMenuOpen, setPostMenuOpen] = useState(false);
   const [willDelete, setWillDelete] = useState(false);
 
   const topStats = getReactionIcons(postData?.top_reactions || []);
-  const selectedReaction = postData?.user_reaction
-    ? postData?.user_reaction.charAt(0).toUpperCase() +
-      postData?.user_reaction.slice(1).toLowerCase()
-    : "None";
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const posts = useSelector((state: RootState) => state.posts.list);
-  const { author }: { author: PostUserType } = postData;
-  const { date, media } = postData;
 
   useEffect(() => {
     if (
-      media &&
-      (media.media_type === "image" || media.media_type === "images")
+      postData?.media &&
+      (postData?.media.media_type === "image" ||
+        postData?.media.media_type === "images")
     ) {
       const img = new Image();
-      img.src = media.link[0];
+      img.src = postData?.media.link[0];
       img.onload = () => {
         setIsLandscape(img.width > img.height);
       };
     }
-  }, [media]);
+  }, [postData?.media]);
 
   useEffect(() => {
-    if (postData.is_saved) setIsSaved(postData.is_saved);
-  }, [postData.is_saved]);
+    if (postData?.is_saved) setIsSaved(postData?.is_saved);
+  }, [postData?.is_saved]);
 
   useEffect(() => {
     const commentButton = document.getElementById("engagement-Comment");
 
-    if (commentButton && postData.comments_disabled === "No one") {
+    if (commentButton && postData?.comments_disabled === "No one") {
       commentButton.setAttribute("disabled", "true");
       commentButton.classList.add(
         "opacity-50",
@@ -107,7 +101,10 @@ const PostLargePreview: React.FC<PostLargePreviewProps> = ({
       );
       commentButton.classList.remove("hover:cursor-pointer");
     }
-  }, [postData.comments_disabled]);
+  }, [postData?.comments_disabled]);
+  if (!postData) {
+    return <PostSkeleton />;
+  }
 
   if (!postData || !postData._id) {
     return (
@@ -125,8 +122,8 @@ const PostLargePreview: React.FC<PostLargePreviewProps> = ({
 
     const postForEdit: PostDBObject = {
       content: postData.content,
-      mediaType: (postData.media?.media_type as MediaType) || "none",
-      media: postData.media?.link || [],
+      mediaType: (postData?.media?.media_type as MediaType) || "none",
+      media: postData?.media?.link || [],
       commentsDisabled: postData.comments_disabled || "Anyone",
       publicPost: postData.public_post !== false,
       taggedUsers: postData.tagged_users || [],
@@ -227,7 +224,7 @@ const PostLargePreview: React.FC<PostLargePreviewProps> = ({
 
   // UI helpers
   const menuActions =
-    userId === author.username
+    userId === postData?.author.username
       ? getPersonalMenuActions(
           handleSaveButton,
           handleEditPostButton,
@@ -244,7 +241,11 @@ const PostLargePreview: React.FC<PostLargePreviewProps> = ({
   };
 
   return (
-    <Card className="p-2 bg-white border-0 mb-4 pl-0 dark:bg-gray-900 dark:text-neutral-200">
+    <Card
+      className={`p-2 bg-white border-0 mb-4 pl-0 dark:bg-gray-900 dark:text-neutral-200 ${
+        borders ? "border dark:border-gray-500" : ""
+      }`}
+    >
       <CardContent className="flex flex-col items-start pl-0 w-full">
         {action && (
           <header className="flex pl-4 justify-start items-center w-full border-b gap-2 pb-2 dark:border-neutral-700">
@@ -267,15 +268,15 @@ const PostLargePreview: React.FC<PostLargePreviewProps> = ({
           </header>
         )}
         <PostHeader
-          user={author}
+          user={postData?.author}
           action={action}
           postId={postData._id}
           postMenuOpen={postMenuOpen}
           setPostMenuOpen={setPostMenuOpen}
           menuActions={menuActions}
-          edited={postData.is_edited}
+          edited={postData.is_edited || false}
           publicPost={postData.public_post}
-          date={date}
+          date={postData?.date}
           hideActions={true}
           savedPostView={true}
           disableLink
@@ -284,28 +285,36 @@ const PostLargePreview: React.FC<PostLargePreviewProps> = ({
           <TruncatedText
             id="post-content"
             content={postData.content}
+            limitHeight
             lineCount={3}
           />
         )}
 
         {/* Post Image(s) */}
-        {((media && media.media_type === "image") ||
-          media?.media_type === "images") && (
-          <PostImages images={media.link || []} isLandscape={isLandscape} />
+        {((postData?.media && postData?.media.media_type === "image") ||
+          postData?.media?.media_type === "images") && (
+          <PostImages
+            images={postData?.media.link || []}
+            isLandscape={isLandscape}
+          />
         )}
 
-        {media && media.media_type === "video" && (
+        {postData?.media && postData?.media.media_type === "video" && (
           <div className="flex w-1/3 relative left-4 self-center justify-end">
-            <video className="w-full pt-4" controls src={media.link[0]}></video>
+            <video
+              className="w-full pt-4"
+              controls
+              src={postData?.media.link[0]}
+            ></video>
           </div>
         )}
-        {media && media.media_type === "pdf" && (
+        {postData?.media && postData?.media.media_type === "pdf" && (
           <div className="flex w-full justify-center pt-4">
             {(() => {
               try {
                 return (
                   <iframe
-                    src={media.link[0]}
+                    src={postData?.media.link[0]}
                     className="w-[800px] h-[600px]"
                     title="PDF Document"
                   />
@@ -318,7 +327,7 @@ const PostLargePreview: React.FC<PostLargePreviewProps> = ({
                     currentSelectedMedia={[
                       new File(
                         [
-                          new Blob([media.link[0]], {
+                          new Blob([postData?.media.link[0]], {
                             type: "application/pdf",
                           }),
                         ],
@@ -332,9 +341,9 @@ const PostLargePreview: React.FC<PostLargePreviewProps> = ({
             })()}
           </div>
         )}
-        {media && media.media_type === "link" && (
+        {postData?.media && postData?.media.media_type === "link" && (
           <div className="w-full pl-4 pt-4">
-            <LinkPreview url={media.link[0]} className="w-full" />
+            <LinkPreview url={postData?.media.link[0]} className="w-full" />
           </div>
         )}
         <Dialog

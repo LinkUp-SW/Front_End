@@ -29,8 +29,8 @@ interface PostHeaderProps {
   setPostMenuOpen: (isOpen: boolean) => void;
   menuActions: MenuAction[]; // You can replace `any` with a more specific type if available
   savedPostView?: boolean;
-  edited?: boolean;
-  publicPost?: boolean;
+  edited: boolean;
+  publicPost: boolean;
   date: number;
   hideActions?: boolean;
   disableLink?: boolean;
@@ -182,7 +182,11 @@ const PostHeader: React.FC<PostHeaderProps> = ({
             to="#"
             className={`text-ellipsis line-clamp-1 ${action ? "pr-20" : ""}`}
           >
-            {user.headline}
+            {user.followers_count
+              ? user.followers_count === 1
+                ? `1 follower`
+                : ` ${user.followers_count} followers`
+              : user.headline}
           </Link>
 
           <div className="flex gap-x-1 items-center dark:text-neutral-400 text-gray-500">
@@ -193,7 +197,7 @@ const PostHeader: React.FC<PostHeaderProps> = ({
                 <span>Edited </span>
               </>
             )}
-            {publicPost ? (
+            {publicPost === true ? (
               <>
                 <p className="text-lg font-bold"> · </p>
                 <span className="text-lg">

@@ -43,6 +43,7 @@ import {
   AnalyticsPage,
   ContentModerationPage,
 
+  CompanyProfileView,
 } from "./pages";
 
 import PrimaryEmailPage from "./pages/settings/updateEmail/PrimaryEmailPage";
@@ -270,7 +271,15 @@ const routes: RouteObject[] = [
     path:"/admin/content-moderation",
     element: React.createElement(ContentModerationPage)
   },
-  
+  {
+    path:"/admin/job-postings",
+    element: React.createElement(JobPostingsPage)
+  },
+ 
+  {
+    path: "/company/:companyId",
+    element: React.createElement(CompanyProfileView),
+  },
 
 ];
 

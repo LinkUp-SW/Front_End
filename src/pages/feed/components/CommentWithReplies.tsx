@@ -32,6 +32,7 @@ interface CommentWithRepliesProps {
   disableReplies: boolean;
   disableControls?: boolean;
   disableActions?: boolean;
+  limitHeight?: boolean;
 }
 
 const user_token = Cookies.get("linkup_auth_token");
@@ -43,12 +44,10 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
   disableReplies,
   disableControls = false,
   disableActions = false,
+  limitHeight = false,
 }) => {
-  if (!comment) {
-    return <CommentSkeleton />;
-  }
-  const replies = comment.children || [];
-  const hasMoreReplies = replies.length < (comment.children_count || 0);
+  const replies = comment?.children || [];
+  const hasMoreReplies = replies.length < (comment?.children_count || 0);
   // State hooks
   const [showReplies, setShowReplies] = useState(true);
   const [mainCommentHeight, setMainCommentHeight] = useState(0);
@@ -73,7 +72,7 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
   const dispatch = useDispatch();
 
   // Get comments from the comment.children property if replies not provided
-  const commentReplies = replies || comment.children || [];
+  const commentReplies = replies || comment?.children || [];
 
   // Effects
   useEffect(() => {
@@ -107,6 +106,10 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
       setReplyHeights(0);
     }
   }, [commentReplies, showReplies]);
+
+  if (!comment) {
+    return <CommentSkeleton />;
+  }
 
   const handleLoadMoreReplies = async () => {
     if (isLoadingReplies) return;
@@ -187,12 +190,12 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
       <div ref={commentRef}>
         <Comment
           comment={comment}
-          isReplyActive={isReplyActive}
           setIsReplyActive={setIsReplyActive}
           postId={postId}
           disableReplies={disableReplies}
           disableControls={disableControls}
           disableActions={disableActions}
+          limitHeight={limitHeight}
         />
       </div>
 
@@ -223,7 +226,6 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
                   <div className="w-12 h-full rounded-full absolute bg-white dark:bg-gray-900 left-8" />
                   <Reply
                     comment={reply}
-                    isReplyActive={isReplyActive}
                     setIsReplyActive={setIsReplyActive}
                     postId={postId}
                     disableReplies={disableReplies}

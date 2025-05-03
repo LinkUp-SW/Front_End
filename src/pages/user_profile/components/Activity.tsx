@@ -67,9 +67,6 @@ const Activity: React.FC = () => {
   const handleSaveButton = () => setIsSaved((s) => !s);
   const handleEditPostButton = () => {};
   const deleteModal = () => {};
-  const blockPost = () => {};
-  const reportPost = () => {};
-  const unfollow = () => {};
 
   if (posts.length === 0) return null;
 
@@ -135,13 +132,7 @@ const Activity: React.FC = () => {
                           post._id,
                           isSaved
                         )
-                      : getMenuActions(
-                          handleSaveButton,
-                          blockPost,
-                          reportPost,
-                          post._id,
-                          isSaved
-                        )
+                      : getMenuActions(handleSaveButton, post._id, isSaved)
                   }
                   showFooter
                 />
@@ -163,13 +154,7 @@ const Activity: React.FC = () => {
                           post._id,
                           isSaved
                         )
-                      : getMenuActions(
-                          handleSaveButton,
-                          blockPost,
-                          reportPost,
-                          post._id,
-                          isSaved
-                        )
+                      : getMenuActions(handleSaveButton, post._id, isSaved)
                   }
                   showFooter
                 />

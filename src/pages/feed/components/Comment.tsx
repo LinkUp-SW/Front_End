@@ -63,24 +63,24 @@ import UserTagging from "./UserTagging";
 
 export interface CommentProps {
   comment: CommentType;
-  isReplyActive: boolean;
   setIsReplyActive: React.Dispatch<React.SetStateAction<boolean>>;
   postId: string;
   disableReplies: boolean;
   disableControls?: boolean;
   disableActions?: boolean;
+  limitHeight?: boolean;
 }
 
 const token = Cookies.get("linkup_auth_token");
 
 const Comment: React.FC<CommentProps> = ({
   comment,
-  isReplyActive,
   setIsReplyActive,
   postId,
   disableReplies,
   disableControls = false,
   disableActions = false,
+  limitHeight = false,
 }) => {
   const {
     profile_picture,
@@ -101,11 +101,9 @@ const Comment: React.FC<CommentProps> = ({
   const myUserId = Cookies.get("linkup_user_id");
 
   const [commentMenuOpen, setCommentMenuOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
   const [selectedReaction, setSelectedReaction] = useState("None"); // Like, Love, etc.
   const [reactionsOpen, setReactionsOpen] = useState(false); // for Popover open state
-  const [viewMore, setViewMore] = useState(false); // if you want to toggle text next to icons
   const [topStats, setTopStats] = useState(
     getReactionIcons(comment.top_reactions || [])
   );
@@ -131,7 +129,6 @@ const Comment: React.FC<CommentProps> = ({
   };
 
   useEffect(() => {
-    setIsLoading(true);
     const fetchData = async () => {
       try {
         // Call both endpoints concurrently
@@ -141,7 +138,6 @@ const Comment: React.FC<CommentProps> = ({
     };
 
     fetchData();
-    setIsLoading(false);
 
     if (comment.user_reaction)
       setSelectedReaction(
@@ -334,10 +330,7 @@ const Comment: React.FC<CommentProps> = ({
     try {
       // Call the API to delete the post
 
-      const result = await deleteComment(
-        { comment_id: comment._id, post_id: postId },
-        token
-      );
+      await deleteComment({ comment_id: comment._id, post_id: postId }, token);
 
       if (comment.parent_id) {
         dispatch(
@@ -416,7 +409,7 @@ const Comment: React.FC<CommentProps> = ({
                     <span>(edited) </span>
                   </>
                 )}
-                <time className="classname pr-2 aw mr-2">{timeAgo}</time>
+                <time className="classname pr-2 mr-2">{timeAgo}</time>
               </div>
               <Dialog
                 open={deleteModal}
@@ -630,6 +623,7 @@ const Comment: React.FC<CommentProps> = ({
               lineCount={3}
               id={`comment-${comment._id}`}
               className="ml-0 relative -left-5"
+              limitHeight={limitHeight}
             />
           </div>
         )}
@@ -701,11 +695,7 @@ const Comment: React.FC<CommentProps> = ({
                     <LikeEmoji /> Like{" "}
                   </div>
                 )}
-                {selectedReaction == "None"
-                  ? viewMore
-                    ? "Like"
-                    : ""
-                  : selectedReaction}
+                {selectedReaction == "None" ? "" : selectedReaction}
               </Button>
             </PopoverTrigger>
             <TooltipProvider>

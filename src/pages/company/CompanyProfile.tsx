@@ -10,6 +10,10 @@ import { toast } from 'sonner';
 import { WithNavBar } from '../../components';
 import JobViewerComponent from './components/companyProfilePageComponents/JobViewerComponent';
 import AdminViewerComponent from './components/companyProfilePageComponents/AdminViewerComponent';
+import { useSelector } from "react-redux";
+import { useFeedPosts } from "@/hooks/useFeedPosts";
+import PostList from "../feed/components/PostList";
+import { RootState } from "@/store";
 import { 
   BiBuildingHouse, 
   BiGlobe, 
@@ -18,7 +22,6 @@ import {
   BiGroup, 
   BiMapPin, 
   BiBriefcase, 
-  BiTime 
 } from 'react-icons/bi';
 
 interface CompanyData {
@@ -72,6 +75,24 @@ const CompanyProfileView = () => {
     overview: "",
     description: "",
   });
+
+    const {
+      posts,
+      observerRef,
+      isLoading: postsLoading,
+      initialLoading,
+    } = useFeedPosts(
+      false, // single
+      "", // profile
+      companyId // company
+    );
+  
+    const screenWidth = useSelector((state: RootState) => state.screen.width);
+    const [viewMore, setViewMore] = useState(screenWidth >= 768);
+  
+    useEffect(() => {
+      setViewMore(screenWidth >= 768);
+    }, [screenWidth]);
   
   // State for following status
   const [isFollowing, setIsFollowing] = useState<boolean>(false);
@@ -98,6 +119,13 @@ const CompanyProfileView = () => {
         if (companyResponse && companyResponse.companyProfile) {
           const company = companyResponse.companyProfile;
           
+          // Use the correct follower count from the API response
+          // First check followerCount, then check followers_count, then fallback to the length of followers array
+          const followerCount = 
+            company.followerCount || 
+            company.followers_count || 
+            (company.followers ? company.followers.length : 0);
+          
           setCompanyData({
             _id: company._id,
             name: company.name,
@@ -107,7 +135,7 @@ const CompanyProfileView = () => {
             industry: company.industry || "",
             size: company.size || "",
             type: company.type || "",
-            followerCount: company.followers_count || 0,
+            followerCount: followerCount,
             location: {
               country: company.location?.country || "",
               city: company.location?.city || "",
@@ -405,7 +433,7 @@ const CompanyProfileView = () => {
                           <BiGroup className="w-4 h-4 mr-2 text-blue-600 dark:text-blue-400" />
                           Company size
                         </h3>
-                        <p className="text-gray-700 dark:text-gray-300">{companyData.size} employees</p>
+                        <p className="text-gray-700 dark:text-gray-300">{companyData.size}</p>
                       </div>
                     )}
                     
@@ -424,23 +452,16 @@ const CompanyProfileView = () => {
             )}
             
             {/* Posts section - placeholder for when "posts" tab is active */}
-            {activeTab === 'posts' && (
-              <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg mb-6 p-6">
-                <h2 className="text-lg font-semibold mb-4 dark:text-white flex items-center">
-                  <BiTime className="w-5 h-5 mr-2 text-blue-600 dark:text-blue-400" />
-                  Posts
-                </h2>
-                <div className="flex flex-col items-center justify-center py-8 text-center">
-                  <div className="w-32 h-32 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4">
-                    <BiTime className="w-14 h-14 text-gray-400 dark:text-gray-500" />
-                  </div>
-                  <h3 className="text-lg font-medium mb-2 dark:text-gray-200">No posts yet</h3>
-                  <p className="text-gray-600 dark:text-gray-400 max-w-md">
-                    This company hasn't shared any posts yet. Check back later for updates.
-                  </p>
-                </div>
-              </div>
-            )}
+            {activeTab === 'posts' && <main className="flex flex-col w-full ">
+                <div className="mt-4" />
+                <PostList
+                  posts={posts}
+                  viewMore={viewMore}
+                  isLoading={postsLoading}
+                  initialLoading={initialLoading}
+                  observerRef={observerRef}
+                />
+              </main>}
           </div>
           
           {/* Right column */}
@@ -465,7 +486,7 @@ const CompanyProfileView = () => {
                     <BiGroup className="w-5 h-5 mr-3 text-gray-500 dark:text-gray-400 mt-0.5" />
                     <div>
                       <p className="text-gray-600 dark:text-gray-400">Company size</p>
-                      <p className="font-medium dark:text-gray-200">{companyData.size} employees</p>
+                      <p className="font-medium dark:text-gray-200">{companyData.size}</p>
                     </div>
                   </div>
                 )}

@@ -5,6 +5,7 @@ import People from "./components/People";
 import Jobs from "./components/Jobs";
 import Cookies from "js-cookie";
 import { getusers, Person } from "@/endpoints/myNetwork";
+import Posts from "./components/Posts";
 
 const SearchPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -43,8 +44,11 @@ const SearchPage: React.FC = () => {
       ) : (
         query && (
           <>
-            {people.length > 0 && <People people={people} setPeople={setPeople} query={query} />}
+            {people.length > 0 && (
+              <People people={people} setPeople={setPeople} query={query} />
+            )}
             <Jobs query={query} />
+            <Posts query={query} />
           </>
         )
       )}

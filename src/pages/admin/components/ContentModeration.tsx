@@ -334,6 +334,7 @@ const ContentModeration = () => {
                                     }
                                     disableControls
                                     disableActions
+                                    limitHeight
                                   />
                                 </div>
                               </div>
