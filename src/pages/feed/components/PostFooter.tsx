@@ -125,7 +125,6 @@ const PostFooter: React.FC<PostFooterProps> = ({
       }
 
       setSelectedImage(file);
-      console.log("Uploaded:", file);
     }
   };
 
@@ -146,7 +145,6 @@ const PostFooter: React.FC<PostFooterProps> = ({
 
     reader.onload = () => {
       const base64Image = reader.result as string;
-      console.log("Base64 Image:", base64Image);
 
       const newComment = {
         post_id: postId,
@@ -155,7 +153,6 @@ const PostFooter: React.FC<PostFooterProps> = ({
         tagged_users: extractedTaggedUsers.map((user) => user.id),
         parent_id: parentId,
       };
-      console.log("Comment Payload:", newComment);
 
       // Reset input and selected image
       setCommentInput("");

@@ -131,7 +131,6 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
         comment._id,
         user_token
       );
-      console.log("Responseeeee:", response);
 
       // Update the replies in the comment
       dispatch(
