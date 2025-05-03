@@ -80,7 +80,7 @@ export interface ReportDetailsJobData {
 export interface DashboardDataResponse {
     summary: {
       reported_content: number;
-      pending_jobs: number;
+      total_jobs: number; 
       total_users: number;
       delta: {
         reports: number;
@@ -103,6 +103,7 @@ export interface DashboardDataResponse {
       content_posted_today: number;
     };
   }
+  
   
 
 export const getreports = async (

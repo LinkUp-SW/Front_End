@@ -9,16 +9,22 @@ const SmallStatCard = ({
   title,
   value,
   change,
+  isNegative,
 }: {
   title: string;
   value: string;
   change: string;
+  isNegative?: boolean;
 }) => {
+  const changeColor = isNegative
+    ? "text-red-500 dark:text-red-400"
+    : "text-green-500 dark:text-green-400";
+
   return (
     <div className="bg-gradient-to-br from-white to-blue-50 dark:from-gray-800 dark:to-gray-900 rounded-2xl shadow-lg p-6 flex flex-col justify-between transform transition duration-300 hover:-translate-y-1 hover:scale-105 hover:shadow-2xl">
       <div className="text-sm text-gray-600 dark:text-gray-400 mb-2">{title}</div>
       <div className="text-3xl font-bold text-gray-900 dark:text-white">{value}</div>
-      <div className="text-xs mt-1 text-green-500 dark:text-green-400">{change}</div>
+      <div className={`text-xs mt-1 ${changeColor}`}>{change}</div>
     </div>
   );
 };
@@ -98,22 +104,25 @@ const Dashboard = () => {
         </p>
       </div>
 
-      {/* First row: Small cards centered over 3 columns */}
+      {/* First row: Small cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
         <SmallStatCard
           title="Reported Content"
           value={data.summary.reported_content.toString()}
-          change={`+${data.summary.delta.reports} since yesterday`}
+          change={`${data.summary.delta.reports >= 0 ? "+" : ""}${data.summary.delta.reports} since yesterday`}
+          isNegative={data.summary.delta.reports < 0}
         />
         <SmallStatCard
-          title="Pending Jobs"
-          value={data.summary.pending_jobs.toString()}
-          change={`+${data.summary.delta.jobs} since yesterday`}
+          title="Total Jobs"
+          value={data.summary.total_jobs.toString()}
+          change={`${data.summary.delta.jobs >= 0 ? "+" : ""}${data.summary.delta.jobs} since yesterday`}
+          isNegative={data.summary.delta.jobs < 0}
         />
         <SmallStatCard
           title="Active Users"
           value={data.summary.total_users.toString()}
-          change={`+${data.summary.delta.users} since yesterday`}
+          change={`${data.summary.delta.users >= 0 ? "+" : ""}${data.summary.delta.users} since yesterday`}
+          isNegative={data.summary.delta.users < 0}
         />
       </div>
 
