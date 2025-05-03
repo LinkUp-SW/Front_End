@@ -1,12 +1,14 @@
 import { useState } from "react";
-import { Modal, WithNavBar } from "../../components";
+import whoIsHiringImage from "@/assets/whoIsHiring.jpg";
+
+import { LinkUpFooter, Modal, WithNavBar } from "../../components";
 import {
   AboutSection,
   EducationSection,
   ExperienceSection,
   LicenseSection,
   ProfileStrength,
-  ResourcesSection,
+  ProfileUrlSection,
   SkillsSection,
   UserInfo,
 } from "./components";
@@ -23,7 +25,7 @@ const UserProfilePage = () => {
   const [isProfileVisible, setIsProfileVisible] = useState(true);
   const { data } = useFetchData(
     async () => (token && id ? checkIsMe(token, id) : Promise.resolve(null)),
-    []
+    [id]
   );
 
   return (
@@ -45,9 +47,19 @@ const UserProfilePage = () => {
         </div>
 
         {/* Right Sidebar */}
-        <div className="lg:col-span-1 space-y-4">
-          <ProfileStrength />
-          <ResourcesSection />
+        <div className="lg:col-span-1 space-y-4 flex flex-col items-center">
+          <ProfileUrlSection />
+          {data?.is_me && <ProfileStrength />}
+          <div className="mt-4 cursor-pointer h-fit w-full hidden lg:block">
+            <img
+              src={whoIsHiringImage}
+              alt="Promotional Banner"
+              className="rounded-lg shadow-lg w-full aspect-square object-fill object-center"
+            />
+          </div>
+          <div className="hidden lg:block">
+            <LinkUpFooter />
+          </div>
         </div>
       </div>
       <Modal />

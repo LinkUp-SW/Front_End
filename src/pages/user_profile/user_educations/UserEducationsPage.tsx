@@ -6,9 +6,10 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  LinkUpFooter,
+  WhosHiringImage,
   WithNavBar,
 } from "@/components";
-import { ResourcesSection, ViewedSection } from "../components";
 import Header from "../components/modals/components/Header";
 import AddEducationModal from "../components/modals/education_modal/AddEducationModal";
 import { Education } from "@/types";
@@ -170,8 +171,8 @@ const UserEducationsPage = () => {
 
         {/* Right Sidebar */}
         <div className="lg:col-span-1 space-y-4">
-          <ViewedSection />
-          <ResourcesSection />
+          <WhosHiringImage />
+          <LinkUpFooter />
         </div>
       </div>
 

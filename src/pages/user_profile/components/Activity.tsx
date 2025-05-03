@@ -63,7 +63,6 @@ const Activity: React.FC<{
     if (activeTab === "video") return post.media.media_type.includes("video");
     return false;
   });
-  useEffect(() => {}, [posts]);
 
   const handleCreatePost = () => dispatch(openCreatePostDialog());
   const handleSaveButton = () => setIsSaved((s) => !s);

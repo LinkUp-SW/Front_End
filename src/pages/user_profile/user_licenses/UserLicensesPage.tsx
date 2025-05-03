@@ -1,5 +1,4 @@
 import React, { Fragment, useEffect, useState } from "react";
-import { ResourcesSection, ViewedSection } from "../components";
 import {
   Button,
   Dialog,
@@ -8,6 +7,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  LinkUpFooter,
+  WhosHiringImage,
   WithNavBar,
 } from "@/components";
 import { License } from "@/types";
@@ -171,8 +172,8 @@ const UserLicensesPage = () => {
 
         {/* Right Sidebar */}
         <div className="lg:col-span-1 space-y-4">
-          <ViewedSection />
-          <ResourcesSection />
+          <WhosHiringImage />
+          <LinkUpFooter />
         </div>
       </div>
 

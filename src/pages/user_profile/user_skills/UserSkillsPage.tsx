@@ -7,7 +7,6 @@ import {
   getUserSkills,
 } from "@/endpoints/userProfile";
 import { Skill } from "@/types";
-import { ResourcesSection, ViewedSection } from "../components";
 import { Fragment, useEffect, useState } from "react";
 import { getErrorMessage } from "@/utils/errorHandler";
 import { toast } from "sonner";
@@ -19,6 +18,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  LinkUpFooter,
+  WhosHiringImage,
   WithNavBar,
 } from "@/components";
 import Header from "../components/modals/components/Header";
@@ -281,8 +282,8 @@ const UserSkillsPage = () => {
         </div>
 
         <div className="lg:col-span-1 space-y-4">
-          <ViewedSection />
-          <ResourcesSection />
+          <WhosHiringImage />
+          <LinkUpFooter />
         </div>
       </div>
 
