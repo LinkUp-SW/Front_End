@@ -1,7 +1,11 @@
 import Cookies from "js-cookie";
 import { useParams } from "react-router-dom";
 import useFetchData from "@/hooks/useFetchData";
-import { deleteUserSkills, getUserSkills } from "@/endpoints/userProfile";
+import {
+  deleteUserSkills,
+  getUserBio,
+  getUserSkills,
+} from "@/endpoints/userProfile";
 import { Skill } from "@/types";
 import { ResourcesSection, ViewedSection } from "../components";
 import { Fragment, useEffect, useState } from "react";
@@ -209,6 +213,15 @@ const UserSkillsPage = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [skillToEdit, setSkillToEdit] = useState<Skill | null>(null);
   const [editOpen, setEditOpen] = useState(false);
+  const [isUserInConnection, setIsUserInConnection] = useState<
+    boolean | undefined
+  >(undefined);
+
+  useEffect(() => {
+    getUserBio(authToken as string, id as string)
+      .then((data) => setIsUserInConnection(data.isInConnections))
+      .catch(() => toast.error("couldnt retrieve the connection state"));
+  }, [id]);
 
   if (error) {
     return (
@@ -257,6 +270,8 @@ const UserSkillsPage = () => {
                       setSelectedSkill={setSelectedSkill}
                       idx={idx}
                       isMe={isMe}
+                      isInConnections={isUserInConnection}
+                      userID={id}
                     />
                   </Fragment>
                 ))

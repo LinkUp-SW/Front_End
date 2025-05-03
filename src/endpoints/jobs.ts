@@ -57,6 +57,7 @@ export interface SearchJobs {
   experience_level: string;
   salary: number;
   timeAgo: string;
+  is_saved: boolean;
   organization: Organization;
 }
 
@@ -218,14 +219,16 @@ export const convertJobDataToJob = (jobData: JobData): Job => {
 };
 
 export const getSearchJobs = async (
-  query: string,
-  cursor: string | null,
-  limit: number | null
-): Promise<JobSearchResponse> => {
+  token:string,
+  query:string,
+  cursor:string | null,
+  limit:number |null
+): Promise<JobSearchResponse > => {
   const response = await axiosInstance.get(
     "/api/v1/jobs/search-jobs",
     {
       headers: {
+        Authorization: `Bearer ${token}`
       
       },
       params: { query, cursor, limit },

@@ -2,6 +2,7 @@
 
 import { openModal } from "@/slices/modal/modalSlice";
 import { SkillResponse, UserStarterInterface } from "@/types";
+import React from "react";
 import type { Area } from "react-easy-crop";
 
 // Example utility function to convert an array of strings to lowercase
@@ -257,4 +258,69 @@ export const hasRichFormatting = (text: string): boolean => {
   const richFormatRegex =
     /(\*[^*]+\*)|(-[^-]+-)|(~[^~]+~)|(@[^:]+:[A-Za-z0-9_-]+\^)/;
   return richFormatRegex.test(text);
+};
+
+export async function compressDataUrl(
+  dataUrl: string,
+  maxW = 800,
+  maxH = 800,
+  quality = 0.7
+): Promise<Blob> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      // calculate target size
+      let { width, height } = img;
+      if (width > maxW || height > maxH) {
+        if (width / height > maxW / maxH) {
+          height = Math.round(height * (maxW / width));
+          width = maxW;
+        } else {
+          width = Math.round(width * (maxH / height));
+          height = maxH;
+        }
+      }
+      // draw to canvas
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext("2d")!;
+      ctx.drawImage(img, 0, 0, width, height);
+      // export blob
+      canvas.toBlob(
+        (blob) => (blob ? resolve(blob) : reject("toBlob failed")),
+        "image/jpeg",
+        quality
+      );
+    };
+    img.onerror = () => reject("Image load error");
+    img.src = dataUrl;
+  });
+}
+
+export const validateName = (name: string): boolean => {
+  const regex = /^[a-zA-Z]{1,15}$/;
+  return regex.test(name);
+};
+
+export const splitHeadline = (text: string) => {
+  const words = text.split(" "); // Split by spaces to check each word/substring
+
+  return words.map((word, index) => {
+    if (word.length > 10) {
+      // Apply `break-all` for words longer than 15 characters
+      return React.createElement(
+        "span",
+        { key: index, className: "break-all" },
+        word + " "
+      );
+    } else {
+      // Apply `break-words` for shorter words
+      return React.createElement(
+        "span",
+        { key: index, className: "break-words" },
+        word + " "
+      );
+    }
+  });
 };

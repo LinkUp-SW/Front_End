@@ -17,6 +17,7 @@ import { getReplies } from "@/endpoints/feed";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { addRepliesToComment } from "@/slices/feed/postsSlice";
+import CommentSkeleton from "./CommentSkeleton";
 
 interface CommentWithRepliesProps {
   handleCreateComment: (
@@ -26,8 +27,12 @@ interface CommentWithRepliesProps {
     setCommentInput: React.Dispatch<React.SetStateAction<string>>,
     commentId: string
   ) => void;
-  comment: CommentType;
+  comment: CommentType | undefined;
   postId: string;
+  disableReplies: boolean;
+  disableControls?: boolean;
+  disableActions?: boolean;
+  limitHeight?: boolean;
 }
 
 const user_token = Cookies.get("linkup_auth_token");
@@ -36,12 +41,13 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
   handleCreateComment,
   comment,
   postId,
+  disableReplies,
+  disableControls = false,
+  disableActions = false,
+  limitHeight = false,
 }) => {
-  const replies = comment.children || [];
-  const hasMoreReplies = replies.length < (comment.childrenCount || 0);
-  console.log("Has more replies:", hasMoreReplies);
-  console.log("Comment:", comment);
-  console.log("Replies:", replies);
+  const replies = comment?.children || [];
+  const hasMoreReplies = replies.length < (comment?.children_count || 0);
   // State hooks
   const [showReplies, setShowReplies] = useState(true);
   const [mainCommentHeight, setMainCommentHeight] = useState(0);
@@ -51,7 +57,6 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [isLoadingReplies, setIsLoadingReplies] = useState(false);
   const [nextCursor, setNextCursor] = useState(0);
-  console.log("cursor:", nextCursor);
 
   // Refs
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -67,7 +72,7 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
   const dispatch = useDispatch();
 
   // Get comments from the comment.children property if replies not provided
-  const commentReplies = replies || comment.children || [];
+  const commentReplies = replies || comment?.children || [];
 
   // Effects
   useEffect(() => {
@@ -102,6 +107,10 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
     }
   }, [commentReplies, showReplies]);
 
+  if (!comment) {
+    return <CommentSkeleton />;
+  }
+
   const handleLoadMoreReplies = async () => {
     if (isLoadingReplies) return;
     if (!user_token) {
@@ -130,10 +139,10 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
           postId,
           parentCommentId: comment._id,
           replies: response.replies,
-          nextCursor: response.nextCursor,
+          nextCursor: response.next_cursor,
         })
       );
-      setNextCursor(response.nextCursor);
+      setNextCursor(response.next_cursor);
     } catch (error) {
       console.error("Error loading more replies:", error);
       toast.error("Failed to load more replies");
@@ -149,6 +158,17 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    const maxFileSizeInMB = 10;
+    const maxFileSize = maxFileSizeInMB * 1048576; // 10 MB
+
+    if (file) {
+      if (file.size > maxFileSize) {
+        toast.error(
+          `File "${file.name}" exceeds the maximum size of ${maxFileSizeInMB} MB.`
+        );
+        return false;
+      }
+    }
     if (file) {
       setSelectedImage(file);
     }
@@ -172,6 +192,10 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
           comment={comment}
           setIsReplyActive={setIsReplyActive}
           postId={postId}
+          disableReplies={disableReplies}
+          disableControls={disableControls}
+          disableActions={disableActions}
+          limitHeight={limitHeight}
         />
       </div>
 
@@ -204,6 +228,7 @@ const CommentWithReplies: React.FC<CommentWithRepliesProps> = ({
                     comment={reply}
                     setIsReplyActive={setIsReplyActive}
                     postId={postId}
+                    disableReplies={disableReplies}
                   />
                 </div>
               ))}

@@ -92,9 +92,9 @@ export const getUserPosts = async (
     cursor: number;
     limit: number;
   }
-): Promise<{ posts: PostType[]; nextCursor: number | null }> => {
+): Promise<{ posts: PostType[]; next_cursor: number | null }> => {
   const response = await axiosInstance.get(
-    `/api/v1/post/posts/user/${userId}`,
+    `/api/v2/post/posts/user/${userId}`,
     {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -106,9 +106,9 @@ export const getUserPosts = async (
   console.log("Returned:", {
     posts: response.data.posts.map((post: PostType) => ({
       ...post,
-      commentsData: {
+      comments_data: {
         comments: [], // Empty initially
-        count: post.commentsCount || 0,
+        count: post.comments_count || 0,
         nextCursor: 0,
         isLoading: false,
         hasInitiallyLoaded: false,
@@ -119,15 +119,15 @@ export const getUserPosts = async (
   return {
     posts: response.data.posts.map((post: PostType) => ({
       ...post,
-      commentsData: {
+      comments_data: {
         comments: [], // Empty initially
-        count: post.commentsCount || 0,
+        count: post.comments_count || 0,
         nextCursor: 0,
         isLoading: false,
         hasInitiallyLoaded: false,
       },
     })),
-    nextCursor: response.data.nextCursor,
+    next_cursor: response.data.next_cursor,
   };
 };
 
@@ -536,6 +536,39 @@ export const addUserResume = async (token: string, resume: File) => {
   const response = await axiosInstance.post(
     `/api/v1/user/profile/resume`,
     formData,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
+
+export const endorseSkill = async (
+  token: string,
+  userId: string,
+  skillId: string
+) => {
+  const response = await axiosInstance.post(
+    `api/v1/user/endorse-skill/${userId}/${skillId}`,
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
+
+export const removeEndorsement = async (
+  token: string,
+  userId: string,
+  skillId: string
+) => {
+  const response = await axiosInstance.delete(
+    `api/v1/user/remove-endorsement/${userId}/${skillId}`,
     {
       headers: {
         Authorization: `Bearer ${token}`,

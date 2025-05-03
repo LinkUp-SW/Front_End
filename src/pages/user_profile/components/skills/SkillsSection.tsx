@@ -21,7 +21,11 @@ import { Skill } from "@/types";
 import useFetchData from "@/hooks/useFetchData";
 import Cookies from "js-cookie";
 import { Link, useParams } from "react-router-dom";
-import { deleteUserSkills, getUserSkills } from "@/endpoints/userProfile";
+import {
+  deleteUserSkills,
+  getUserBio,
+  getUserSkills,
+} from "@/endpoints/userProfile";
 import AddSkillModal from "../modals/skill_modal/AddSkillModal";
 import Header from "../modals/components/Header";
 import { MdDeleteForever } from "react-icons/md";
@@ -133,6 +137,9 @@ const SkillsSection = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [skillToEdit, setSkillToEdit] = useState<Skill | null>(null);
   const [editOpen, setEditOpen] = useState(false);
+  const [isUserInConnection, setIsUserInConnection] = useState<
+    boolean | undefined
+  >(undefined);
 
   const skillNamesByLicenseId = skills.reduce<Record<string, string[]>>(
     (map, skill) => {
@@ -208,6 +215,12 @@ const SkillsSection = () => {
     });
   }, [skills]);
 
+  useEffect(() => {
+    getUserBio(authToken as string, id as string)
+      .then((data) => setIsUserInConnection(data.isInConnections))
+      .catch(() => toast.error("couldnt retrieve the connection state"));
+  }, [id]);
+
   if (error) {
     return (
       <section
@@ -264,6 +277,8 @@ const SkillsSection = () => {
               setSelectedSkill={setSelectedSkill}
               idx={idx}
               isMe={isMe}
+              isInConnections={isUserInConnection}
+              userID={id}
             />
           </Fragment>
         ))}

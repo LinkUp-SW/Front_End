@@ -6,12 +6,13 @@ import {
   LinkUpFooter,
   WhosHiringImage,
 } from "../../components";
-import { PremiumBanner, Shortcuts, CreatePost } from "./components";
+import { PremiumBanner, Shortcuts } from "./components";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { useFeedPosts } from "@/hooks/useFeedPosts";
 import PostList from "./components/PostList"; // <-- Import PostList
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
+import CreatePostButton from "./components/CreatePostButton";
 
 interface FeedPageProps {
   single?: boolean;
@@ -24,6 +25,7 @@ const FeedPage: React.FC<FeedPageProps> = ({
 }) => {
   const screenWidth = useSelector((state: RootState) => state.screen.width);
   const [viewMore, setViewMore] = useState(screenWidth >= 768);
+  const userBio = useSelector((state: RootState) => state.userBio.data);
 
   const { posts, observerRef, isLoading, initialLoading } = useFeedPosts(
     single,
@@ -61,7 +63,7 @@ const FeedPage: React.FC<FeedPageProps> = ({
           </Button>
           {viewMore && (
             <>
-              <PremiumBanner />
+              {userBio && !userBio.isSubscribed && <PremiumBanner />}
               <Shortcuts />
             </>
           )}
@@ -69,7 +71,7 @@ const FeedPage: React.FC<FeedPageProps> = ({
 
         {/* Main Content */}
         <main className="flex flex-col w-full md:max-w-[27.8rem] lg:max-w-[35rem]">
-          {!single && !profile.length && <CreatePost />}
+          {!single && !profile.length && <CreatePostButton />}
           <div className="mt-4" />
           <PostList
             posts={posts}

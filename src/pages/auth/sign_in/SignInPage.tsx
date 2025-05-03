@@ -9,6 +9,8 @@ import { toast } from "sonner";
 import { initiateGoogleAuth, signin } from "@/endpoints/userAuth";
 import { validateEmail } from "@/utils";
 import { getErrorMessage } from "@/utils/errorHandler";
+import Cookies from "js-cookie";
+
 
 const SignInPage: React.FC = () => {
   const [identifier, setIdentifier] = useState<string>("");
@@ -83,7 +85,12 @@ const SignInPage: React.FC = () => {
         localStorage.setItem("user-email", data.user.email);
         return window.location.replace("/email-verification");
       }
+
+      
+   
+
       toast.success("Signed in successfully!");
+      Cookies.set("linkup_user_type", data.user.isAdmin ? "admin" : "user");
       if (data.user.isAdmin) {
         setTimeout(() => {
           window.location.replace("/admin/dashboard");

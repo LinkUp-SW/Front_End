@@ -101,6 +101,8 @@ export interface Person {
   mutual_connections: MutualConnections;
   is_in_sent_connections: boolean;
   is_in_received_connections: boolean;
+  is_connect_by_email: boolean;
+
 }
 
 export interface MutualConnections {

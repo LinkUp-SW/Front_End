@@ -2,13 +2,21 @@ import { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import Cookies from "js-cookie";
-import { fetchSinglePost, getPostsFeed } from "@/endpoints/feed";
+import {
+  fetchSinglePost,
+  getCompanyPosts,
+  getPostsFeed,
+} from "@/endpoints/feed";
 import { getUserPosts } from "@/endpoints/userProfile";
 import { setPosts } from "@/slices/feed/postsSlice";
 import { RootState } from "@/store";
 import { toast } from "sonner";
 
-export function useFeedPosts(single: boolean, profile: string) {
+export function useFeedPosts(
+  single: boolean = false,
+  profile: string = "",
+  company: string = "" // Add new parameter
+) {
   const posts = useSelector((state: RootState) => state.posts.list);
   const dispatch = useDispatch();
   const { id } = useParams<{ id: string }>();
@@ -37,8 +45,13 @@ export function useFeedPosts(single: boolean, profile: string) {
       const payload = { cursor: nextCursor, limit: 5 };
 
       let fetchedPosts = [];
-
-      if (profile && id) {
+      console.log("COMPANY", company);
+      if (company) {
+        // Add company posts case
+        const response = await getCompanyPosts(user_token, company);
+        fetchedPosts = response?.posts || [];
+        console.log("Company Fetched POsts", fetchedPosts);
+      } else if (profile && id) {
         const response = await getUserPosts(user_token, id, payload);
         fetchedPosts = response?.posts || [];
       } else if (single && id) {

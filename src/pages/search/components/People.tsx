@@ -10,6 +10,15 @@ import {
 import Cookies from "js-cookie";
 import { toast } from "sonner";
 import { getErrorMessage } from "@/utils/errorHandler";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 const People: React.FC<{
   people: Person[];
@@ -19,17 +28,20 @@ const People: React.FC<{
   const navigate = useNavigate();
   const [connectingUserIds, setConnectingUserIds] = useState<string[]>([]);
   const [acceptingUserIds, setAcceptingUserIds] = useState<string[]>([]);
+  const [openDialogUserId, setOpenDialogUserId] = useState<string | null>(null);
+  const [emailInput, setEmailInput] = useState<string>("");
+  const [emailTouched, setEmailTouched] = useState<boolean>(false);
   const token = Cookies.get("linkup_auth_token");
 
   const navigateToUser = (user_id: string) => {
-    return navigate(`/user-profile/${user_id}`);
+    navigate(`/user-profile/${user_id}`);
   };
 
-  const handleConnect = async (userId: string) => {
+  const handleConnect = async (userId: string, email: string) => {
     if (!token) return;
     setConnectingUserIds((prev) => [...prev, userId]);
     try {
-      await connectWithUser(token, userId, "");
+      await connectWithUser(token, userId, email);
       toast.success("Connection request sent successfully!");
       setPeople((prev) =>
         prev.map((person) =>
@@ -43,6 +55,9 @@ const People: React.FC<{
       toast.error(getErrorMessage(error) || "Failed to send connection");
     } finally {
       setConnectingUserIds((prev) => prev.filter((id) => id !== userId));
+      setOpenDialogUserId(null);
+      setEmailInput("");
+      setEmailTouched(false);
     }
   };
 
@@ -72,10 +87,15 @@ const People: React.FC<{
     }
   };
 
+  const isValidEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
   return (
     <div className="flex justify-center">
       <div className="max-w-3xl w-full bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 flex flex-col">
-        <h2 className="text-xl font-semibold mb-4">People</h2>
+        <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">People</h2>
 
         <div className="space-y-4">
           {people.slice(0, 3).map((person, index) => (
@@ -127,6 +147,7 @@ const People: React.FC<{
                   </p>
                 </div>
               </div>
+
               <div className="flex-shrink-0">
                 {person.connection_degree === "1st" ? (
                   <button
@@ -159,7 +180,11 @@ const People: React.FC<{
                 ) : (
                   <button
                     id="connect-button"
-                    onClick={() => handleConnect(person.user_id)}
+                    onClick={() =>
+                      person.is_connect_by_email
+                        ? setOpenDialogUserId(person.user_id)
+                        : handleConnect(person.user_id, "")
+                    }
                     disabled={connectingUserIds.includes(person.user_id)}
                     className="w-full sm:w-auto px-4 py-2 border rounded-full text-blue-600 border-blue-600 hover:bg-blue-100 dark:hover:bg-gray-700 disabled:opacity-50 flex items-center justify-center gap-2"
                   >
@@ -173,6 +198,7 @@ const People: React.FC<{
             </div>
           ))}
         </div>
+
         {people.length > 3 && (
           <button
             id="see-all-people-button"
@@ -184,6 +210,56 @@ const People: React.FC<{
             See all people results
           </button>
         )}
+
+        {/* Email Dialog */}
+        <Dialog open={!!openDialogUserId} onOpenChange={() => {
+          setOpenDialogUserId(null);
+          setEmailInput("");
+          setEmailTouched(false);
+        }}>
+          <DialogContent className="dark:bg-gray-800 dark:text-white">
+            <DialogHeader>
+              <DialogTitle className="dark:text-white">Enter Email to Connect</DialogTitle>
+              <DialogDescription className="dark:text-gray-300">
+                This user requires email verification to connect.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="flex flex-col gap-2 mt-4">
+              <Input
+                type="email"
+                placeholder="Enter email"
+                value={emailInput}
+                onChange={(e) => {
+                  setEmailInput(e.target.value);
+                  setEmailTouched(true);
+                }}
+                className="dark:bg-gray-700 dark:text-white dark:border-gray-600"
+              />
+              {!isValidEmail(emailInput) && emailTouched && (
+                <p className="text-sm text-red-500">The email you entered is invalid.</p>
+              )}
+              <Button
+                onClick={() =>
+                  openDialogUserId && handleConnect(openDialogUserId, emailInput)
+                }
+                disabled={
+                  !emailInput ||
+                  !isValidEmail(emailInput) ||
+                  connectingUserIds.includes(openDialogUserId || "")
+                }
+                className={`${
+                  emailInput && isValidEmail(emailInput)
+                    ? "bg-blue-600 text-white hover:bg-blue-700"
+                    : "bg-gray-300 text-gray-600"
+                } rounded-md px-4 py-2 transition-colors duration-200`}
+              >
+                {connectingUserIds.includes(openDialogUserId || "")
+                  ? "Connecting..."
+                  : "Submit"}
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );

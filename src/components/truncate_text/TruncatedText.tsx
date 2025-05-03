@@ -6,6 +6,7 @@ interface TruncatedTextProps {
   id: string;
   lineCount?: number;
   hideLinks?: boolean;
+  limitHeight?: boolean;
   className?: string;
 }
 
@@ -14,6 +15,7 @@ const TruncatedText: React.FC<TruncatedTextProps> = ({
   id,
   lineCount = 3,
   hideLinks = false,
+  limitHeight = false,
   className,
 }) => {
   const textRef = useRef<HTMLParagraphElement>(null);
@@ -265,7 +267,7 @@ const TruncatedText: React.FC<TruncatedTextProps> = ({
           <div
             key={`url-${index}`}
             rel="noopener noreferrer"
-            className="text-blue-600 dark:text-blue-400 hover:underline break-all"
+            className="text-blue-600 dark:text-blue-400 hover:underline break-words"
             onClick={(e) => e.stopPropagation()}
           >
             {segment.content}
@@ -362,17 +364,21 @@ const TruncatedText: React.FC<TruncatedTextProps> = ({
   };
 
   return (
-    <div className={`pl-4 ${className || ""}`}>
+    <div
+      className={`pl-4 w-full overflow-y-auto ${
+        limitHeight ? "max-h-30" : ""
+      } ${className || ""}`}
+    >
       {/* Hidden element for measurement (off-screen) */}
       <p
         ref={textRef}
         id={id}
-        className="text-sm whitespace-pre-wrap break-words invisible absolute -z-10"
+        className="text-sm whitespace-pre-wrap break-words invisible w-1/2 absolute -z-10"
       >
         {content}
       </p>
 
-      <p className="text-sm whitespace-pre-wrap break-all">
+      <p className="text-sm whitespace-pre-wrap break-all max-w-full  w-full">
         {expanded || !isTruncated
           ? formatText(content)
           : formatText(truncatedText)}
