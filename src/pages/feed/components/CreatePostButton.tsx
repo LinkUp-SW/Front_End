@@ -56,6 +56,7 @@ const CreatePost: React.FC<CreatePostProps> = ({ className, company }) => {
                 ) : (
                   <>
                     <AvatarImage
+                      className="h-12 w-12"
                       src={company ? company.logo : data?.profile_photo || ""}
                       alt="Profile"
                     />

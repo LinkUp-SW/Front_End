@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import Cookies from "js-cookie";
 import { FiSearch } from "react-icons/fi";
+import { toast } from "sonner";
 import {
   getReportDetails,
   getreports,
@@ -19,6 +20,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+
 import PostPreviewSkeleton from "@/pages/feed/components/PostPreviewSkeleton";
 import CommentWithReplies from "@/pages/feed/components/CommentWithReplies";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -165,19 +167,15 @@ const ContentModeration = () => {
       const res = await DeleteContent(token, report.type, report.content_ref);
       if (res.success) {
         setReports((prev) =>
-          prev.map((r) =>
-            r.content_id === report.content_id
-              ? { ...r, status: "resolved" }
-              : r
-          )
+          prev.filter((r) => r.content_id !== report.content_id)
         );
-        alert("Content deleted and report resolved.");
+        toast.success("Content deleted successfully");
       } else {
-        alert("Failed to delete content.");
+        toast.error("Failed to delete content");
       }
     } catch (error) {
       console.error("Delete content error:", error);
-      alert("An error occurred while deleting content.");
+      toast.error("An error occurred while deleting content");
     }
   };
 
@@ -186,19 +184,15 @@ const ContentModeration = () => {
       const res = await DismissReport(token, report.type, report.content_ref);
       if (res.success) {
         setReports((prev) =>
-          prev.map((r) =>
-            r.content_id === report.content_id
-              ? { ...r, status: "resolved" }
-              : r
-          )
+          prev.filter((r) => r.content_id !== report.content_id)
         );
-        alert("Report dismissed successfully.");
+        toast.success("Report dismissed successfully");
       } else {
-        alert("Failed to dismiss report.");
+        toast.error("Failed to dismiss report");
       }
     } catch (error) {
       console.error("Dismiss report error:", error);
-      alert("An error occurred while dismissing report.");
+      toast.error("An error occurred while dismissing report");
     }
   };
 
@@ -301,7 +295,7 @@ const ContentModeration = () => {
                             Manage
                           </button>
                         </DialogTrigger>
-                        <DialogContent className="dark:bg-gray-900 dark:border-0 max-w-3xl">
+                        <DialogContent className="dark:bg-gray-900 dark:border-0 max-w-4xl max-h-[90vh] overflow-y-auto">
                           <DialogHeader>
                             <DialogTitle>Manage Report</DialogTitle>
                             <DialogDescription className="dark:text-neutral-300">
@@ -315,15 +309,21 @@ const ContentModeration = () => {
                             {detailsLoading ? (
                               <PostPreviewSkeleton />
                             ) : selectedReport?.type === "Post" ? (
-                              <PostLargePreview
-                                postData={postReportDetails?.content}
-                              />
-                            ) : selectedReport?.type === "Comment" ? (
-                              <>
+                              <div className="overflow-hidden">
                                 <PostLargePreview
-                                  postData={commentReportDetails?.parent_post}
+                                  postData={postReportDetails?.content}
                                 />
-                                <div className="w-full pb-5 px-4">
+                              </div>
+                            ) : selectedReport?.type === "Comment" ? (
+                              <div className="overflow-hidden space-y-4">
+                                {commentReportDetails?.parent_post && (
+                                  <div className="overflow-hidden">
+                                    <PostLargePreview
+                                      postData={commentReportDetails.parent_post}
+                                    />
+                                  </div>
+                                )}
+                                <div className="w-full pb-5 px-4 overflow-hidden">
                                   <CommentWithReplies
                                     comment={commentReportDetails?.content}
                                     disableReplies
@@ -337,10 +337,10 @@ const ContentModeration = () => {
                                     limitHeight
                                   />
                                 </div>
-                              </>
+                              </div>
                             ) : selectedReport?.type === "Job" &&
                               jobReportDetails?.content ? (
-                              <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg space-y-4">
+                              <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg space-y-4 overflow-hidden">
                                 <div className="flex items-start space-x-4">
                                   <img
                                     src={
@@ -370,11 +370,6 @@ const ContentModeration = () => {
                                       </span>
                                     </div>
                                   </div>
-                                </div>
-
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                                  <div></div>
-                                  <div></div>
                                 </div>
 
                                 <Tabs
@@ -447,24 +442,27 @@ const ContentModeration = () => {
                               </p>
                             )}
 
-                            <button
-                              className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-xl"
-                              onClick={() =>
-                                selectedReport &&
-                                handleDeleteContent(selectedReport)
-                              }
-                            >
-                              Delete Content
-                            </button>
-                            <button
-                              className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-4 rounded-xl"
-                              onClick={() =>
-                                selectedReport &&
-                                handleDismissReport(selectedReport)
-                              }
-                            >
-                              Dismiss Report
-                            </button>
+                            <div className="flex flex-col sm:flex-row gap-3 mt-4">
+                              
+                              <button
+                                className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-4 rounded-xl flex-1"
+                                onClick={() =>
+                                  selectedReport &&
+                                  handleDismissReport(selectedReport)
+                                }
+                              >
+                                Dismiss Report
+                              </button>
+                              <button
+                                className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-xl flex-1"
+                                onClick={() =>
+                                  selectedReport &&
+                                  handleDeleteContent(selectedReport)
+                                }
+                              >
+                                Delete Content
+                              </button>
+                            </div>
                           </div>
                         </DialogContent>
                       </Dialog>

@@ -264,8 +264,9 @@ const PostFooter: React.FC<PostFooterProps> = ({
                     placeholder="Add a comment..."
                     value={commentInput}
                     disabled={
-                      comment_privacy === "Connections only" &&
-                      connection_degree !== "1st"
+                      (comment_privacy === "Connections only" &&
+                        connection_degree !== "1st") ||
+                      comment_privacy === "No one"
                     }
                     autoFocus
                     onFocus={() => {
@@ -344,8 +345,9 @@ const PostFooter: React.FC<PostFooterProps> = ({
                         <Button
                           variant="ghost"
                           disabled={
-                            comment_privacy === "Connections only" &&
-                            connection_degree !== "1st"
+                            (comment_privacy === "Connections only" &&
+                              connection_degree !== "1st") ||
+                            comment_privacy === "No one"
                           }
                           className="hover:cursor-pointer rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 dark:hover:text-neutral-200"
                         >
@@ -376,8 +378,9 @@ const PostFooter: React.FC<PostFooterProps> = ({
                       variant="ghost"
                       onClick={() => fileInputRef.current?.click()}
                       disabled={
-                        comment_privacy === "Connections only" &&
-                        connection_degree !== "1st"
+                        (comment_privacy === "Connections only" &&
+                          connection_degree !== "1st") ||
+                        comment_privacy === "No one"
                       }
                       className="hover:cursor-pointer rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 dark:hover:text-neutral-200"
                     >
@@ -400,9 +403,9 @@ const PostFooter: React.FC<PostFooterProps> = ({
                       )
                     }
                     disabled={
-                      (commentInput.trim().length === 0 && !selectedImage) ||
                       (comment_privacy === "Connections only" &&
-                        connection_degree !== "1st")
+                        connection_degree !== "1st") ||
+                      comment_privacy === "No one"
                     }
                   >
                     Comment

@@ -34,6 +34,22 @@ export const createPostSlice = createSlice({
       state.postToEdit = action.payload;
       state.activeModal = "create-post";
     },
+    openEditCompanyPostDialog: (
+      state,
+      action: PayloadAction<{
+        post: PostDBObject;
+        company: BasicCompanyData | null | undefined;
+      }>
+    ) => {
+      if (!action.payload.company) {
+        return;
+      }
+      state.createPostOpen = true;
+      state.editMode = true;
+      state.postToEdit = action.payload.post;
+      state.companyInfo = action.payload.company;
+      state.activeModal = "create-post";
+    },
     openCompanyPostDialog: (state, action: PayloadAction<BasicCompanyData>) => {
       state.createPostOpen = true;
       state.editMode = false;
@@ -61,6 +77,7 @@ export const {
   openEditPostDialog,
   closeCreatePostDialog,
   setActiveModal,
+  openEditCompanyPostDialog,
   openCompanyPostDialog,
   resetCompanyInfo,
 } = createPostSlice.actions;

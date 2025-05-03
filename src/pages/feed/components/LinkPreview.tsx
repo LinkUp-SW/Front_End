@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { FaGlobe, FaExternalLinkAlt } from "react-icons/fa";
 import { fetchLinkPreview, LinkPreviewData } from "@/endpoints/feed";
+import { Link } from "react-router-dom";
 
 interface LinkPreviewProps {
   url: string;
@@ -69,57 +70,59 @@ const LinkPreview: React.FC<LinkPreviewProps> = ({ url, className }) => {
   }
 
   return (
-    <div
-      rel="noopener noreferrer"
-      className={`block border mt-5 dark:border-gray-700 rounded-lg overflow-hidden hover:bg-gray-50 dark:hover:bg-gray-800 transition shadow-sm ${className}`}
-    >
-      {metadata.image && (
-        <div className="h-48 w-full bg-gray-100 dark:bg-gray-800 overflow-hidden">
-          <img
-            src={metadata.image}
-            alt="Link preview"
-            className="w-full h-full object-cover"
-            onError={(e) => {
-              (e.target as HTMLImageElement).style.display = "none";
-            }}
-          />
-        </div>
-      )}
-
-      <div className="p-4">
-        <h3 className="font-medium text-gray-900 dark:text-white line-clamp-2 mb-1">
-          {metadata.title}
-        </h3>
-
-        {metadata.description && (
-          <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2 mb-2">
-            {metadata.description}
-          </p>
+    <Link to={url}>
+      <div
+        rel="noopener noreferrer"
+        className={`block hover:cursor-pointer border mt-5 dark:border-gray-700 rounded-lg overflow-hidden hover:bg-gray-50 dark:hover:bg-gray-800 transition shadow-sm ${className}`}
+      >
+        {metadata.image && (
+          <div className="h-48 w-full bg-gray-100 dark:bg-gray-800 overflow-hidden">
+            <img
+              src={metadata.image}
+              alt="Link preview"
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                (e.target as HTMLImageElement).style.display = "none";
+              }}
+            />
+          </div>
         )}
 
-        <div className="flex items-center justify-between mt-2">
-          <div className="flex items-center">
-            {metadata.favicon ? (
-              <img
-                src={metadata.favicon}
-                alt=""
-                className="h-4 w-4 mr-2"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.style.display = "none";
-                }}
-              />
-            ) : (
-              <FaGlobe className="h-4 w-4 text-gray-400 mr-2" />
-            )}
-            <span className="text-sm text-gray-500 dark:text-gray-400 truncate max-w-[200px]">
-              {metadata.domain}
-            </span>
+        <div className="p-4">
+          <h3 className="font-medium text-gray-900 dark:text-white line-clamp-2 mb-1">
+            {metadata.title}
+          </h3>
+
+          {metadata.description && (
+            <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2 mb-2">
+              {metadata.description}
+            </p>
+          )}
+
+          <div className="flex items-center justify-between mt-2">
+            <div className="flex items-center">
+              {metadata.favicon ? (
+                <img
+                  src={metadata.favicon}
+                  alt=""
+                  className="h-4 w-4 mr-2"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.style.display = "none";
+                  }}
+                />
+              ) : (
+                <FaGlobe className="h-4 w-4 text-gray-400 mr-2" />
+              )}
+              <span className="text-sm text-gray-500 dark:text-gray-400 truncate max-w-[200px]">
+                {metadata.domain}
+              </span>
+            </div>
+            <FaExternalLinkAlt className="h-3 w-3 text-gray-400 flex-shrink-0" />
           </div>
-          <FaExternalLinkAlt className="h-3 w-3 text-gray-400 flex-shrink-0" />
         </div>
       </div>
-    </div>
+    </Link>
   );
 };
 

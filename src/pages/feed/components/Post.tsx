@@ -75,15 +75,23 @@ import CommentSkeleton from "./CommentSkeleton";
 import { RootState } from "@/store";
 import { FaCommentSlash } from "react-icons/fa";
 import CommentWithReplies from "./CommentWithReplies";
-import { openEditPostDialog } from "@/slices/feed/createPostSlice";
+import {
+  openEditCompanyPostDialog,
+  openEditPostDialog,
+} from "@/slices/feed/createPostSlice";
 import { EditIcon } from "lucide-react";
 import { BiRepost as RepostIcon } from "react-icons/bi";
+import PostLargePreview from "./PostLargePreview";
+import { getCompanyAdmins, getCompanyAdminView } from "@/endpoints/company";
+import { AxiosError } from "axios";
+import { BasicCompanyData } from "@/pages/company/ManageCompanyPage";
 
 interface PostProps {
   postData: PostType;
   viewMore: boolean; // used to hide certain elements for responsive design
   action?: ActivityContextType; // used if the post is an action
   className?: string;
+  originalPost?: PostType;
 }
 
 const userId = Cookies.get("linkup_user_id");
@@ -94,6 +102,7 @@ const Post: React.FC<PostProps> = ({
   viewMore,
   action,
   className,
+  originalPost,
 }) => {
   // State hooks
   const [isLandscape, setIsLandscape] = useState<boolean>(false);
@@ -103,14 +112,24 @@ const Post: React.FC<PostProps> = ({
   const [reactionsOpen, setReactionsOpen] = useState(false);
   const [repostMenuOpen, setRepostMenuOpen] = useState(false);
   const [willDelete, setWillDelete] = useState(false);
+  const [companyData, setCompanyData] = useState<BasicCompanyData | null>();
+  const instant = originalPost?.post_type === "Repost instant";
+  console.log(instant);
 
   const [topStats, setTopStats] = useState(
-    getReactionIcons(postData?.top_reactions || [])
+    getReactionIcons(
+      originalPost && instant
+        ? originalPost.top_reactions || []
+        : postData?.top_reactions || []
+    )
   );
   const [selectedReaction, setSelectedReaction] = useState<string>(
-    postData?.user_reaction
+    originalPost?.user_reaction && instant
+      ? originalPost?.user_reaction.charAt(0).toUpperCase() +
+          originalPost?.user_reaction.slice(1).toLowerCase()
+      : postData?.user_reaction
       ? postData?.user_reaction.charAt(0).toUpperCase() +
-          postData?.user_reaction.slice(1).toLowerCase()
+        postData?.user_reaction.slice(1).toLowerCase()
       : "None"
   );
   const [loadingComments, setLoadingComments] = useState(false);
@@ -126,6 +145,62 @@ const Post: React.FC<PostProps> = ({
     isLoading: postData.comments_data?.isLoading || false,
     hasInitiallyLoaded: postData.comments_data?.hasInitiallyLoaded || false,
   };
+  const [isCompanyAdmin, setIsCompanyAdmin] = useState(false);
+  const isInstantRepost = postData.post_type === "Repost instant";
+  const isRepostWithThoughts = postData.media?.media_type === "post";
+
+  const targetPost = isInstantRepost && originalPost ? originalPost : postData;
+
+  const fetchCompanyData = async () => {
+    if (!postData.author.username) return;
+
+    try {
+      const response = await getCompanyAdminView(postData.author.username);
+      console.log("API Response:", response);
+
+      if (response && response.company) {
+        const company = response.company;
+        setCompanyData({
+          _id: company._id,
+          name: company.name,
+          logo: company.logo || "",
+          website: company.website || "",
+          industry: company.industry || "",
+          size: company.size || "",
+          type: company.type || "",
+          phone: company.phone || "",
+          founded: company.founded || "",
+          overview: company.overview || "",
+          followerCount: company.followerCount || 0,
+        });
+      }
+    } catch (err) {
+      console.error("Failed to fetch company data:", err);
+    }
+  };
+
+  const fetchAdmins = async () => {
+    try {
+      const response = await getCompanyAdmins(author.username);
+      if (userId && response.admins.some((admin) => admin.user_id === userId)) {
+        setIsCompanyAdmin(postData.is_company || false);
+      }
+      console.log("Searching for user", userId);
+      console.log("Admins list:", response.admins);
+    } catch (err) {
+      // Only show error toast if not 403 (forbidden)
+      if ((err as AxiosError).status !== 403) {
+        toast.error("Failed to load admins. Please try again.");
+      }
+    }
+  };
+  useEffect(() => {
+    if (postData.is_company === true) {
+      console.log("fetching admins");
+      fetchAdmins();
+      fetchCompanyData();
+    }
+  }, [postData.is_company]);
 
   useEffect(() => {
     if (
@@ -166,13 +241,16 @@ const Post: React.FC<PostProps> = ({
       );
   }, [postData.user_reaction]);
 
-  if (!postData || !postData._id) {
+  if (!postData || !targetPost._id) {
     return (
       <div className={className}>
         <PostSkeleton />
       </div>
     );
   }
+
+  console.log("PostData:", postData);
+  console.log("Original Post:", originalPost);
 
   // Comment handling functions
   const handleToggleComments = async () => {
@@ -207,7 +285,7 @@ const Post: React.FC<PostProps> = ({
       // Update loading state
       dispatch(
         updatePost({
-          postId: postData._id,
+          postId: targetPost._id,
           updatedPost: {
             comments_data: {
               ...comments_data,
@@ -218,8 +296,9 @@ const Post: React.FC<PostProps> = ({
       );
 
       // Fetch comments
+      console.log(originalPost && instant);
       const response = await loadPostComments(
-        postData._id,
+        targetPost._id,
         token,
         comments_data.nextCursor || 0
       );
@@ -234,7 +313,7 @@ const Post: React.FC<PostProps> = ({
       // Update post with comments - adding to existing comments
       dispatch(
         addCommentsToPost({
-          postId: postData._id,
+          postId: targetPost._id,
           comments: newComments as CommentType[],
           nextCursor: response.next_cursor || 0,
         })
@@ -247,7 +326,7 @@ const Post: React.FC<PostProps> = ({
 
       dispatch(
         updatePost({
-          postId: postData._id,
+          postId: targetPost._id,
           updatedPost: {
             comments_data: {
               comments: updatedComments as CommentType[],
@@ -267,7 +346,7 @@ const Post: React.FC<PostProps> = ({
       // Reset loading state
       dispatch(
         updatePost({
-          postId: postData._id,
+          postId: targetPost._id,
           updatedPost: {
             comments_data: {
               ...comments_data,
@@ -299,15 +378,23 @@ const Post: React.FC<PostProps> = ({
         // Add top-level comment
         dispatch(
           addNewCommentToPost({
-            postId: postData._id,
-            comment: createdComment.comment,
+            postId: targetPost._id,
+            comment: {
+              ...createdComment.comment,
+              media: createdComment.comment.media
+                ? {
+                    link: [createdComment.comment.media],
+                    media_type: createdComment.comment.media ? "image" : "None",
+                  }
+                : null,
+            },
           })
         );
       } else {
         // Add reply to existing comment
         dispatch(
           updatePost({
-            postId: postData._id,
+            postId: targetPost._id,
             updatedPost: {
               comments_data: {
                 ...comments_data,
@@ -316,7 +403,18 @@ const Post: React.FC<PostProps> = ({
                     return {
                       ...comment,
                       children: Array.isArray(comment.children)
-                        ? [...comment.children, createdComment.comment]
+                        ? [
+                            ...comment.children,
+                            {
+                              ...createdComment.comment,
+                              media: createdComment.comment.media
+                                ? {
+                                    link: [createdComment.comment.media],
+                                    media_type: "image",
+                                  }
+                                : null,
+                            },
+                          ]
                         : [createdComment.comment],
                     };
                   }
@@ -380,12 +478,12 @@ const Post: React.FC<PostProps> = ({
     };
 
     try {
-      const result = await createReaction(reaction, postData._id, token);
+      const result = await createReaction(reaction, targetPost._id, token);
       setTopStats(getReactionIcons(result.top_reactions || []));
 
       dispatch(
         updatePost({
-          postId: postData._id,
+          postId: targetPost._id,
           updatedPost: {
             reactions: result.top_reactions,
             reactions_count: result.reactions_count,
@@ -409,7 +507,7 @@ const Post: React.FC<PostProps> = ({
     try {
       const result = await deleteReaction(
         { target_type: "Post" },
-        postData._id,
+        targetPost._id,
         token
       );
 
@@ -417,7 +515,7 @@ const Post: React.FC<PostProps> = ({
 
       dispatch(
         updatePost({
-          postId: postData._id,
+          postId: targetPost._id,
           updatedPost: {
             reactions: result.top_reactions,
             reactions_count: result.reactions_count,
@@ -442,11 +540,22 @@ const Post: React.FC<PostProps> = ({
       commentsDisabled: postData.comments_disabled || "Anyone",
       publicPost: postData.public_post !== false,
       taggedUsers: postData.tagged_users || [],
-      _id: postData._id, // Make sure to include the post ID
+      _id: targetPost._id, // Make sure to include the post ID
     };
 
     // Use the createPostSlice action instead of modal
-    dispatch(openEditPostDialog(postForEdit));
+    if (isCompanyAdmin) {
+      // Use the new company edit action
+      dispatch(
+        openEditCompanyPostDialog({
+          post: postForEdit,
+          company: companyData,
+        })
+      );
+    } else {
+      // Use regular edit action
+      dispatch(openEditPostDialog(postForEdit));
+    }
 
     // Remove this line since we're using Redux now
     // postModal.openEdit(postForEdit);
@@ -466,7 +575,7 @@ const Post: React.FC<PostProps> = ({
       setRepostMenuOpen(false);
       const loadingToastId = toast.loading("Reposting...");
       const postPayload = {
-        media: [postData._id],
+        media: [targetPost._id],
         mediaType: "post",
         postType: "Repost instant",
       };
@@ -495,12 +604,12 @@ const Post: React.FC<PostProps> = ({
     }
   };
 
-  const tempFunc = () => {
+  const repostDialogue = () => {
     setRepostMenuOpen(false);
     const postForEdit: PostDBObject = {
       content: "",
       mediaType: "post" as MediaType,
-      media: [postData._id],
+      media: [targetPost._id],
       commentsDisabled: "Anyone",
       publicPost: true,
       taggedUsers: [],
@@ -518,7 +627,7 @@ const Post: React.FC<PostProps> = ({
     {
       name: "Repost with your thoughts",
       subtext: "Create a new post with this post attached",
-      callback: tempFunc,
+      callback: repostDialogue,
       icon: React.createElement(EditIcon, { className: "mr-2" }),
     },
     {
@@ -540,10 +649,10 @@ const Post: React.FC<PostProps> = ({
 
     try {
       setWillDelete(false);
-      await deletePost(postData._id, token);
+      await deletePost(targetPost._id, token);
 
       dispatch(
-        setPosts(posts.filter((post: PostType) => post._id !== postData._id))
+        setPosts(posts.filter((post: PostType) => post._id !== targetPost._id))
       );
       toast.success("Post deleted successfully!");
     } catch (error) {
@@ -571,12 +680,12 @@ const Post: React.FC<PostProps> = ({
       );
 
       await (isSaved
-        ? unsavePost(postData._id, token)
-        : savePost(postData._id, token));
+        ? unsavePost(targetPost._id, token)
+        : savePost(targetPost._id, token));
 
       dispatch(
         updatePost({
-          postId: postData._id,
+          postId: targetPost._id,
           updatedPost: {
             is_saved: newSavedState,
           },
@@ -612,15 +721,15 @@ const Post: React.FC<PostProps> = ({
 
   // UI helpers
   const menuActions =
-    userId === author.username
+    userId === author.username || isCompanyAdmin
       ? getPersonalMenuActions(
           handleSaveButton,
           handleEditPostButton,
           deleteModal,
-          postData._id,
+          targetPost._id,
           isSaved
         )
-      : getMenuActions(handleSaveButton, postData._id, isSaved);
+      : getMenuActions(handleSaveButton, targetPost._id, isSaved);
 
   const engagementButtons = getEngagementButtons(
     selectedReaction,
@@ -631,9 +740,9 @@ const Post: React.FC<PostProps> = ({
   );
 
   const stats = {
-    comments: postData.comments_count || 0,
-    reposts: 0,
-    total: postData.reactions_count,
+    comments: targetPost?.comments_count || 0,
+    reposts: targetPost?.reposts_count || 0,
+    total: targetPost?.reactions_count || 0,
   };
 
   // Component rendering
@@ -647,7 +756,7 @@ const Post: React.FC<PostProps> = ({
   ];
 
   return (
-    <Card className="p-2 bg-white border-0 mb-4 pl-0 dark:bg-gray-900 dark:text-neutral-200">
+    <Card className="p-2 bg-white border-0 mb-4 pl-0 max-w-[50rem] dark:bg-gray-900 dark:text-neutral-200">
       <CardContent className="flex flex-col items-start pl-0 w-full">
         {action && (
           <header className="flex pl-4 justify-start items-center w-full border-b gap-2 pb-2 dark:border-neutral-700">
@@ -669,14 +778,36 @@ const Post: React.FC<PostProps> = ({
             </span>
           </header>
         )}
+        {originalPost && instant && (
+          <header className="flex pl-4 justify-start items-center w-full border-b gap-2 pb-2 dark:border-neutral-700">
+            <Link to={`/user-profile/${originalPost.author?.username}`}>
+              <img
+                src={originalPost.author?.profile_picture}
+                alt={originalPost.author?.first_name}
+                className="w-4 h-4 md:w-6 md:h-6 rounded-full"
+              />
+            </Link>
+            <span className="text-gray-500 text-xs dark:text-neutral-400">
+              <Link
+                to={`/user-profile/${originalPost.author?.username}`}
+                className="text-xs font-medium text-black dark:text-neutral-200 hover:cursor-pointer hover:underline hover:text-blue-600 dark:hover:text-blue-400"
+              >
+                {originalPost.author?.first_name +
+                  " " +
+                  originalPost.author?.last_name}
+              </Link>{" "}
+              {POST_ACTIONS[originalPost.post_type || "error"]}
+            </span>
+          </header>
+        )}
         <PostHeader
           user={author}
           action={action}
-          postId={postData._id}
+          postId={targetPost._id}
           postMenuOpen={postMenuOpen}
           setPostMenuOpen={setPostMenuOpen}
           menuActions={menuActions}
-          edited={postData.is_edited}
+          edited={postData.is_edited || false}
           publicPost={postData.public_post}
           date={date}
         />
@@ -737,6 +868,9 @@ const Post: React.FC<PostProps> = ({
             <LinkPreview url={media.link[0]} className="w-full" />
           </div>
         )}
+        {isRepostWithThoughts && (
+          <PostLargePreview postData={postData.original_post} borders />
+        )}
         <Dialog
           open={willDelete}
           onOpenChange={() => setWillDelete(!willDelete)}
@@ -776,7 +910,7 @@ const Post: React.FC<PostProps> = ({
                     {stat}
                   </span>
                 ))}
-                {stats.total > 0 && stats.total}
+                {stats.total != 0 && stats.total}
               </button>
             </DialogTrigger>
             <DialogContent className="dark:bg-gray-900 min-w-[20rem] sm:min-w-[35rem] w-auto dark:border-gray-700">
@@ -785,11 +919,11 @@ const Post: React.FC<PostProps> = ({
               </DialogTitle>
               <DialogDescription />
 
-              <ReactionsModal postId={postData._id} />
+              <ReactionsModal postId={targetPost._id} />
             </DialogContent>
           </Dialog>
           <div className="flex text-gray-500 dark:text-neutral-400 gap-2 text-sm items-center ">
-            {stats.comments !== 0 && (
+            {stats.comments !== undefined && stats.comments !== 0 && (
               <p
                 onClick={() => {
                   handleToggleComments();
@@ -1037,7 +1171,7 @@ const Post: React.FC<PostProps> = ({
             {/* Always show PostFooter with comment input */}
 
             <PostFooter
-              postId={postData._id}
+              postId={targetPost._id}
               addNewComment={addNewComment}
               comments={{
                 ...comments_data,
@@ -1079,7 +1213,7 @@ const Post: React.FC<PostProps> = ({
                 comment={postData.activity_context.comment}
                 disableReplies={true}
                 handleCreateComment={() => {}}
-                postId={postData._id}
+                postId={targetPost._id}
                 disableControls
               />
             </div>

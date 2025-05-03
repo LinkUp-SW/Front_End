@@ -77,6 +77,35 @@ export interface ReportDetailsJobData {
   };
 }
 
+export interface DashboardDataResponse {
+    summary: {
+      reported_content: number;
+      total_jobs: number; 
+      total_users: number;
+      delta: {
+        reports: number;
+        jobs: number;
+        users: number;
+      };
+    };
+    content_moderation: {
+      pending_reviews: number;
+      resolved_today: number;
+      avg_response_time_hours: number;
+    };
+    job_management: {
+      pending_approval: number;
+      approved_today: number;
+      rejected_today: number;
+    };
+    platform_analytics: {
+      new_users_today: number;
+      content_posted_today: number;
+    };
+  }
+  
+  
+
 export const getreports = async (
   token: string,
   status: string,
@@ -107,6 +136,8 @@ export const getReportDetails = async (
   );
   return response.data;
 };
+
+
 
 export const DeleteContent = async (
   token: string,
@@ -146,3 +177,15 @@ export const DismissReport = async (
   };
   
 
+  export const getDashboardData = async (
+    token: string,
+   
+  ): Promise<DashboardDataResponse> => {
+    const response = await axiosInstance.get("/api/v1/admin/dashboard", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    
+    });
+    return response.data;
+  };

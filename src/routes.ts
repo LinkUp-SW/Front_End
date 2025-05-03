@@ -36,6 +36,7 @@ import {
   CompanyCreationPage,
   ManageCompanyPage,
   CreateJobPage,
+  CompanyProfileView,
   DashboardPage,
   SettingsPage,
   UsersPage,
@@ -52,7 +53,7 @@ import BlockingListPage from "./pages/settings/BlockingListPage";
 import VisibilityPage from "./pages/settings/VisibilityPage";
 
 import React from "react";
-import JobPostingsPage from "./pages/admin/JobPostingsPage";
+
 
 // Define your routes as an array of RouteObject (compatible with React Router v6)
 const routes: RouteObject[] = [
@@ -235,6 +236,11 @@ const routes: RouteObject[] = [
     path: "/jobs/create",
     element: React.createElement(CreateJobPage),
   },
+  {
+    path: "/company/:companyId",
+    element: React.createElement(CompanyProfileView),
+  },
+
   
   {
     path: "/settings/visibility",

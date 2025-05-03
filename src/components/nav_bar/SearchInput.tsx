@@ -10,9 +10,7 @@ const SearchInput = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [searchTerm, setSearchTerm] = useState("");
-  const [filteredResults, setFilteredResults] = useState<SearchSuggestion[]>(
-    []
-  );
+  const [filteredResults, setFilteredResults] = useState<SearchSuggestion[]>([]);
   const [open, setOpen] = useState(false);
   const token = Cookies.get("linkup_auth_token");
 
@@ -57,6 +55,20 @@ const SearchInput = () => {
 
   const navigateToUser = (user_id: string) => {
     navigate(`/user-profile/${user_id}`);
+    setSearchTerm("");
+    setFilteredResults([]);
+    setOpen(false);
+  };
+
+  const navigateToJob = (job_id: string) => {
+    navigate(`/jobs/see-more?selected=${job_id}`);
+    setSearchTerm("");
+    setFilteredResults([]);
+    setOpen(false);
+  };
+
+  const navigateToCompany = (company_id: string) => {
+    navigate(`/company/${company_id}`);
     setSearchTerm("");
     setFilteredResults([]);
     setOpen(false);
@@ -118,6 +130,7 @@ const SearchInput = () => {
                   <div
                     key={index}
                     className="flex items-center gap-3 p-4 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition"
+                    onClick={() => navigateToCompany(result._id)}
                   >
                     {result.logo ? (
                       <img
@@ -146,6 +159,7 @@ const SearchInput = () => {
                   <div
                     key={index}
                     className="p-4 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition"
+                    onClick={() => navigateToJob(result._id)}
                   >
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
