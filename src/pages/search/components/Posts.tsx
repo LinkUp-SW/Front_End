@@ -26,38 +26,8 @@ const Posts = ({ query }: { query: string }) => {
   }, [screenWidth]);
 
   return (
-    <div className="min-h-screen">
-      <div className="max-w-6xl mx-auto px-4 py-4 flex flex-col lg:flex-row gap-6">
-        {/* Left sidebar */}
-        <div className="w-full lg:w-64 flex-shrink-0">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden border border-gray-200 dark:border-gray-700">
-            <div className="p-4">
-              <h2 className="text-lg font-medium text-gray-900 dark:text-white">
-                Search Results
-              </h2>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                Results for "{query}"
-              </p>
-            </div>
-
-            {/* Search filters could go here */}
-            <nav className="mb-4">
-              <ul className="py-1">
-                <li>
-                  <button className="w-full text-left px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300">
-                    Most Recent
-                  </button>
-                </li>
-                <li>
-                  <button className="w-full text-left px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300">
-                    Most Relevant
-                  </button>
-                </li>
-              </ul>
-            </nav>
-          </div>
-        </div>
-
+    <div className="flex justify-center mt-6">
+      <div className="max-w-3xl w-full bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 flex flex-col">
         {/* Main content area */}
         <div className="flex-1">
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 border border-gray-200 dark:border-gray-700">
