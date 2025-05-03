@@ -13,6 +13,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components";
+import uploadMediaDarkImg from "@/assets/feed_upload_dark.svg";
+import uploadMediaLightImg from "@/assets/feed_upload_light.svg";
 
 interface UploadMediaModalProps {
   setActiveModal: (value: string) => void;
@@ -66,51 +68,99 @@ const UploadMediaModal: React.FC<UploadMediaModalProps> = ({
 
   const handleAdd = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
-    if (files) {
-      const fileArray = Array.from(files);
-      const maxFileSizeInMB = 10;
-      const maxFileSize = maxFileSizeInMB * 1048576; // 10 MB
-      const maxFiles = 10;
+    if (!files) return;
 
-      if (fileArray.length > maxFiles) {
-        toast.error(`You can only upload up to ${maxFiles} files.`);
+    const fileArray = Array.from(files);
+    const maxFileSizeInMB = 10;
+    const maxFileSize = maxFileSizeInMB * 1048576; // 10 MB
+    const maxFiles = 10;
+
+    // First, determine if we currently have images or video
+    const hasExistingImages = currentSelectedMedia.some((file) =>
+      file.type.startsWith("image/")
+    );
+    const hasExistingVideo = currentSelectedMedia.some((file) =>
+      file.type.startsWith("video/")
+    );
+
+    // Validate new files
+    const validFiles = fileArray.filter((file) => {
+      // Check file type
+      const isValidImage = file.type.match(/^image\/(jpeg|png|gif|webp)$/);
+      const isValidVideo = file.type.match(/^video\/(mp4|webm)$/);
+
+      if (!isValidImage && !isValidVideo) {
+        toast.error(`File "${file.name}" is not a supported format.`);
+        return false;
+      }
+
+      // Check file size
+      if (file.size > maxFileSize) {
+        toast.error(`File "${file.name}" exceeds ${maxFileSizeInMB}MB limit.`);
+        return false;
+      }
+
+      return true;
+    });
+
+    if (!validFiles.length) return;
+
+    // Separate new files by type
+    const newImages = validFiles.filter((file) =>
+      file.type.startsWith("image/")
+    );
+    const newVideos = validFiles.filter((file) =>
+      file.type.startsWith("video/")
+    );
+
+    // Early validation for mixed content
+    if (newImages.length > 0 && newVideos.length > 0) {
+      toast.error(
+        "Cannot mix images and videos. Please select either images or a video."
+      );
+      return;
+    }
+
+    // Handle video uploads
+    if (newVideos.length > 0) {
+      if (hasExistingImages) {
+        toast.error(
+          "Cannot add video when images are present. Please remove existing images first."
+        );
         return;
       }
-      const validFiles = fileArray.filter((file) => {
-        if (file.size > maxFileSize) {
-          toast.error(
-            `File "${file.name}" exceeds the maximum size of ${maxFileSizeInMB} MB.`
-          );
-          return false;
-        }
-        return file.type.startsWith("image/") || file.type.startsWith("video/");
-      });
-      if (validFiles.length) {
-        setSelectedIndex(0);
+      if (hasExistingVideo) {
+        toast.error(
+          "Only one video allowed. Please remove existing video first."
+        );
+        return;
       }
-      const images = validFiles.filter((file) =>
-        file.type.startsWith("image/")
-      );
-      const videos = validFiles.filter((file) =>
-        file.type.startsWith("video/")
-      );
+      if (newVideos.length > 1) {
+        toast.error("Only one video can be uploaded at a time.");
+        return;
+      }
+      setCurrentSelectedMedia([newVideos[0]]);
+      setSelectedIndex(0);
+      return;
+    }
 
-      if (
-        videos.length > 1 ||
-        (videos.length > 0 &&
-          currentSelectedMedia.some((file) => file.type.startsWith("video/")))
-      ) {
-        toast.error("You can only upload one video at a time.");
+    // Handle image uploads
+    if (newImages.length > 0) {
+      if (hasExistingVideo) {
+        toast.error(
+          "Cannot add images when video is present. Please remove existing video first."
+        );
         return;
       }
 
-      if (videos.length > 0 && images.length > 0) {
-        toast.error("You cannot upload images and a video together.");
+      const newTotalCount = currentSelectedMedia.length + newImages.length;
+      if (newTotalCount > maxFiles) {
+        toast.error(`Maximum ${maxFiles} images allowed.`);
         return;
       }
 
       setSelectedIndex(currentSelectedMedia.length);
-      setCurrentSelectedMedia([...currentSelectedMedia, ...validFiles]);
+      setCurrentSelectedMedia([...currentSelectedMedia, ...newImages]);
     }
   };
 
@@ -140,7 +190,11 @@ const UploadMediaModal: React.FC<UploadMediaModalProps> = ({
             <div className="flex flex-col items-center justify-center gap-2">
               <div>
                 <img
-                  src={`../../../../public/feed_upload_media_${darkMode}.svg`}
+                  src={
+                    darkMode === "light"
+                      ? uploadMediaLightImg
+                      : uploadMediaDarkImg
+                  }
                   alt="Upload Media"
                   className=""
                 />
@@ -268,7 +322,7 @@ const UploadMediaModal: React.FC<UploadMediaModalProps> = ({
 
       <input
         type="file"
-        accept="image/*,video/*"
+        accept="image/jpeg,image/png,image/gif,image/webp,video/mp4,video/webm"
         ref={fileInputRef}
         onChange={handleAdd}
         multiple

@@ -1,113 +1,142 @@
+import React, { useEffect, useState } from "react";
 import { WithNavBar } from "../../components";
-import { useParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import People from "./components/People";
 import Jobs from "./components/Jobs";
-
-// Sample Data
-const people = [
-  {
-    name: "Nada Salem",
-    title: "Front end developer",
-    location: "Giza",
-    mutualConnections: "Ahmed Khattab, Yousef Gilany, and 19 other mutual connections",
-    avatar: "https://via.placeholder.com/50",
-    isConnected: true,
-    industry: "Front end",
-  },
-  {
-    name: "Nada Khaled",
-    title: "Front end developer",
-    location: "Cairo, Egypt",
-    mutualConnections: "Marwan Abdellah, AbdEl-Monem El-Sharkawy, PhD, and 70 other mutual connections",
-    avatar: "https://via.placeholder.com/50",
-    isConnected: true,
-    industry: "Front end",
-  },
-  {
-    name: "Nada Zayed",
-    title: "Backend Developer",
-    location: "Alexandria, Egypt",
-    mutualConnections: "Ibrahim Sobh, PhD, and 47 other mutual connections",
-    avatar: "https://via.placeholder.com/50",
-    isConnected: false,
-    industry: "Backend",
-  },
-];
-
-const jobs = [
-  {
-    title: "Front end Developer - Internship",
-    company: "Tech Solutions",
-    location: "Cairo, Egypt (Hybrid)",
-    applicants: "<10 Applicants",
-    alumni: "23 alumni work here",
-    time: "3 days ago",
-    logo: "https://via.placeholder.com/50",
-  },
-  {
-    title: "Internship Program - Front end developer - Jumia (Full Time)",
-    company: "Jumia Group",
-    location: "Cairo, Cairo, Egypt (Hybrid)",
-    applicants: "<10 Applicants",
-    alumni: "23 alumni work here",
-    time: "3 months ago",
-    logo: "https://via.placeholder.com/50",
-  },
-  {
-    title: "Front end developer Intern",
-    company: "Aleph Group, Inc",
-    location: "Cairo, Cairo, Egypt (Hybrid)",
-    applicants: "<10 Applicants",
-    alumni: "13 alumni work here",
-    time: "1 week ago",
-    logo: "https://via.placeholder.com/50",
-  },
-  {
-    title: "Backend Developer - Junior",
-    company: "Innovatech",
-    location: "Alexandria, Egypt (Remote)",
-    applicants: "<50 Applicants",
-    alumni: "10 alumni work here",
-    time: "1 week ago",
-    logo: "https://via.placeholder.com/50",
-  },
-  {
-    title: "Front end developer - Part time",
-    company: "Aim Consultants LLC",
-    location: "Heliopolis, Cairo, Egypt (On-site)",
-    applicants: "<10 Applicants",
-    alumni: "",
-    time: "10 hours ago",
-    logo: "https://via.placeholder.com/50",
-  },
-];
+import Posts from "./components/Posts";
+import Cookies from "js-cookie";
+import { getusers, Person } from "@/endpoints/myNetwork";
+import withSidebarAd from "@/components/hoc/withSidebarAd";
 
 const SearchPage: React.FC = () => {
-  const { query } = useParams<{ query: string }>();
+  const [searchParams] = useSearchParams();
+  const query = searchParams.get("query") || "";
+  const token = Cookies.get("linkup_auth_token");
+  const [activeFilter, setActiveFilter] = useState<string | null>(null);
 
-  const filteredPeople = people.filter(
-    (person) =>
-      person.name.toLowerCase().includes(query?.toLowerCase() || "") ||
-      person.industry.toLowerCase().includes(query?.toLowerCase() || "")
-  );
+  const [people, setPeople] = useState<Person[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [jobsFound, setJobsFound] = useState<boolean | null>(null);
+  const [postsFound, setPostsFound] = useState<boolean | null>(null);
 
-  const filteredJobs = jobs.filter(
-    (job) =>
-      job.title.toLowerCase().includes(query?.toLowerCase() || "") ||
-      job.company.toLowerCase().includes(query?.toLowerCase() || "")
+  const hasQuery = !!query;
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      if (!token || !query) {
+        setPeople([]);
+        return;
+      }
+
+      setLoading(true);
+      try {
+        const response = await getusers(token, query, "", 1, 6);
+        setPeople(response.people);
+      } catch (error) {
+        console.error("Failed to fetch users", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUsers();
+  }, [token, query]);
+
+  const hasPeople = people.length > 0;
+  const hasPosts = postsFound === true;
+  const hasJobs = jobsFound === true;
+  const hasResults = hasPeople || hasPosts || hasJobs;
+
+  const handleFilterClick = (filter: string) => {
+    setActiveFilter(filter === activeFilter ? null : filter);
+    const element = document.getElementById(filter);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
+  const FilterSidebar = () => (
+    <aside className="sticky top-24 h-fit w-full md:w-56 bg-white border rounded-md p-4 shadow-sm">
+      <h2 className="text-lg font-semibold mb-4">Filter Results</h2>
+      <nav className="flex flex-col gap-1">
+        {hasPeople && (
+          <button
+            onClick={() => handleFilterClick("people")}
+            className={`px-3 py-2 text-left rounded-md transition-all ${
+              activeFilter === "people"
+                ? "bg-blue-50 text-blue-600 font-medium"
+                : "hover:bg-gray-50 text-gray-700 hover:text-blue-600"
+            }`}
+          >
+            People
+          </button>
+        )}
+        {hasPosts && (
+          <button
+            onClick={() => handleFilterClick("posts")}
+            className={`px-3 py-2 text-left rounded-md transition-all ${
+              activeFilter === "posts"
+                ? "bg-blue-50 text-blue-600 font-medium"
+                : "hover:bg-gray-50 text-gray-700 hover:text-blue-600"
+            }`}
+          >
+            Posts
+          </button>
+        )}
+        {hasJobs && (
+          <button
+            onClick={() => handleFilterClick("jobs")}
+            className={`px-3 py-2 text-left rounded-md transition-all ${
+              activeFilter === "jobs"
+                ? "bg-blue-50 text-blue-600 font-medium"
+                : "hover:bg-gray-50 text-gray-700 hover:text-blue-600"
+            }`}
+          >
+            Jobs
+          </button>
+        )}
+      </nav>
+    </aside>
   );
 
   return (
-    <div className="container mx-auto p-4">
-      
-      {query ? (
-        <>
-          <People people={filteredPeople} />
-          <Jobs jobs={filteredJobs} />
-        </>
-      ) : null}
+    <div className="container mx-auto px-4 py-6 flex flex-col md:flex-row gap-6">
+      {hasQuery && hasResults && (
+        <div className="hidden md:block w-full md:w-56">
+          <FilterSidebar />
+        </div>
+      )}
+
+      <main className="flex-1 space-y-6">
+        {loading ? (
+          <div className="flex justify-center items-center h-64">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+          </div>
+        ) : hasResults ? (
+          <>
+            {hasPeople ? (
+              <section id="people">
+                <People people={people} setPeople={setPeople} query={query} />
+              </section>
+            ) : null}
+
+            <section id="posts">
+              <Posts query={query} setPostsFound={setPostsFound} />
+            </section>
+
+            <section id="jobs">
+              <Jobs query={query} setJobsFound={setJobsFound} />
+            </section>
+          </>
+        ) : (
+          <div className="w-full text-center text-gray-500 border rounded-md p-6 shadow-sm">
+            <p className="text-lg font-medium">No results found.</p>
+          </div>
+        )}
+      </main>
     </div>
   );
 };
 
-export default WithNavBar(SearchPage);
+const SearchPageWithSidebarAd = withSidebarAd(SearchPage);
+export default WithNavBar(SearchPageWithSidebarAd);

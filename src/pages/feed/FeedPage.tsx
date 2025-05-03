@@ -6,110 +6,91 @@ import {
   LinkUpFooter,
   WhosHiringImage,
 } from "../../components";
-import {
-  StatsCard,
-  PremiumBanner,
-  Shortcuts,
-  CreatePost,
-  Post,
-} from "./components";
+import { PremiumBanner, Shortcuts } from "./components";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
+import { useFeedPosts } from "@/hooks/useFeedPosts";
+import PostList from "./components/PostList"; // <-- Import PostList
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
-import { CommentType, PostType } from "@/types";
-import { getFeedPosts, getPostComments } from "@/endpoints/feed";
+import CreatePostButton from "./components/CreatePostButton";
 
-const FeedPage = () => {
-  const [viewMore, setViewMore] = useState(true);
+interface FeedPageProps {
+  single?: boolean;
+  profile?: string;
+}
+
+const FeedPage: React.FC<FeedPageProps> = ({
+  single = false,
+  profile = "",
+}) => {
   const screenWidth = useSelector((state: RootState) => state.screen.width);
+  const [viewMore, setViewMore] = useState(screenWidth >= 768);
+  const userBio = useSelector((state: RootState) => state.userBio.data);
 
-  const [posts, setPosts] = useState<PostType[]>([]);
-  const [comments, setComments] = useState<CommentType[]>([]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // Call both endpoints concurrently
-        const [fetchedPosts, fetchedComments] = await Promise.all([
-          getFeedPosts(),
-          getPostComments(),
-        ]);
-        if (fetchedPosts) setPosts(fetchedPosts);
-        else setPosts([]);
-        if (fetchedComments) setComments(fetchedComments);
-        else setComments([]);
-      } catch (error) {
-        console.error("Error fetching feed data", error);
-      }
-    };
-
-    fetchData();
-  }, []);
+  const { posts, observerRef, isLoading, initialLoading } = useFeedPosts(
+    single,
+    profile
+  );
 
   useEffect(() => {
-    if (screenWidth < 768) {
-      setViewMore(false);
-    } else {
-      setViewMore(true);
-    }
+    setViewMore(screenWidth >= 768);
   }, [screenWidth]);
 
   return (
-    <>
-      <div className="flex justify-center relative w-full px-0 ">
-        <section className="flex w-full justify-center gap-4 px-0 sm:px-10 md:px-0 md:flex-row flex-col">
-          {/* Left Sidebar */}
-          <aside className="flex flex-col h-full w-full md:max-w-60">
-            <ProfileCard />
-            <Button
-              variant="ghost"
-              className="block md:hidden hover:cursor-pointer hover:bg-stone-200 w-full transition-colors my-2"
-              onClick={() => setViewMore(!viewMore)}
-            >
-              <div className="flex justify-center gap-x-2 items-center">
-                {!viewMore ? (
-                  <>
-                    <p>Show more</p>
-                    <FaChevronDown />
-                  </>
-                ) : (
-                  <>
-                    <p>Show less</p>
-                    <FaChevronUp />
-                  </>
-                )}
-              </div>
-            </Button>
-            {viewMore && (
-              <>
-                <StatsCard profileViewers={27} postImpressions={22} />
-                <PremiumBanner />
-                <Shortcuts />
-              </>
-            )}
-          </aside>
-          {/* Main Content */}
-          <main className="flex flex-col w-full max-w-auto md:max-w-[27.8rem] lg:max-w-[35rem]">
-            <CreatePost />
-            {posts.map((post, index) => (
-              <Post
-                key={index}
-                viewMore={viewMore}
-                postData={post}
-                comments={comments}
-              />
-            ))}
-          </main>
-          {/* Right Sidebar */}
-          {screenWidth > 1158 && (
-            <aside className="flex flex-col items-center">
-              <WhosHiringImage />
-              <LinkUpFooter />
-            </aside>
+    <div className="flex justify-center w-full overflow-x-hidden">
+      <section className="flex w-full justify-center gap-4 flex-col md:flex-row px-0 sm:px-10 md:px-0">
+        {/* Left Sidebar */}
+        <aside className="flex flex-col w-full md:max-w-60">
+          <ProfileCard />
+          <Button
+            variant="ghost"
+            className="block md:hidden w-full transition-colors my-2"
+            onClick={() => setViewMore(!viewMore)}
+          >
+            <div className="flex justify-center items-center gap-x-2">
+              {!viewMore ? (
+                <>
+                  <p>Show more</p>
+                  <FaChevronDown />
+                </>
+              ) : (
+                <>
+                  <p>Show less</p>
+                  <FaChevronUp />
+                </>
+              )}
+            </div>
+          </Button>
+          {viewMore && (
+            <>
+              {userBio && !userBio.isSubscribed && <PremiumBanner />}
+              <Shortcuts />
+            </>
           )}
-        </section>
-      </div>
-    </>
+        </aside>
+
+        {/* Main Content */}
+        <main className="flex flex-col w-full md:max-w-[27.8rem] lg:max-w-[35rem]">
+          {!single && !profile.length && <CreatePostButton />}
+          <div className="mt-4" />
+          <PostList
+            posts={posts}
+            viewMore={viewMore}
+            isLoading={isLoading}
+            initialLoading={initialLoading}
+            observerRef={observerRef}
+          />
+        </main>
+
+        {/* Right Sidebar */}
+        {screenWidth > 1158 && (
+          <aside className="flex flex-col items-center">
+            <WhosHiringImage />
+            <LinkUpFooter />
+          </aside>
+        )}
+      </section>
+    </div>
   );
 };
 

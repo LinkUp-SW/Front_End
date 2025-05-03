@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Job } from "../../types";
+import JobApplicationDialog from './JobApplicationDialog';
 
 interface JobContentProps {
   job: Job;
@@ -8,6 +9,7 @@ interface JobContentProps {
 const JobContent: React.FC<JobContentProps> = ({ job }) => {
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [activeSection, setActiveSection] = useState<'responsibilities' | 'qualifications' | 'benefits'>('responsibilities');
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   
   const descriptionText = job.description || "";
   
@@ -40,24 +42,7 @@ const JobContent: React.FC<JobContentProps> = ({ job }) => {
           </button>
         </div>
       </div>
-      
-      <div className="mb-6">
-        <h2 className="text-lg font-semibold mb-3 dark:text-white">People you can reach out to</h2>
-        <div className="flex items-center justify-between border border-gray-200 dark:border-gray-700 rounded-lg p-3">
-          <div className="flex items-center">
-            <div className="w-8 h-8 bg-gray-100 dark:bg-gray-800 flex items-center justify-center rounded-md mr-2">
-              <span className="text-gray-500 dark:text-gray-400">🎓</span>
-            </div>
-            <span className="text-sm dark:text-gray-300">School alumni from Cairo University</span>
-          </div>
-          <button 
-            id="btn-show-connections" 
-            className="border border-gray-300 dark:border-gray-600 rounded-full px-4 py-1 text-sm dark:text-gray-300"
-          >
-            Show all
-          </button>
-        </div>
-      </div>
+    
       
       <div>
         <h2 className="text-lg font-semibold mb-2 dark:text-white">About the job</h2>
@@ -136,11 +121,17 @@ const JobContent: React.FC<JobContentProps> = ({ job }) => {
         
         <div className="mt-8 mb-6">
           <button 
-            id="btn-apply-now"
-            className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg"
+            onClick={() => setIsDialogOpen(true)}
+            className="py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg w-full"
           >
             Apply Now
           </button>
+          
+          <JobApplicationDialog 
+            open={isDialogOpen}
+            onOpenChange={setIsDialogOpen}
+            job={job}
+          />
         </div>
       </div>
     </>

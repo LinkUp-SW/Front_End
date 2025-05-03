@@ -20,10 +20,15 @@ export interface Conversation {
   otherUser: User;
   lastMessage: LastMessage;
   unreadCount: number;
-
 }
 
+export interface unreadMessagesCount {
+  conversationId: string;
+  otherUser: User;
+  lastMessage: LastMessage;
+  unreadCount: number;
 
+}
 export interface MessageChat
   {
     messageId:string
@@ -35,6 +40,8 @@ export interface MessageChat
     reacted: boolean;
     isSeen: boolean;
     isOwnMessage: boolean;
+    isDeleted: boolean;
+    isEdited: boolean;
   }
 
 export interface chattingMessages{
@@ -114,6 +121,148 @@ export const editMessage = async (
 
 
 
+export const markConversationAsRead = async (token: string, conversationId: string) => {
+  try {
+    const response = await axiosInstance.put(
+      `/api/v1/conversations/${conversationId}/read`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;  // This will contain the success message from the backend
+  } catch (error) {
+    console.error("Error marking conversation as unread:", error);
+    throw new Error('Error marking conversation as read');
+  }
+};
+
+export const markConversationAsUnread = async (token: string, conversationId: string) => {
+  try {
+    const response = await axiosInstance.put(
+      `/api/v1/conversations/${conversationId}/unread`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data; 
+  } catch (error) {
+    console.error("Error marking conversation as unread:", error);
+    throw new Error('Error marking conversation as unread');
+  }
+};
+
+export const startConversation = async (
+  token: string,
+  user2ID: string,
+  firstMessage?: string,
+  media?: string[],
+  mediaTypes?: string[]
+): Promise<{ conversationId: string }> => {
+  try {
+    const response = await axiosInstance.post(
+      `/api/v1/conversations/start-conversation/${user2ID}`,
+      {
+        firstMessage,
+        media,
+        mediaTypes
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error starting conversation:", error);
+    throw new Error('Failed to start conversation');
+  }
+}
+
+
+
+
+
+
+
+export const getUnseenMessagesCountByConversation = async (
+  token: string
+): Promise<unreadMessagesCount[]> => {
+  const response = await axiosInstance.get(
+    '/api/v1/conversation/unread-messages-count',
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data.formattedUnseenCountByConversation;
+};
+export const getUnseenMessagesCount = async (
+  token: string
+): Promise<number> => {
+  const response = await axiosInstance.get(
+    '/api/v1/conversation/unread-conversations',
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data.unseenCount;
+};
+
+
+export const markMessagesAsSeen = async (
+  token: string,
+  conversationId: string
+) => {
+  const response = await axiosInstance.put(
+    `/api/v1/messages/${conversationId}/seen`,
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+  
+};
+export const blockUser = async (token: string, userId: string) => {
+  const response = await axiosInstance.post(
+    `/api/v1/user/block/${userId}`,
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
+
+export const checkConversationExists = async (
+  token: string,
+  user2ID: string
+): Promise<{ conversationExists: boolean }> => {
+  const response = await axiosInstance.get(
+    `/api/v1/conversations/check-conversation/${user2ID}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  return response.data;
+};
 
 
 

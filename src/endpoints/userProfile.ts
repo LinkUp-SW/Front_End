@@ -1,10 +1,12 @@
 import axiosInstance from "@/services/axiosInstance";
 import {
   About,
+  BioFormData,
   Education,
   Experience,
   License,
   Organization,
+  PostType,
   Skill,
   SkillForm,
   SkillUserSections,
@@ -83,6 +85,39 @@ export const getUserSkills = async (
   return response.data;
 };
 
+export const getUserPosts = async (
+  token: string,
+  userId: string,
+  postPayload: {
+    cursor: number;
+    limit: number;
+  }
+): Promise<{ posts: PostType[]; next_cursor: number | null }> => {
+  const response = await axiosInstance.get(
+    `/api/v2/post/posts/user/${userId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      params: postPayload,
+    }
+  );
+
+  return {
+    posts: response.data.posts.map((post: PostType) => ({
+      ...post,
+      comments_data: {
+        comments: [], // Empty initially
+        count: post.comments_count || 0,
+        nextCursor: 0,
+        isLoading: false,
+        hasInitiallyLoaded: false,
+      },
+    })),
+    next_cursor: response.data.next_cursor,
+  };
+};
+
 export const addUserSkills = async (
   token: string,
   skillsForm: SkillForm
@@ -155,7 +190,7 @@ export const updateWorkExperience = async (
   token: string,
   id: string,
   form: Experience
-): Promise<{ message: string }> => {
+): Promise<{ message: string; experience: Experience }> => {
   const response = await axiosInstance.put(
     `api/v1/user/update-work-experience/${id}`,
     form,
@@ -223,7 +258,7 @@ export const updateEducation = async (
   token: string,
   id: string,
   form: Education
-): Promise<{ message: string }> => {
+): Promise<{ message: string; education: Education }> => {
   const response = await axiosInstance.put(
     `/api/v1/user/update-education/${id}`,
     form,
@@ -466,5 +501,78 @@ export const getUserCoverPhoto = async (token: string, userId: string) => {
       },
     }
   );
+  return response.data;
+};
+
+export const updateUserBio = async (token: string, bio: BioFormData) => {
+  const response = await axiosInstance.put(
+    "/api/v1/user/update-user-profile",
+    { bio: bio },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
+
+export const addUserResume = async (token: string, resume: File) => {
+  const formData = new FormData();
+  formData.append("resume", resume);
+  const response = await axiosInstance.post(
+    `/api/v1/user/profile/resume`,
+    formData,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
+
+export const endorseSkill = async (
+  token: string,
+  userId: string,
+  skillId: string
+) => {
+  const response = await axiosInstance.post(
+    `api/v1/user/endorse-skill/${userId}/${skillId}`,
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
+
+export const removeEndorsement = async (
+  token: string,
+  userId: string,
+  skillId: string
+) => {
+  const response = await axiosInstance.delete(
+    `api/v1/user/remove-endorsement/${userId}/${skillId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
+
+export const checkIsMe = async (
+  token: string,
+  userId: string
+): Promise<{ is_me: boolean; status: string }> => {
+  const response = await axiosInstance.get(`/api/v1/user/${userId}/is-me`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
   return response.data;
 };

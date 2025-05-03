@@ -15,9 +15,9 @@ import {
 } from "@/components";
 import { Link, useNavigate } from "react-router-dom";
 import CreatePostModal from "./modals/CreatePostModal";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import PostSettingsModal from "./modals/PostSettingsModal";
 import UploadMediaModal from "./modals/UploadMediaModal";
 import AddDocumentModal from "./modals/AddDocumentModal";
@@ -25,8 +25,20 @@ import CommentControlModal from "./modals/CommentControlModal";
 import { MediaType, PostDBObject } from "@/types";
 import Cookies from "js-cookie";
 import { toast } from "sonner";
-import { createPost } from "@/endpoints/feed";
+import {
+  createCompanyPost,
+  createPost,
+  editCompanyPost,
+  fetchSinglePost,
+  repostWithThoughts,
+} from "@/endpoints/feed";
 import { DialogDescription } from "@radix-ui/react-dialog";
+import { editPost } from "@/endpoints/feed";
+import { updatePost } from "@/slices/feed/postsSlice";
+import React from "react";
+import { closeCreatePostDialog } from "@/slices/feed/createPostSlice";
+import { openCreatePostDialog } from "@/slices/feed/createPostSlice";
+import { unshiftPosts } from "@/slices/feed/postsSlice";
 
 const useDismissModal = () => {
   const dismiss = () => {
@@ -44,18 +56,80 @@ const useDismissModal = () => {
     dismiss,
   };
 };
+interface CreatePostProps {
+  className?: string;
+}
 
-const CreatePost: React.FC = () => {
+const CreatePost: React.FC<CreatePostProps> = ({ className }) => {
+  //const posts = useSelector((state: RootState) => state.posts.list);
+  const dispatch = useDispatch();
   const { data, loading } = useSelector((state: RootState) => state.userBio);
   const [privacySetting, setPrivacySetting] = useState<string>("Anyone");
   const [postText, setPostText] = useState<string>("");
   const [commentSetting, setCommentSetting] = useState<string>("Anyone");
   const [selectedMedia, setSelectedMedia] = useState<File[]>([]);
   const [activeModal, setActiveModal] = useState<string>("create-post");
+  const [taggedUsers, setTaggedUsers] = useState<
+    { name: string; id: string }[]
+  >([]);
   const { dismiss } = useDismissModal();
+  const isDialogOpen = useSelector(
+    (state: RootState) => state.createPost.createPostOpen
+  );
+  const editMode = useSelector((state: RootState) => state.createPost.editMode);
+  const postToEdit = useSelector(
+    (state: RootState) => state.createPost.postToEdit
+  );
+  const companyInfo = useSelector(
+    (state: RootState) => state.createPost.companyInfo
+  );
 
   const navigate = useNavigate();
-  const userID = Cookies.get("linkup_auth_token");
+  const user_token = Cookies.get("linkup_auth_token");
+  const user_id = Cookies.get("linkup_user_id");
+
+  useEffect(() => {
+    if (editMode && postToEdit) {
+      setPostText(postToEdit.content || "");
+      setPrivacySetting(postToEdit.publicPost ? "Anyone" : "Connections only");
+      setCommentSetting(postToEdit.commentsDisabled || "Anyone");
+
+      // Handle media if exists
+      if (postToEdit.media && postToEdit.media.length > 0) {
+        // For URLs, we'll need to fetch the images and convert them to Files
+        const fetchImages = async () => {
+          try {
+            const files = await Promise.all(
+              postToEdit.media.map(async (url) => {
+                const response = await fetch(url);
+                const blob = await response.blob();
+                return new File([blob], `image.${blob.type.split("/")[1]}`, {
+                  type: blob.type,
+                });
+              })
+            );
+            setSelectedMedia(files);
+          } catch (error) {
+            console.error("Error fetching media:", error);
+          }
+        };
+
+        fetchImages();
+      }
+
+      if (postToEdit.taggedUsers) {
+        setTaggedUsers(
+          postToEdit.taggedUsers.map((id) => ({
+            id,
+            name: "", // You might need to fetch user names
+          }))
+        );
+      }
+      if (postToEdit.repostedPost) {
+        clearFields();
+      }
+    }
+  }, [editMode, postToEdit]);
 
   const clearFields = () => {
     setPrivacySetting("Anyone");
@@ -64,7 +138,39 @@ const CreatePost: React.FC = () => {
     setSelectedMedia([]);
   };
 
-  const submitPost = async () => {
+  // Add a useMemo for handling text changes
+
+  const submitPost = async (link?: string) => {
+    dispatch(closeCreatePostDialog());
+    if (!user_token) {
+      toast.error("Please sign in again.");
+      setTimeout(() => {
+        navigate("/login");
+      }, 1000);
+      return;
+    }
+
+    if (postToEdit && postToEdit.repostedPost) {
+      const postPayload: {
+        content: string;
+        mediaType: string;
+        media: string[];
+        commentsDisabled: string;
+        publicPost: boolean;
+        postType: string;
+      } = {
+        media: [postToEdit.repostedPost._id],
+        mediaType: "post",
+        commentsDisabled: postToEdit.commentsDisabled,
+        content: postText,
+        postType: "Repost thought",
+        publicPost: postToEdit.publicPost,
+      };
+
+      handleRepostWithThoughts(postPayload);
+      return;
+    }
+
     let media_type: string | undefined;
     const media: string[] = [];
 
@@ -129,9 +235,37 @@ const CreatePost: React.FC = () => {
           fileReaders.push(imagePromise);
         });
       }
+      const pdfs = selectedMedia.filter(
+        (file) => file.type === "application/pdf"
+      );
+
+      if (pdfs.length > 0) {
+        media_type = "pdf";
+        pdfs.forEach((pdf) => {
+          const reader = new FileReader();
+
+          const pdfPromise = new Promise<void>((resolve, reject) => {
+            reader.onload = () => {
+              const result = reader.result as string; // Convert to Base64 string
+              media.push(result);
+              resolve();
+            };
+            reader.onerror = (error) => {
+              console.error(`Error reading file ${pdf.name}:`, error);
+              reject(error);
+            };
+          });
+
+          reader.readAsDataURL(pdf);
+          fileReaders.push(pdfPromise);
+        });
+      }
 
       // Wait for all FileReader operations to complete
       await Promise.all(fileReaders);
+    } else if (link) {
+      media_type = "link";
+      media.push(link);
     } else {
       media_type = "none";
     }
@@ -140,41 +274,207 @@ const CreatePost: React.FC = () => {
       toast.error("The post must have either content or media.");
       return;
     }
-    if (!userID) {
-      toast.error("Please sign in again.");
-      setTimeout(() => {
-        navigate("/login");
-      }, 1000);
-      return;
-    }
 
     const postObject: PostDBObject = {
       content: postText,
       mediaType: (media_type as MediaType) || "none",
       media: media,
       commentsDisabled: commentSetting,
-      publicPost: privacySetting === "anyone",
-      taggedUsers: [],
+      publicPost: privacySetting === "Anyone",
+      taggedUsers: taggedUsers.map((user) => user.id),
+      _id: editMode ? postToEdit?._id : undefined,
     };
 
-    //console.log("Post Object:", postObject);
     try {
       dismiss();
       clearFields();
-      const toastId = toast.loading("Submitting your post...");
-      await createPost(postObject, userID);
-      toast.success("Post created successfully!", { id: toastId });
+      const toastId = toast.loading(
+        editMode ? "Updating your post..." : "Submitting your post..."
+      );
+      if (companyInfo && !postToEdit) {
+        // Call company post endpoint
+        const result = await createCompanyPost(
+          postObject,
+          companyInfo._id,
+          user_token
+        );
+        toast.success(
+          <span>
+            {result.message}{" "}
+            <a
+              href={`/feed/posts/${result.postId}`}
+              className="text-blue-600 dark:text-blue-300 hover:underline"
+              onClick={() => toast.dismiss(toastId)}
+            >
+              . View post
+            </a>
+          </span>,
+          {
+            id: toastId,
+            duration: 15000,
+          }
+        );
+        const post = await fetchSinglePost(result.postId, user_token);
+        if (post) {
+          // Prepare the post with comments-related fields
+          const postWithComments = {
+            ...post,
+            commentsCount: 0,
+            commentsData: {
+              comments: [],
+              count: 0,
+              nextCursor: null,
+            },
+          };
+
+          // Add the new post to the Redux store at the beginning of the list
+          dispatch(unshiftPosts([postWithComments]));
+        }
+      } else if (editMode && postToEdit?._id && companyInfo === null) {
+        // Handle edit
+        await editPost(postObject, user_token);
+
+        dispatch(
+          updatePost({
+            postId: postToEdit._id,
+            updatedPost: {
+              content: postObject.content,
+              media: {
+                media_type: postObject.mediaType,
+                link: postObject.media,
+              },
+              comments_disabled: postObject.commentsDisabled,
+              public_post: postObject.publicPost,
+              tagged_users: postObject.taggedUsers,
+              is_edited: true,
+            },
+          })
+        );
+
+        toast.success("Post updated successfully", { id: toastId });
+        dispatch(closeCreatePostDialog());
+      } else if (editMode && postToEdit?._id && companyInfo) {
+        // Handle edit
+        await editCompanyPost(
+          postObject,
+          { organization_id: companyInfo._id, post_id: postToEdit._id },
+          user_token
+        );
+
+        dispatch(
+          updatePost({
+            postId: postToEdit._id,
+            updatedPost: {
+              content: postObject.content,
+              media: {
+                media_type: postObject.mediaType,
+                link: postObject.media,
+              },
+              comments_disabled: postObject.commentsDisabled,
+              public_post: postObject.publicPost,
+              tagged_users: postObject.taggedUsers,
+              is_edited: true,
+            },
+          })
+        );
+
+        toast.success("Post updated successfully", { id: toastId });
+        dispatch(closeCreatePostDialog());
+      } else {
+        const response = await createPost(postObject, user_token);
+        toast.success(
+          <span>
+            {response.message}{" "}
+            <a
+              href={`/feed/posts/${response.postId}`}
+              className="text-blue-600 dark:text-blue-300 hover:underline"
+              onClick={() => toast.dismiss(toastId)}
+            >
+              . View post
+            </a>
+          </span>,
+          {
+            id: toastId,
+            duration: 15000,
+          }
+        );
+        const post = await fetchSinglePost(response.postId, user_token);
+        if (post) {
+          // Prepare the post with comments-related fields
+          const postWithComments = {
+            ...post,
+            commentsCount: 0,
+            commentsData: {
+              comments: [],
+              count: 0,
+              nextCursor: null,
+            },
+          };
+
+          // Add the new post to the Redux store at the beginning of the list
+          dispatch(unshiftPosts([postWithComments]));
+        }
+        dispatch(closeCreatePostDialog());
+        clearFields();
+      }
     } catch {
       toast.error("Error creating post. Please try again.");
     }
   };
 
+  const handleRepostWithThoughts = async (postPayload: {
+    content: string;
+    mediaType: string;
+    media: string[];
+    commentsDisabled: string;
+    publicPost: boolean;
+    postType: string;
+  }) => {
+    if (!user_token) {
+      toast.error("Please sign in again.");
+      setTimeout(() => {
+        navigate("/login");
+      }, 1000);
+      return;
+    }
+    try {
+      const loadingToastId = toast.loading("Reposting...");
+
+      const result = await repostWithThoughts(postPayload, user_token);
+      const post = await fetchSinglePost(result.postId, user_token);
+      if (post) {
+        // Prepare the post with comments-related fields
+        const postWithComments = {
+          ...post,
+          commentsCount: 0,
+          commentsData: {
+            comments: [],
+            count: 0,
+            nextCursor: null,
+          },
+        };
+
+        // Add the new post to the Redux store at the beginning of the list
+        dispatch(unshiftPosts([postWithComments]));
+      }
+      toast.success("Repost successful!");
+      toast.dismiss(loadingToastId);
+
+      return;
+    } catch (error) {
+      console.error("Error reposting:", error);
+      toast.error("Failed to repost. Please try again.");
+    }
+  };
+
   return (
     <>
-      <Card className="mb-4 w-full bg-white border-0 pr-4 dark:bg-gray-900 ">
+      <Card
+        className={`mb-1 w-full bg-white border-0 pr-4 dark:bg-gray-900 ${className}`}
+      >
         <CardContent>
           <div className="flex space-x-3 justify-start items-start">
-            <Link to={"#"}>
+            <Link to={`/user-profile/${user_id}`}>
               <Avatar className="h-12 w-12 pl-0">
                 {loading ? (
                   <>
@@ -194,18 +494,21 @@ const CreatePost: React.FC = () => {
             <Dialog
               onOpenChange={(isOpen) => {
                 if (!isOpen) {
+                  dispatch(closeCreatePostDialog());
                   setTimeout(() => {
-                    setSelectedMedia([]); // Reset activeModal to "create-post" when the modal is closed
+                    setSelectedMedia([]);
                     setActiveModal("create-post");
                   }, 200);
                 }
               }}
+              open={isDialogOpen}
             >
               <DialogTrigger asChild className="w-full">
                 <Button
                   variant="ghost"
                   id="create-post-button"
-                  className="w-[90%] h-11 border p-4 hover:bg-gray-200 dark:hover:bg-zinc-800 transition-colors hover:cursor-pointer hover:text-gray-950 dark:hover:text-neutral-200 rounded-full border-gray-400 font-medium text-black focus:outline-none text-left dark:text-neutral-300"
+                  onClick={() => dispatch(openCreatePostDialog())}
+                  className="w-[90%] h-11 border p-4 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors hover:cursor-pointer hover:text-gray-950 dark:hover:text-neutral-200 rounded-full border-gray-400 font-medium text-black focus:outline-none text-left dark:text-neutral-300"
                 >
                   <p className="w-full">Start a post</p>
                 </Button>
@@ -238,9 +541,17 @@ const CreatePost: React.FC = () => {
                     privacySetting={privacySetting}
                     selectedMedia={selectedMedia}
                     setSelectedMedia={setSelectedMedia}
+                    taggedUsers={taggedUsers}
+                    setTaggedUsers={setTaggedUsers}
+                    repostedPost={postToEdit?.repostedPost}
+                    company={companyInfo}
                   />
                 ) : activeModal == "add-document" ? (
-                  <AddDocumentModal setActiveModal={setActiveModal} />
+                  <AddDocumentModal
+                    setActiveModal={setActiveModal}
+                    selectedMedia={selectedMedia}
+                    setSelectedMedia={setSelectedMedia}
+                  />
                 ) : activeModal == "comment-control" ? (
                   <CommentControlModal
                     commentSetting={commentSetting}

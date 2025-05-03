@@ -1,5 +1,6 @@
 import { defaultProfileImage } from "@/constants";
 import { UserProfileBio } from "@/types";
+import { splitHeadline } from "@/utils";
 import Cookies from "js-cookie";
 import { Link } from "react-router-dom";
 
@@ -15,6 +16,8 @@ const UserProfilePopover: React.FC<UserProfilePopoverProps> = ({
   setUserPopOverOpen,
 }) => {
   const userId = Cookies.get("linkup_user_id");
+  const headline = userProfileBioData?.bio.headline || "";
+
   return (
     <div className="grid gap-2 text-gray-700 dark:text-gray-300">
       <section className="grid gap-2">
@@ -29,9 +32,9 @@ const UserProfilePopover: React.FC<UserProfilePopoverProps> = ({
               {userProfileBioData?.bio.first_name}{" "}
               {userProfileBioData?.bio.last_name}
             </h2>
-            {userProfileBioData?.bio.headline && (
-              <p className="break-words whitespace-normal  max-w-[200px]">
-                {userProfileBioData?.bio.headline}
+            {headline && (
+              <p className="max-w-[300px] whitespace-normal">
+                {splitHeadline(headline)}
               </p>
             )}
           </div>
@@ -44,14 +47,20 @@ const UserProfilePopover: React.FC<UserProfilePopoverProps> = ({
           View Profile
         </Link>
       </section>
-      <section>
+      <section className="flex flex-col">
         <div className="h-[0.05rem] w-full bg-gray-500 dark:bg-gray-300" />
         <h2 className="pt-1 font-semibold">Account</h2>
         <Link
-          to={"/settings/account"}
+          to={"/settings/preference"}
           className="text-sm capitalize text-gray-500 dark:text-gray-400 p-2 hover:underline"
         >
           settings & privacy
+        </Link>
+        <Link
+          to={"/settings/subscription-billing"}
+          className="text-sm capitalize text-gray-500 dark:text-gray-400 p-2 hover:underline"
+        >
+          Manage Subscription
         </Link>
       </section>
       <section className="flex flex-col">

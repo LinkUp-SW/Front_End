@@ -25,9 +25,40 @@ import UserSkillsPage from "./user_profile/user_skills/UserSkillsPage";
 import UserEducationsPage from "./user_profile/user_educations/UserEducationsPage";
 import UserLicensesPage from "./user_profile/user_licenses/UserLicensesPage";
 import UserExperiencesPage from "./user_profile/user_experiences/UserExperiencesPage";
-import SignInAndSecurityPage from "./settings/SignInAndSecurityPage";
-import ChangePasswordPage from "./settings/ChangePasswordPage";
 import MyItemsPage from "./my_items/MyItemsPage";
+import AllPeoplePage from "./search/AllPeoplePage";
+import CompanyCreationPage from "./company/CompanyCreationPage";
+import ManageCompanyPage from "./company/ManageCompanyPage";
+import CreateJobPage from "./company/CreateJobPage";
+import AdminPanelSidebar from "./admin/components/AdminPanel";
+import DashboardPage from "./admin/DashboardPage";
+
+import UsersPage from "./admin/UsersPage";
+import AnalyticsPage from "./admin/AnalyticsPage";
+
+import ContentModerationPage from "./admin/ContentModerationPage";
+import CompanyProfileView from "./company/CompanyProfile";
+
+import GoodByePage from "./goodbye/GoodByePage";
+import PaymentStatusPage from "./payment/PaymentStatusPage";
+import {
+  SignInAndSecurityPage,
+  AccountPreferencePage,
+  BlockingListPage,
+  VisibilityPage,
+  OTP,
+  AddEmailPage,
+  PrimaryEmailPage,
+  DisplayPage,
+  InstructionPage,
+  CloseAccountPage,
+  OtherOptionPage,
+  ReasonPage,
+  ChangePasswordPage,
+  ConnectionRequest,
+  ProfileVisibility,
+  SubscriptionBillingPage,
+} from "./settings";
 
 //Export the Imported Pages
 export {
@@ -58,6 +89,32 @@ export {
   UserLicensesPage,
   UserExperiencesPage,
   SignInAndSecurityPage,
-  ChangePasswordPage,
   MyItemsPage,
+  AccountPreferencePage,
+  InstructionPage,
+  ReasonPage,
+  OtherOptionPage,
+  PrimaryEmailPage,
+  OTP,
+  AddEmailPage,
+  AllPeoplePage,
+  CompanyCreationPage,
+  ManageCompanyPage,
+  CreateJobPage,
+  CompanyProfileView,
+  VisibilityPage,
+  BlockingListPage,
+  AdminPanelSidebar,
+  DashboardPage,
+  UsersPage,
+  AnalyticsPage,
+  ContentModerationPage,
+  GoodByePage,
+  DisplayPage,
+  CloseAccountPage,
+  ChangePasswordPage,
+  ConnectionRequest,
+  ProfileVisibility,
+  SubscriptionBillingPage,
+  PaymentStatusPage,
 };

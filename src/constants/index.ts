@@ -1,10 +1,8 @@
 import { GoHomeFill } from "react-icons/go";
 import { FaPeopleGroup } from "react-icons/fa6";
-import { FaBell, FaBriefcase, FaUserAlt, FaBookmark } from "react-icons/fa";
+import { FaBell, FaBriefcase, FaUserAlt } from "react-icons/fa";
 import { BsChatDotsFill } from "react-icons/bs";
-import { BiSliderAlt } from "react-icons/bi";
 import { HiOutlineDocumentText } from "react-icons/hi";
-import { BsBarChartLine } from "react-icons/bs";
 import { CgTimelapse } from "react-icons/cg";
 import { RiMoreLine } from "react-icons/ri";
 
@@ -114,21 +112,6 @@ export const RECOMMENDED_PROFILE_SECTIONS = [
   },
 ];
 
-export const SIDEBAR_MENU_ITEMS = [
-  {
-    icon: BiSliderAlt,
-    label: "Preferences",
-  },
-  {
-    icon: FaBookmark,
-    label: "My jobs",
-  },
-  {
-    icon: BsBarChartLine,
-    label: "My Career Insights",
-  },
-];
-
 export const FOOTER_LINKS = [
   { text: "About", url: "#" },
   { text: "Accessibility", url: "#" },
@@ -148,24 +131,16 @@ export const JOB_COLLECTIONS = [
   { id: "more", title: "More", icon: RiMoreLine },
 ];
 
-export const RECENT_SEARCHES = [
-  { query: "project manager", location: "Cairo, Egypt", applyOn: true },
-  {
-    query: "project manager",
-    location: "Riyadh, Saudi Arabia",
-    applyOn: true,
-    alert: true,
-  },
-  { query: "agile", location: "Cairo, Egypt", applyOn: false },
-];
-
 export const POST_ACTIONS: Record<string, string> = {
   like: "likes this",
-  comment: "commented on this",
-  repost: "reposted this",
   love: "loves this",
   insightful: "finds this insightful",
   celebrate: "celebrates this",
+  funny: "finds this funny",
+  support: "supports this",
+  comment: "commented on this",
+  "Repost instant": "reposted this",
+
   error: "no action",
 };
 
@@ -310,7 +285,6 @@ export const COUNTRY_CITY_MAP: { [key: string]: string[] } = {
   ],
 };
 
-
 // Map of Egypt and Middle Eastern countries to their international dialing codes
 export const COUNTRY_PHONE_CODE_MAP: { [key: string]: string } = {
   Egypt: "+20",
@@ -328,9 +302,6 @@ export const COUNTRY_PHONE_CODE_MAP: { [key: string]: string } = {
   Yemen: "+967",
   Turkey: "+90",
 };
-
-
-
 
 export const defaultProfileImage =
   "https://res.cloudinary.com/dyhnxqs6f/image/upload/v1719229880/meme_k18ky2_c_crop_w_674_h_734_x_0_y_0_u0o1yz.png";

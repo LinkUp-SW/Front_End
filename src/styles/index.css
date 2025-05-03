@@ -80,6 +80,10 @@
     --text-color: var(--dark-text-color);
 }
 
+* {
+    scroll-behavior: smooth;
+}
+
 /* Example usage */
 body {
     background-color: var(--background-color);
@@ -230,17 +234,15 @@ body {
 
 @layer components {
 
-    .selectMainButton {
+    .selectButton {
         @apply text-center appearance-none hover:bg-green-900 hover:cursor-pointer font-semibold bg-[#01754f] rounded-2xl text-white pr-2 pl-2 pt-1 pb-1 m-5 mt-3 mb-3
     }
 
-    .selectMainButton option {
+    .selectButton option {
         @apply bg-white text-black
     }
 
-    .buttonStyle {
-        @apply text-center hover:bg-gray-100 hover:border-1 hover:border-gray-800 hover:cursor-pointer text-black rounded-2xl border-1 border-gray-400 border-1 pr-2 pl-2 pt-1 pb-1 mr-3
-    }
+
 
 }
 
@@ -267,9 +269,85 @@ button {
 }
 
 .destructiveBtn {
-    @apply bg-pink-500 hover:bg-pink-700 focus-visible:ring-pink-500 border-none hover:text-white text-white transition-all duration-300 ease-in-out disabled:cursor-not-allowed
+    @apply bg-pink-500 disabled:opacity-50 hover:bg-pink-700 focus-visible:ring-pink-500 border-none hover:text-white text-white transition-all duration-300 ease-in-out disabled:cursor-not-allowed
 }
 
 .affirmativeBtn {
-    @apply bg-cyan-600 hover:bg-cyan-700 transition-all duration-300 ease-in-out
+    @apply bg-cyan-600 hover:bg-cyan-700 border-none hover:text-white text-white transition-all duration-300 ease-in-out disabled:cursor-not-allowed
+}
+
+
+
+.sprite {
+    /* preserve pixel-perfect scaling */
+    image-rendering: pixelated;
+    background-repeat: no-repeat;
+}
+
+/* size of one frame */
+.cry-pixel {
+    width: 190px;
+    /* 1218px total ÷ 6 frames */
+    height: 205px;
+
+    background-image: url('/src/assets/crying_man.png');
+    /* start at left/top of the strip */
+    background-position: 0 0;
+
+    /* animate: 0.5s per cycle → 6 frames @ 12 fps */
+    animation: cry 1s steps(6) infinite;
+}
+
+@keyframes cry {
+    from {
+        background-position: 0 0;
+    }
+
+    to {
+        background-position: -1185px 0;
+    }
+
+    /* shift totalWidth = frameWidth×6 */
+}
+
+
+
+
+.celebrate-pixel {
+    /* one frame is 1 997px ÷ 6 ≃ 333px wide */
+    width: 333px;
+    /* full sprite height */
+    height: 404px;
+
+    background-image: url('/src/assets/celebrating_man.png');
+    background-position: 0 0;
+
+    /* 6 steps (frames) in 0.5s → 12 fps */
+    animation: pixelCelebrate 2.5s steps(6) infinite;
+}
+
+@keyframes pixelCelebrate {
+    from {
+        background-position: 0 0;
+    }
+
+    /* shift by total width = 333px × 6 = 1 998px */
+    to {
+        background-position: -1998px 0;
+    }
+}
+
+
+/* Hide Edge/IE password reveal button */
+.password::-ms-reveal {
+    display: none;
+}
+
+/* Hide Chrome/Safari password reveal button */
+.password::-webkit-contacts-auto-fill-button,
+.password::-webkit-credentials-auto-fill-button {
+    visibility: hidden;
+    pointer-events: none;
+    position: absolute;
+    right: 0;
 }

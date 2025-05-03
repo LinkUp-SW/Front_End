@@ -1,5 +1,7 @@
+import { RootState } from "@/store";
 import React from "react";
 import { FaBookmark } from "react-icons/fa";
+import { useSelector } from "react-redux";
 interface LeftSidebarProps {
   selectedPage: string;
   setSelectedPage: (page: string) => void;
@@ -9,6 +11,8 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
   selectedPage,
   setSelectedPage,
 }) => {
+  const { data } = useSelector((state: RootState) => state.userBio);
+
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow py-4 pr-0">
       <h2 className="font-medium text-gray-600  dark:text-gray-200 mb-4 flex items-center pl-4">
@@ -35,13 +39,13 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
           >
             My jobs
           </button>
-          <span
+          {/* <span
             className={`
               "text-gray-600 dark:text-gray-400
               text-sm pr-4`}
           >
-            248
-          </span>
+            {data?.number_of_saved_jobs}
+          </span> */}
         </div>
 
         <div
@@ -58,7 +62,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
               selectedPage === "saved-posts"
                 ? "text-blue-600 dark:text-blue-400 font-medium"
                 : "text-gray-600 dark:text-gray-400"
-            }`}
+            } text-left line-clamp-1 text-ellipsis`}
           >
             Saved posts and articles
           </button>
@@ -67,7 +71,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
             "text-gray-600 dark:text-gray-400
             text-sm pr-4`}
           >
-            10+
+            {data?.number_of_saved_posts}
           </span>
         </div>
       </div>

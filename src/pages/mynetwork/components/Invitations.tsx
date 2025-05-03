@@ -13,6 +13,9 @@ import { useConnectionContext } from "./ConnectionContext";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { editUserBio } from "@/slices/user_profile/userBioSlice";
+import { toast } from "sonner";
+import { socketService } from "@/services/socket";
+
 const Invitations = () => {
   const [invitations, setInvitations] = useState<ReceivedConnections[]>([]);
   const [numberOfReceived, setNumberOfReceived] = useState(0);
@@ -48,6 +51,7 @@ const Invitations = () => {
 
       try {
         await acceptInvitation(token, userId);
+        socketService.sendNotification(userId as string, Cookies.get('linkup_user_id') as string, 'connection_accepted',undefined,'Connection Accepted')
 
         setInvitations((prevInvitations) =>
           prevInvitations.filter((c) => c.user_id !== userId)
@@ -60,8 +64,10 @@ const Invitations = () => {
             number_of_connections: connectionCount + 1,
           })
         );
+        toast.success("Invitation accepted!");
       } catch (error) {
         console.error("can't", error);
+        toast.error("Failed to accept invitation.");
       }
     },
     [token, connectionCount, setConnectionCount]
@@ -81,8 +87,10 @@ const Invitations = () => {
           prevInvitations.filter((c) => c.user_id !== userId)
         );
         setNumberOfReceived((prev) => Math.max(prev - 1, 0));
+        toast.success("Invitation ignored.");
       } catch (error) {
         console.error("Error", error);
+        toast.error("Failed to ignore invitation.");
       }
     },
     [token]
@@ -98,7 +106,7 @@ const Invitations = () => {
         )}
         <button
           id="showall-invitations-button"
-          className="text-blue-600 hover:underline cursor-pointer"
+          className="text-cyan-600 dark:text-blue-400 hover:underline cursor-pointer"
           onClick={() => navigate("/manage-invitations")}
         >
           Manage
@@ -155,7 +163,7 @@ const Invitations = () => {
               <button
                 id="accept-invitation-button"
                 onClick={() => acceptInvitations(invite.user_id)}
-                className="px-4 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 cursor-pointer"
+                className=" affirmativeBtn px-4 py-1 rounded-lg cursor-pointer"
               >
                 Accept
               </button>

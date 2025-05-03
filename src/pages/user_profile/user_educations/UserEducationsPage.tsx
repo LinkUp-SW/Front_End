@@ -6,9 +6,10 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  LinkUpFooter,
+  WhosHiringImage,
   WithNavBar,
 } from "@/components";
-import { ResourcesSection, ViewedSection } from "../components";
 import Header from "../components/modals/components/Header";
 import AddEducationModal from "../components/modals/education_modal/AddEducationModal";
 import { Education } from "@/types";
@@ -24,6 +25,16 @@ import EducationSkeletonLoader from "../components/educations/EducationSkeletonL
 import EducationsList from "../components/educations/EducationsList";
 import { MdDeleteForever } from "react-icons/md";
 import EditEducationModal from "../components/modals/education_modal/EditEducationModal";
+// Redux
+import { useSelector, useDispatch } from "react-redux";
+import { RootState, AppDispatch } from "@/store";
+import {
+  setEducations as setGlobalEducations,
+  addEducation as addGlobalEducation,
+  updateEducation as updateGlobalEducation,
+  removeEducation as removeGlobalEducation,
+} from "@/slices/education/educationsSlice";
+import { removeOrganizationFromSkills as removeEducationFromSkills } from "@/slices/skills/skillsSlice";
 
 interface FetchDataResult {
   education: Education[];
@@ -33,7 +44,6 @@ interface FetchDataResult {
 const UserEducationsPage = () => {
   const authToken = Cookies.get("linkup_auth_token");
   const { id } = useParams();
-  const [educations, setEducations] = useState<Education[]>([]);
   const [editOpen, setEditOpen] = useState(false);
   const [educationToEdit, setEducationToEdit] = useState<Education | null>(
     null
@@ -50,9 +60,12 @@ const UserEducationsPage = () => {
     return Promise.resolve(null);
   }, [authToken, id]);
 
+  const dispatch = useDispatch<AppDispatch>();
+  const educations = useSelector((state: RootState) => state.education.items);
+
   useEffect(() => {
     if (data?.education) {
-      setEducations(data.education);
+      dispatch(setGlobalEducations(data.education));
     }
   }, [data]);
 
@@ -60,9 +73,9 @@ const UserEducationsPage = () => {
     if (authToken && selectedEducationId) {
       try {
         const response = await removeEducation(authToken, selectedEducationId);
-        setEducations((prev) =>
-          prev.filter((edu) => edu._id !== selectedEducationId)
-        );
+        dispatch(removeGlobalEducation(selectedEducationId));
+        dispatch(removeEducationFromSkills({ orgId: selectedEducationId }));
+
         toast.success(response.message);
       } catch (error) {
         console.error("Failed to delete education", error);
@@ -92,14 +105,12 @@ const UserEducationsPage = () => {
 
   // Handler for adding a new education
   const handleAddEducation = (newEducation: Education) => {
-    setEducations((prev) => [...prev, newEducation]);
+    dispatch(addGlobalEducation(newEducation));
   };
 
   // Handler for updating an existing education
   const handleEditEducation = (updatedEdu: Education) => {
-    setEducations((prev) =>
-      prev.map((edu) => (edu._id === updatedEdu._id ? updatedEdu : edu))
-    );
+    dispatch(updateGlobalEducation(updatedEdu));
     setEditOpen(false);
     setEducationToEdit(null);
   };
@@ -160,8 +171,8 @@ const UserEducationsPage = () => {
 
         {/* Right Sidebar */}
         <div className="lg:col-span-1 space-y-4">
-          <ViewedSection />
-          <ResourcesSection />
+          <WhosHiringImage />
+          <LinkUpFooter />
         </div>
       </div>
 

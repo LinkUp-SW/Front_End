@@ -76,10 +76,10 @@ const CoverPictureModal: React.FC<CoverPictureModalProps> = ({
         toast.error("Selected file is not a valid image.");
         return;
       }
-      // Validate file size (limit: 5MB).
-      const maxSize = 5 * 1024 * 1024;
+      // Validate file size (limit: 2MB).
+      const maxSize = 2 * 1024 * 1024;
       if (file.size > maxSize) {
-        toast.error("File size exceeds the maximum limit (5MB).");
+        toast.error("File size exceeds the maximum limit (2MB).");
         return;
       }
       const reader = new FileReader();
@@ -90,6 +90,7 @@ const CoverPictureModal: React.FC<CoverPictureModalProps> = ({
         if (!isEditing) {
           setIsEditing(true);
         }
+        e.target.value = "";
       };
       reader.readAsDataURL(file);
     }

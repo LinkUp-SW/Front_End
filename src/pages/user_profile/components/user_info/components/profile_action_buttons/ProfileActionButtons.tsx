@@ -2,10 +2,11 @@ import React, { useState, useMemo, useCallback } from "react";
 import CustomButton from "./CustomButton";
 import AddSectionModal from "./AddSectionModal";
 import ResourcesPopover from "./ResourcesPopover";
-import { IoCloseCircle } from "react-icons/io5";
+import { IoCheckmarkSharp, IoCloseCircle } from "react-icons/io5";
 import { CiCirclePlus, CiClock2 } from "react-icons/ci";
 import { FaUserPlus, FaUserMinus, FaPaperPlane } from "react-icons/fa";
 import {
+  acceptInvitation,
   connectWithUser,
   followUser,
   removeUserFromConnection,
@@ -28,12 +29,17 @@ import {
   FormInput,
 } from "@/components";
 import { blockUser } from "@/endpoints/userProfile";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "@/store";
+import { editUserBio } from "@/slices/user_profile/userBioSlice";
+import { socketService } from "@/services/socket";
 
 export type FollowStatus = {
   isFollowing?: boolean;
   isPending?: boolean;
   followPrimary?: boolean;
   isInConnection?: boolean;
+  isInRecievedConnections?: boolean;
 };
 
 export interface ProfileActionButtonsProps {
@@ -41,6 +47,14 @@ export interface ProfileActionButtonsProps {
   followStatus: FollowStatus;
   isConnectByEmail: boolean;
   email: string;
+  resume: string | null;
+  setNumOfConnections: React.Dispatch<React.SetStateAction<number>>;
+  setIsInConnections: React.Dispatch<React.SetStateAction<undefined | boolean>>;
+  connectionCount: number;
+  isAllowingMessage: boolean;
+  isViewerSubscribed: boolean;
+  setOpenSubscribeNowDialog: React.Dispatch<React.SetStateAction<boolean>>;
+  isPremium: boolean;
 }
 
 const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
@@ -48,8 +62,19 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
   followStatus,
   isConnectByEmail,
   email,
+  setNumOfConnections,
+  setIsInConnections,
+  connectionCount,
+  resume,
+  isAllowingMessage,
+  isViewerSubscribed,
+  setOpenSubscribeNowDialog,
+  isPremium,
 }) => {
   const { id } = useParams();
+  const userBioState = useSelector((state: RootState) => state.userBio);
+  const theme = useSelector((state: RootState) => state.theme.theme);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const authToken = Cookies.get("linkup_auth_token");
   const [localFollowStatus, setLocalFollowStatus] =
@@ -97,6 +122,7 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
         id as string,
         email
       );
+      socketService.sendNotification(id as string, Cookies.get('linkup_user_id') as string, 'connection_request',undefined,'new connection request')
       toast.success(response.message);
       setLocalFollowStatus((prev) => ({
         ...prev,
@@ -114,6 +140,32 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
     }
   }, []);
 
+  const handleAcceptConnection = useCallback(async () => {
+    try {
+      const response = await acceptInvitation(
+        authToken as string,
+        id as string
+      );
+      toast.success(response.message);
+      setLocalFollowStatus((prev) => ({
+        ...prev,
+        isFollowing: true,
+        isInConnection: true,
+      }));
+      setNumOfConnections((prev: number) => prev + 1);
+      setIsInConnections(true);
+      dispatch(
+        editUserBio({
+          ...userBioState,
+          number_of_connections: connectionCount + 1,
+        })
+      );
+    } catch (error) {
+      toast.error(getErrorMessage(error));
+      setLocalFollowStatus((prev) => ({ ...prev, isInConnection: false }));
+    }
+  }, []);
+
   const handleCancelRequest = useCallback(async () => {
     let resolveDelay: (result: string) => void;
 
@@ -127,7 +179,7 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
 
     const loadingToast = toast.loading("Withdraw connection request", {
       description: (
-        <p className="text-gray-600">
+        <p className="text-gray-600 dark:text-gray-300">
           If you withdraw the request, you won’t be able to send another request
           for <strong>3 weeks</strong>.
         </p>
@@ -140,7 +192,7 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
       },
       // Custom styling for the cancel button
       cancelButtonStyle: {
-        backgroundColor: "#f87171", // Tailwind's red-400
+        backgroundColor: "oklch(0.525 0.223 3.958)", // Tailwind's red-400
         color: "#fff",
         fontWeight: "bold",
         borderRadius: "4px",
@@ -148,6 +200,10 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
         marginLeft: "8px",
         border: "none",
         cursor: "pointer",
+      },
+      style: {
+        background: theme === "light" ? "white" : "#1e2939",
+        color: theme === "light" ? "black" : "white",
       },
     });
 
@@ -195,7 +251,7 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
         },
       },
       actionButtonStyle: {
-        backgroundColor: "#f87171", // Tailwind's red-400
+        backgroundColor: "oklch(0.525 0.223 3.958)", // Tailwind's red-400
         color: "#fff",
         fontWeight: "bold",
         borderRadius: "4px",
@@ -203,6 +259,10 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
         marginLeft: "8px",
         border: "none",
         cursor: "pointer",
+      },
+      style: {
+        background: theme === "light" ? "white" : "#1e2939",
+        color: theme === "light" ? "black" : "white",
       },
     });
     // Wait for either the timeout or cancel click
@@ -216,6 +276,14 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
         );
         toast.success(response.message);
         setLocalFollowStatus((prev) => ({ ...prev, isInConnection: false }));
+        dispatch(
+          editUserBio({
+            ...userBioState,
+            number_of_connections: connectionCount - 1,
+          })
+        );
+        setNumOfConnections((prev) => prev - 1);
+        setIsInConnections(false);
       } catch (error) {
         toast.error(getErrorMessage(error));
         setLocalFollowStatus((prev) => ({ ...prev, isInConnection: true }));
@@ -226,7 +294,18 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
   //-- If isConnectByEmail true open a Dialog
 
   // --- Other Handlers ---
-  const handleMessage = useCallback(() => alert("Message clicked"), []);
+  const handleMessage = useCallback(() => {
+    if (
+      followStatus.isInConnection ||
+      isAllowingMessage ||
+      isViewerSubscribed
+    ) {
+      alert("You Can Send Message Directly");
+    } else {
+      setOpenSubscribeNowDialog(true);
+    }
+  }, []);
+
   const handleBlock = useCallback(async () => {
     let resolveDelay: (result: string) => void;
     // Create a promise that resolves after 4000ms or when cancel is clicked
@@ -245,7 +324,7 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
         },
       },
       actionButtonStyle: {
-        backgroundColor: "#f87171", // Tailwind's red-400
+        backgroundColor: "oklch(0.525 0.223 3.958)", // Tailwind's red-400
         color: "#fff",
         fontWeight: "bold",
         borderRadius: "4px",
@@ -253,6 +332,10 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
         marginLeft: "8px",
         border: "none",
         cursor: "pointer",
+      },
+      style: {
+        background: theme === "light" ? "white" : "#1e2939",
+        color: theme === "light" ? "black" : "white",
       },
     });
     // Wait for either the timeout or cancel click
@@ -270,21 +353,20 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
       }
     }
   }, []);
-  const handleEnhanceProfile = useCallback(
-    () => alert("Enhance Profile clicked"),
-    []
-  );
+  const handleEnhanceProfile = useCallback(() => {
+    setOpenSubscribeNowDialog(true);
+  }, []);
   const handleOpenToWork = useCallback(() => alert("Open to Work clicked"), []);
   const handleAboutProfile = useCallback(
     () => alert("About Profile clicked"),
     []
   );
   const handleViewActivity = useCallback(
-    () => alert("View Activity clicked"),
+    () => navigate(`/user-profile/${id}/posts`),
     []
   );
   const handleViewBlockedUsers = useCallback(
-    () => alert("View Blocked Users clicked"),
+    () => navigate(`/settings/visibility/blocking`),
     []
   );
 
@@ -299,13 +381,16 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
           Open to work
         </CustomButton>
         <AddSectionModal />
-        <CustomButton
-          id="enhance-profile-button"
-          variant="secondary"
-          onClick={handleEnhanceProfile}
-        >
-          Enhance Profile
-        </CustomButton>
+        {!isPremium && (
+          <CustomButton
+            id="enhance-profile-button"
+            variant="secondary"
+            onClick={handleEnhanceProfile}
+          >
+            Enhance Profile
+          </CustomButton>
+        )}
+
         <ResourcesPopover
           title="Resources"
           isOwner
@@ -362,6 +447,8 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
                 ? handleCancelRequest
                 : effectiveStatus.isInConnection
                 ? handleRemoveConnection
+                : effectiveStatus.isInRecievedConnections
+                ? handleAcceptConnection
                 : isConnectByEmail
                 ? () => setOpenEmailDialog(true)
                 : () => handleConnect(email)
@@ -376,6 +463,11 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
               <>
                 <FaUserMinus size={16} />
                 Remove Connection
+              </>
+            ) : effectiveStatus.isInRecievedConnections ? (
+              <>
+                <IoCheckmarkSharp size={14} />
+                Accept Request
               </>
             ) : (
               <>
@@ -401,6 +493,8 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
         isFollowing={effectiveStatus.isFollowing}
         isPendingConnection={effectiveStatus.isPending}
         isInConnection={effectiveStatus.isInConnection}
+        isInRecievedConnection={effectiveStatus.isInRecievedConnections}
+        onAccept={handleAcceptConnection}
         onFollow={handleFollow}
         onUnfollow={handleUnfollow}
         onConnect={handleConnect}
@@ -411,6 +505,7 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
         onRemoveConnection={handleRemoveConnection}
         onBlock={handleBlock}
         onAboutProfile={handleAboutProfile}
+        resume={resume}
       />
       <EmailConnectionDialog
         onOpenChange={setOpenEmailDialog}
@@ -435,12 +530,14 @@ const EmailConnectionDialog = ({
   const [email, setEmail] = useState("");
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-xl">
+      <DialogContent className="sm:max-w-xl bg-white dark:bg-gray-800">
         <DialogHeader>
-          <DialogTitle>Does this user know you?</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-lg text-black dark:text-white">
+            Does this user know you?
+          </DialogTitle>
+          <DialogDescription className="text-sm text-gray-700 dark:text-gray-300">
             To verify this member knows you, please enter their email to
-            connect.{" "}
+            connect.
           </DialogDescription>
         </DialogHeader>
         <div className="flex items-center space-x-2">
@@ -466,13 +563,12 @@ const EmailConnectionDialog = ({
               onOpenChange?.(false);
             }}
             type="submit"
-            size="sm"
-            className="px-3"
+            className="affirmativeBtn"
           >
-            send
+            Send
           </Button>
           <DialogClose asChild>
-            <Button type="button" variant="secondary">
+            <Button type="button" variant="outline" className="destructiveBtn">
               Close
             </Button>
           </DialogClose>

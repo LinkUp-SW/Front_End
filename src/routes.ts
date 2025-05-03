@@ -1,5 +1,3 @@
-// src/routes.ts
-
 import { RouteObject } from "react-router-dom";
 import {
   LandingPage,
@@ -27,8 +25,33 @@ import {
   UserExperiencesPage,
   UserLicensesPage,
   SignInAndSecurityPage,
-  ChangePasswordPage,
   MyItemsPage,
+  AccountPreferencePage,
+  InstructionPage,
+  ReasonPage,
+  OtherOptionPage,
+  AllPeoplePage,
+  CompanyCreationPage,
+  ManageCompanyPage,
+  CreateJobPage,
+  CompanyProfileView,
+  DashboardPage,
+  UsersPage,
+  AnalyticsPage,
+  ContentModerationPage,
+  GoodByePage,
+  ChangePasswordPage,
+  CloseAccountPage,
+  PrimaryEmailPage,
+  OTP,
+  AddEmailPage,
+  VisibilityPage,
+  BlockingListPage,
+  DisplayPage,
+  ConnectionRequest,
+  ProfileVisibility,
+  SubscriptionBillingPage,
+  PaymentStatusPage,
 } from "./pages";
 
 import React from "react";
@@ -75,6 +98,14 @@ const routes: RouteObject[] = [
   },
 
   { path: "/connections/:id", element: React.createElement(ConnectionsPage) },
+  {
+    path: "/feed/posts/:id",
+    element: React.createElement(FeedPage, { single: true }),
+  },
+  {
+    path: "/user-profile/:id/posts",
+    element: React.createElement(FeedPage, { profile: ":id" }),
+  },
 
   {
     path: "/manage-invitations",
@@ -93,7 +124,6 @@ const routes: RouteObject[] = [
     path: "/my-items/saved-posts",
     element: React.createElement(MyItemsPage),
   },
-
   {
     path: "/login",
     element: React.createElement(SignInPage),
@@ -127,7 +157,7 @@ const routes: RouteObject[] = [
     element: React.createElement(NotFoundPage),
   },
   {
-    path: "/search/:query",
+    path: "/search",
     element: React.createElement(SearchPage),
   },
   {
@@ -153,6 +183,122 @@ const routes: RouteObject[] = [
   {
     path: "/settings/security/changepassword",
     element: React.createElement(ChangePasswordPage),
+  },
+  {
+    path: "/settings/preference",
+    element: React.createElement(AccountPreferencePage),
+  },
+  // New routes for account closing flow
+  {
+    path: "/settings/close-account",
+    element: React.createElement(InstructionPage),
+  },
+  {
+    path: "/settings/close-account/reason",
+    element: React.createElement(ReasonPage),
+  },
+  {
+    path: "/settings/close-account/other-option",
+    element: React.createElement(OtherOptionPage),
+  },
+  {
+    path: "/settings/close-account/confirm",
+    element: React.createElement(CloseAccountPage),
+  },
+  {
+    path: "/settings/security/email",
+    element: React.createElement(PrimaryEmailPage),
+  },
+  {
+    path: "/settings/security/email/verify",
+    element: React.createElement(OTP),
+  },
+  {
+    path: "/settings/security/email/add",
+    element: React.createElement(AddEmailPage),
+  },
+  {
+    path: "/search/users",
+    element: React.createElement(AllPeoplePage),
+  },
+  {
+    path: "/company-creation",
+    element: React.createElement(CompanyCreationPage),
+  },
+  {
+    path: "/company-manage/:companyId",
+    element: React.createElement(ManageCompanyPage),
+  },
+  {
+    path: "/company-manage/:companyId/jobs/create",
+    element: React.createElement(CreateJobPage),
+  },
+  {
+    path: "/jobs/create",
+    element: React.createElement(CreateJobPage),
+  },
+  {
+    path: "/company/:companyId",
+    element: React.createElement(CompanyProfileView),
+  },
+
+  {
+    path: "/settings/visibility",
+    element: React.createElement(VisibilityPage),
+  },
+  {
+    path: "/settings/visibility/blocking",
+    element: React.createElement(BlockingListPage),
+  },
+  {
+    path: "/admin/dashboard",
+    element: React.createElement(DashboardPage),
+  },
+
+  {
+    path: "/admin/users",
+    element: React.createElement(UsersPage),
+  },
+  {
+    path: "/admin/analytics",
+    element: React.createElement(AnalyticsPage),
+  },
+  {
+    path: "/admin/content-moderation",
+    element: React.createElement(ContentModerationPage),
+  },
+
+  {
+    path: "/company/:companyId",
+    element: React.createElement(CompanyProfileView),
+  },
+  {
+    path: "/goodbye",
+    element: React.createElement(GoodByePage),
+  },
+  {
+    path: "/settings/theme",
+    element: React.createElement(DisplayPage),
+  },
+  {
+    path: "/settings/visibility/connection-request",
+    element: React.createElement(ConnectionRequest),
+  },
+  {
+    path: "/settings/visibility/profile",
+    element: React.createElement(ProfileVisibility),
+  },
+  {
+    path: "/settings/subscription-billing",
+    element: React.createElement(SubscriptionBillingPage),
+  },
+  {
+    path: "/payment",
+    element: React.createElement(PaymentStatusPage),
+  },
+  {
+    path: "/logout",
+    element: React.createElement(LandingPage),
   },
 ];
 

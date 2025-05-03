@@ -4,7 +4,15 @@ import {
   selectMessage,
   selectUserName,
   selectUserStatus,
+  selectUserId,
+  setResponsiveIsSidebar,
+  setDataInfo,
+  setTotalCount,
 } from "../../slices/messaging/messagingSlice";
+import {
+  incomingUnreadMessagesCount,
+  SocketEventData,
+} from "@/services/socket";
 import { toggleStarred } from "../../slices/messaging/messagingSlice";
 import * as Popover from "@radix-ui/react-popover";
 import { FaStar } from "react-icons/fa";
@@ -24,11 +32,23 @@ import {
   DialogTitle,
 } from "@/components";
 
-import { getAllConversations, deleteConversation } from "@/endpoints/messaging";
+import {
+  getAllConversations,
+  deleteConversation,
+  markConversationAsRead,
+  markConversationAsUnread,
+  blockUser,
+} from "@/endpoints/messaging";
+
 import Cookies from "js-cookie";
 import { Conversation } from "@/endpoints/messaging";
+import { toast } from "sonner";
+import { socketService } from "@/services/socket";
+import LinkUpLoader from "../../components/linkup_loader/LinkUpLoader";
+import { useParams } from "react-router-dom";
 
 const SideBar = () => {
+  const { id } = useParams();
   const token = Cookies.get("linkup_auth_token");
 
   const dispatch = useDispatch();
@@ -45,12 +65,19 @@ const SideBar = () => {
   const [SelectedConversationStyle, setSelectedConversationStyle] =
     useState<string>();
 
-  const [dataInfo, setDataInfo] = useState<Conversation[]>([]);
+  // const [dataInfo, setDataInfo] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [isOpen, setIsOpen] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [isBlockOpen, setIsBlockOpen] = useState(false);
 
-  const openModal = () => setIsOpen(true);
-  const closeModal = () => setIsOpen(false);
+  const openDeleteModal = () => setIsDeleteOpen(true);
+  const closeDeleteModal = () => setIsDeleteOpen(false);
+  const openBlockModal = () => setIsBlockOpen(true);
+  const closeBlockModal = () => setIsBlockOpen(false);
+
+  const dataInfo = useSelector(
+    (state: RootState) => state.messaging.setDataInfo
+  );
 
   useEffect(() => {
     const fetchConversations = async () => {
@@ -59,9 +86,10 @@ const SideBar = () => {
 
         const data: { conversations: Conversation[] } =
           await getAllConversations(token);
-        setDataInfo(data.conversations);
+        dispatch(setDataInfo(data.conversations));
       } catch (error) {
         console.error("Failed to fetch conversations:", error);
+        toast.error("Failed to load Conversations");
       } finally {
         setLoading(false);
       }
@@ -78,10 +106,121 @@ const SideBar = () => {
       }
     });
   }, [dataInfo]);
+
+  useEffect(() => {
+    const handleUserOnline = (incoming: SocketEventData) => {
+      // Type assertion to cast the incoming data to { userId: string }
+      const { userId } = incoming as { userId: string };
+
+      if (userId !== id) {
+        const updatedData = dataInfo.map((conversation) =>
+          conversation.otherUser.userId === userId
+            ? {
+                ...conversation,
+                otherUser: {
+                  ...conversation.otherUser,
+                  onlineStatus: true,
+                },
+              }
+            : conversation
+        );
+        dispatch(setDataInfo(updatedData));
+      }
+    };
+
+    const handleUserOffline = (incoming: SocketEventData) => {
+      // Type assertion to cast the incoming data to { userId: string }
+      const { userId } = incoming as { userId: string };
+
+      if (userId !== id) {
+        const updatedData = dataInfo.map((conversation) =>
+          conversation.otherUser.userId === userId
+            ? {
+                ...conversation,
+                otherUser: {
+                  ...conversation.otherUser,
+                  onlineStatus: false,
+                },
+              }
+            : conversation
+        );
+        dispatch(setDataInfo(updatedData));
+      }
+    };
+
+    socketService.on("user_online", handleUserOnline);
+    socketService.on("user_offline", handleUserOffline);
+
+    return () => {
+      socketService.off("user_online", handleUserOnline);
+      socketService.off("user_offline", handleUserOffline);
+    };
+  }, [id, dataInfo]);
+
+  // useEffect(() => {
+  //   const handleTotalUnreadCount = (incoming: incomingTotalCount) => {
+  //     console.log("unread_messages_count received:", incoming);
+
+  //     // Check if the data has the expected structure
+  //     if (incoming && typeof incoming.totalUnreadCount === 'number') {
+  //       dispatch(setTotalCount(incoming.totalUnreadCount));
+  //     } else {
+  //       console.error("Invalid data structure received for unread_messages_count:", incoming);
+  //     }
+  //   };
+
+  //   // Debug: Log when effect runs
+  //   console.log("Setting up unread_messages_count listener");
+
+  //   // Make sure we're using the correct event name
+  //   socketService.on("unread_messages_count", handleTotalUnreadCount);
+
+  //   return () => {
+  //     console.log("Cleaning up unread_messages_count listener");
+  //     socketService.off("unread_messages_count", handleTotalUnreadCount);
+  //   };
+  // }, [dispatch]); // Keep only dispatch as dependency
+
+  useEffect(() => {
+    const handleUnreadCount = (incoming: incomingUnreadMessagesCount) => {
+      const updatedData = dataInfo.map((message) =>
+        message.conversationId === incoming.conversationId
+          ? {
+              ...message,
+              unreadCount: incoming.count,
+              conversationType:
+                incoming.count > 0
+                  ? message.conversationType.includes("Unread")
+                    ? message.conversationType
+                    : [...message.conversationType, "Unread"]
+                  : message.conversationType.filter(
+                      (type) => type !== "Unread"
+                    ),
+            }
+          : message
+      );
+      const totalUnreadMessages = updatedData.reduce(
+        (sum, msg) => sum + msg.unreadCount,
+        0
+      );
+      dispatch(setTotalCount(totalUnreadMessages));
+      dispatch(setDataInfo(updatedData));
+    };
+
+    const unsubscribe = socketService.on<incomingUnreadMessagesCount>(
+      "conversation_unread_count",
+      handleUnreadCount
+    );
+
+    return () => {
+      unsubscribe();
+    };
+  }, [dataInfo, dispatch]);
+
   const filterButtonData = {
     Focused: dataInfo,
     [FILTER_OPTIONS_MESSAGES.UNREAD]: dataInfo.filter((info) =>
-      info.conversationType.includes("unread")
+      info.conversationType.includes("Unread")
     ),
     [FILTER_OPTIONS_MESSAGES.MY_CONNECTIONS]: dataInfo.filter((info) =>
       info.conversationType.includes("myconnections")
@@ -94,7 +233,12 @@ const SideBar = () => {
     ),
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading)
+    return (
+      <div>
+        <LinkUpLoader />
+      </div>
+    );
 
   const filteredMessagesSearch = filterButtonData[activeFilter].filter(
     (info) =>
@@ -102,27 +246,45 @@ const SideBar = () => {
       info.lastMessage.message.toLowerCase().includes(search.toLowerCase())
   );
 
-  const handleSelectConversation = (
+  const handleSelectConversation = async (
     conversationID: string,
     dataType: string[],
     user2Name: string,
-    userStatus: boolean
+    userStatus: boolean,
+    user2Id: string
   ) => {
     dispatch(selectMessage(conversationID.toString()));
     dispatch(selectUserName(user2Name));
     dispatch(selectUserStatus(userStatus));
-    if (dataType.includes("unread")) {
-      setDataInfo((prevData) =>
-        prevData.map((message) =>
-          message.conversationId === conversationID
-            ? {
-                ...message,
-                type: message.conversationType.filter((t) => t !== "unread"),
-              }
-            : message
-        )
-      );
+    dispatch(selectUserId(user2Id));
+    dispatch(setResponsiveIsSidebar(true));
+
+    // If this conversation has unread messages
+    if (dataType.includes("Unread")) {
+      if (token) {
+        try {
+          await markConversationAsRead(token, conversationID);
+
+          const updatedData = dataInfo.map((message) =>
+            message.conversationId === conversationID
+              ? {
+                  ...message,
+                  conversationType: message.conversationType.filter(
+                    (t) => t !== "Unread"
+                  ),
+                  unreadCount: 0,
+                }
+              : message
+          );
+          dispatch(setDataInfo(updatedData));
+          toast.success("Conversation marked as read");
+        } catch (err) {
+          console.error("Failed to mark conversation as read:", err);
+          toast.error("Failed to mark conversation as read");
+        }
+      }
     }
+
     setSelectedConversationStyle(conversationID);
   };
 
@@ -161,46 +323,67 @@ const SideBar = () => {
     );
   };
 
-  const unreadFiltering = (conversationID: string) => {
-    setDataInfo((prevData) =>
-      prevData.map((message) =>
+  const unreadFiltering = async (conversationID: string) => {
+    try {
+      await markConversationAsUnread(token!, conversationID);
+      const updatedData = dataInfo.map((message) =>
         message.conversationId === conversationID
           ? {
               ...message,
-              conversationType: message.conversationType.includes("unread")
-                ? message.conversationType.filter((t) => t !== "unread")
-                : [...message.conversationType, "unread"],
+              conversationType: message.conversationType.includes("Unread")
+                ? message.conversationType.filter((t) => t !== "Unread")
+                : [...message.conversationType, "Unread"],
             }
           : message
-      )
-    );
+      );
+      dispatch(setDataInfo(updatedData));
+      toast.success("Conversation marked as unread");
+    } catch (err) {
+      console.error("Error marking as unread:", err);
+      toast.error("Failed to mark conversation as unread");
+    }
   };
 
   const starredFiltering = (conversationID: string) => {
     dispatch(toggleStarred(conversationID.toString()));
 
-    setDataInfo((prevData) =>
-      prevData.map((message) =>
-        message.conversationId === conversationID
-          ? {
-              ...message,
-              conversationType: message.conversationType.includes("starred")
-                ? message.conversationType.filter((t) => t !== "starred")
-                : [...message.conversationType, "starred"],
-            }
-          : message
-      )
+    const updatedData = dataInfo.map((message) =>
+      message.conversationId === conversationID
+        ? {
+            ...message,
+            conversationType: message.conversationType.includes("starred")
+              ? message.conversationType.filter((t) => t !== "starred")
+              : [...message.conversationType, "starred"],
+          }
+        : message
     );
+    dispatch(setDataInfo(updatedData));
   };
 
   const handlingDeleteConv = async (conversationID: string) => {
     try {
       await deleteConversation(token!, conversationID);
-      setDataInfo((prevData) =>
-        prevData.filter((conv) => conversationID !== conv.conversationId)
+      const updatedData = dataInfo.filter(
+        (conv) => conversationID !== conv.conversationId
       );
+      dispatch(setDataInfo(updatedData));
+      toast.success("Conversation deleted");
     } catch (err) {
       console.error("Error deleting:", err);
+      toast.error("Failed to delete conversation");
+    }
+  };
+  const handlingBlockUser = async (userID: string) => {
+    try {
+      await blockUser(token!, userID);
+      const updatedData = dataInfo.filter(
+        (conv) => userID !== conv.otherUser.userId
+      );
+      dispatch(setDataInfo(updatedData));
+      toast.success("User blocked successfully");
+    } catch (err) {
+      console.error("Error blocking user:", err);
+      toast.error("Failed to block user");
     }
   };
 
@@ -254,14 +437,15 @@ const SideBar = () => {
                   data.conversationId,
                   data.conversationType,
                   data.otherUser.firstName,
-                  data.otherUser.onlineStatus
+                  data.otherUser.onlineStatus,
+                  data.otherUser.userId
                 );
               }}
               key={data.conversationId}
               className={`relative flex items-start p-4 hover:cursor-pointer ${
                 SelectedConversationStyle === data.conversationId
                   ? "bg-[#e6eef4] hover:bg-[#d9e5f0]"
-                  : data.conversationType.includes("unread")
+                  : data.conversationType.includes("Unread")
                   ? "bg-[#eaf4fe] hover:bg-[#d9e5f0]"
                   : "hover:bg-gray-100"
               }`}
@@ -295,12 +479,17 @@ const SideBar = () => {
                       </button>
                     </div>
                   ) : (
-                    <img
-                      id="profile-section"
-                      className="rounded-full w-12 h-12 border border-gray-200"
-                      src={data.otherUser.profilePhoto}
-                      alt="profile"
-                    />
+                    <div className="relative w-12 h-12">
+                      <img
+                        id="profile-section"
+                        className="rounded-full w-12 h-12 border  border-gray-200"
+                        src={data.otherUser.profilePhoto}
+                        alt="profile"
+                      />
+                      {data.otherUser.onlineStatus && (
+                        <span className="absolute bottom-0 right-0 w-3 h-3 bg-[#01754f] border-2 border-white rounded-full"></span>
+                      )}
+                    </div>
                   )}
                 </div>
 
@@ -308,12 +497,12 @@ const SideBar = () => {
                   <div className="flex justify-between items-center">
                     <p
                       className={`text-sm ${
-                        data.conversationType.includes("unread")
+                        data.conversationType.includes("Unread")
                           ? "font-semibold"
                           : "font-medium"
                       }`}
                     >
-                      {data.otherUser.firstName}
+                      {data.otherUser.firstName} {data.otherUser.lastName}
                     </p>
 
                     {!dotAppearance.includes(data.conversationId) && (
@@ -327,8 +516,8 @@ const SideBar = () => {
                     )}
                   </div>
 
-                  <p className="text-sm text-gray-600 truncate mt-1 ">
-                    {data.lastMessage?.message || ""}
+                  <p className="text-sm text-gray-600 truncate w-40 mt-1 ">
+                    {data.lastMessage?.message || "attachement sent"}
                   </p>
                 </div>
               </div>
@@ -369,7 +558,7 @@ const SideBar = () => {
                           className="block w-full text-left py-2 px-3 text-sm hover:bg-gray-100 rounded"
                           onClick={() => unreadFiltering(data.conversationId)}
                         >
-                          {data.conversationType.includes("unread")
+                          {data.conversationType.includes("Unread")
                             ? "Mark as read"
                             : "Mark as unread"}
                         </button>
@@ -396,14 +585,65 @@ const SideBar = () => {
                         </button>
                         <div>
                           <button
+                            id="block"
+                            className="block w-full text-left py-2 px-3 text-sm hover:bg-gray-100 rounded"
+                            onClick={openBlockModal}
+                          >
+                            Block
+                          </button>
+                          {isBlockOpen && (
+                            <Dialog
+                              open={isBlockOpen}
+                              onOpenChange={setIsBlockOpen}
+                            >
+                              <DialogContent>
+                                <DialogHeader>
+                                  <DialogTitle>Block</DialogTitle>
+                                  <DialogDescription>
+                                    You’re about to block
+                                    {data.otherUser.firstName}{" "}
+                                    {data.otherUser.lastName}
+                                  </DialogDescription>
+                                  <DialogDescription>
+                                    You’ll no longer be connected, and will lose
+                                    any endorsements or recommendations from
+                                    this person.
+                                  </DialogDescription>
+                                </DialogHeader>
+                                <DialogFooter>
+                                  <button
+                                    onClick={closeBlockModal}
+                                    className="btn btn-cancel"
+                                  >
+                                    Back
+                                  </button>
+                                  <button
+                                    onClick={() => {
+                                      handlingBlockUser(data.otherUser.userId);
+                                      closeBlockModal();
+                                    }}
+                                    className="bg-blue-700 text-white rounded-md p-2"
+                                  >
+                                    Block
+                                  </button>
+                                </DialogFooter>
+                              </DialogContent>
+                            </Dialog>
+                          )}
+                        </div>
+                        <div>
+                          <button
                             id="delete-conversation"
                             className="block w-full text-left py-2 px-3 text-sm hover:bg-gray-100 rounded"
-                            onClick={openModal}
+                            onClick={openDeleteModal}
                           >
                             Delete conversation
                           </button>
-                          {isOpen && (
-                            <Dialog open={isOpen} onOpenChange={setIsOpen}>
+                          {isDeleteOpen && (
+                            <Dialog
+                              open={isDeleteOpen}
+                              onOpenChange={setIsDeleteOpen}
+                            >
                               <DialogContent>
                                 <DialogHeader>
                                   <DialogTitle>
@@ -416,7 +656,7 @@ const SideBar = () => {
                                 </DialogHeader>
                                 <DialogFooter>
                                   <button
-                                    onClick={closeModal}
+                                    onClick={closeDeleteModal}
                                     className="btn btn-cancel"
                                   >
                                     Cancel
@@ -424,7 +664,7 @@ const SideBar = () => {
                                   <button
                                     onClick={() => {
                                       handlingDeleteConv(data.conversationId);
-                                      closeModal();
+                                      closeDeleteModal();
                                     }}
                                     className="bg-blue-700 text-white rounded-md p-2"
                                   >
@@ -453,9 +693,9 @@ const SideBar = () => {
                   <FaStar id="star" size={15} className="text-[#c37d16]" />
                 )}
 
-                {data.conversationType.includes("unread") && (
+                {data.conversationType.includes("Unread") && (
                   <span className="flex items-center justify-center text-xs rounded-full text-white w-4 h-4 bg-blue-600 font-medium">
-                    1
+                    {data.unreadCount > 0 ? data.unreadCount : ""}
                   </span>
                 )}
               </div>

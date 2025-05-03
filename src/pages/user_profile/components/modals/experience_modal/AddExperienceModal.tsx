@@ -17,6 +17,9 @@ import { Experience, JobTypeEnum, Organization } from "@/types";
 import { addWorkExperience, getCompaniesList } from "@/endpoints/userProfile";
 import { getErrorMessage } from "@/utils/errorHandler";
 import FormSpinner from "@/components/form/form_spinner/FormSpinner";
+import { useDispatch } from "react-redux";
+import { addExperienceToSkill } from "@/slices/skills/skillsSlice";
+import { isSkillResponse } from "@/utils";
 
 /**
  * We'll rely on user input + a generated ID to create a new Experience object
@@ -46,7 +49,7 @@ export interface ExperienceFormData {
   media: MediaItem[];
 }
 
-interface AddExperienceModalProps {
+export interface AddExperienceModalProps {
   /** Called when the modal should be closed, typically after a successful submission */
   onClose?: () => void;
   /** Called on a successful experience creation; passes the newly created experience */
@@ -76,6 +79,7 @@ const AddExperienceModal: React.FC<AddExperienceModalProps> = ({
     skills: [],
     media: [],
   });
+  const dispatch = useDispatch();
 
   /**
    * General change handler for form fields
@@ -169,6 +173,7 @@ const AddExperienceModal: React.FC<AddExperienceModalProps> = ({
       return;
     }
 
+
     try {
       // -- Perform local validations first --
       if (!validateForm()) {
@@ -196,12 +201,25 @@ const AddExperienceModal: React.FC<AddExperienceModalProps> = ({
 
       // We rely on the server returning a 200 status to confirm success
       const response = await addWorkExperience(authToken, toBeSentFormData);
-
       // If we reach here, the request is successful (status 200)
       toast.success(response?.message || "Experience added successfully!");
       // Update the parent state with the newly created experience
       onSuccess?.({ ...toBeSentFormData, _id: response.experience._id });
-
+      response.experience.skills.forEach((skill) => {
+        if (isSkillResponse(skill)) {
+          dispatch(
+            addExperienceToSkill({
+              skillId: skill._id,
+              skillName: skill.name,
+              experience: {
+                _id: response.experience._id as string,
+                logo: response.experience.organization.logo,
+                name: response.experience.title,
+              },
+            })
+          );
+        }
+      });
       // Close the modal
       onClose?.();
     } catch (err) {

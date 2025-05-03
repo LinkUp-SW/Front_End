@@ -14,6 +14,9 @@ import MediaManager from "../components/MediaManager";
 import SkillsManager from "../components/SkillsManager";
 import { MediaItem } from "../components/types";
 import { getErrorMessage } from "@/utils/errorHandler";
+import { useDispatch } from "react-redux";
+import { addLicenseToSkill } from "@/slices/skills/skillsSlice";
+import { isSkillResponse } from "@/utils";
 
 const generateTempId = () =>
   crypto.randomUUID?.() || Math.random().toString(36).substr(2, 9);
@@ -31,7 +34,7 @@ interface LicenseFormData {
   media: MediaItem[];
 }
 
-interface AddLicenseModalProps {
+export interface AddLicenseModalProps {
   onClose?: () => void;
   onSuccess?: (newLicense: License) => void;
 }
@@ -40,6 +43,7 @@ const AddLicenseModal: React.FC<AddLicenseModalProps> = ({
   onClose,
   onSuccess,
 }) => {
+  const dispatch = useDispatch();
   const authToken = Cookies.get("linkup_auth_token");
   const { isSubmitting, startSubmitting, stopSubmitting } = useFormStatus();
 
@@ -117,9 +121,23 @@ const AddLicenseModal: React.FC<AddLicenseModalProps> = ({
       const response = await addLicense(authToken, newLicense);
       toast.success(response.message);
       onSuccess?.({ ...newLicense, _id: response.license._id });
+      response.license.skills.forEach((skill) => {
+        if (isSkillResponse(skill)) {
+          dispatch(
+            addLicenseToSkill({
+              skillId: skill._id,
+              skillName: skill.name,
+              license: {
+                _id: response.license._id as string,
+                logo: response.license.issuing_organization.logo,
+                name: response.license.name,
+              },
+            })
+          );
+        }
+      });
       onClose?.();
     } catch (error) {
-      console.log(error);
       toast.error(getErrorMessage(error));
     } finally {
       stopSubmitting();
@@ -212,7 +230,7 @@ const AddLicenseModal: React.FC<AddLicenseModalProps> = ({
           disabled={isSubmitting}
           className="bg-purple-600 hover:bg-purple-700 w-full disabled:opacity-60 disabled:hover:bg-purple-600 disabled:cursor-not-allowed cursor-pointer text-white py-2 px-4 rounded-full transition-all duration-300"
         >
-          {isSubmitting ? <FormSpinner /> : "Save Education"}
+          {isSubmitting ? <FormSpinner /> : "Save License"}
         </button>
       </form>
     </div>
