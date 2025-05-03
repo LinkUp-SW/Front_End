@@ -43,9 +43,20 @@ const PostList: React.FC<PostListProps> = ({
       {posts.map((post) => (
         <Post
           key={post._id}
-          postData={post}
+          postData={
+            post.original_post && post.post_type === "Repost instant"
+              ? post.original_post
+              : post
+          }
           viewMore={viewMore}
           action={post.activity_context}
+          originalPost={
+            post.post_type === "Repost instant"
+              ? post
+              : post.post_type === "Repost thought"
+              ? post.original_post
+              : undefined
+          }
         />
       ))}
       {isLoading && <PostSkeleton />}
