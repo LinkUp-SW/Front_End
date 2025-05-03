@@ -4,10 +4,10 @@ import { useLocation, useNavigate } from "react-router-dom";
 import {
   FiHome,
   FiFlag,
-  FiBriefcase,
+  
   FiBarChart2,
   FiUsers,
-  FiSettings,
+ 
 } from "react-icons/fi";
 import AuthMiddleware from "./AuthMiddleware";
 import Cookies from "js-cookie";
@@ -37,22 +37,14 @@ const WithAdminPanel = <P extends object>(
         icon: <FiFlag size={20} />,
         path: "/admin/content-moderation",
       },
-      {
-        name: "Job Postings",
-        icon: <FiBriefcase size={20} />,
-        path: "/admin/job-postings",
-      },
+      
       {
         name: "Analytics",
         icon: <FiBarChart2 size={20} />,
         path: "/admin/analytics",
       },
       { name: "Users", icon: <FiUsers size={20} />, path: "/admin/users" },
-      {
-        name: "Settings",
-        icon: <FiSettings size={20} />,
-        path: "/admin/settings",
-      },
+      
     ];
 
     const handleTabClick = (path: string) => {
