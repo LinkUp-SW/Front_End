@@ -36,14 +36,15 @@ import {
   deleteConversation,
   markConversationAsRead,
   markConversationAsUnread,
+  blockUser
 } from "@/endpoints/messaging";
+
 import Cookies from "js-cookie";
 import { Conversation } from "@/endpoints/messaging";
 import { toast } from "sonner";
 import { socketService } from "@/services/socket";
 import LinkUpLoader from "../../components/linkup_loader/LinkUpLoader";
 import { useParams } from "react-router-dom";
-
 
 const SideBar = () => {
   const { id } = useParams();
@@ -65,11 +66,14 @@ const SideBar = () => {
 
   // const [dataInfo, setDataInfo] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [isOpen, setIsOpen] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [isBlockOpen, setIsBlockOpen] = useState(false);
 
-  const openModal = () => setIsOpen(true);
-  const closeModal = () => setIsOpen(false);
-
+  const openDeleteModal = () => setIsDeleteOpen(true);
+  const closeDeleteModal = () => setIsDeleteOpen(false);
+  const openBlockModal = () => setIsBlockOpen(true);
+  const closeBlockModal = () => setIsBlockOpen(false);
+  
   const dataInfo = useSelector(
     (state: RootState) => state.messaging.setDataInfo
   );
@@ -155,28 +159,30 @@ const SideBar = () => {
 
   useEffect(() => {
     const handleUnreadCount = (incoming: incomingUnreadMessagesCount) => {
-      console.log("couuuuuuuuuuuuuuuuuuuuunt:", incoming);
       const updatedData = dataInfo.map((message) =>
         message.conversationId === incoming.conversationId
           ? {
               ...message,
               unreadCount: incoming.count,
-              conversationType: incoming.count > 0 
-                ? message.conversationType.includes("Unread") 
-                  ? message.conversationType 
-                  : [...message.conversationType, "Unread"]
-                : message.conversationType.filter(type => type !== "Unread")
+              conversationType:
+                incoming.count > 0
+                  ? message.conversationType.includes("Unread")
+                    ? message.conversationType
+                    : [...message.conversationType, "Unread"]
+                  : message.conversationType.filter(
+                      (type) => type !== "Unread"
+                    ),
             }
           : message
       );
       dispatch(setDataInfo(updatedData));
     };
-  
+
     const unsubscribe = socketService.on<incomingUnreadMessagesCount>(
       "conversation_unread_count",
       handleUnreadCount
     );
-  
+
     return () => {
       unsubscribe();
     };
@@ -337,13 +343,23 @@ const SideBar = () => {
       toast.error("Failed to delete conversation");
     }
   };
-
-
+  const handlingBlockUser = async (userID: string) => {
+    try {
+      await blockUser(token!, userID);
+        const updatedData = dataInfo.filter(
+        (conv) => userID !== conv.otherUser.userId
+      );
+      dispatch(setDataInfo(updatedData));
+      toast.success("User blocked successfully");
+    } catch (err) {
+      console.error("Error blocking user:", err);
+      toast.error("Failed to block user");
+    }
+  };
 
 
   return (
     <>
-      
       <div className="flex flex-col h-full overflow-hidden">
         {selectedItems.length != 0 ? (
           <div className="bg-[#f3f6fa] p-3 pl-5 flex justify-between items-center border-b border-gray-200 sticky top-0 z-10 flex-shrink-0">
@@ -370,7 +386,7 @@ const SideBar = () => {
                   onClick={() => setUnread(!unread)}
                 />
               </button>
-              <button  className="p-1 mx-1 hover:bg-gray-200 rounded-full">
+              <button className="p-1 mx-1 hover:bg-gray-200 rounded-full">
                 <MdOutlineDelete size={22} className="text-gray-600" />
               </button>
               <button className="p-1 mx-1 hover:bg-gray-200 rounded-full">
@@ -540,14 +556,59 @@ const SideBar = () => {
                         </button>
                         <div>
                           <button
+                            id="block"
+                            className="block w-full text-left py-2 px-3 text-sm hover:bg-gray-100 rounded"
+                            onClick={openBlockModal}
+                          >
+                            Block
+                          </button>
+                          {isBlockOpen && (
+                            <Dialog open={isBlockOpen} onOpenChange={setIsBlockOpen}>
+                              <DialogContent>
+                                <DialogHeader>
+                                  <DialogTitle>
+                                    Block
+                                  </DialogTitle>
+                                  <DialogDescription>
+                                  You’re about to block{data.otherUser.firstName}{" "}
+                                    {data.otherUser.lastName} 
+                                  </DialogDescription>
+                                  <DialogDescription>
+                                  You’ll no longer be connected, and will lose any endorsements or recommendations from this person.
+                                  </DialogDescription>
+
+                                </DialogHeader>
+                                <DialogFooter>
+                                  <button
+                                    onClick={closeBlockModal}
+                                    className="btn btn-cancel"
+                                  >
+                                    Back
+                                  </button>
+                                  <button
+                                    onClick={() => {
+                                      handlingBlockUser(data.otherUser.userId);
+                                      closeBlockModal();
+                                    }}
+                                    className="bg-blue-700 text-white rounded-md p-2"
+                                  >
+                                    Block
+                                  </button>
+                                </DialogFooter>
+                              </DialogContent>
+                            </Dialog>
+                          )}
+                        </div>
+                        <div>
+                          <button
                             id="delete-conversation"
                             className="block w-full text-left py-2 px-3 text-sm hover:bg-gray-100 rounded"
-                            onClick={openModal}
+                            onClick={openDeleteModal}
                           >
                             Delete conversation
                           </button>
-                          {isOpen && (
-                            <Dialog open={isOpen} onOpenChange={setIsOpen}>
+                          {isDeleteOpen && (
+                            <Dialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
                               <DialogContent>
                                 <DialogHeader>
                                   <DialogTitle>
@@ -560,7 +621,7 @@ const SideBar = () => {
                                 </DialogHeader>
                                 <DialogFooter>
                                   <button
-                                    onClick={closeModal}
+                                    onClick={closeDeleteModal}
                                     className="btn btn-cancel"
                                   >
                                     Cancel
@@ -568,7 +629,7 @@ const SideBar = () => {
                                   <button
                                     onClick={() => {
                                       handlingDeleteConv(data.conversationId);
-                                      closeModal();
+                                      closeDeleteModal();
                                     }}
                                     className="bg-blue-700 text-white rounded-md p-2"
                                   >
