@@ -25,6 +25,122 @@ import {
 } from "@/services/socket";
 import { useParams } from "react-router-dom";
 import LinkUpLoader from "../../components/linkup_loader/LinkUpLoader";
+function getMimeType(filePath: string): string {
+  const extension = filePath.split(".").pop()?.toLowerCase();
+  switch (extension) {
+    case "png":
+      return "image/png";
+    case "jpg":
+    case "jpeg":
+      return "image/jpeg";
+    case "gif":
+      return "image/gif";
+    case "mp4":
+      return "video/mp4";
+    case "mov":
+      return "video/quicktime";
+    case "pdf":
+      return "application/pdf";
+    case "txt":
+      return "text/plain";
+    case "doc":
+      return "application/msword";
+    case "docx":
+      return "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+    default:
+      return "application/octet-stream";
+  }
+}
+
+function getMimeTypeFromDataUrl(dataUrl: string): string {
+  const match = dataUrl.match(/^data:([^;]+);/);
+  return match ? match[1] : "application/octet-stream";
+}
+
+// Helper function to get file icon/display based on mime type
+function getFileDisplay(mediaUrl: string, mimeType: string, index: number) {
+  if (mimeType.startsWith("image/")) {
+    return (
+      <img
+        key={index}
+        src={mediaUrl}
+        alt={`image-${index}`}
+        style={{
+          maxWidth: "200px",
+          borderRadius: "8px",
+          marginTop: "8px",
+        }}
+      />
+    );
+  } else if (mimeType.startsWith("video/")) {
+    return (
+      <video
+        key={index}
+        controls
+        style={{
+          maxWidth: "200px",
+          borderRadius: "8px",
+          marginTop: "8px",
+        }}
+      >
+        <source src={mediaUrl} type={mimeType} />
+        Your browser does not support the video tag.
+      </video>
+    );
+  } else if (mimeType === "application/pdf") {
+    return (
+      <a
+        key={index}
+        href={mediaUrl}
+        download={`document-${index}.pdf`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex items-center px-3 py-2 bg-gray-100 rounded-lg mt-2 hover:bg-gray-200"
+      >
+        <span className="text-red-500 mr-2">📄</span>
+        <span>PDF Document</span>
+      </a>
+    );
+  } else if (mimeType.startsWith("text/")) {
+    return (
+      <a
+        key={index}
+        href={mediaUrl}
+        download={`text-${index}.txt`}
+        className="flex items-center px-3 py-2 bg-gray-100 rounded-lg mt-2 hover:bg-gray-200"
+      >
+        <span className="text-blue-500 mr-2">📝</span>
+        <span>Text Document</span>
+      </a>
+    );
+  } else if (mimeType.includes("word") || mimeType.includes("document")) {
+    return (
+      <a
+        key={index}
+        href={mediaUrl}
+        download={`document-${index}`}
+        className="flex items-center px-3 py-2 bg-gray-100 rounded-lg mt-2 hover:bg-gray-200"
+      >
+        <span className="text-blue-700 mr-2">📃</span>
+        <span>Word Document</span>
+      </a>
+    );
+  } else {
+    return (
+      <a
+        key={index}
+        href={mediaUrl}
+        download={`file-${index}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex items-center px-3 py-2 bg-gray-100 rounded-lg mt-2 hover:bg-gray-200"
+      >
+        <span className="text-gray-500 mr-2">📎</span>
+        <span>Download File</span>
+      </a>
+    );
+  }
+}
 
 const ChatingScreen = () => {
   const { id } = useParams();
@@ -39,7 +155,9 @@ const ChatingScreen = () => {
     (state: RootState) => state.messaging.starredConversations
   );
 
-  const user2Name = `${userBioState?.bio.first_name || ""} ${userBioState?.bio.last_name || ""}`.trim();
+  const user2Name = `${userBioState?.bio.first_name || ""} ${
+    userBioState?.bio.last_name || ""
+  }`.trim();
   const user2Img =
     "https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg";
   /* const user2Name = useSelector(
@@ -55,8 +173,6 @@ const ChatingScreen = () => {
       (conv) => conv.conversationID === selectedConvID
     )
   );*/
-
- 
 
   const isCurrentConversationStarred =
     starredConversations.includes(selectedConvID);
@@ -177,7 +293,9 @@ const ChatingScreen = () => {
           senderId: incoming.senderId,
           senderName:
             incoming.senderId === id
-              ? (userBioState?.bio.first_name || "") + " " + (userBioState?.bio.last_name || "")
+              ? (userBioState?.bio.first_name || "") +
+                " " +
+                (userBioState?.bio.last_name || "")
               : dataChat?.otherUser?.firstName || "",
           message: incoming.message.message,
           media: incoming.message.media || [],
@@ -377,6 +495,33 @@ const ChatingScreen = () => {
                       ) : (
                         <>
                           {msg.message}
+                          {/* MEDIA BLOCK GOES HERE */}
+                     
+                
+                          {msg.media?.length > 0 && (
+                            <div className="media-container mt-2">
+                              {msg.media.map((mediaUrl, index) => {
+                                // Handle base64 data URLs
+                                const isBase64 = mediaUrl.startsWith("data:");
+                                let mimeType = "";
+
+                                if (isBase64) {
+                                  mimeType = mediaUrl
+                                    .split(";")[0]
+                                    .replace("data:", "");
+                                } else {
+                                  // For regular URLs, try to determine mime type from extension
+                                  mimeType = getMimeType(mediaUrl);
+                                }
+
+                                return getFileDisplay(
+                                  mediaUrl,
+                                  mimeType,
+                                  index
+                                );
+                              })}
+                            </div>
+                          )}
                           {isEdited && (
                             <span className="text-s text-gray-500  pl-2">
                               (Edited)
