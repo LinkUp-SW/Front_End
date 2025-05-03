@@ -18,7 +18,9 @@ import { setPosts } from "@/slices/feed/postsSlice";
 const token = Cookies.get("linkup_auth_token");
 const userId = Cookies.get("linkup_user_id");
 
-const Activity: React.FC = () => {
+const Activity: React.FC<{
+  isMe?: boolean;
+}> = ({ isMe }) => {
   const [activeTab, setActiveTab] = useState<"post" | "comment" | "video">(
     "post"
   );
@@ -27,11 +29,8 @@ const Activity: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { id } = useParams<{ id: string }>();
   const dispatch = useDispatch<AppDispatch>();
-  const width=useSelector((state:RootState)=>state.screen.width)
-  const posts=useSelector((state:RootState)=>state.posts.list)
-
-
-
+  const width = useSelector((state: RootState) => state.screen.width);
+  const posts = useSelector((state: RootState) => state.posts.list);
 
   // Fetch user posts whenever the route changes
   useEffect(() => {
@@ -45,9 +44,9 @@ const Activity: React.FC = () => {
         }
         const payload = { limit: 5, cursor: 0 };
         const response = await getUserPosts(token, id || "", payload);
-        if (response?.posts) {        
+        if (response?.posts) {
           dispatch(setPosts(response.posts));
-        };
+        }
       } catch (err) {
         console.error(err);
         toast.error("Failed to load posts. Please try again later.");
@@ -64,9 +63,7 @@ const Activity: React.FC = () => {
     if (activeTab === "video") return post.media.media_type.includes("video");
     return false;
   });
-  useEffect(()=>{
-
-  },[posts])
+  useEffect(() => {}, [posts]);
 
   const handleCreatePost = () => dispatch(openCreatePostDialog());
   const handleSaveButton = () => setIsSaved((s) => !s);
@@ -85,9 +82,11 @@ const Activity: React.FC = () => {
         <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
           Activity
         </h1>
-        <TransparentButton onClick={handleCreatePost}>
-          Create a post
-        </TransparentButton>
+        {isMe && (
+          <TransparentButton onClick={handleCreatePost}>
+            Create a post
+          </TransparentButton>
+        )}
       </div>
 
       {/* Tabs */}
@@ -100,9 +99,7 @@ const Activity: React.FC = () => {
           </TransparentButton>
         )}
         {activeTab === "video" ? (
-          <BlueButton onClick={() => setActiveTab("video")}>
-            Videos
-          </BlueButton>
+          <BlueButton onClick={() => setActiveTab("video")}>Videos</BlueButton>
         ) : (
           <TransparentButton onClick={() => setActiveTab("video")}>
             Videos
@@ -124,62 +121,65 @@ const Activity: React.FC = () => {
         </div>
       ) : filteredPosts.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {(width*0.063)>=48?(<>
-            {filteredPosts.slice(0,2).map((post) => (
-            <PostPreview
-              key={post._id}
-              post={post}
-              // no width override—let the grid control sizing
-              menuActions={
-                id === userId
-                  ? getPersonalMenuActions(
-                      handleSaveButton,
-                      handleEditPostButton,
-                      deleteModal,
-                      post._id,
-                      isSaved
-                    )
-                  : getMenuActions(
-                      handleSaveButton,
-                      blockPost,
-                      reportPost,
-                      unfollow,
-                      post._id,
-                      isSaved
-                    )
-              }
-              showFooter
-            />
-          ))}
-          </>):(<>
-            {filteredPosts.slice(0,1).map((post) => (
-            <PostPreview
-              key={post._id}
-              post={post}
-              // no width override—let the grid control sizing
-              menuActions={
-                id === userId
-                  ? getPersonalMenuActions(
-                      handleSaveButton,
-                      handleEditPostButton,
-                      deleteModal,
-                      post._id,
-                      isSaved
-                    )
-                  : getMenuActions(
-                      handleSaveButton,
-                      blockPost,
-                      reportPost,
-                      unfollow,
-                      post._id,
-                      isSaved
-                    )
-              }
-              showFooter
-            />
-          ))}
-          </>)}
-          
+          {width * 0.063 >= 48 ? (
+            <>
+              {filteredPosts.slice(0, 2).map((post) => (
+                <PostPreview
+                  key={post._id}
+                  post={post}
+                  // no width override—let the grid control sizing
+                  menuActions={
+                    id === userId
+                      ? getPersonalMenuActions(
+                          handleSaveButton,
+                          handleEditPostButton,
+                          deleteModal,
+                          post._id,
+                          isSaved
+                        )
+                      : getMenuActions(
+                          handleSaveButton,
+                          blockPost,
+                          reportPost,
+                          unfollow,
+                          post._id,
+                          isSaved
+                        )
+                  }
+                  showFooter
+                />
+              ))}
+            </>
+          ) : (
+            <>
+              {filteredPosts.slice(0, 1).map((post) => (
+                <PostPreview
+                  key={post._id}
+                  post={post}
+                  // no width override—let the grid control sizing
+                  menuActions={
+                    id === userId
+                      ? getPersonalMenuActions(
+                          handleSaveButton,
+                          handleEditPostButton,
+                          deleteModal,
+                          post._id,
+                          isSaved
+                        )
+                      : getMenuActions(
+                          handleSaveButton,
+                          blockPost,
+                          reportPost,
+                          unfollow,
+                          post._id,
+                          isSaved
+                        )
+                  }
+                  showFooter
+                />
+              ))}
+            </>
+          )}
         </div>
       ) : (
         <div className="text-center text-gray-500 py-10">

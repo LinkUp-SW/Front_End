@@ -581,3 +581,15 @@ export const removeEndorsement = async (
   );
   return response.data;
 };
+
+export const checkIsMe = async (
+  token: string,
+  userId: string
+): Promise<{ is_me: boolean; status: string }> => {
+  const response = await axiosInstance.get(`/api/v1/user/${userId}/is-me`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data;
+};
