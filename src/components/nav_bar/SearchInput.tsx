@@ -74,6 +74,14 @@ const SearchInput = () => {
     setOpen(false);
   };
 
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    // Check if the blur is happening because we're clicking a suggestion
+    const relatedTarget = e.relatedTarget as HTMLElement;
+    if (!relatedTarget || !relatedTarget.closest('.suggestion-item')) {
+      setOpen(false);
+    }
+  };
+
   return (
     <div className="relative w-full lg:max-w-[600px] xl:max-w-[700px]">
       <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
@@ -86,7 +94,7 @@ const SearchInput = () => {
         onChange={handleSearchChange}
         onKeyDown={handleKeyDown}
         onFocus={() => setOpen(true)}
-        onBlur={() => setTimeout(() => setOpen(false), 150)}
+        onBlur={handleBlur}
         className="block w-full p-3 ps-10 text-base text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800 outline-none focus:ring-blue-500 focus:border-blue-500 transition duration-200"
       />
       {open && filteredResults.length > 0 && (
@@ -97,8 +105,9 @@ const SearchInput = () => {
                 return (
                   <div
                     key={index}
-                    className="flex items-center gap-3 p-4 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition"
+                    className="suggestion-item flex items-center gap-3 p-4 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition"
                     onClick={() => navigateToUser(result.user_id)}
+                    onMouseDown={(e) => e.preventDefault()}
                   >
                     {result.profile_photo ? (
                       <img
@@ -129,8 +138,9 @@ const SearchInput = () => {
                 return (
                   <div
                     key={index}
-                    className="flex items-center gap-3 p-4 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition"
+                    className="suggestion-item flex items-center gap-3 p-4 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition"
                     onClick={() => navigateToCompany(result._id)}
+                    onMouseDown={(e) => e.preventDefault()}
                   >
                     {result.logo ? (
                       <img
@@ -158,8 +168,9 @@ const SearchInput = () => {
                 return (
                   <div
                     key={index}
-                    className="p-4 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition"
+                    className="suggestion-item p-4 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition"
                     onClick={() => navigateToJob(result._id)}
+                    onMouseDown={(e) => e.preventDefault()}
                   >
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
@@ -181,7 +192,8 @@ const SearchInput = () => {
                 return (
                   <div
                     key={index}
-                    className="p-4 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition"
+                    className="suggestion-item p-4 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition"
+                    onMouseDown={(e) => e.preventDefault()}
                   >
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
