@@ -242,7 +242,18 @@ export const markMessagesAsSeen = async (
   return response.data;
   
 };
-
+export const blockUser = async (token: string, userId: string) => {
+  const response = await axiosInstance.post(
+    `/api/v1/user/block/${userId}`,
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
 
 
 
