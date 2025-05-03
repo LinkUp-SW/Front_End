@@ -334,3 +334,21 @@ export const DismissReport = async (
     );
     return response.data; 
   };
+
+
+  export const DeleteUser = async (
+    token: string,
+    userId: string,
+    
+  ): Promise<{ message: string; success: boolean }> => {
+    const response = await axiosInstance.delete(
+      `/api/v1/admin/delete/${userId}`,
+      
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  };
