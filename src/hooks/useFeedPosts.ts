@@ -12,6 +12,7 @@ import { getUserPosts } from "@/endpoints/userProfile";
 import { setPosts } from "@/slices/feed/postsSlice";
 import { RootState } from "@/store";
 import { toast } from "sonner";
+import { PostType } from "@/types";
 
 export function useFeedPosts(
   single: boolean = false,
@@ -45,7 +46,10 @@ export function useFeedPosts(
 
     try {
       const payload = { cursor: nextCursor, limit: 5 };
-
+      let response: { posts: PostType[]; next_cursor: number | null } = {
+        posts: [],
+        next_cursor: 0,
+      };
       let fetchedPosts = [];
       console.log("COMPANY", company);
       if (search) {
@@ -58,17 +62,17 @@ export function useFeedPosts(
         fetchedPosts = response?.posts || [];
       } else if (company) {
         // Add company posts case
-        const response = await getCompanyPosts(user_token, company);
+        response = await getCompanyPosts(user_token, company);
         fetchedPosts = response?.posts || [];
         console.log("Company Fetched POsts", fetchedPosts);
       } else if (profile && id) {
-        const response = await getUserPosts(user_token, id, payload);
+        response = await getUserPosts(user_token, id, payload);
         fetchedPosts = response?.posts || [];
       } else if (single && id) {
         const post = await fetchSinglePost(id, user_token);
         fetchedPosts = post ? [post] : [];
       } else {
-        const response = await getPostsFeed(user_token, payload);
+        response = await getPostsFeed(user_token, payload);
         fetchedPosts = response?.posts || [];
       }
 
@@ -79,8 +83,9 @@ export function useFeedPosts(
         // 👈 Subsequent pages: APPEND posts
         dispatch(setPosts([...posts, ...fetchedPosts]));
       }
+      console.log("RESPONSE", response);
 
-      setNextCursor((prev) => prev + fetchedPosts.length);
+      setNextCursor(response.next_cursor || 0);
       setHasMore(fetchedPosts.length === 5);
     } catch (error) {
       console.error("Error loading posts:", error);
