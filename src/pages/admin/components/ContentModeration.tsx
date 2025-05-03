@@ -155,10 +155,11 @@ const ContentModeration = () => {
   const filteredReports = reports.filter((report) => {
     const q = searchQuery.toLowerCase();
     return (
-      report.content_id.toLowerCase().includes(q) ||
-      report.type.toLowerCase().includes(q) ||
+      report.status === activeTab && // Add this line to filter by status
+      (report.content_id.toLowerCase().includes(q) ||
+        report.type.toLowerCase().includes(q) ||
       report.reasons.some((r) => r.toLowerCase().includes(q))
-    );
+    ));
   });
 
   const handleDeleteContent = async (report: Report) => {
