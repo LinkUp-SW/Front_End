@@ -700,3 +700,52 @@ export const createCompanyPost = async (
   );
   return response.data;
 };
+
+export const getSearchPosts = async (
+  token: string,
+  postPayload: {
+    query: string;
+    cursor: number;
+    limit: number;
+  }
+): Promise<{ posts: PostType[]; next_cursor: number | null }> => {
+  const response = await axiosInstance.get(`api/v2/post/search/posts`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    params: postPayload,
+  });
+  console.log("getSearchPosts:", response.data);
+
+  // Filter out null posts and transform the rest
+  const validPosts = (response.data.posts || []).filter(
+    (post: PostType) => post !== null
+  );
+
+  const transformedPosts = validPosts.map((post: PostType) => ({
+    ...post,
+    comments_data: {
+      comments: [], // Empty initially
+      count: post.comments_count || 0,
+      next_cursor: 0,
+      isLoading: false,
+      hasInitiallyLoaded: false,
+    },
+  }));
+
+  console.log("Returned:", {
+    posts: transformedPosts,
+    next_cursor: response.data.next_cursor,
+  });
+
+  return {
+    posts: transformedPosts.map((post: PostType) => ({
+      ...post,
+      author: {
+        ...post.author,
+        connection_degree: "1st",
+      },
+    })),
+    next_cursor: response.data.next_cursor,
+  };
+};
