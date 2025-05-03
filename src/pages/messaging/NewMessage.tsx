@@ -23,47 +23,40 @@ const NewMessage = () => {
   const goToMessaging = () => {
     navigate("/messaging");
   };
-   const user2Id = useSelector(
-      (state: RootState) => state.messaging.user2IdPop
-    );
-    const user2Name = useSelector(
-      (state: RootState) => state.messaging.user2NamePop
-    );
-    const user2ProfilePicture = useSelector(
-        (state: RootState) => state.messaging.user2ProfilePicturePop
-        );
-    const user2Headline = useSelector(
-        (state: RootState) => state.messaging.user2HeadlinePop
-        );
-        const handleStartConversation = async () => {
-            if (!textMessage.trim()) {
-              return;
-            }
-          
-            setIsLoading(true);
-            try {
-              if (!user2Id) {
-                console.error("Missing user2Id");
-                return;
-              }
-              
-              const response = await startConversation(
-                token!,
-                user2Id,
-                textMessage
-              );
-              
-              console.log("Conversation started with ID:", response.conversationId);
-              setTextMessage("");
-              dispatch(setShowPopup(false));
-              goToMessaging();
-            } catch (error) {
-              console.error("Failed to start conversation:", error);
+  const user2Id = useSelector((state: RootState) => state.messaging.user2IdPop);
+  const user2Name = useSelector(
+    (state: RootState) => state.messaging.user2NamePop
+  );
+  const user2ProfilePicture = useSelector(
+    (state: RootState) => state.messaging.user2ProfilePicturePop
+  );
+  const user2Headline = useSelector(
+    (state: RootState) => state.messaging.user2HeadlinePop
+  );
+  const handleStartConversation = async () => {
+    if (!textMessage.trim()) {
+      return;
+    }
 
-            } finally {
-              setIsLoading(false);
-            }
-          };
+    setIsLoading(true);
+    try {
+      if (!user2Id) {
+        console.error("Missing user2Id");
+        return;
+      }
+
+      const response = await startConversation(token!, user2Id, textMessage);
+
+      console.log("Conversation started with ID:", response.conversationId);
+      setTextMessage("");
+      dispatch(setShowPopup(false));
+      goToMessaging();
+    } catch (error) {
+      console.error("Failed to start conversation:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
   return (
     <div className="flex flex-col w-full h-full border-2 rounded-xl bg-white shadow-xl">
       <div
@@ -117,9 +110,7 @@ const NewMessage = () => {
             <span className="mx-2 text-gray-400">·</span>
             <span className="text-gray-400 text-sm">1st</span>
           </div>
-          <p className="text-gray-600 text-sm">
-            {user2Headline}
-          </p>
+          <p className="text-gray-600 text-sm">{user2Headline}</p>
         </div>
       </div>
 
