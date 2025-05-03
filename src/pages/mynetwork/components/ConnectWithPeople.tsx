@@ -441,7 +441,7 @@ const EmailConnectionDialog = ({
             type="submit"
             className="affirmativeBtn"
           >
-            send
+            Send
           </Button>
           <DialogClose asChild>
             <Button type="button" variant="outline" className="destructiveBtn">
