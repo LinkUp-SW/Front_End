@@ -90,7 +90,7 @@ const NavBar = () => {
     <header className="w-full border-b bg-white border-b-gray-400 dark:bg-gray-900 dark:border-gray-700 flex items-center justify-center">
       <nav className="max-w-[85rem] px-5 py-2 flex lg:justify-between items-center gap-2 w-full">
         <div className="flex gap-2 items-center lg:w-fit w-full relative">
-          <img src={linkUpLogo} alt="LinkUp-Logo" className="w-9 dark:invert" />
+          <img src={linkUpLogo} onClick={()=>window.location.replace('/feed')} alt="LinkUp-Logo" className="w-9 dark:invert cursor-pointer" />
 
           <SearchInput />
           <CreatePost className="hidden" />
