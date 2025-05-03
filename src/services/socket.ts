@@ -55,7 +55,9 @@ export interface IncomingNotificationCount {
   count: number;
 }
 
-// Base interface for all socket events
+export interface incomingTotalCount {
+  totalUnreadCount:number;
+}
 export interface BaseSocketEvent {
   type: string;
   [key: string]: unknown;
@@ -66,6 +68,7 @@ export type SocketEventData =
   | incomingTypingIndicator 
   | incomingMessageRead 
   | incomingUnreadMessagesCount 
+  |incomingTotalCount
   | IncomingNotification
   | IncomingNotificationCount
   | BaseSocketEvent;

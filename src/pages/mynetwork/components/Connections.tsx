@@ -24,6 +24,14 @@ import { editUserBio } from "@/slices/user_profile/userBioSlice";
 import { toast } from "sonner";
 import { AxiosError } from "axios";
 import { getErrorMessage } from "@/utils/errorHandler";
+import {
+  setShowPopup,
+  setUser2IdPop,
+  setUser2NamePop,
+  setUser2ProfilePicturePop,
+  setUser2HeadlinePop,
+} from "@/slices/messaging/messagingSlice";
+import { checkConversationExists } from "@/endpoints/messaging";
 
 const Connections: React.FC = () => {
   const navigate = useNavigate();
@@ -40,7 +48,32 @@ const Connections: React.FC = () => {
   const observer = useRef<IntersectionObserver | null>(null);
   const hasFetchedInitial = useRef(false); // Prevents double fetching on mount
   const [openDialogUserId, setOpenDialogUserId] = useState<string | null>(null);
-  const[error, setError]=useState<AxiosError| null>(null);
+  const [error, setError] = useState<AxiosError | null>(null);
+
+  /*messaging popup*/
+  const handlePopUp = async (
+    user2Id: string,
+    name: string,
+    profilePicture: string,
+    headline: string
+  ) => {
+    try {
+      const result = await checkConversationExists(token!, user2Id);
+
+      if (result.conversationExists) {
+        dispatch(setShowPopup(false));
+        navigate("/messaging");
+      } else {
+        dispatch(setUser2IdPop(user2Id));
+        dispatch(setUser2NamePop(name));
+        dispatch(setUser2ProfilePicturePop(profilePicture));
+        dispatch(setUser2HeadlinePop(headline));
+        dispatch(setShowPopup(true));
+      }
+    } catch (error) {
+      console.error("Error checking conversation:", error);
+    }
+  };
 
   const handleRemoveConnection = useCallback(
     async (userId: string) => {
@@ -62,7 +95,6 @@ const Connections: React.FC = () => {
     },
     [token]
   );
-  
 
   const loadConnections = useCallback(async () => {
     if (!token || loading || !hasMore) return;
@@ -82,8 +114,7 @@ const Connections: React.FC = () => {
       setCursor(data.nextCursor);
       setHasMore(!!data.nextCursor);
     } catch (error) {
-      if(error instanceof AxiosError)
-      setError(error)
+      if (error instanceof AxiosError) setError(error);
       console.error("Error fetching connections:", error);
     } finally {
       setLoading(false);
@@ -186,8 +217,16 @@ const Connections: React.FC = () => {
                   <button
                     id="message-button"
                     className="w-full sm:w-auto px-4 py-2 border rounded-full text-blue-600 border-blue-600 hover:bg-blue-100 dark:hover:bg-gray-700 flex items-center justify-center gap-2"
+                    onClick={() =>
+                      handlePopUp(
+                        conn.user_id,
+                        conn.name,
+                        conn.profilePicture,
+                        conn.headline
+                      )
+                    }
                   >
-                    <FaPaperPlane/>
+                    <FaPaperPlane />
                     Message
                   </button>
 

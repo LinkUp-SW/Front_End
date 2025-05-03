@@ -72,7 +72,6 @@ import {
 } from "@/components/ui/tooltip";
 import LeftSidebar from "@/components/my_items/LeftSideBar";
 import SavedJobsDashboard from "@/components/my_items/SavedJobsDashboard";
-import InterviewTipsPanel from "@/components/my_items/InterviewTipsPanel";
 import Footer from "@/components/my_items/Footer";
 import SavedPostsDashboard from "@/components/my_items/SavedPostsDashboard";
 import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
@@ -147,7 +146,6 @@ export {
   TooltipTrigger,
   LeftSidebar,
   SavedJobsDashboard,
-  InterviewTipsPanel,
   Footer,
   SavedPostsDashboard,
   Alert,

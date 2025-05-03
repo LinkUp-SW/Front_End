@@ -38,7 +38,7 @@ interface EditPageDialogProps {
     description?: string;
     tagline?: string;
     category_type?: string;
-    logo?: string; // Add logo field to receive existing logo
+    logo?: string; 
     location?: {
       country?: string;
       address?: string;
@@ -196,20 +196,90 @@ const EditPageDialog = ({ open, onOpenChange, companyData, onSubmit }: EditPageD
     setLocationData({ ...locationData, [name]: value });
   };
 
-  const validateForm = () => {
-    // Required fields validation
-    const requiredFields = {
-      'name': 'Name',
-      'industry': 'Industry',
-      'size': 'Size',
-      'type': 'Type'
-    };
+  const validateName = (name: string) => {
+    if (!name) return 'Name is required';
+    if (name.length > 50) return 'Name must be 50 characters or less';
+    return null;
+  };
+  
+  const validateWebsite = (website: string) => {
+    if (!website) return null; // Website is optional
+    if (!/^(https?:\/\/|www\.)/i.test(website)) {
+      return 'Website must start with http://, https://, or www.';
+    }
+    return null;
+  };
+  
+  const validateIndustry = (industry: string) => {
+    if (!industry) return 'Industry is required';
+    if (industry.length > 50) return 'Industry must be 50 characters or less';
+    return null;
+  };
+  
+  const validatePostalCode = (postalCode: string, country: string) => {
+    if (!postalCode) return null; // Postal code is optional
     
-    for (const [field, label] of Object.entries(requiredFields)) {
-      if (!formData[field as keyof typeof formData]) {
-        toast.error(`${label} is required`);
-        return false;
-      }
+    // Basic postal code validation based on country
+    if (country === 'United States' && !/^\d{5}(-\d{4})?$/.test(postalCode)) {
+      return 'US postal code must be in format: 12345 or 12345-6789';
+    }
+    
+    if (country === 'Canada' && !/^[A-Za-z]\d[A-Za-z][ -]?\d[A-Za-z]\d$/.test(postalCode)) {
+      return 'Canadian postal code must be in format: A1A 1A1';
+    }
+    
+    return null;
+  };
+  
+  const validatePhone = (phone: string) => {
+    if (!phone) return null; // Phone is optional
+    // Basic international phone format
+    if (!/^[+]?[(]?[0-9]{1,4}[)]?[-\s.]?[0-9]{1,4}[-\s.]?[0-9]{1,9}$/.test(phone)) {
+      return 'Please enter a valid phone number';
+    }
+    return null;
+  };
+  
+  const validateForm = () => {
+    // Field validation
+    const nameError = validateName(formData.name);
+    if (nameError) {
+      toast.error(nameError);
+      setActiveSection('Page info');
+      return false;
+    }
+    
+    const websiteError = validateWebsite(formData.website);
+    if (websiteError) {
+      toast.error(websiteError);
+      setActiveSection('Details');
+      return false;
+    }
+    
+    const industryError = validateIndustry(formData.industry);
+    if (industryError) {
+      toast.error(industryError);
+      setActiveSection('Details');
+      return false;
+    }
+    
+    const phoneError = validatePhone(formData.phone);
+    if (phoneError) {
+      toast.error(phoneError);
+      setActiveSection('Details');
+      return false;
+    }
+    
+    if (!formData.size) {
+      toast.error('Size is required');
+      setActiveSection('Details');
+      return false;
+    }
+    
+    if (!formData.type) {
+      toast.error('Type is required');
+      setActiveSection('Details');
+      return false;
     }
     
     // Location validation
@@ -226,8 +296,39 @@ const EditPageDialog = ({ open, onOpenChange, companyData, onSubmit }: EditPageD
         return false;
       }
       
+      if (locationData.city.length > 50) {
+        toast.error('City name must be 50 characters or less');
+        setActiveSection('Location');
+        return false;
+      }
+      
       if (hasStreetAddress && !locationData.address) {
         toast.error('Street address is required');
+        setActiveSection('Location');
+        return false;
+      }
+      
+      if (locationData.address && locationData.address.length > 100) {
+        toast.error('Street address must be 100 characters or less');
+        setActiveSection('Location');
+        return false;
+      }
+      
+      if (locationData.state && locationData.state.length > 50) {
+        toast.error('State/Province must be 50 characters or less');
+        setActiveSection('Location');
+        return false;
+      }
+      
+      const postalCodeError = validatePostalCode(locationData.postal_code, locationData.country);
+      if (postalCodeError) {
+        toast.error(postalCodeError);
+        setActiveSection('Location');
+        return false;
+      }
+      
+      if (locationData.location_name && locationData.location_name.length > 50) {
+        toast.error('Location name must be 50 characters or less');
         setActiveSection('Location');
         return false;
       }
@@ -337,6 +438,7 @@ const EditPageDialog = ({ open, onOpenChange, companyData, onSubmit }: EditPageD
                 onChange={handleInputChange}
                 placeholder={isEducationalInstitution ? "Enter institution name" : "Enter company name"}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                maxLength={50}
                 required
               />
             </div>
@@ -350,6 +452,7 @@ const EditPageDialog = ({ open, onOpenChange, companyData, onSubmit }: EditPageD
                 placeholder="Add your slogan or mission statement"
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 rows={3}
+                maxLength={150}
               />
             </div>
           </div>
@@ -380,7 +483,6 @@ const EditPageDialog = ({ open, onOpenChange, companyData, onSubmit }: EditPageD
               </div>
             </div>
             
-            {/* Rest of Details section remains the same */}
             <div className="mb-6">
               <label className="block text-gray-700 dark:text-gray-300 mb-1 text-sm font-medium">Website URL</label>
               <input
@@ -390,7 +492,9 @@ const EditPageDialog = ({ open, onOpenChange, companyData, onSubmit }: EditPageD
                 onChange={handleInputChange}
                 placeholder="Add your website homepage (www.example.com)"
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                maxLength={100}
               />
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Must start with http://, https://, or www.</p>
             </div>
             
             <div className="mb-6">
@@ -402,6 +506,7 @@ const EditPageDialog = ({ open, onOpenChange, companyData, onSubmit }: EditPageD
                 onChange={handleInputChange}
                 placeholder={isEducationalInstitution ? "Education" : "Software Development"}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                maxLength={50}
                 required
               />
             </div>
@@ -466,6 +571,7 @@ const EditPageDialog = ({ open, onOpenChange, companyData, onSubmit }: EditPageD
                 onChange={handleInputChange}
                 placeholder="Enter a phone number"
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                maxLength={50}  
               />
             </div>
           </div>
@@ -541,6 +647,7 @@ const EditPageDialog = ({ open, onOpenChange, companyData, onSubmit }: EditPageD
                       placeholder="Enter street address"
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                       required={hasLocation && hasStreetAddress}
+                      maxLength={100}
                     />
                   </div>
                 )}
@@ -555,6 +662,7 @@ const EditPageDialog = ({ open, onOpenChange, companyData, onSubmit }: EditPageD
                     placeholder="Enter city"
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                     required={hasLocation}
+                    maxLength={50}
                   />
                 </div>
                 
@@ -568,6 +676,7 @@ const EditPageDialog = ({ open, onOpenChange, companyData, onSubmit }: EditPageD
                       onChange={handleLocationInputChange}
                       placeholder="Enter state"
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      maxLength={50}
                     />
                   </div>
                   <div>
@@ -579,6 +688,7 @@ const EditPageDialog = ({ open, onOpenChange, companyData, onSubmit }: EditPageD
                       onChange={handleLocationInputChange}
                       placeholder="Enter postal code"
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      maxLength={50}
                     />
                   </div>
                 </div>
@@ -592,6 +702,7 @@ const EditPageDialog = ({ open, onOpenChange, companyData, onSubmit }: EditPageD
                     onChange={handleLocationInputChange}
                     placeholder={isEducationalInstitution ? "Optional (e.g. Main Campus, West Wing)" : "Optional (e.g. Headquarters, Branch Office)"}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    maxLength={50}
                   />
                 </div>
               </>

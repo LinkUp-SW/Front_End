@@ -314,7 +314,14 @@ const ManageInvitations: React.FC = () => {
                     <DialogTrigger asChild>
                       <button
                         id="withdraw-invitation-button"
-                        className="destructiveBtn px-4 py-1 rounded-lg cursor-pointer"
+                        className="px-3 py-1 sm:px-4 sm:py-2 text-xs sm:text-base 
+             text-gray-700 dark:text-gray-200 
+             bg-gray-200 dark:bg-gray-800 
+             hover:bg-gray-300 dark:hover:bg-gray-700 
+             hover:text-black dark:hover:text-white 
+             rounded-lg cursor-pointer 
+             transition-colors duration-200 
+             focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 dark:focus:ring-gray-500"
                         onClick={() => setOpenWithdrawDialogId(invite.user_id)}
                       >
                         Withdraw

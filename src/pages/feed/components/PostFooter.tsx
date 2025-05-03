@@ -1,4 +1,4 @@
-import React, { useRef, useState, memo } from "react";
+import React, { useRef, useState, memo, useMemo } from "react";
 import {
   Popover,
   PopoverContent,
@@ -37,6 +37,7 @@ interface PostFooterProps {
     hasInitiallyLoaded: boolean;
     isLoading: boolean;
   };
+  authorName: string;
   addNewComment: (newComment: CommentDBType) => Promise<void>;
   postId: string;
   comment_privacy: string;
@@ -47,6 +48,7 @@ interface PostFooterProps {
 
 const PostFooter: React.FC<PostFooterProps> = ({
   comments,
+  authorName,
   addNewComment,
   postId,
   loadMoreComments,
@@ -62,6 +64,28 @@ const PostFooter: React.FC<PostFooterProps> = ({
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const darkMode = useSelector((state: RootState) => state.theme.theme);
   const { data } = useSelector((state: RootState) => state.userBio);
+
+  const commentSuggestions = useMemo(
+    () => [
+      `Congratulations, ${authorName}!`,
+      `Thank you for sharing, ${authorName}!`,
+      `Great insight, ${authorName}!`,
+      `Well explained, ${authorName}!`,
+      "I appreciate this!",
+      "Useful takeaway",
+      "Valuable content",
+      "Inspiring work",
+      "Excellent point",
+      "Good perspective",
+      "Very informative",
+      "Insightful analysis",
+      "Well articulated",
+      "Important message",
+      "Thought-provoking",
+      "Impressive work",
+    ],
+    [authorName]
+  );
 
   // Function to handle loading more comments using the provided callback
   const handleLoadMoreComments = async () => {
@@ -79,6 +103,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
   };
 
   // Check if text contains any rich formatting
+
   const hasRichFormatting = (text: string): boolean => {
     const richFormatRegex =
       /(\*[^*]+\*)|(-[^-]+-)|(~[^~]+~)|(@[^:]+:[A-Za-z0-9_-]+\^)/;
@@ -176,44 +201,35 @@ const PostFooter: React.FC<PostFooterProps> = ({
   return (
     <section className="flex flex-col w-full gap-4">
       {/* Container for text buttons with relative positioning */}
-      {comment_privacy !== "Connections only" ||
-        (connection_degree === "1st" && (
-          <Carousel className="w-full">
-            <CarouselContent className="px-2">
-              {[
-                "I appreciate this!",
-                "Congratulations!",
-                "Useful takeaway",
-                "Great insight!",
-                "I appreciate this!",
-                "Congratulations!",
-                "Useful takeaway",
-                "Great insight!",
-              ].map((text, index) => (
-                <CarouselItem
-                  key={index}
-                  className="basis-1/2 sm:basis-1/3 lg:basis-1/4 px-6"
-                >
-                  <div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        setCommentInput(text);
-                        inputRef.current?.focus();
-                      }}
-                      className="bg-transparent text-xs sm:text-sm w-fit px-1.5 light:border-gray-600 light:hover:border-2 dark:hover:text-neutral-200 dark:hover:bg-transparent hover:cursor-pointer dark:text-blue-300 dark:border-blue-300 rounded-full"
-                    >
-                      {text}
-                    </Button>
-                  </div>
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-            <CarouselPrevious className="dark:bg-gray-900 dark:text-neutral-400 absolute -left-5" />
-            <CarouselNext className="dark:bg-gray-900 dark:text-neutral-400 absolute -right-8" />
-          </Carousel>
-        ))}
+      {(comment_privacy !== "Connections only" ||
+        connection_degree === "1st") && (
+        <Carousel className="w-full">
+          <CarouselContent className="px-2">
+            {commentSuggestions.map((text, index) => (
+              <CarouselItem
+                key={index}
+                className="gap-3 px-6 basis-1/2 text-center"
+              >
+                <div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setCommentInput(text);
+                      inputRef.current?.focus();
+                    }}
+                    className="bg-transparent text-xs sm:text-sm w-fit px-1.5 light:border-gray-600 light:hover:border-2 dark:hover:text-neutral-200 dark:hover:bg-transparent hover:cursor-pointer dark:text-blue-300 dark:border-blue-300 rounded-full"
+                  >
+                    {text}
+                  </Button>
+                </div>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+          <CarouselPrevious className="dark:bg-gray-900 dark:text-neutral-400 absolute -left-5" />
+          <CarouselNext className="dark:bg-gray-900 dark:text-neutral-400 absolute -right-8" />
+        </Carousel>
+      )}
       {comment_privacy === "Connections only" &&
         connection_degree !== "1st" && (
           <div className="flex gap-4 w-full items-center">
@@ -248,8 +264,9 @@ const PostFooter: React.FC<PostFooterProps> = ({
                     placeholder="Add a comment..."
                     value={commentInput}
                     disabled={
-                      comment_privacy === "Connections only" &&
-                      connection_degree !== "1st"
+                      (comment_privacy === "Connections only" &&
+                        connection_degree !== "1st") ||
+                      comment_privacy === "No one"
                     }
                     autoFocus
                     onFocus={() => {
@@ -328,8 +345,9 @@ const PostFooter: React.FC<PostFooterProps> = ({
                         <Button
                           variant="ghost"
                           disabled={
-                            comment_privacy === "Connections only" &&
-                            connection_degree !== "1st"
+                            (comment_privacy === "Connections only" &&
+                              connection_degree !== "1st") ||
+                            comment_privacy === "No one"
                           }
                           className="hover:cursor-pointer rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 dark:hover:text-neutral-200"
                         >
@@ -360,8 +378,9 @@ const PostFooter: React.FC<PostFooterProps> = ({
                       variant="ghost"
                       onClick={() => fileInputRef.current?.click()}
                       disabled={
-                        comment_privacy === "Connections only" &&
-                        connection_degree !== "1st"
+                        (comment_privacy === "Connections only" &&
+                          connection_degree !== "1st") ||
+                        comment_privacy === "No one"
                       }
                       className="hover:cursor-pointer rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 dark:hover:text-neutral-200"
                     >
@@ -384,9 +403,9 @@ const PostFooter: React.FC<PostFooterProps> = ({
                       )
                     }
                     disabled={
-                      (commentInput.trim().length === 0 && !selectedImage) ||
                       (comment_privacy === "Connections only" &&
-                        connection_degree !== "1st")
+                        connection_degree !== "1st") ||
+                      comment_privacy === "No one"
                     }
                   >
                     Comment
@@ -398,7 +417,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
         </>
       )}
 
-      {comments.hasInitiallyLoaded && comments.comments.length > 0 && (
+      {comments.comments.length > 0 && (
         <div className="flex flex-col relative -left-1">
           {/* Show existing comments */}
           {comments.comments.map((comment, index) => (
