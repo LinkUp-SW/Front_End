@@ -51,7 +51,6 @@ export function useFeedPosts(
         next_cursor: 0,
       };
       let fetchedPosts = [];
-      console.log("COMPANY", company);
       if (search) {
         // Add search posts case
         const response = await getSearchPosts(user_token, {
@@ -64,7 +63,6 @@ export function useFeedPosts(
         // Add company posts case
         response = await getCompanyPosts(user_token, company);
         fetchedPosts = response?.posts || [];
-        console.log("Company Fetched POsts", fetchedPosts);
       } else if (profile && id) {
         response = await getUserPosts(user_token, id, payload);
         fetchedPosts = response?.posts || [];
@@ -83,7 +81,6 @@ export function useFeedPosts(
         // 👈 Subsequent pages: APPEND posts
         dispatch(setPosts([...posts, ...fetchedPosts]));
       }
-      console.log("RESPONSE", response);
 
       setNextCursor(response.next_cursor || 0);
       setHasMore(fetchedPosts.length === 5);

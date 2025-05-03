@@ -24,10 +24,8 @@ const PostSettingsModal: React.FC<PostSettingsModalProps> = ({
     if (typeof currentSettings === "boolean" && currentSettings === true) {
       setCurrentSettings("Anyone");
     } else if (typeof currentSettings === "boolean" && !currentSettings) {
-      console.log("Setting here to ");
       setCurrentSettings("Connections only");
     }
-    console.log(currentSettings);
   }, [currentSettings]);
   return (
     <div className="flex-col flex">

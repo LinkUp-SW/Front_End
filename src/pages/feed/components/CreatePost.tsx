@@ -93,7 +93,6 @@ const CreatePost: React.FC<CreatePostProps> = ({ className }) => {
       setPostText(postToEdit.content || "");
       setPrivacySetting(postToEdit.publicPost ? "Anyone" : "Connections only");
       setCommentSetting(postToEdit.commentsDisabled || "Anyone");
-      console.log(postToEdit);
 
       // Handle media if exists
       if (postToEdit.media && postToEdit.media.length > 0) {
@@ -265,7 +264,6 @@ const CreatePost: React.FC<CreatePostProps> = ({ className }) => {
       // Wait for all FileReader operations to complete
       await Promise.all(fileReaders);
     } else if (link) {
-      console.log("here", link);
       media_type = "link";
       media.push(link);
     } else {
@@ -333,10 +331,8 @@ const CreatePost: React.FC<CreatePostProps> = ({ className }) => {
           dispatch(unshiftPosts([postWithComments]));
         }
       } else if (editMode && postToEdit?._id && companyInfo === null) {
-        console.log("Calling normal edit", companyInfo === null);
         // Handle edit
-        const response = await editPost(postObject, user_token);
-        console.log("RESPONSE:", response);
+        await editPost(postObject, user_token);
 
         dispatch(
           updatePost({
@@ -358,14 +354,12 @@ const CreatePost: React.FC<CreatePostProps> = ({ className }) => {
         toast.success("Post updated successfully", { id: toastId });
         dispatch(closeCreatePostDialog());
       } else if (editMode && postToEdit?._id && companyInfo) {
-        console.log("Calling company edit");
         // Handle edit
-        const response = await editCompanyPost(
+        await editCompanyPost(
           postObject,
           { organization_id: companyInfo._id, post_id: postToEdit._id },
           user_token
         );
-        console.log("RESPONSE:", response);
 
         dispatch(
           updatePost({
@@ -388,7 +382,6 @@ const CreatePost: React.FC<CreatePostProps> = ({ className }) => {
         dispatch(closeCreatePostDialog());
       } else {
         const response = await createPost(postObject, user_token);
-        console.log(response);
         toast.success(
           <span>
             {response.message}{" "}

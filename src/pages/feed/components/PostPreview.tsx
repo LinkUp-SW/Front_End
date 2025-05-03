@@ -51,7 +51,6 @@ const PostPreview: React.FC<PostPreviewProps> = ({
   const dispatch = useDispatch();
   const [willDelete, setWillDelete] = useState(false);
   const [isSaved, setIsSaved] = useState<boolean>(post?.is_saved || false);
-  console.log("PUBLICPOST", post?.public_post);
   const navigate = useNavigate();
   const posts = useSelector((state: RootState) => state.posts.list);
 

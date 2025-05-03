@@ -108,7 +108,6 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
 
   useEffect(() => {
     setTaggedUsers(extractTaggedUsers(postText));
-    console.log(taggedUsers);
   }, [postText]);
 
   // Detect URL when post text changes
@@ -344,8 +343,6 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
               // Get just the IDs for the API
               const taggedUserIds = taggedUsers.map((user) => user.id);
 
-              console.log("Tagged users:", taggedUsers);
-              console.log("Tagged user IDs:", taggedUserIds);
 
               // Format the content for display (remove the :user_id parts)
 
