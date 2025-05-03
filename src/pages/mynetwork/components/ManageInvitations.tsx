@@ -22,6 +22,7 @@ import {
 import WithdrawInvitationModal from "./modals/WithdrawInvitationModal";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { socketService } from "@/services/socket";
 
 const LIMIT = 10;
 
@@ -176,6 +177,8 @@ const ManageInvitations: React.FC = () => {
     if (!token) return;
     try {
       await acceptInvitation(token, userId);
+      socketService.sendNotification(userId as string, Cookies.get('linkup_user_id') as string, 'connection_accepted',undefined,'Connection Accepted')
+      
       setReceivedInvitations((prev) =>
         prev.filter((c) => c.user_id !== userId)
       );

@@ -14,6 +14,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { editUserBio } from "@/slices/user_profile/userBioSlice";
 import { toast } from "sonner";
+import { socketService } from "@/services/socket";
 
 const Invitations = () => {
   const [invitations, setInvitations] = useState<ReceivedConnections[]>([]);
@@ -50,6 +51,7 @@ const Invitations = () => {
 
       try {
         await acceptInvitation(token, userId);
+        socketService.sendNotification(userId as string, Cookies.get('linkup_user_id') as string, 'connection_accepted',undefined,'Connection Accepted')
 
         setInvitations((prevInvitations) =>
           prevInvitations.filter((c) => c.user_id !== userId)

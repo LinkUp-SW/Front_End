@@ -85,6 +85,7 @@ import PostLargePreview from "./PostLargePreview";
 import { getCompanyAdmins, getCompanyAdminView } from "@/endpoints/company";
 import { AxiosError } from "axios";
 import { BasicCompanyData } from "@/pages/company/ManageCompanyPage";
+import { socketService } from "@/services/socket";
 
 interface PostProps {
   postData: PostType;
@@ -360,6 +361,14 @@ const Post: React.FC<PostProps> = ({
     try {
       // Call the API to create the comment
       const createdComment = await createComment(newComment, token);
+      if (postData.author.username !== userId)
+        socketService.sendNotification(
+          postData.author.username,
+          userId as string,
+          "comment",
+          undefined,
+          "Someone Commented on a post"
+        );
 
       if (!newComment.parent_id) {
         // Add top-level comment
@@ -466,6 +475,16 @@ const Post: React.FC<PostProps> = ({
 
     try {
       const result = await createReaction(reaction, targetPost._id, token);
+
+      if (postData.author.username !== userId)
+        socketService.sendNotification(
+          postData.author.username,
+          userId as string,
+          "reacted",
+          undefined,
+          "Someone Reacted on a post"
+        );
+
       setTopStats(getReactionIcons(result.top_reactions || []));
 
       dispatch(
