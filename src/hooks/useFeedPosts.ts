@@ -6,6 +6,7 @@ import {
   fetchSinglePost,
   getCompanyPosts,
   getPostsFeed,
+  getSearchPosts,
 } from "@/endpoints/feed";
 import { getUserPosts } from "@/endpoints/userProfile";
 import { setPosts } from "@/slices/feed/postsSlice";
@@ -15,7 +16,8 @@ import { toast } from "sonner";
 export function useFeedPosts(
   single: boolean = false,
   profile: string = "",
-  company: string = "" // Add new parameter
+  company: string = "", // Add new parameter
+  search: string = "" // Add search parameter
 ) {
   const posts = useSelector((state: RootState) => state.posts.list);
   const dispatch = useDispatch();
@@ -46,7 +48,15 @@ export function useFeedPosts(
 
       let fetchedPosts = [];
       console.log("COMPANY", company);
-      if (company) {
+      if (search) {
+        // Add search posts case
+        const response = await getSearchPosts(user_token, {
+          query: search,
+          cursor: nextCursor,
+          limit: 5,
+        });
+        fetchedPosts = response?.posts || [];
+      } else if (company) {
         // Add company posts case
         const response = await getCompanyPosts(user_token, company);
         fetchedPosts = response?.posts || [];
