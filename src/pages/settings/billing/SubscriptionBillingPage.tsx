@@ -49,8 +49,10 @@ const SubscriptionBillingPage: React.FC = () => {
         let res;
         if (action === "cancel") res = await cancelSubscription(token);
         if (action === "resume") res = await resumeSubscription(token);
-        if (action === "renew" || action === "subscribe")
+        if (action === "renew" || action === "subscribe") {
           res = await initiateSubscriptionSession(token);
+          return (window.location.href = res.url);
+        }
 
         toast.success(res.message);
         setTimeout(refetch, 800);
@@ -145,7 +147,7 @@ const SubscriptionBillingPage: React.FC = () => {
                     </button>
                   )}
 
-                  {subData?.status === "active" &&
+                  {subData?.plan === "premium" &&
                     !subData.cancel_at_period_end && (
                       <button
                         onClick={() => handleAction("cancel")}
@@ -251,46 +253,49 @@ const SubscriptionBillingPage: React.FC = () => {
                   </div>
                 )}
 
-              {/* details */}
-              <dl className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-6">
-                <div>
-                  <dt className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                    Started On
-                  </dt>
-                  <dd className="mt-1 text-gray-900 dark:text-gray-100">
-                    {formatDate(subData?.subscription_started_at)}
-                  </dd>
-                </div>
+              {subData?.plan === "premium" && (
+                <>
+                  {/* details */}
+                  <dl className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-6">
+                    <div>
+                      <dt className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                        Started On
+                      </dt>
+                      <dd className="mt-1 text-gray-900 dark:text-gray-100">
+                        {formatDate(subData?.subscription_started_at)}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                        Ends On
+                      </dt>
+                      <dd className="mt-1 text-gray-900 dark:text-gray-100">
+                        {formatDate(subData?.subscription_ends_at)}
+                      </dd>
+                    </div>
 
-                <div>
-                  <dt className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                    Cancels At Period End?
-                  </dt>
-                  <dd className="mt-1 text-gray-900 dark:text-gray-100">
-                    {subData?.cancel_at_period_end ? "Yes" : "No"}
-                  </dd>
-                </div>
+                    {subData?.canceled_at && (
+                      <div>
+                        <dt className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                          Canceled At
+                        </dt>
+                        <dd className="mt-1 text-gray-900 dark:text-gray-100">
+                          {formatDate(subData.canceled_at)}
+                        </dd>
+                      </div>
+                    )}
 
-                {subData?.canceled_at && (
-                  <div>
-                    <dt className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                      Canceled At
-                    </dt>
-                    <dd className="mt-1 text-gray-900 dark:text-gray-100">
-                      {formatDate(subData.canceled_at)}
-                    </dd>
-                  </div>
-                )}
-
-                <div>
-                  <dt className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                    Subscription ID
-                  </dt>
-                  <dd className="mt-1 text-gray-900 dark:text-gray-100 break-all">
-                    {subData?.subscription_id || "—"}
-                  </dd>
-                </div>
-              </dl>
+                    <div>
+                      <dt className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                        Subscription ID
+                      </dt>
+                      <dd className="mt-1 text-gray-900 dark:text-gray-100 break-all">
+                        {subData?.subscription_id || "—"}
+                      </dd>
+                    </div>
+                  </dl>
+                </>
+              )}
             </div>
           </div>
         )}
