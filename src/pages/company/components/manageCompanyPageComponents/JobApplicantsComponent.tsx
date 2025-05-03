@@ -52,10 +52,14 @@ const JobApplicantsComponent: React.FC<JobApplicantsComponentProps> = ({ jobId, 
       if (response && response.data) {
         // Log the entire applicants data for debugging
         
-
+        // Log specifically the resume URLs
+        response.data.forEach((applicant, index) => {
+          console.log(`Applicant ${index + 1} (${applicant.first_name} ${applicant.last_name}) resume URL:`, applicant.resume);
+        });
         
         setApplicants(response.data);
       } else {
+        console.log('No applicants data found in response:', response);
         setApplicants([]);
       }
       setError(null);
