@@ -1,3 +1,4 @@
+import NewMessage from "@/pages/messaging/NewMessage";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 
@@ -97,6 +98,12 @@ interface MessageState {
   chatData:chattingMessages;
   setEditedMessageIds: string[];
   setDataInfo:Conversation[];
+  popup: boolean;
+
+  user2IdPop:string;
+  user2NamePop:string;
+  user2ProfilePicturePop:string;
+  user2HeadlinePop:string;
 
 
 
@@ -142,6 +149,12 @@ const initialState: MessageState = {
 },
 setEditedMessageIds:[],
 setDataInfo:[],
+popup: false,
+
+user2IdPop:"",
+user2NamePop:"",
+user2ProfilePicturePop:"",
+user2HeadlinePop:"",
 
 
 
@@ -223,6 +236,24 @@ const MessagingSlice = createSlice({
       state.setDataInfo = action.payload; 
     },
 
+    // popup of NewMessage
+    setShowPopup: (state, action: PayloadAction<boolean>) => {
+      state.popup = action.payload; 
+    },
+
+    setUser2IdPop: (state, action: PayloadAction<string>) => {
+      state.user2IdPop = action.payload; 
+    },
+    setUser2NamePop: (state, action: PayloadAction<string>) => {
+      state.user2NamePop = action.payload; 
+    },
+    setUser2ProfilePicturePop: (state, action: PayloadAction<string>) => {
+      state.user2ProfilePicturePop = action.payload; 
+    },
+    setUser2HeadlinePop: (state, action: PayloadAction<string>) => {
+      state.user2HeadlinePop = action.payload; 
+    },
+
     
 
 
@@ -234,5 +265,5 @@ const MessagingSlice = createSlice({
   },
 });
 
-export const {toggleStarred, activeButton, searchFiltering, selectMessage,selectUserName,selectUserStatus,setEditingMessageId,setEditText,clearEditingState,selectUserId,addMessage,setResponsiveIsSidebar,setChatData,setEditedMessageIds,setDataInfo} = MessagingSlice.actions;
+export const {toggleStarred, activeButton, searchFiltering, selectMessage,selectUserName,selectUserStatus,setEditingMessageId,setEditText,clearEditingState,selectUserId,addMessage,setResponsiveIsSidebar,setChatData,setEditedMessageIds,setDataInfo,setShowPopup,setUser2IdPop,setUser2NamePop,setUser2ProfilePicturePop,setUser2HeadlinePop} = MessagingSlice.actions;
 export default MessagingSlice.reducer;
