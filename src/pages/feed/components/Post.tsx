@@ -920,11 +920,13 @@ const Post: React.FC<PostProps> = ({
                 {stats.comments} comments
               </p>
             )}
-            {stats.reposts !== 0 && stats.comments && stats.comments !== 0 && (
+            {stats.reposts !== 0 && stats.comments && stats.comments !== 0 ? (
               <p className="text-xs text-gray-500 dark:text-neutral-400 font-bold">
                 {" "}
                 ·
               </p>
+            ) : (
+              <></>
             )}
             {stats.reposts !== 0 && (
               <>
