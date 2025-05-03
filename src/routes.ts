@@ -36,12 +36,9 @@ import {
   CreateJobPage,
   CompanyProfileView,
   DashboardPage,
- 
   UsersPage,
   AnalyticsPage,
   ContentModerationPage,
-  
-
   GoodByePage,
   ChangePasswordPage,
   CloseAccountPage,
@@ -50,7 +47,6 @@ import {
   AddEmailPage,
   VisibilityPage,
   BlockingListPage,
-  JobPostingsPage,
   DisplayPage,
   ConnectionRequest,
   ProfileVisibility,
@@ -59,7 +55,6 @@ import {
 } from "./pages";
 
 import React from "react";
-
 
 // Define your routes as an array of RouteObject (compatible with React Router v6)
 const routes: RouteObject[] = [
@@ -247,7 +242,6 @@ const routes: RouteObject[] = [
     element: React.createElement(CompanyProfileView),
   },
 
-
   {
     path: "/settings/visibility",
     element: React.createElement(VisibilityPage),
@@ -273,10 +267,10 @@ const routes: RouteObject[] = [
     path: "/admin/content-moderation",
     element: React.createElement(ContentModerationPage),
   },
-  
+
   {
-    path: "/admin/job-postings",
-    element: React.createElement(JobPostingsPage),
+    path: "/company/:companyId",
+    element: React.createElement(CompanyProfileView),
   },
   {
     path: "/goodbye",

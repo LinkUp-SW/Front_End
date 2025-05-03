@@ -36,7 +36,8 @@ import DashboardPage from "./admin/DashboardPage";
 import UsersPage from "./admin/UsersPage";
 import AnalyticsPage from "./admin/AnalyticsPage";
 
-import ContentModerationPage from "./admin/ContentModerationPage";import CompanyProfileView from "./company/CompanyProfile"
+import ContentModerationPage from "./admin/ContentModerationPage";
+import CompanyProfileView from "./company/CompanyProfile";
 
 import GoodByePage from "./goodbye/GoodByePage";
 import PaymentStatusPage from "./payment/PaymentStatusPage";
@@ -56,7 +57,7 @@ import {
   ChangePasswordPage,
   ConnectionRequest,
   ProfileVisibility,
-  SubscriptionBillingPage
+  SubscriptionBillingPage,
 } from "./settings";
 
 //Export the Imported Pages
@@ -105,10 +106,8 @@ export {
   BlockingListPage,
   AdminPanelSidebar,
   DashboardPage,
- 
   UsersPage,
   AnalyticsPage,
-
   ContentModerationPage,
   GoodByePage,
   DisplayPage,
@@ -117,5 +116,5 @@ export {
   ConnectionRequest,
   ProfileVisibility,
   SubscriptionBillingPage,
-  PaymentStatusPage
+  PaymentStatusPage,
 };
