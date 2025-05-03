@@ -150,12 +150,49 @@ export const markConversationAsUnread = async (token: string, conversationId: st
         },
       }
     );
-    return response.data; // { message: 'Conversation marked as unread' }
+    return response.data; 
   } catch (error) {
     console.error("Error marking conversation as unread:", error);
     throw new Error('Error marking conversation as unread');
   }
 };
+
+export const startConversation = async (
+  token: string,
+  user2ID: string,
+  firstMessage?: string,
+  media?: string[],
+  mediaTypes?: string[]
+): Promise<{ conversationId: string }> => {
+  try {
+    const response = await axiosInstance.post(
+      `/api/v1/conversations/start-conversation/${user2ID}`,
+      {
+        firstMessage,
+        media,
+        mediaTypes
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error: any) {
+    // Improved error handling
+    console.error("Error starting conversation:", error);
+    
+    // Return more specific error information if available
+    if (error.response) {
+      throw new Error(error.response.data.message || 'Failed to start conversation');
+    }
+    
+    throw new Error('Failed to start conversation');
+  }
+}
+
+
 
 
 
