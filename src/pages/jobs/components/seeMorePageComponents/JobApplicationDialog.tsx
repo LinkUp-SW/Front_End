@@ -52,18 +52,29 @@ const JobApplicationDialog: React.FC<JobApplicationDialogProps> = ({
   const [isResumeUploaded, setIsResumeUploaded] = useState(false);
   const [resumeBase64, setResumeBase64] = useState<string | null>(null);
 
+  // Validation state
+  const [phoneNumberError, setPhoneNumberError] = useState('');
+  const [emailError, setEmailError] = useState('');
+
   // Fetch user info on dialog open
   useEffect(() => {
     if (open) {
       fetchUserInfo();
     } else {
       // Reset state when dialog closes
-      setCurrentStep('info');
-      setProgress(0);
-      setIsResumeUploaded(false);
-      setResumeBase64(null);
+      resetForm();
     }
   }, [open]);
+
+  // Reset form state
+  const resetForm = () => {
+    setCurrentStep('info');
+    setProgress(0);
+    setIsResumeUploaded(false);
+    setResumeBase64(null);
+    setPhoneNumberError('');
+    setEmailError('');
+  };
 
   // Update progress based on current step
   useEffect(() => {
@@ -138,10 +149,67 @@ const JobApplicationDialog: React.FC<JobApplicationDialogProps> = ({
     }
   };
 
+  // Validation functions
+  const validateEmail = (email: string): boolean => {
+    // Regular expression for email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email.trim()) {
+      setEmailError('Email is required');
+      return false;
+    } else if (!emailRegex.test(email)) {
+      setEmailError('Please enter a valid email address');
+      return false;
+    }
+    setEmailError('');
+    return true;
+  };
+
+  const validatePhoneNumber = (phone: string): boolean => {
+    // Regular expression to allow only digits
+    const phoneRegex = /^\d+$/;
+    if (!phone.trim()) {
+      setPhoneNumberError('Phone number is required');
+      return false;
+    } else if (!phoneRegex.test(phone)) {
+      setPhoneNumberError('Phone number should contain digits only');
+      return false;
+    } else if (phone.length < 5 || phone.length > 15) {
+      setPhoneNumberError('Phone number should be between 5-15 digits');
+      return false;
+    }
+    setPhoneNumberError('');
+    return true;
+  };
+
+  // Handle phone number input changes with real-time validation
+  const handlePhoneNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    // Allow only digits
+    if (value === '' || /^\d*$/.test(value)) {
+      setPhoneNumber(value);
+      if (phoneNumberError) validatePhoneNumber(value);
+    }
+  };
+
+  // Handle email input changes with real-time validation
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setEmail(value);
+    if (emailError) validateEmail(value);
+  };
+
   // Function to handle application submission
   const handleSubmitApplication = async () => {
     if (!job || !job._id) {
       toast.error('Job information is missing');
+      return;
+    }
+
+    // Validate before submitting
+    const isEmailValid = validateEmail(email);
+    const isPhoneValid = validatePhoneNumber(phoneNumber);
+    
+    if (!isEmailValid || !isPhoneValid) {
       return;
     }
 
@@ -191,10 +259,29 @@ const JobApplicationDialog: React.FC<JobApplicationDialogProps> = ({
   // Function to go to next step
   const goToNextStep = () => {
     if (currentStep === 'info') {
-      if (!firstName.trim() || !lastName.trim() || !phoneNumber.trim()) {
-        toast.error('Please fill in all required fields');
+      // Validate all fields in the info step
+      const isEmailValid = validateEmail(email);
+      const isPhoneValid = validatePhoneNumber(phoneNumber);
+      
+      if (!firstName.trim()) {
+        toast.error('First name is required');
         return;
       }
+      
+      if (!lastName.trim()) {
+        toast.error('Last name is required');
+        return;
+      }
+      
+      if (!countryCode) {
+        toast.error('Country code is required');
+        return; 
+      }
+      
+      if (!isEmailValid || !isPhoneValid) {
+        return;
+      }
+      
       setCurrentStep('resume');
     } else if (currentStep === 'resume') {
       if (!resumeUrl) {
@@ -327,6 +414,7 @@ const JobApplicationDialog: React.FC<JobApplicationDialogProps> = ({
                         onChange={(e) => setFirstName(e.target.value)}
                         className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-gray-400 dark:focus:ring-gray-500 dark:bg-gray-800 dark:text-white text-sm sm:text-base"
                         required
+                        maxLength={50}
                       />
                     </div>
                     
@@ -340,6 +428,7 @@ const JobApplicationDialog: React.FC<JobApplicationDialogProps> = ({
                         onChange={(e) => setLastName(e.target.value)}
                         className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-gray-400 dark:focus:ring-gray-500 dark:bg-gray-800 dark:text-white text-sm sm:text-base"
                         required
+                        maxLength={50}
                       />
                     </div>
                     
@@ -377,10 +466,15 @@ const JobApplicationDialog: React.FC<JobApplicationDialogProps> = ({
                         <input
                           type="tel"
                           value={phoneNumber}
-                          onChange={(e) => setPhoneNumber(e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-gray-400 dark:focus:ring-gray-500 dark:bg-gray-800 dark:text-white text-sm sm:text-base"
+                          onChange={handlePhoneNumberChange}
+                          className={`w-full px-3 py-2 border ${phoneNumberError ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'} rounded focus:outline-none focus:ring-1 ${phoneNumberError ? 'focus:ring-red-500' : 'focus:ring-gray-400 dark:focus:ring-gray-500'} dark:bg-gray-800 dark:text-white text-sm sm:text-base`}
                           required
+                          maxLength={15}
+                          onBlur={() => validatePhoneNumber(phoneNumber)}
                         />
+                        {phoneNumberError && (
+                          <p className="text-xs text-red-500 mt-1">{phoneNumberError}</p>
+                        )}
                       </div>
                     </div>
                     
@@ -391,10 +485,15 @@ const JobApplicationDialog: React.FC<JobApplicationDialogProps> = ({
                       <input
                         type="email"
                         value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-gray-400 dark:focus:ring-gray-500 dark:bg-gray-800 dark:text-white text-sm sm:text-base"
+                        onChange={handleEmailChange}
+                        className={`w-full px-3 py-2 border ${emailError ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'} rounded focus:outline-none focus:ring-1 ${emailError ? 'focus:ring-red-500' : 'focus:ring-gray-400 dark:focus:ring-gray-500'} dark:bg-gray-800 dark:text-white text-sm sm:text-base`}
                         required
+                        maxLength={50}
+                        onBlur={() => validateEmail(email)}
                       />
+                      {emailError && (
+                        <p className="text-xs text-red-500 mt-1">{emailError}</p>
+                      )}
                     </div>
                   </div>
                 </div>
