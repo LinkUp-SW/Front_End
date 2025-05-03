@@ -18,9 +18,7 @@ import { setPosts } from "@/slices/feed/postsSlice";
 const token = Cookies.get("linkup_auth_token");
 const userId = Cookies.get("linkup_user_id");
 
-const Activity: React.FC<{
-  isMe?: boolean;
-}> = ({ isMe }) => {
+const Activity: React.FC = () => {
   const [activeTab, setActiveTab] = useState<"post" | "comment" | "video">(
     "post"
   );
@@ -63,6 +61,7 @@ const Activity: React.FC<{
     if (activeTab === "video") return post.media.media_type.includes("video");
     return false;
   });
+  useEffect(() => {}, [posts]);
 
   const handleCreatePost = () => dispatch(openCreatePostDialog());
   const handleSaveButton = () => setIsSaved((s) => !s);
@@ -74,16 +73,16 @@ const Activity: React.FC<{
   return (
     <section className="bg-white p-4 dark:bg-gray-900 rounded-lg shadow-md max-w-7xl w-full mx-auto">
       {/* Header */}
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
-          Activity
-        </h1>
-        {isMe && (
+      {id === userId && (
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
+            Activity
+          </h1>
           <TransparentButton onClick={handleCreatePost}>
             Create a post
           </TransparentButton>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Tabs */}
       <div className="flex gap-4 mb-6">

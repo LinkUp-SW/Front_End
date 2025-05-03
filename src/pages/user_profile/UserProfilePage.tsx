@@ -37,7 +37,7 @@ const UserProfilePage = () => {
           {isProfileVisible && (
             <>
               <AboutSection />
-              <Activity isMe={data?.is_me} />
+              <Activity />
               <ExperienceSection />
               <EducationSection />
               <LicenseSection />
