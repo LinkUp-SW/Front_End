@@ -52,10 +52,10 @@ function getMimeType(filePath: string): string {
   }
 }
 
-function getMimeTypeFromDataUrl(dataUrl: string): string {
-  const match = dataUrl.match(/^data:([^;]+);/);
-  return match ? match[1] : "application/octet-stream";
-}
+// function getMimeTypeFromDataUrl(dataUrl: string): string {
+//   const match = dataUrl.match(/^data:([^;]+);/);
+//   return match ? match[1] : "application/octet-stream";
+// }
 
 // Helper function to get file icon/display based on mime type
 function getFileDisplay(mediaUrl: string, mimeType: string, index: number) {
@@ -252,7 +252,7 @@ const ChatingScreen = () => {
     }, 3000); // every 3 seconds (adjust as needed)
 
     return () => {
-      clearInterval(interval); // cleanup on unmount or selectedConvID change
+      clearInterval(interval); 
     };
   }, [selectedConvID]);
 
@@ -433,9 +433,27 @@ const ChatingScreen = () => {
             )}
           </div>
         </div>
-
+       
         {/* Messages Section */}
         <div className="border border-[#e8e8e8] overflow-y-auto p-3 flex-1">
+          {dataChat?.otherUser&&(
+             <div className="flex flex-col p-4 bg-white border-b-2 border-gray-200">
+             <div className="w-22 h-22 mb-2 rounded-full overflow-hidden mr-4 border-1">
+               <img
+                 src={dataChat?.otherUser?.profilePhoto}
+                 alt="profile picture"
+                 className="w-full h-full object-cover"
+               />
+             </div>
+             <div className="flex-1">
+               <div className="flex items-center">
+                 <h3 className="p-2 font-bold text-xl text-gray-800">
+                   {dataChat?.otherUser?.firstName} {dataChat?.otherUser?.lastName}
+                 </h3>
+               </div>
+             </div>
+           </div>
+          )}
           {Array.isArray(dataChat?.messages) &&
           dataChat?.messages.length === 0 ? (
             <p className="text-center text-gray-500">No messages yet</p>
