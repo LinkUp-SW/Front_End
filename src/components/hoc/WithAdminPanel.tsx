@@ -1,14 +1,8 @@
 // components/hoc/WithAdminPanel.tsx
 import { ComponentType, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import {
-  FiHome,
-  FiFlag,
-  
-  FiBarChart2,
-  FiUsers,
- 
-} from "react-icons/fi";
+import { FiHome, FiFlag, FiBarChart2, FiUsers } from "react-icons/fi";
+import { CiLogout } from "react-icons/ci";
 import AuthMiddleware from "./AuthMiddleware";
 import Cookies from "js-cookie";
 
@@ -37,14 +31,15 @@ const WithAdminPanel = <P extends object>(
         icon: <FiFlag size={20} />,
         path: "/admin/content-moderation",
       },
-      
+
       {
         name: "Analytics",
         icon: <FiBarChart2 size={20} />,
         path: "/admin/analytics",
       },
       { name: "Users", icon: <FiUsers size={20} />, path: "/admin/users" },
-      
+
+      { name: "Logout", icon: <CiLogout size={20} />, path: "/logout" },
     ];
 
     const handleTabClick = (path: string) => {

@@ -296,6 +296,10 @@ const routes: RouteObject[] = [
     path: "/payment",
     element: React.createElement(PaymentStatusPage),
   },
+  {
+    path: "/logout",
+    element: React.createElement(LandingPage),
+  },
 ];
 
 export default routes;
