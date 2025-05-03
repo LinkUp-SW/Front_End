@@ -5,6 +5,7 @@ import { FaEye } from "react-icons/fa";
 import EditPageDialog from './components/manageCompanyPageComponents/EditPageDialog';
 import SettingsComponent from './components/manageCompanyPageComponents/SettingsPage';
 import CompanyJobsComponent from './components/manageCompanyPageComponents/CompanyJobs';
+import AnalyticsComponent from './components/manageCompanyPageComponents/CompanyAnalyticsComponent';
 import { getCompanyAdminView, getCompanyAllView, updateCompanyProfile } from '@/endpoints/company';
 import { toast } from 'sonner';
 
@@ -472,21 +473,18 @@ const ManageCompanyPage = () => {
           <CompanyJobsComponent
             companyId={companyId}
           />
+        ) : activeTab === 'analytics' ? (
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 border border-gray-200 dark:border-gray-700">
+            <h1 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Analytics</h1>
+            <AnalyticsComponent companyId={companyId} />
+          </div>
         ) : (
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 border border-gray-200 dark:border-gray-700">
             <h1 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">
-              {activeTab === 'analytics' ? 'Analytics' : 
-              activeTab === 'page-posts' ? 'Page Posts' : 'Dashboard'}
+              {activeTab === 'page-posts' ? 'Page Posts' : 'Dashboard'}
             </h1>
                   
             {/* Content based on active tab would go here */}
-            {activeTab === 'analytics' && (
-              <div className="text-gray-700 dark:text-gray-300">
-                <p>Analytics dashboard for {companyData.name}</p>
-                {/* Add your analytics components here */}
-              </div>
-            )}
-                  
             {activeTab === 'page-posts' && (
               <div className="text-gray-700 dark:text-gray-300">
                 <p>Posts for {companyData.name}</p>
