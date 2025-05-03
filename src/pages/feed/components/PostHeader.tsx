@@ -29,8 +29,8 @@ interface PostHeaderProps {
   setPostMenuOpen: (isOpen: boolean) => void;
   menuActions: MenuAction[]; // You can replace `any` with a more specific type if available
   savedPostView?: boolean;
-  edited?: boolean;
-  publicPost?: boolean;
+  edited: boolean;
+  publicPost: boolean;
   date: number;
   hideActions?: boolean;
   disableLink?: boolean;
@@ -197,7 +197,7 @@ const PostHeader: React.FC<PostHeaderProps> = ({
                 <span>Edited </span>
               </>
             )}
-            {publicPost ? (
+            {publicPost === true ? (
               <>
                 <p className="text-lg font-bold"> · </p>
                 <span className="text-lg">
