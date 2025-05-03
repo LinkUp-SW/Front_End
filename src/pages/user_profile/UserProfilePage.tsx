@@ -17,8 +17,12 @@ import useFetchData from "@/hooks/useFetchData";
 import Cookies from "js-cookie";
 import { useParams } from "react-router-dom";
 import { checkIsMe } from "@/endpoints/userProfile";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store";
+import NewMessage from "@/pages/messaging/NewMessage";
 
 const UserProfilePage = () => {
+  const showPopup = useSelector((state: RootState) => state.messaging.popup);
   const token = Cookies.get("linkup_auth_token");
   const { id } = useParams<{ id: string }>();
 
@@ -63,6 +67,11 @@ const UserProfilePage = () => {
         </div>
       </div>
       <Modal />
+      {showPopup &&(
+        <div className="fixed bottom-0 left-1/2 h-[calc(100vh-140px)] transform -translate-x-1/2 w-full max-w-xl z-50">
+          <NewMessage />
+        </div>
+      )}
     </main>
   );
 };
