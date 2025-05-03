@@ -5,10 +5,10 @@ import {
   EducationSection,
   ExperienceSection,
   LicenseSection,
+  ProfileStrength,
   ResourcesSection,
   SkillsSection,
   UserInfo,
-  ViewedSection,
 } from "./components";
 import Activity from "./components/Activity";
 import useFetchData from "@/hooks/useFetchData";
@@ -17,13 +17,14 @@ import { useParams } from "react-router-dom";
 import { checkIsMe } from "@/endpoints/userProfile";
 
 const UserProfilePage = () => {
-  const token=Cookies.get('linkup_auth_token');
+  const token = Cookies.get("linkup_auth_token");
   const { id } = useParams<{ id: string }>();
 
   const [isProfileVisible, setIsProfileVisible] = useState(true);
-  const {data}=useFetchData(async()=>(
-    token&&id?checkIsMe(token,id):Promise.resolve(null)
-  ),[])
+  const { data } = useFetchData(
+    async () => (token && id ? checkIsMe(token, id) : Promise.resolve(null)),
+    []
+  );
 
   return (
     <main className="max-w-7xl mx-auto  lg:px-8">
@@ -45,7 +46,7 @@ const UserProfilePage = () => {
 
         {/* Right Sidebar */}
         <div className="lg:col-span-1 space-y-4">
-          <ViewedSection />
+          <ProfileStrength />
           <ResourcesSection />
         </div>
       </div>
