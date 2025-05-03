@@ -318,10 +318,6 @@ const postsSlice = createSlice({
                   ) {
                     post.comments_data.count -= 1;
                   }
-
-                  console.log(
-                    `Reply ${replyId} removed from comment ${commentId}`
-                  );
                 }
               } else {
                 console.warn(

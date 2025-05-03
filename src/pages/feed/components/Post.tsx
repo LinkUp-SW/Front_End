@@ -829,7 +829,7 @@ const Post: React.FC<PostProps> = ({
                   />
                 );
               } catch (error) {
-                console.log(error);
+                console.error(error);
                 // Assuming you have a DocumentPreview component
                 return (
                   <DocumentPreview

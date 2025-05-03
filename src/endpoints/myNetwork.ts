@@ -139,7 +139,6 @@ export const fetchConnections = async (
       params: { cursor, limit },
     }
   );
-  console.log("Connections response:", response.data);
   return response.data;
 };
 
@@ -157,7 +156,6 @@ export const removeConnections = async (
     }
   );
 
-  console.log("Remove connection response:", response.data);
   return response.data;
 };
 
@@ -175,7 +173,6 @@ export const fetchFollowers = async (
       params: { cursor, limit },
     }
   );
-  console.log("Followers response:", response.data);
   return response.data;
 };
 
@@ -193,7 +190,6 @@ export const fetchFollowing = async (
       params: { cursor, limit },
     }
   );
-  console.log("Following response:", response.data);
   return response.data;
 };
 
@@ -208,7 +204,6 @@ export const fetchConnectionsNumber = async (
       },
     }
   );
-  console.log("Connections number response:", response.data);
   return response.data;
 };
 

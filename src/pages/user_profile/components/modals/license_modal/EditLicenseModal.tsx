@@ -138,7 +138,6 @@ const EditLicenseModal: React.FC<AddLicenseModalProps> = ({
         newLicense
       );
       toast.success(response.message);
-      console.log(response.license);
       onSuccess?.(newLicense);
       if (response.license.skills.length === 0) {
         dispatch(

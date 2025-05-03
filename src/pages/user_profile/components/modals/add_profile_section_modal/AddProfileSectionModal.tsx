@@ -56,7 +56,6 @@ const AddProfileSectionModal: React.FC = () => {
 
   // invoked when a section form succeeds
   const handleSuccess = <T,>(key: SectionKey, data: T): void => {
-    console.log(`${key} added successfully`, data);
     // e.g. refetch profile, dispatch Redux, etc.
     if (key === "skills") {
       dispatch(addGlobalSkill(data as Skill));
@@ -66,9 +65,7 @@ const AddProfileSectionModal: React.FC = () => {
       dispatch(addGlobalEducation(data as Education));
     } else if (key === "license") {
       dispatch(addGlobalLicense(data as License));
-    } else {
-      console.log("resume uploaded");
-    }
+    } 
   };
 
   const skillNamesByLicenseId = skills.reduce<Record<string, string[]>>(

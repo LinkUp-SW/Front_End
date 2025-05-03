@@ -138,7 +138,6 @@ const AddLicenseModal: React.FC<AddLicenseModalProps> = ({
       });
       onClose?.();
     } catch (error) {
-      console.log(error);
       toast.error(getErrorMessage(error));
     } finally {
       stopSubmitting();

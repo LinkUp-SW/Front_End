@@ -20,7 +20,6 @@ const ResumePreviewComponent: React.FC<ResumePreviewComponentProps> = ({ resumeU
 
   // Function to handle direct download
   const handleDirectDownload = () => {
-    console.log('Attempting to download resume from URL:', resumeUrl);
     window.open(resumeUrl, '_blank');
   };
 
@@ -99,7 +98,6 @@ const ResumePreviewComponent: React.FC<ResumePreviewComponentProps> = ({ resumeU
                   src={resumeUrl}
                   className="w-full h-[70vh] border-0"
                   onLoad={() => {
-                    console.log('Resume preview loaded successfully:', resumeUrl);
                     setIsLoading(false);
                   }}
                   onError={(e) => {

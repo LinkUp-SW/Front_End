@@ -98,9 +98,7 @@ const ChangePasswordPage: React.FC = () => {
     }
   };
 
-  const handleForgotPassword = () => {
-    console.log("Forgot password clicked");
-  };
+
 
   return (
     <SettingsLayoutPage>
@@ -123,7 +121,7 @@ const ChangePasswordPage: React.FC = () => {
           <div className="relative mb-6">
             <button
               onClick={() => setShowPasswordInfo(!showPasswordInfo)}
-              className="flex items-center bg-transparent border-0 text-[var(--badge-color)] px-3 py-2 rounded-2xl bg-[rgba(10,102,194,0.08)] dark:bg-[rgba(10,102,194,0.15)] cursor-pointer text-sm"
+              className="flex items-center border-0 text-[var(--badge-color)] px-3 py-2 rounded-2xl bg-[rgba(10,102,194,0.08)] dark:bg-[rgba(10,102,194,0.15)] cursor-pointer text-sm"
             >
               <FaInfoCircle className="mr-2 text-base" />
               <span className="dark:text-white">
@@ -257,13 +255,6 @@ const ChangePasswordPage: React.FC = () => {
                 }`}
             >
               {isLoading ? "Processing..." : "Save Password"}
-            </button>
-
-            <button
-              onClick={handleForgotPassword}
-              className="bg-transparent border-0 text-[var(--badge-color)] cursor-pointer text-base text-left p-0 w-fit mb-4 dark:text-white"
-            >
-              Forgot Password
             </button>
           </div>
         </div>

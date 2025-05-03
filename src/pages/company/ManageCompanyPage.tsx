@@ -168,7 +168,6 @@ const ManageCompanyPage = () => {
       try {
         setIsLoading(true);
         const response = await getCompanyAdminView(companyId);
-        console.log("API Response:", response);
 
         if (response && response.company) {
           const company = response.company;
@@ -210,9 +209,7 @@ const ManageCompanyPage = () => {
     }
 
     try {
-      console.log(`Fetching full company data for ID: ${companyId}`);
       const response = await getCompanyAllView(companyId);
-      console.log("API Response:", response);
 
       if (response && response.companyProfile) {
         // Map API Company response to our FullCompanyData type
@@ -242,7 +239,6 @@ const ManageCompanyPage = () => {
         };
 
         setFullCompanyData(fullData);
-        console.log("Company type:", fullData.type);
 
         return fullData;
       } else {
@@ -287,7 +283,6 @@ const ManageCompanyPage = () => {
       const response = await updateCompanyProfile(companyId, data);
 
       if (response && (response.success || response.message)) {
-        console.log("Company profile updated successfully");
         setEditDialogOpen(false);
         toast.success("Company information updated successfully!");
 
@@ -402,7 +397,6 @@ const ManageCompanyPage = () => {
                     alt={`${companyData.name} logo`}
                     className="w-full object-cover"
                     onError={(e) => {
-                      console.log("Image failed to load:", companyData.logo);
                       (e.target as HTMLImageElement).src =
                         "/api/placeholder/50/50";
                     }}

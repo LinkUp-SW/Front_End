@@ -105,7 +105,6 @@ const EditPageDialog = ({ open, onOpenChange, companyData, onSubmit }: EditPageD
   // Update form data when companyData changes or dialog opens
   useEffect(() => {
     if (companyData && open) {
-      console.log("Updating form data with:", companyData);
       
       // Set the main form data
       setFormData({

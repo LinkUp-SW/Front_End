@@ -22,7 +22,6 @@ const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
       socketService
         .connect(token)
         .then(() => {
-          console.log("Socket connected from provider");
           socketService.setOnlineStatus(true);
           setConnected(true);
         })

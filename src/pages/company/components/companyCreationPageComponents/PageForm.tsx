@@ -173,7 +173,6 @@ export const PageForm: React.FC<PageFormProps> = ({ type, onSubmit, setPreviewDa
     }
     
     try {
-      console.log('Submitting form data:', formData);
       
       // Format data for API
       const apiData: CompanyProfileData = {
@@ -183,10 +182,8 @@ export const PageForm: React.FC<PageFormProps> = ({ type, onSubmit, setPreviewDa
       };
       
       // Log the API request for debugging
-      console.log('Sending API request with data:', apiData);
       
-      const response = await createCompanyProfile(apiData);
-      console.log('API response:', response);
+      await createCompanyProfile(apiData);
       
       // Show success toast notification
       toast.success(`${type === 'company' ? 'Company' : 'Education'} profile created successfully!`);

@@ -88,14 +88,14 @@ export const fetchLinkPreview = async (
           };
         }
       } catch (proxyError) {
-        console.log("Could not fetch enhanced metadata:", proxyError);
+        console.error("Could not fetch enhanced metadata:", proxyError);
         // Continue with basic preview data
       }
     }
 
     return previewData;
   } catch (error) {
-    console.log("Error creating link preview:", error);
+    console.error("Error creating link preview:", error);
 
     // Return basic fallback for invalid URLs
     return {
@@ -196,7 +196,7 @@ export const fetchSinglePost = async (
       },
     };
   } catch (error) {
-    console.log(error);
+    console.error(error);
     throw error;
   }
 };
@@ -210,7 +210,7 @@ export const getPostComments = async (): Promise<CommentType[]> => {
     );
     return response.data;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     throw error;
   }
 };
@@ -253,7 +253,7 @@ export const getSinglePost = async (postId: string): Promise<PostType> => {
     );
     return response.data;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     throw error;
   }
 };
@@ -269,7 +269,7 @@ export const getSingleComments = async (
     );
     return response.data;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     throw error;
   }
 };
@@ -283,7 +283,7 @@ export const getPostReactions = async (): Promise<string[]> => {
     );
     return response.data;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     throw error;
   }
 };
@@ -574,7 +574,7 @@ export const repostInstant = async (
     );
     return response.data;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     throw error;
   }
 };
@@ -602,7 +602,7 @@ export const repostWithThoughts = async (
     );
     return response.data;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     throw error;
   }
 };

@@ -45,9 +45,8 @@ const NewMessage = () => {
         return;
       }
 
-      const response = await startConversation(token!, user2Id, textMessage);
+      await startConversation(token!, user2Id, textMessage);
 
-      console.log("Conversation started with ID:", response.conversationId);
       setTextMessage("");
       dispatch(setShowPopup(false));
       goToMessaging();
