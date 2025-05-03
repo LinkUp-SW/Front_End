@@ -54,6 +54,7 @@ import {
   ChangePasswordPage,
   ConnectionRequest,
   ProfileVisibility,
+  SubscriptionBillingPage
 } from "./settings";
 
 //Export the Imported Pages
@@ -112,4 +113,5 @@ export {
   ChangePasswordPage,
   ConnectionRequest,
   ProfileVisibility,
+  SubscriptionBillingPage
 };

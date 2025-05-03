@@ -51,6 +51,7 @@ import {
   DisplayPage,
   ConnectionRequest,
   ProfileVisibility,
+  SubscriptionBillingPage,
 } from "./pages";
 
 import React from "react";
@@ -284,6 +285,10 @@ const routes: RouteObject[] = [
   {
     path: "/settings/visibility/profile",
     element: React.createElement(ProfileVisibility),
+  },
+  {
+    path: "/settings/subscription-billing",
+    element: React.createElement(SubscriptionBillingPage),
   },
 ];
 

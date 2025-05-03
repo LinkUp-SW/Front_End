@@ -13,6 +13,7 @@ import ReasonPage from "./close_account/ReasonPage";
 import ChangePasswordPage from "./change_password/ChangePasswordPage";
 import ConnectionRequest from "./visibility/ConnectionRequest";
 import ProfileVisibility from "./visibility/ProfileVisibility";
+import SubscriptionBillingPage from "./billing/SubscriptionBillingPage";
 export {
   SignInAndSecurityPage,
   AccountPreferencePage,
@@ -29,4 +30,5 @@ export {
   ChangePasswordPage,
   ConnectionRequest,
   ProfileVisibility,
+  SubscriptionBillingPage,
 };

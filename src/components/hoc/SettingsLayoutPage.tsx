@@ -4,6 +4,7 @@ import { FaUser, FaLock, FaEye, FaBars, FaTimes } from "react-icons/fa";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 import AuthMiddleware from "./AuthMiddleware";
+import { TbPremiumRights } from "react-icons/tb";
 
 interface SettingsLayoutPageProps {
   children?: ReactNode;
@@ -27,6 +28,12 @@ const SETTING_MENU_ITEMS = [
     icon: <FaEye />,
     label: "Visibility",
     path: "/settings/visibility",
+  },
+  {
+    id: "billing",
+    icon: <TbPremiumRights />,
+    label: "Subscription & Billing",
+    path: "/settings/subscription-billing",
   },
 ];
 
@@ -131,9 +138,7 @@ const SettingsLayoutPage: React.FC<SettingsLayoutPageProps> = ({
           </aside>
 
           {/* Main Content */}
-          <main className="flex-1 mt-0 md:mt-4 relative">
-            {children}
-          </main>
+          <main className="flex-1 mt-0 md:mt-4 relative">{children}</main>
         </div>
 
         {/* Footer */}
