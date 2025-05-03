@@ -1,6 +1,6 @@
 import { GoHomeFill } from "react-icons/go";
 import { FaPeopleGroup } from "react-icons/fa6";
-import { FaBell, FaBriefcase, FaUserAlt} from "react-icons/fa";
+import { FaBell, FaBriefcase, FaUserAlt } from "react-icons/fa";
 import { BsChatDotsFill } from "react-icons/bs";
 import { HiOutlineDocumentText } from "react-icons/hi";
 import { CgTimelapse } from "react-icons/cg";
@@ -112,7 +112,6 @@ export const RECOMMENDED_PROFILE_SECTIONS = [
   },
 ];
 
-
 export const FOOTER_LINKS = [
   { text: "About", url: "#" },
   { text: "Accessibility", url: "#" },
@@ -132,7 +131,6 @@ export const JOB_COLLECTIONS = [
   { id: "more", title: "More", icon: RiMoreLine },
 ];
 
-
 export const POST_ACTIONS: Record<string, string> = {
   like: "likes this",
   love: "loves this",
@@ -141,7 +139,7 @@ export const POST_ACTIONS: Record<string, string> = {
   funny: "finds this funny",
   support: "supports this",
   comment: "commented on this",
-  repost: "reposted this",
+  "Repost instant": "reposted this",
 
   error: "no action",
 };
