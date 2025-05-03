@@ -33,6 +33,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { editUserBio } from "@/slices/user_profile/userBioSlice";
 import { socketService } from "@/services/socket";
+import { UserProfileBio } from "@/types";
 
 export type FollowStatus = {
   isFollowing?: boolean;
@@ -55,6 +56,7 @@ export interface ProfileActionButtonsProps {
   isViewerSubscribed: boolean;
   setOpenSubscribeNowDialog: React.Dispatch<React.SetStateAction<boolean>>;
   isPremium: boolean;
+  data:UserProfileBio
 }
 
 const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
@@ -70,6 +72,7 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
   isViewerSubscribed,
   setOpenSubscribeNowDialog,
   isPremium,
+  data
 }) => {
   const { id } = useParams();
   const userBioState = useSelector((state: RootState) => state.userBio);
@@ -300,6 +303,7 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
       isAllowingMessage ||
       isViewerSubscribed
     ) {
+      console.log(data)
       alert("You Can Send Message Directly");
     } else {
       setOpenSubscribeNowDialog(true);
