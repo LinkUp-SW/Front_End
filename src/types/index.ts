@@ -75,6 +75,7 @@ export interface ProfileCardType {
 export interface PostType {
   author: PostUserType;
   post_type: string;
+  is_company?: boolean;
   reposts: string[];
   content: string;
   reposts_count: number;

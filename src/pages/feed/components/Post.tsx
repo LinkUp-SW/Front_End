@@ -79,6 +79,8 @@ import { openEditPostDialog } from "@/slices/feed/createPostSlice";
 import { EditIcon } from "lucide-react";
 import { BiRepost as RepostIcon } from "react-icons/bi";
 import PostLargePreview from "./PostLargePreview";
+import { getCompanyAdmins } from "@/endpoints/company";
+import { AxiosError } from "axios";
 
 interface PostProps {
   postData: PostType;
@@ -138,10 +140,34 @@ const Post: React.FC<PostProps> = ({
     isLoading: postData.comments_data?.isLoading || false,
     hasInitiallyLoaded: postData.comments_data?.hasInitiallyLoaded || false,
   };
+  const [isCompanyAdmin, setIsCompanyAdmin] = useState(false);
   const isInstantRepost = postData.post_type === "Repost instant";
   const isRepostWithThoughts = postData.media?.media_type === "post";
 
   const targetPost = isInstantRepost && originalPost ? originalPost : postData;
+
+  const fetchAdmins = async () => {
+    try {
+      const response = await getCompanyAdmins(author.username);
+      if (userId && response.admins.some((admin) => admin.user_id === userId)) {
+        setIsCompanyAdmin(postData.is_company || false);
+      }
+      console.log("Searching for user", userId);
+      console.log("Admins list:", response.admins);
+    } catch (err) {
+      // Only show error toast if not 403 (forbidden)
+      if ((err as AxiosError).status !== 403) {
+        toast.error("Failed to load admins. Please try again.");
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (postData.is_company === true) {
+      console.log("fetching admins");
+      fetchAdmins();
+    }
+  }, [postData.is_company]);
 
   useEffect(() => {
     if (
@@ -632,7 +658,7 @@ const Post: React.FC<PostProps> = ({
 
   // UI helpers
   const menuActions =
-    userId === author.username
+    userId === author.username || isCompanyAdmin
       ? getPersonalMenuActions(
           handleSaveButton,
           handleEditPostButton,
@@ -718,7 +744,7 @@ const Post: React.FC<PostProps> = ({
           postMenuOpen={postMenuOpen}
           setPostMenuOpen={setPostMenuOpen}
           menuActions={menuActions}
-          edited={postData.is_edited}
+          edited={postData.is_edited || false}
           publicPost={postData.public_post}
           date={date}
         />
