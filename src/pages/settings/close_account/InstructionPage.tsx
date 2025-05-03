@@ -23,7 +23,7 @@ const InstructionPage: React.FC = () => {
             Close account
           </h1>
           <p className="text-base text-[#666666] dark:text-[rgba(255,255,255,0.6)] mt-2 mb-0">
-            Malak, we're sorry to see you go
+            We're sorry to see you go
           </p>
         </div>
 
