@@ -26,7 +26,7 @@ const EmailVerification = () => {
           return;
         }
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     } else if (storedUserEmail) {
       setUserEmail(storedUserEmail);

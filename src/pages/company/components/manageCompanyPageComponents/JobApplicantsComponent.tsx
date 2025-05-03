@@ -51,7 +51,6 @@ const JobApplicantsComponent: React.FC<JobApplicantsComponentProps> = ({ jobId, 
       
       if (response && response.data) {
         // Log the entire applicants data for debugging
-        console.log('Job applicants data:', response.data);
         
         // Log specifically the resume URLs
         response.data.forEach((applicant, index) => {

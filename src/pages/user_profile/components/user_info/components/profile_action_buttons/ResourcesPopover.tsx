@@ -112,7 +112,6 @@ const OwnerPopoverContent: React.FC<OwnerPopoverContentProps> = ({
   onAboutProfile,
 }) => {
   const userBio = useSelector((state: RootState) => state.userBio.data);
-  console.log(userBio);
   return (
     <div className="grid gap-2">
       <button

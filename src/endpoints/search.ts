@@ -107,7 +107,6 @@ export const searchUsersForTag = async (
     });
 
     // Add this logging to see the exact structure
-    console.log("User search response:", response.data);
 
     return response.data;
   } catch (error) {

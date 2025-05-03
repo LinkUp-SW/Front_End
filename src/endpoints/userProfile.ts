@@ -102,20 +102,7 @@ export const getUserPosts = async (
       params: postPayload,
     }
   );
-  console.log("GetUserPosts:", response.data);
-  console.log("Returned:", {
-    posts: response.data.posts.map((post: PostType) => ({
-      ...post,
-      comments_data: {
-        comments: [], // Empty initially
-        count: post.comments_count || 0,
-        nextCursor: 0,
-        isLoading: false,
-        hasInitiallyLoaded: false,
-      },
-    })),
-    nextCursor: response.data.nextCursor,
-  });
+
   return {
     posts: response.data.posts.map((post: PostType) => ({
       ...post,
@@ -575,5 +562,17 @@ export const removeEndorsement = async (
       },
     }
   );
+  return response.data;
+};
+
+export const checkIsMe = async (
+  token: string,
+  userId: string
+): Promise<{ is_me: boolean; status: string }> => {
+  const response = await axiosInstance.get(`/api/v1/user/${userId}/is-me`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
   return response.data;
 };

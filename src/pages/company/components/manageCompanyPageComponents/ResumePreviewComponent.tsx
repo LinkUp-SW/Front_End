@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 interface ResumePreviewComponentProps {
@@ -10,6 +10,9 @@ const ResumePreviewComponent: React.FC<ResumePreviewComponentProps> = ({ resumeU
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [previewError, setPreviewError] = useState(false);
+  useEffect(()=>{
+console.log(resumeUrl)
+  },[resumeUrl])
 
   // Function to handle opening the preview
   const handleOpenPreview = () => {
@@ -20,7 +23,6 @@ const ResumePreviewComponent: React.FC<ResumePreviewComponentProps> = ({ resumeU
 
   // Function to handle direct download
   const handleDirectDownload = () => {
-    console.log('Attempting to download resume from URL:', resumeUrl);
     window.open(resumeUrl, '_blank');
   };
 
@@ -99,7 +101,6 @@ const ResumePreviewComponent: React.FC<ResumePreviewComponentProps> = ({ resumeU
                   src={resumeUrl}
                   className="w-full h-[70vh] border-0"
                   onLoad={() => {
-                    console.log('Resume preview loaded successfully:', resumeUrl);
                     setIsLoading(false);
                   }}
                   onError={(e) => {

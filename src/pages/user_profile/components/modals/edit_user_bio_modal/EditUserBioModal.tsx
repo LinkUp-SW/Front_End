@@ -137,7 +137,6 @@ const EditUserBioModal: React.FC<EditUserBioModalProps> = ({
     try {
       const response = await updateUserBio(authToken, formData);
       setOpenEditDialog(false);
-      console.log(response);
       dispatch(editUserBio({ ...userBio, bio: response.user }));
       toast.success(response.message);
     } catch (error) {

@@ -25,36 +25,36 @@ import {
   UserExperiencesPage,
   UserLicensesPage,
   SignInAndSecurityPage,
-  ChangePasswordPage,
   MyItemsPage,
   AccountPreferencePage,
   InstructionPage,
   ReasonPage,
   OtherOptionPage,
-  LastPage,
   AllPeoplePage,
   CompanyCreationPage,
   ManageCompanyPage,
   CreateJobPage,
   CompanyProfileView,
   DashboardPage,
- 
   UsersPage,
   AnalyticsPage,
   ContentModerationPage,
-  
-
-
+  GoodByePage,
+  ChangePasswordPage,
+  CloseAccountPage,
+  PrimaryEmailPage,
+  OTP,
+  AddEmailPage,
+  VisibilityPage,
+  BlockingListPage,
+  DisplayPage,
+  ConnectionRequest,
+  ProfileVisibility,
+  SubscriptionBillingPage,
+  PaymentStatusPage,
 } from "./pages";
 
-import PrimaryEmailPage from "./pages/settings/updateEmail/PrimaryEmailPage";
-import AddEmailPage from "./pages/settings/updateEmail/AddEmailPage";
-import OTP from "./pages/settings/updateEmail/OTP";
-import BlockingListPage from "./pages/settings/BlockingListPage";
-import VisibilityPage from "./pages/settings/VisibilityPage";
-
 import React from "react";
-
 
 // Define your routes as an array of RouteObject (compatible with React Router v6)
 const routes: RouteObject[] = [
@@ -203,7 +203,7 @@ const routes: RouteObject[] = [
   },
   {
     path: "/settings/close-account/confirm",
-    element: React.createElement(LastPage),
+    element: React.createElement(CloseAccountPage),
   },
   {
     path: "/settings/security/email",
@@ -242,7 +242,6 @@ const routes: RouteObject[] = [
     element: React.createElement(CompanyProfileView),
   },
 
-  
   {
     path: "/settings/visibility",
     element: React.createElement(VisibilityPage),
@@ -252,28 +251,51 @@ const routes: RouteObject[] = [
     element: React.createElement(BlockingListPage),
   },
   {
-    path:"/admin/dashboard",
-    element: React.createElement(DashboardPage)
+    path: "/admin/dashboard",
+    element: React.createElement(DashboardPage),
   },
 
   {
-    path:"/admin/users",
-    element: React.createElement(UsersPage)
+    path: "/admin/users",
+    element: React.createElement(UsersPage),
   },
   {
-    path:"/admin/analytics",
-    element: React.createElement(AnalyticsPage)
+    path: "/admin/analytics",
+    element: React.createElement(AnalyticsPage),
   },
   {
-    path:"/admin/content-moderation",
-    element: React.createElement(ContentModerationPage)
+    path: "/admin/content-moderation",
+    element: React.createElement(ContentModerationPage),
   },
-  
+
   {
     path: "/company/:companyId",
     element: React.createElement(CompanyProfileView),
   },
-
+  {
+    path: "/goodbye",
+    element: React.createElement(GoodByePage),
+  },
+  {
+    path: "/settings/theme",
+    element: React.createElement(DisplayPage),
+  },
+  {
+    path: "/settings/visibility/connection-request",
+    element: React.createElement(ConnectionRequest),
+  },
+  {
+    path: "/settings/visibility/profile",
+    element: React.createElement(ProfileVisibility),
+  },
+  {
+    path: "/settings/subscription-billing",
+    element: React.createElement(SubscriptionBillingPage),
+  },
+  {
+    path: "/payment",
+    element: React.createElement(PaymentStatusPage),
+  },
 ];
 
 export default routes;

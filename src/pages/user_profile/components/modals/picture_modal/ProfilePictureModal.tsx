@@ -44,7 +44,7 @@ const ProfilePictureModal = ({
           setEditedImage(data);
           setUploadedImage(data);
         })
-        .catch((err) => console.log(err));
+        .catch((err) => console.error(err));
     }
   }, []);
 

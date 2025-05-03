@@ -25,6 +25,7 @@ import {
 } from "@/services/socket";
 import { useParams } from "react-router-dom";
 import LinkUpLoader from "../../components/linkup_loader/LinkUpLoader";
+import { getErrorMessage } from "@/utils/errorHandler";
 function getMimeType(filePath: string): string {
   const extension = filePath.split(".").pop()?.toLowerCase();
   switch (extension) {
@@ -379,8 +380,7 @@ const ChatingScreen = () => {
 
       toast.success("Message deleted");
     } catch (err) {
-      console.log("Error deleting:", err);
-      toast.error("Failed to delete message");
+      toast.error(getErrorMessage(err));
     }
   };
 

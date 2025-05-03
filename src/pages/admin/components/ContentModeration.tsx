@@ -105,7 +105,6 @@ const ContentModeration = () => {
       setDetailsLoading(true);
 
       try {
-        console.log(selectedReport.type);
         const result = await getReportDetails(
           token,
           selectedReport.type,

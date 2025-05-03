@@ -322,7 +322,7 @@ const PostLargePreview: React.FC<PostLargePreviewProps> = ({
                   />
                 );
               } catch (error) {
-                console.log(error);
+                console.error(error);
                 // Assuming you have a DocumentPreview component
                 return (
                   <DocumentPreview

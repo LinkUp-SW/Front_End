@@ -1,7 +1,7 @@
 import whoIsHiringImage from "@/assets/whoIsHiring.jpg";
 const WhosHiringImage = () => {
   return (
-    <div className="mt-4 cursor-pointer h-fit">
+    <div className="mt-4 cursor-pointer h-fit w-full">
       <img
         src={whoIsHiringImage}
         alt="Promotional Banner"

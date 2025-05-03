@@ -72,6 +72,7 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
 }) => {
   const { id } = useParams();
   const userBioState = useSelector((state: RootState) => state.userBio);
+  const theme = useSelector((state: RootState) => state.theme.theme);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const authToken = Cookies.get("linkup_auth_token");
@@ -176,7 +177,7 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
 
     const loadingToast = toast.loading("Withdraw connection request", {
       description: (
-        <p className="text-gray-600">
+        <p className="text-gray-600 dark:text-gray-300">
           If you withdraw the request, you won’t be able to send another request
           for <strong>3 weeks</strong>.
         </p>
@@ -189,7 +190,7 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
       },
       // Custom styling for the cancel button
       cancelButtonStyle: {
-        backgroundColor: "#f87171", // Tailwind's red-400
+        backgroundColor: "oklch(0.525 0.223 3.958)", // Tailwind's red-400
         color: "#fff",
         fontWeight: "bold",
         borderRadius: "4px",
@@ -197,6 +198,10 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
         marginLeft: "8px",
         border: "none",
         cursor: "pointer",
+      },
+      style: {
+        background: theme === "light" ? "white" : "#1e2939",
+        color: theme === "light" ? "black" : "white",
       },
     });
 
@@ -244,7 +249,7 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
         },
       },
       actionButtonStyle: {
-        backgroundColor: "#f87171", // Tailwind's red-400
+        backgroundColor: "oklch(0.525 0.223 3.958)", // Tailwind's red-400
         color: "#fff",
         fontWeight: "bold",
         borderRadius: "4px",
@@ -252,6 +257,10 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
         marginLeft: "8px",
         border: "none",
         cursor: "pointer",
+      },
+      style: {
+        background: theme === "light" ? "white" : "#1e2939",
+        color: theme === "light" ? "black" : "white",
       },
     });
     // Wait for either the timeout or cancel click
@@ -313,7 +322,7 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
         },
       },
       actionButtonStyle: {
-        backgroundColor: "#f87171", // Tailwind's red-400
+        backgroundColor: "oklch(0.525 0.223 3.958)", // Tailwind's red-400
         color: "#fff",
         fontWeight: "bold",
         borderRadius: "4px",
@@ -321,6 +330,10 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
         marginLeft: "8px",
         border: "none",
         cursor: "pointer",
+      },
+      style: {
+        background: theme === "light" ? "white" : "#1e2939",
+        color: theme === "light" ? "black" : "white",
       },
     });
     // Wait for either the timeout or cancel click
@@ -347,11 +360,11 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
     []
   );
   const handleViewActivity = useCallback(
-    () => alert("View Activity clicked"),
+    () => navigate(`/user-profile/${id}/posts`),
     []
   );
   const handleViewBlockedUsers = useCallback(
-    () => alert("View Blocked Users clicked"),
+    () => navigate(`/settings/visibility/blocking`),
     []
   );
 
@@ -515,12 +528,14 @@ const EmailConnectionDialog = ({
   const [email, setEmail] = useState("");
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-xl">
+      <DialogContent className="sm:max-w-xl bg-white dark:bg-gray-800">
         <DialogHeader>
-          <DialogTitle>Does this user know you?</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-lg text-black dark:text-white">
+            Does this user know you?
+          </DialogTitle>
+          <DialogDescription className="text-sm text-gray-700 dark:text-gray-300">
             To verify this member knows you, please enter their email to
-            connect.{" "}
+            connect.
           </DialogDescription>
         </DialogHeader>
         <div className="flex items-center space-x-2">
@@ -546,13 +561,12 @@ const EmailConnectionDialog = ({
               onOpenChange?.(false);
             }}
             type="submit"
-            size="sm"
-            className="px-3"
+            className="affirmativeBtn"
           >
-            send
+            Send
           </Button>
           <DialogClose asChild>
-            <Button type="button" variant="secondary">
+            <Button type="button" variant="outline" className="destructiveBtn">
               Close
             </Button>
           </DialogClose>

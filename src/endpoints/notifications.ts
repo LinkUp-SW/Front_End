@@ -21,7 +21,6 @@ export const getNotifications = async (
       response.data.unReadCount = response.data.notifications?.filter((n: Notification) => !n.isRead).length || 0;
     }
     
-    console.log("API Response:", response.data);
     return response.data;
   } catch (error) {
     console.error('Error fetching notifications:', error);
@@ -39,7 +38,6 @@ export const getUnreadNotificationsCount = async (token: string): Promise<number
     
     // Return the count directly - handle both possible API response formats
     const count = response.data.count || 0;
-    console.log("Unread count from API:", count);
     return count;
   } catch (error) {
     console.error('Error fetching unread count:', error);
