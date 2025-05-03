@@ -9,6 +9,7 @@ import {
 } from '../../endpoints/jobs';
 import Cookies from 'js-cookie';
 import { MdClose } from 'react-icons/md';
+import { useNavigate } from 'react-router-dom';
 
 enum TabState {
   SAVED = 'saved',
@@ -29,6 +30,7 @@ const SavedJobsDashboard: React.FC = () => {
   const [isDarkMode, setIsDarkMode] = useState<boolean>(
     window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
   );
+  const navigate = useNavigate();
 
   useEffect(() => {
     const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
@@ -132,6 +134,10 @@ const SavedJobsDashboard: React.FC = () => {
     }
   };
 
+  const handleJobClick = (jobId: string) => {
+    navigate(`/jobs/see-more?selected=${jobId}`);
+  };
+
   const handleTabChange = (tab: TabState) => {
     setActiveTab(tab);
     // Reset error state when changing tabs
@@ -222,7 +228,11 @@ const SavedJobsDashboard: React.FC = () => {
       return (
         <div className="space-y-4">
           {savedJobs.map((job) => (
-            <div key={job.id} className="border-t pt-4">
+            <div 
+              key={job.id} 
+              className="border-t pt-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700"
+              onClick={() => handleJobClick(job.id!)}
+            >
               <div className="flex justify-between">
                 <div className="flex">
                   <div className="w-12 h-12 bg-black rounded-md flex items-center justify-center overflow-hidden">
@@ -233,7 +243,7 @@ const SavedJobsDashboard: React.FC = () => {
                     )}
                   </div>
                   <div className="ml-3">
-                    <h3 className="font-medium text-gray-900 dark:text-white">{job.title}</h3>
+                    <h3 className="font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400">{job.title}</h3>
                     <p className="text-sm text-gray-800 dark:text-gray-300">{job.company}</p>
                     <p className="text-sm text-gray-500 dark:text-gray-400">{job.location}  ({job.workMode})</p>
                     <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -244,7 +254,10 @@ const SavedJobsDashboard: React.FC = () => {
                 <div className="flex items-start">
                   <button 
                     className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
-                    onClick={() => handleRemoveFromSaved(job.id!)}
+                    onClick={(e) => {
+                      e.stopPropagation(); // Prevent the parent div click from triggering
+                      handleRemoveFromSaved(job.id!);
+                    }}
                     title="Remove from saved"
                   >
                     <MdClose size={20} />
@@ -260,7 +273,11 @@ const SavedJobsDashboard: React.FC = () => {
       return (
         <div className="space-y-4">
           {appliedJobs.map((job) => (
-            <div key={job.id} className="border-t pt-4">
+            <div 
+              key={job.id} 
+              className="border-t pt-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700"
+              onClick={() => handleJobClick(job.id!)}
+            >
               <div className="flex justify-between">
                 <div className="flex">
                   <div className="w-12 h-12 bg-black rounded-md flex items-center justify-center overflow-hidden">
@@ -271,7 +288,7 @@ const SavedJobsDashboard: React.FC = () => {
                     )}
                   </div>
                   <div className="ml-3">
-                    <h3 className="font-medium text-gray-900 dark:text-white">{job.title}</h3>
+                    <h3 className="font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400">{job.title}</h3>
                     <p className="text-sm text-gray-800 dark:text-gray-300">{job.company}</p>
                     <p className="text-sm text-gray-500 dark:text-gray-400">{job.location} ({job.workMode})</p>
                     <div className="flex items-center mt-1">

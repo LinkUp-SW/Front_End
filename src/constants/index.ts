@@ -114,20 +114,6 @@ export const RECOMMENDED_PROFILE_SECTIONS = [
   },
 ];
 
-export const SIDEBAR_MENU_ITEMS = [
-  {
-    icon: BiSliderAlt,
-    label: "Preferences",
-  },
-  {
-    icon: FaBookmark,
-    label: "My jobs",
-  },
-  {
-    icon: BsBarChartLine,
-    label: "My Career Insights",
-  },
-];
 
 export const FOOTER_LINKS = [
   { text: "About", url: "#" },
@@ -148,16 +134,6 @@ export const JOB_COLLECTIONS = [
   { id: "more", title: "More", icon: RiMoreLine },
 ];
 
-export const RECENT_SEARCHES = [
-  { query: "project manager", location: "Cairo, Egypt", applyOn: true },
-  {
-    query: "project manager",
-    location: "Riyadh, Saudi Arabia",
-    applyOn: true,
-    alert: true,
-  },
-  { query: "agile", location: "Cairo, Egypt", applyOn: false },
-];
 
 export const POST_ACTIONS: Record<string, string> = {
   like: "likes this",

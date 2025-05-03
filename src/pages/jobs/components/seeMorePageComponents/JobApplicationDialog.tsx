@@ -66,8 +66,8 @@ const JobApplicationDialog: React.FC<JobApplicationDialogProps> = ({
 
   // Update progress based on current step
   useEffect(() => {
-    if (currentStep === 'info') setProgress(20);
-    else if (currentStep === 'resume') setProgress(50);
+    if (currentStep === 'info') setProgress(40);
+    else if (currentStep === 'resume') setProgress(70);
     else if (currentStep === 'preview') setProgress(100);
   }, [currentStep]);
 
@@ -263,9 +263,9 @@ const JobApplicationDialog: React.FC<JobApplicationDialogProps> = ({
         onOpenChange(newOpen);
       }
     }}>
-      <DialogContent className="w-full max-w-2xl p-0 bg-white dark:bg-gray-900 dark:text-gray-200 overflow-hidden">
-        <div className="flex justify-between items-center px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-          <h2 className="text-xl font-semibold dark:text-white">Apply to {job?.title || ''}</h2>
+      <DialogContent className="w-full max-w-2xl sm:w-11/12 md:w-4/5 lg:max-w-2xl p-0 bg-white dark:bg-gray-900 dark:text-gray-200 overflow-hidden">
+        <div className="flex justify-between items-center px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 dark:border-gray-700">
+          <h2 className="text-lg sm:text-xl font-semibold dark:text-white truncate">Apply to {job?.title || ''}</h2>
           <button 
             className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200" 
             onClick={() => onOpenChange(false)}
@@ -280,116 +280,119 @@ const JobApplicationDialog: React.FC<JobApplicationDialogProps> = ({
             style={{ width: `${progress}%` }}
           >
           </div>
-          <div className="text-right text-sm text-gray-600 dark:text-gray-300 pr-4 pt-1">{progress}%</div>
+          <div className="text-right text-xs sm:text-sm text-gray-600 dark:text-gray-300 pr-4 pt-1">{progress}%</div>
         </div>
         
-        <div className="p-6">
+        <div className="p-4 sm:p-6">
           {isLoading ? (
-            <div className="flex justify-center items-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-600 dark:border-gray-300"></div>
+            <div className="flex justify-center items-center py-8 sm:py-12">
+              <div className="animate-spin rounded-full h-8 w-8 sm:h-12 sm:w-12 border-b-2 border-gray-600 dark:border-gray-300"></div>
             </div>
           ) : (
             <>
               {/* Contact Info Step */}
               {currentStep === 'info' && (
                 <div>
-                  <h2 className="text-xl font-semibold mb-4 dark:text-white">Contact info</h2>
+                  <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4 dark:text-white">Contact info</h2>
                   
                   {/* Profile Header */}
-                  <div className="flex items-center mb-6">
+                  <div className="flex items-center mb-4 sm:mb-6">
                     {profilePhoto ? (
                       <img 
                         src={profilePhoto} 
                         alt="Profile" 
-                        className="w-16 h-16 rounded-full mr-3 object-cover"
+                        className="w-12 h-12 sm:w-16 sm:h-16 rounded-full mr-3 object-cover"
                       />
                     ) : (
-                      <div className="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center text-white text-2xl mr-3">
+                      <div className="w-12 h-12 sm:w-16 sm:h-16 bg-purple-600 rounded-full flex items-center justify-center text-white text-xl sm:text-2xl mr-3">
                         {getInitials()}
                       </div>
                     )}
                     <div>
-                      <h3 className="font-medium text-lg dark:text-gray-100">{firstName} {lastName}</h3>
+                      <h3 className="font-medium text-base sm:text-lg dark:text-gray-100">{firstName} {lastName}</h3>
                       {userInfo?.bio?.headline && (
-                        <p className="text-gray-500 dark:text-gray-400">{userInfo.bio.headline}</p>
+                        <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400">{userInfo.bio.headline}</p>
                       )}
                     </div>
                   </div>
                   
-                  <div className="space-y-6">
+                  <div className="space-y-4 sm:space-y-6">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         First name*
                       </label>
                       <input
                         type="text"
                         value={firstName}
                         onChange={(e) => setFirstName(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-gray-400 dark:focus:ring-gray-500 dark:bg-gray-800 dark:text-white"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-gray-400 dark:focus:ring-gray-500 dark:bg-gray-800 dark:text-white text-sm sm:text-base"
                         required
                       />
                     </div>
                     
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         Last name*
                       </label>
                       <input
                         type="text"
                         value={lastName}
                         onChange={(e) => setLastName(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-gray-400 dark:focus:ring-gray-500 dark:bg-gray-800 dark:text-white"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-gray-400 dark:focus:ring-gray-500 dark:bg-gray-800 dark:text-white text-sm sm:text-base"
                         required
                       />
                     </div>
                     
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Phone country code*
-                      </label>
-                      <div className="relative">
-                        <select
-                          value={countryCode}
-                          onChange={(e) => setCountryCode(e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-gray-400 dark:focus:ring-gray-500 appearance-none pr-10 dark:bg-gray-800 dark:text-white"
-                          required
-                        >
-                          <option value="">Select a country code</option>
-                          <option value="+20">Egypt (+20)</option>
-                          <option value="+1">United States (+1)</option>
-                          <option value="+44">United Kingdom (+44)</option>
-                          <option value="+971">UAE (+971)</option>
-                          <option value="+966">Saudi Arabia (+966)</option>
-                        </select>
-                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700 dark:text-gray-300">
-                          <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                            <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
-                          </svg>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                          Phone country code*
+                        </label>
+                        <div className="relative">
+                          <select
+                            value={countryCode}
+                            onChange={(e) => setCountryCode(e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-gray-400 dark:focus:ring-gray-500 appearance-none pr-10 dark:bg-gray-800 dark:text-white text-sm sm:text-base"
+                            required
+                          >
+                            <option value="">Select a country code</option>
+                            <option value="+20">Egypt (+20)</option>
+                            <option value="+1">United States (+1)</option>
+                            <option value="+44">United Kingdom (+44)</option>
+                            <option value="+971">UAE (+971)</option>
+                            <option value="+966">Saudi Arabia (+966)</option>
+                          </select>
+                          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700 dark:text-gray-300">
+                            <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                              <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+                            </svg>
+                          </div>
                         </div>
+                      </div>
+                      
+                      <div>
+                        <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                          Mobile phone number*
+                        </label>
+                        <input
+                          type="tel"
+                          value={phoneNumber}
+                          onChange={(e) => setPhoneNumber(e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-gray-400 dark:focus:ring-gray-500 dark:bg-gray-800 dark:text-white text-sm sm:text-base"
+                          required
+                        />
                       </div>
                     </div>
                     
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Mobile phone number*
-                      </label>
-                      <input
-                        type="tel"
-                        value={phoneNumber}
-                        onChange={(e) => setPhoneNumber(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-gray-400 dark:focus:ring-gray-500 dark:bg-gray-800 dark:text-white"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         Email*
                       </label>
                       <input
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-gray-400 dark:focus:ring-gray-500 dark:bg-gray-800 dark:text-white"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-gray-400 dark:focus:ring-gray-500 dark:bg-gray-800 dark:text-white text-sm sm:text-base"
                         required
                       />
                     </div>
@@ -400,31 +403,31 @@ const JobApplicationDialog: React.FC<JobApplicationDialogProps> = ({
               {/* Resume Step */}
               {currentStep === 'resume' && (
                 <div>
-                  <h2 className="text-xl font-semibold mb-2 dark:text-white">Resume</h2>
-                  <p className="text-gray-600 dark:text-gray-400 mb-6">Be sure to include an updated resume *</p>
+                  <h2 className="text-lg sm:text-xl font-semibold mb-2 dark:text-white">Resume</h2>
+                  <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mb-4 sm:mb-6">Be sure to include an updated resume *</p>
                   
                   {resumeUrl && (
-                    <div className="border border-gray-300 dark:border-gray-600 rounded-md mb-6 flex items-center">
-                      <div className="bg-red-600 p-4 text-white font-bold">
+                    <div className="border border-gray-300 dark:border-gray-600 rounded-md mb-4 sm:mb-6 flex items-center overflow-hidden">
+                      <div className="bg-red-600 p-2 sm:p-4 text-white font-bold text-xs sm:text-base">
                         PDF
                       </div>
-                      <div className="px-4 py-2 flex-1">
-                        <div className="font-medium dark:text-gray-100">{renderResumeFilename()}</div>
-                        <div className="text-sm text-gray-500 dark:text-gray-400">
+                      <div className="px-2 sm:px-4 py-2 flex-1 min-w-0">
+                        <div className="font-medium dark:text-gray-100 text-sm sm:text-base truncate">{renderResumeFilename()}</div>
+                        <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 truncate">
                           {getFileSize()}
                           {getLastUsedDate() && ` · Last used on ${getLastUsedDate()}`}
                         </div>
                       </div>
-                      <div className="flex pr-4">
-                        <button className="text-gray-700 dark:text-gray-300 p-2">
-                          <IoMdDownload size={24} />
+                      <div className="flex pr-2 sm:pr-4">
+                        <button className="text-gray-700 dark:text-gray-300 p-1 sm:p-2">
+                          <IoMdDownload size={20} />
                         </button>
                       </div>
                     </div>
                   )}
                   
                   <button
-                    className="flex items-center justify-center border border-blue-500 text-blue-500 dark:border-blue-400 dark:text-blue-400 rounded-full px-6 py-2 font-medium hover:bg-blue-50 dark:hover:bg-blue-900/30"
+                    className="flex items-center justify-center border border-blue-500 text-blue-500 dark:border-blue-400 dark:text-blue-400 rounded-full px-4 sm:px-6 py-2 text-sm sm:text-base font-medium hover:bg-blue-50 dark:hover:bg-blue-900/30 w-full sm:w-auto"
                     onClick={() => document.getElementById('resume-upload')?.click()}
                   >
                     Upload resume
@@ -436,72 +439,72 @@ const JobApplicationDialog: React.FC<JobApplicationDialogProps> = ({
                     accept=".pdf,.doc,.docx"
                     onChange={handleResumeUpload}
                   />
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">DOC, DOCX, PDF (2 MB)</p>
+                  <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-2">DOC, DOCX, PDF (2 MB)</p>
                 </div>
               )}
               
               {/* Preview Step */}
               {currentStep === 'preview' && (
                 <div>
-                  <h2 className="text-xl font-semibold mb-2 dark:text-white">Review your application</h2>
-                  <p className="text-gray-600 dark:text-gray-400 mb-6">The employer will also receive a copy of your profile.</p>
+                  <h2 className="text-lg sm:text-xl font-semibold mb-2 dark:text-white">Review your application</h2>
+                  <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-4 sm:mb-6">The employer will also receive a copy of your profile.</p>
                   
                   <div className="border-b border-gray-200 dark:border-gray-700 pb-4">
                     <div className="flex justify-between mb-2">
-                      <h3 className="font-medium dark:text-white">Contact info</h3>
+                      <h3 className="font-medium text-sm sm:text-base dark:text-white">Contact info</h3>
                       <button 
-                        className="text-blue-600 dark:text-blue-400 font-medium"
+                        className="text-blue-600 dark:text-blue-400 font-medium text-xs sm:text-sm"
                         onClick={() => setCurrentStep('info')}
                       >
                         Edit
                       </button>
                     </div>
                     
-                    <div className="flex items-center mb-4">
+                    <div className="flex items-center mb-3 sm:mb-4">
                       {profilePhoto ? (
                         <img 
                           src={profilePhoto} 
                           alt="Profile" 
-                          className="w-12 h-12 rounded-full mr-3 object-cover"
+                          className="w-10 h-10 sm:w-12 sm:h-12 rounded-full mr-2 sm:mr-3 object-cover"
                         />
                       ) : (
-                        <div className="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center text-white text-xl mr-3">
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 bg-purple-600 rounded-full flex items-center justify-center text-white text-lg sm:text-xl mr-2 sm:mr-3">
                           {getInitials()}
                         </div>
                       )}
                       <div>
-                        <h3 className="font-medium dark:text-white">{firstName} {lastName}</h3>
+                        <h3 className="font-medium text-sm sm:text-base dark:text-white">{firstName} {lastName}</h3>
                         {userInfo?.bio?.headline && (
-                          <p className="text-gray-500 dark:text-gray-400">{userInfo.bio.headline}</p>
+                          <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">{userInfo.bio.headline}</p>
                         )}
                       </div>
                     </div>
                     
-                    <div className="space-y-2 pl-4">
+                    <div className="space-y-2 pl-2 sm:pl-4">
                       <div>
-                        <p className="text-gray-500 dark:text-gray-400 text-sm">First name*</p>
-                        <p className="dark:text-gray-200">{firstName}</p>
+                        <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">First name*</p>
+                        <p className="text-xs sm:text-sm dark:text-gray-200">{firstName}</p>
                       </div>
                       
                       <div>
-                        <p className="text-gray-500 dark:text-gray-400 text-sm">Last name*</p>
-                        <p className="dark:text-gray-200">{lastName}</p>
+                        <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Last name*</p>
+                        <p className="text-xs sm:text-sm dark:text-gray-200">{lastName}</p>
                       </div>
                       
                       <div>
-                        <p className="text-gray-500 dark:text-gray-400 text-sm">Phone country code*</p>
-                        <p className="dark:text-gray-200">{getCountryName(countryCode)} ({countryCode})</p>
+                        <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Phone country code*</p>
+                        <p className="text-xs sm:text-sm dark:text-gray-200">{getCountryName(countryCode)} ({countryCode})</p>
                       </div>
                       
                       <div>
-                        <p className="text-gray-500 dark:text-gray-400 text-sm">Mobile phone number*</p>
-                        <p className="dark:text-gray-200">{phoneNumber}</p>
+                        <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Mobile phone number*</p>
+                        <p className="text-xs sm:text-sm dark:text-gray-200">{phoneNumber}</p>
                       </div>
                       
                       {email && (
                         <div>
-                          <p className="text-gray-500 dark:text-gray-400 text-sm">Email address*</p>
-                          <p className="dark:text-gray-200">{email}</p>
+                          <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Email address*</p>
+                          <p className="text-xs sm:text-sm dark:text-gray-200">{email}</p>
                         </div>
                       )}
                     </div>
@@ -509,9 +512,9 @@ const JobApplicationDialog: React.FC<JobApplicationDialogProps> = ({
 
                   <div className="mt-4 border-b border-gray-200 dark:border-gray-700 pb-4">
                     <div className="flex justify-between mb-2">
-                      <h3 className="font-medium dark:text-white">Resume</h3>
+                      <h3 className="font-medium text-sm sm:text-base dark:text-white">Resume</h3>
                       <button 
-                        className="text-blue-600 dark:text-blue-400 font-medium"
+                        className="text-blue-600 dark:text-blue-400 font-medium text-xs sm:text-sm"
                         onClick={() => setCurrentStep('resume')}
                       >
                         Edit
@@ -519,20 +522,20 @@ const JobApplicationDialog: React.FC<JobApplicationDialogProps> = ({
                     </div>
                     
                     {resumeUrl && (
-                      <div className="border border-gray-300 dark:border-gray-600 rounded-md mb-4 flex items-center">
-                        <div className="bg-red-600 p-4 text-white font-bold">
+                      <div className="border border-gray-300 dark:border-gray-600 rounded-md mb-3 sm:mb-4 flex items-center overflow-hidden">
+                        <div className="bg-red-600 p-2 sm:p-4 text-white font-bold text-xs sm:text-base">
                           PDF
                         </div>
-                        <div className="px-4 py-2 flex-1">
-                          <div className="font-medium dark:text-gray-100">{renderResumeFilename()}</div>
-                          <div className="text-sm text-gray-500 dark:text-gray-400">
+                        <div className="px-2 sm:px-4 py-2 flex-1 min-w-0">
+                          <div className="font-medium dark:text-gray-100 text-sm sm:text-base truncate">{renderResumeFilename()}</div>
+                          <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 truncate">
                             {getFileSize()}
                             {getLastUsedDate() && ` · Last used on ${getLastUsedDate()}`}
                           </div>
                         </div>
-                        <div className="flex pr-4">
-                          <button className="text-gray-700 dark:text-gray-300 p-2">
-                            <IoMdDownload size={24} />
+                        <div className="flex pr-2 sm:pr-4">
+                          <button className="text-gray-700 dark:text-gray-300 p-1 sm:p-2">
+                            <IoMdDownload size={20} />
                           </button>
                         </div>
                       </div>
@@ -542,12 +545,12 @@ const JobApplicationDialog: React.FC<JobApplicationDialogProps> = ({
               )}
               
               {/* Button section */}
-              <div className={`${currentStep === 'preview' ? 'mt-6' : 'mt-12'} flex justify-between`}>
+              <div className={`${currentStep === 'preview' ? 'mt-4 sm:mt-6' : 'mt-8 sm:mt-12'} flex justify-between`}>
                 {currentStep !== 'info' ? (
                   <button
                     type="button"
                     onClick={goToPreviousStep}
-                    className="px-6 py-2 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-full hover:bg-gray-50 dark:hover:bg-gray-800"
+                    className="px-4 sm:px-6 py-2 text-xs sm:text-sm text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-full hover:bg-gray-50 dark:hover:bg-gray-800"
                     disabled={isSubmitting}
                   >
                     Back
@@ -561,7 +564,7 @@ const JobApplicationDialog: React.FC<JobApplicationDialogProps> = ({
                     type="button"
                     onClick={handleSubmitApplication}
                     disabled={isSubmitting}
-                    className="px-6 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-4 sm:px-6 py-2 text-xs sm:text-sm bg-blue-600 text-white rounded-full hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isSubmitting ? 'Submitting...' : 'Submit application'}
                   </button>
@@ -569,7 +572,7 @@ const JobApplicationDialog: React.FC<JobApplicationDialogProps> = ({
                   <button
                     type="button"
                     onClick={goToNextStep}
-                    className="px-6 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700"
+                    className="px-4 sm:px-6 py-2 text-xs sm:text-sm bg-blue-600 text-white rounded-full hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700"
                   >
                     Next
                   </button>
