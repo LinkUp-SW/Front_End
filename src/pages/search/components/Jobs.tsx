@@ -3,7 +3,12 @@ import { getSearchJobs, SearchJobs, saveJob, removeFromSaved } from "@/endpoints
 import { toast } from "sonner";
 import Cookies from "js-cookie";
 
-const Jobs: React.FC<{ query: string }> = ({ query }) => {
+interface JobsProps {
+  query: string;
+  setJobsFound: React.Dispatch<React.SetStateAction<boolean | null>>;
+}
+
+const Jobs: React.FC<JobsProps> = ({ query, setJobsFound }) => {
   const [jobs, setJobs] = useState<SearchJobs[]>([]);
   const [loading, setLoading] = useState(false);
   const [savingId, setSavingId] = useState<string | null>(null);
@@ -13,6 +18,7 @@ const Jobs: React.FC<{ query: string }> = ({ query }) => {
     const fetchJobs = async () => {
       if (!token || !query) {
         setJobs([]);
+        setJobsFound(false);
         return;
       }
 
@@ -20,31 +26,33 @@ const Jobs: React.FC<{ query: string }> = ({ query }) => {
       try {
         const response = await getSearchJobs(token, query, null, 3);
         setJobs(response.data);
+        setJobsFound(response.data.length > 0);
       } catch (error) {
         console.error("Failed to fetch jobs", error);
+        setJobsFound(false);
       } finally {
         setLoading(false);
       }
     };
 
     fetchJobs();
-  }, [token, query]);
+  }, [token, query, setJobsFound]);
 
   const handleToggleSaveJob = async (jobId: string, isSaved: boolean) => {
     try {
       setSavingId(jobId);
       if (isSaved) {
         await removeFromSaved(jobId);
-        setJobs((prevJobs) =>
-          prevJobs.map((job) =>
+        setJobs(prev =>
+          prev.map(job =>
             job._id === jobId ? { ...job, is_saved: false } : job
           )
         );
         toast.success("Job unsaved successfully!");
       } else {
         await saveJob(jobId);
-        setJobs((prevJobs) =>
-          prevJobs.map((job) =>
+        setJobs(prev =>
+          prev.map(job =>
             job._id === jobId ? { ...job, is_saved: true } : job
           )
         );
@@ -93,7 +101,7 @@ const Jobs: React.FC<{ query: string }> = ({ query }) => {
                   onClick={() => handleToggleSaveJob(job._id, job.is_saved)}
                   disabled={savingId === job._id}
                   className={`px-4 py-2 border rounded-full 
-                    ${job.is_saved ? 'text-green-600 border-green-600' : 'text-blue-600 border-blue-600'} 
+                    ${job.is_saved ? "text-green-600 border-green-600" : "text-blue-600 border-blue-600"} 
                     hover:bg-blue-100 dark:hover:bg-gray-700 disabled:opacity-50`}
                 >
                   {savingId === job._id

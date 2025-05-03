@@ -46,10 +46,10 @@ import VisibilityPage from "./settings/VisibilityPage";
 import BlockingListPage from "./settings/BlockingListPage";
 import AdminPanelSidebar from "./admin/components/AdminPanel";
 import DashboardPage from "./admin/DashboardPage";
-import SettingsPage from "./admin/SettingsPage";
+
 import UsersPage from "./admin/UsersPage";
 import AnalyticsPage from "./admin/AnalyticsPage";
-import JobPostingsPage from "./admin/JobPostingsPage";
+
 import ContentModerationPage from "./admin/ContentModerationPage";import CompanyProfileView from "./company/CompanyProfile"
 
 //Export the Imported Pages
@@ -102,10 +102,10 @@ export {
   BlockingListPage,
   AdminPanelSidebar,
   DashboardPage,
-  SettingsPage,
+ 
   UsersPage,
   AnalyticsPage,
-  JobPostingsPage,
+
   ContentModerationPage
 
 };
