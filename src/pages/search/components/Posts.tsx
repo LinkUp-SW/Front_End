@@ -1,13 +1,9 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { WithNavBar } from "@/components";
+import { useState, useEffect } from "react";
 import PostList from "@/pages/feed/components/PostList";
-import PostSkeleton from "@/pages/feed/components/PostSkeleton";
 import { useFeedPosts } from "@/hooks/useFeedPosts";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 const Posts = ({ query }: { query: string }) => {
-  const navigate = useNavigate();
   const screenWidth = useSelector((state: RootState) => state.screen.width);
   const [viewMore, setViewMore] = useState(screenWidth >= 768);
 
