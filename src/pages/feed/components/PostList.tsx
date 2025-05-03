@@ -33,7 +33,7 @@ const PostList: React.FC<PostListProps> = ({
   if (posts.length === 0) {
     return (
       <p className="text-center text-2xl bg-white dark:bg-gray-900 p-4 rounded-lg">
-        No posts to display. Start connecting to people!
+        No posts to display.
       </p>
     );
   }
