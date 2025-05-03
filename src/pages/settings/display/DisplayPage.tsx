@@ -1,13 +1,11 @@
-import { Switch } from "@/components";
 import SettingsLayoutPage from "@/components/hoc/SettingsLayoutPage";
 import { RootState } from "@/store";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { FaSun, FaMoon } from "react-icons/fa";
-import { toggleTheme } from "@/slices/theme/themeSlice";
+import ThemeToggle from "@/components/theme_toggle/ThemeToggle";
 
 const DisplayPage = () => {
   const theme = useSelector((state: RootState) => state.theme.theme);
-  const dispatch = useDispatch();
 
   return (
     <SettingsLayoutPage>
@@ -53,15 +51,7 @@ const DisplayPage = () => {
               </span>
             </div>
 
-            <Switch
-              id="theme-toggler"
-              name="themeToggler"
-              checked={theme === "dark"}
-              onCheckedChange={() => dispatch(toggleTheme())}
-              className={`
-                dark:data-[state=checked]:bg-blue-400 cursor-pointer data-[state=checked]:bg-blue-600
-              `}
-            />
+            <ThemeToggle />
           </div>
         </div>
       </div>
