@@ -667,7 +667,7 @@ const Post: React.FC<PostProps> = ({
   ];
 
   return (
-    <Card className="p-2 bg-white border-0 mb-4 pl-0 dark:bg-gray-900 dark:text-neutral-200">
+    <Card className="p-2 bg-white border-0 mb-4 pl-0 max-w-[50rem] dark:bg-gray-900 dark:text-neutral-200">
       <CardContent className="flex flex-col items-start pl-0 w-full">
         {action && (
           <header className="flex pl-4 justify-start items-center w-full border-b gap-2 pb-2 dark:border-neutral-700">
