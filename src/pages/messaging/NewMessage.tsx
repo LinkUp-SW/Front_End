@@ -42,10 +42,8 @@ const NewMessage = () => {
           
             setIsLoading(true);
             try {
-              // Make sure user2Id is valid
               if (!user2Id) {
                 console.error("Missing user2Id");
-                // Consider showing a user-friendly error message here
                 return;
               }
               
@@ -61,8 +59,7 @@ const NewMessage = () => {
               goToMessaging();
             } catch (error) {
               console.error("Failed to start conversation:", error);
-              // Consider showing a user-friendly error message here
-              // For example: setErrorMessage("Could not send message. Please try again later.");
+
             } finally {
               setIsLoading(false);
             }
