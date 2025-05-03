@@ -332,8 +332,8 @@ const CreatePost: React.FC<CreatePostProps> = ({ className }) => {
           // Add the new post to the Redux store at the beginning of the list
           dispatch(unshiftPosts([postWithComments]));
         }
-      } else if (editMode && postToEdit?._id && !(companyInfo === null)) {
-        console.log("Calling normal edit", companyInfo);
+      } else if (editMode && postToEdit?._id && companyInfo === null) {
+        console.log("Calling normal edit", companyInfo === null);
         // Handle edit
         const response = await editPost(postObject, user_token);
         console.log("RESPONSE:", response);

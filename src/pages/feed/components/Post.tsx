@@ -75,12 +75,16 @@ import CommentSkeleton from "./CommentSkeleton";
 import { RootState } from "@/store";
 import { FaCommentSlash } from "react-icons/fa";
 import CommentWithReplies from "./CommentWithReplies";
-import { openEditPostDialog } from "@/slices/feed/createPostSlice";
+import {
+  openEditCompanyPostDialog,
+  openEditPostDialog,
+} from "@/slices/feed/createPostSlice";
 import { EditIcon } from "lucide-react";
 import { BiRepost as RepostIcon } from "react-icons/bi";
 import PostLargePreview from "./PostLargePreview";
-import { getCompanyAdmins } from "@/endpoints/company";
+import { getCompanyAdmins, getCompanyAdminView } from "@/endpoints/company";
 import { AxiosError } from "axios";
+import { BasicCompanyData } from "@/pages/company/ManageCompanyPage";
 
 interface PostProps {
   postData: PostType;
@@ -108,6 +112,7 @@ const Post: React.FC<PostProps> = ({
   const [reactionsOpen, setReactionsOpen] = useState(false);
   const [repostMenuOpen, setRepostMenuOpen] = useState(false);
   const [willDelete, setWillDelete] = useState(false);
+  const [companyData, setCompanyData] = useState<BasicCompanyData | null>();
   const instant = originalPost?.post_type === "Repost instant";
   console.log(instant);
 
@@ -146,6 +151,34 @@ const Post: React.FC<PostProps> = ({
 
   const targetPost = isInstantRepost && originalPost ? originalPost : postData;
 
+  const fetchCompanyData = async () => {
+    if (!postData.author.username) return;
+
+    try {
+      const response = await getCompanyAdminView(postData.author.username);
+      console.log("API Response:", response);
+
+      if (response && response.company) {
+        const company = response.company;
+        setCompanyData({
+          _id: company._id,
+          name: company.name,
+          logo: company.logo || "",
+          website: company.website || "",
+          industry: company.industry || "",
+          size: company.size || "",
+          type: company.type || "",
+          phone: company.phone || "",
+          founded: company.founded || "",
+          overview: company.overview || "",
+          followerCount: company.followerCount || 0,
+        });
+      }
+    } catch (err) {
+      console.error("Failed to fetch company data:", err);
+    }
+  };
+
   const fetchAdmins = async () => {
     try {
       const response = await getCompanyAdmins(author.username);
@@ -161,11 +194,11 @@ const Post: React.FC<PostProps> = ({
       }
     }
   };
-
   useEffect(() => {
     if (postData.is_company === true) {
       console.log("fetching admins");
       fetchAdmins();
+      fetchCompanyData();
     }
   }, [postData.is_company]);
 
@@ -511,7 +544,18 @@ const Post: React.FC<PostProps> = ({
     };
 
     // Use the createPostSlice action instead of modal
-    dispatch(openEditPostDialog(postForEdit));
+    if (isCompanyAdmin) {
+      // Use the new company edit action
+      dispatch(
+        openEditCompanyPostDialog({
+          post: postForEdit,
+          company: companyData,
+        })
+      );
+    } else {
+      // Use regular edit action
+      dispatch(openEditPostDialog(postForEdit));
+    }
 
     // Remove this line since we're using Redux now
     // postModal.openEdit(postForEdit);
