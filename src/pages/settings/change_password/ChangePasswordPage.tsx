@@ -83,17 +83,11 @@ const ChangePasswordPage: React.FC = () => {
           currentPassword,
           newPassword
         );
-
-        if (response.success) {
-          setStatusMessage("Password changed successfully");
-          toast.success(response.message);
-          setTimeout(() => {
-            handleBack();
-          }, 1500);
-        } else {
-          toast.error(response.message || "Failed to change password");
-          setStatusMessage(response.message || "Failed to change password");
-        }
+        setStatusMessage("Password changed successfully");
+        toast.success(response.message);
+        setTimeout(() => {
+          handleBack();
+        }, 1500);
       } catch (error) {
         setStatusMessage("An error occurred. Please try again later.");
         toast.error(getErrorMessage(error));
@@ -132,7 +126,9 @@ const ChangePasswordPage: React.FC = () => {
               className="flex items-center bg-transparent border-0 text-[var(--badge-color)] px-3 py-2 rounded-2xl bg-[rgba(10,102,194,0.08)] dark:bg-[rgba(10,102,194,0.15)] cursor-pointer text-sm"
             >
               <FaInfoCircle className="mr-2 text-base" />
-              <span className="dark:text-white">What makes a strong password?</span>
+              <span className="dark:text-white">
+                What makes a strong password?
+              </span>
             </button>
 
             {showPasswordInfo && (
