@@ -37,7 +37,7 @@ const TruncatedText: React.FC<TruncatedTextProps> = ({
     return (
       text
         // Preserve URLs by replacing them with placeholder text of the same length
-        .replace(/https?:\/\/[^\s]+/g, (url) => {
+        ?.replace(/https?:\/\/[^\s]+/g, (url) => {
           // Replace the URL with a placeholder of the same length
           return "U".repeat(url.length);
         })
@@ -143,7 +143,7 @@ const TruncatedText: React.FC<TruncatedTextProps> = ({
     const urls: { placeholder: string; url: string }[] = [];
     let urlCounter = 0;
 
-    const textWithUrlPlaceholders = text.replace(urlRegex, (url) => {
+    const textWithUrlPlaceholders = text?.replace(urlRegex, (url) => {
       const placeholder = `__URL_${urlCounter}__`;
       urls.push({ placeholder, url });
       urlCounter++;
@@ -182,7 +182,7 @@ const TruncatedText: React.FC<TruncatedTextProps> = ({
     }
 
     // Add any remaining text
-    if (lastIndex < textWithUrlPlaceholders.length) {
+    if (lastIndex < textWithUrlPlaceholders?.length) {
       segments.push({
         type: "text",
         content: textWithUrlPlaceholders.substring(lastIndex),
@@ -263,16 +263,30 @@ const TruncatedText: React.FC<TruncatedTextProps> = ({
           );
         }
       } else if (segment.type === "url") {
-        return (
-          <div
-            key={`url-${index}`}
-            rel="noopener noreferrer"
-            className="text-blue-600 dark:text-blue-400 hover:underline break-words"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {segment.content}
-          </div>
-        );
+        if (hideLinks) {
+          return (
+            <div
+              key={`url-${index}`}
+              rel="noopener noreferrer"
+              className="text-blue-600 dark:text-blue-400 hover:underline break-words"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {segment.content}
+            </div>
+          );
+        } else if (segment.url)
+          return (
+            <Link to={segment.url}>
+              <div
+                key={`url-${index}`}
+                rel="noopener noreferrer"
+                className="text-blue-600 dark:text-blue-400 hover:underline break-words"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {segment.content}
+              </div>
+            </Link>
+          );
       } else {
         // Apply formatting to text segments
         const formattedElements = applyFormatting(
