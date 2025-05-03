@@ -422,6 +422,7 @@ const CreatePost: React.FC<CreatePostProps> = ({ className }) => {
           dispatch(unshiftPosts([postWithComments]));
         }
         dispatch(closeCreatePostDialog());
+        clearFields();
       }
     } catch {
       toast.error("Error creating post. Please try again.");
