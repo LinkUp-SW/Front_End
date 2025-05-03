@@ -75,20 +75,29 @@ export const updateEmail = async (
   return response.data;
 };
 
-export const sendEmailVerificationOTP = async (email: string) => {
-  const response = await axiosInstance.post("/api/v1/user/send-otp", { email });
+export const sendEmailVerificationOTP = async (email: string, token:string) => {
+  const response = await axiosInstance.post("/api/v1/user/send-otp", { email },{
+    headers:{
+      Authorization:`Bearer ${token}`
+    }
+  });
   return response.data;
 };
 
 export const verifyEmailOTP = async (
   otp: string,
   email: string,
-  update: boolean
+  update: boolean,
+  token:string
 ) => {
   const response = await axiosInstance.post("/api/v1/user/verify-otp", {
     otp,
     email,
     update,
+  },{
+    headers:{
+      Authorization:`Bearer ${token}`
+    }
   });
 
   return response.data;

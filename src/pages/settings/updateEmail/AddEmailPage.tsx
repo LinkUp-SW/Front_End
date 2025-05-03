@@ -28,9 +28,9 @@ const AddEmailPage: React.FC = () => {
         return;
       }
 
-      await updateEmail(token, newEmail, password);
-      toast.success('Email updated successfully');
-      navigate('/settings/security/email/verify');
+      await updateEmail(token, newEmail.toLocaleLowerCase(), password);
+      toast.success('OTP sent to your new account');
+      navigate(`/settings/security/email/verify?new=${newEmail}`);
     } catch (error) {
       toast.error(getErrorMessage(error));
     } finally {

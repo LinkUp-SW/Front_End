@@ -1,57 +1,74 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import SettingsLayoutPage from '@/components/hoc/SettingsLayoutPage';
-import { sendEmailVerificationOTP, verifyEmailOTP, getCurrentEmail } from '@/endpoints/settingsEndpoints';
-import { toast } from 'sonner';
-import Cookies from 'js-cookie';
-import { getErrorMessage } from '@/utils/errorHandler';
+import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import SettingsLayoutPage from "@/components/hoc/SettingsLayoutPage";
+import {
+  sendEmailVerificationOTP,
+  verifyEmailOTP,
+} from "@/endpoints/settingsEndpoints";
+import { toast } from "sonner";
+import { getErrorMessage } from "@/utils/errorHandler";
+import { useSearchParams } from "react-router-dom";
+import Cookies from "js-cookie";
 
 const OTP: React.FC = () => {
   const navigate = useNavigate();
-  const [verificationCode, setVerificationCode] = useState('');
-  const [userEmail, setUserEmail] = useState('');
+  const [searchParams] = useSearchParams();
+  const [verificationCode, setVerificationCode] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  useEffect(() => {
-    const fetchEmail = async () => {
-      try {
-        const token = Cookies.get('linkup_auth_token');
-        if (!token) {
-          toast.error('Authentication required');
-          navigate('/login');
-          return;
-        }
+  const newEmail = searchParams.get("new"); // grabs the value of `?new=...`
+  const token = Cookies.get("linkup_auth_token");
+  const didFetchOtp = useRef(false);
 
-        const response = await getCurrentEmail(token);
-        setUserEmail(response.email);
-        await sendEmailVerificationOTP(response.email);
+  useEffect(() => {
+    // only run this effect once
+    if (didFetchOtp.current) return;
+    didFetchOtp.current = true;
+
+    // if we don’t have an email, bail out
+    if (!newEmail) {
+      navigate(-1);
+      return;
+    }
+
+    (async () => {
+      try {
+        await sendEmailVerificationOTP(newEmail.toLowerCase(), token as string);
       } catch (error) {
         toast.error(getErrorMessage(error));
-        navigate('/settings/security/email');
+        navigate("/settings/security/email");
       }
-    };
-
-    fetchEmail();
-  }, [navigate]);
+    })();
+  }, [newEmail, token, navigate]);
 
   const handleBack = () => {
-    navigate('/settings/security/email');
+    navigate("/settings/security/email");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    if (!newEmail) return;
 
     try {
-      await verifyEmailOTP(verificationCode, userEmail, true);
-      toast.success('Email verified successfully');
-      navigate('/settings/security/email/add');
+      await verifyEmailOTP(
+        verificationCode,
+        newEmail.toLocaleLowerCase(),
+        true,
+        token as string
+      );
+      toast.success("Email verified successfully");
+      navigate("/settings/security/email");
     } catch (error) {
       toast.error(getErrorMessage(error));
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  if (!newEmail) {
+    navigate(-1);
+    return null;
+  }
 
   return (
     <SettingsLayoutPage>
@@ -71,10 +88,13 @@ const OTP: React.FC = () => {
 
         <div className="pt-5">
           <p className="text-sm mb-4">
-            Enter the verification code sent to {userEmail}
+            Enter the verification code sent to {newEmail}
           </p>
 
-          <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+          <form
+            onSubmit={handleSubmit}
+            className="flex flex-col sm:flex-row items-start sm:items-center gap-4"
+          >
             <input
               type="text"
               className="w-full max-w-sm px-4 py-3 border border-[rgba(0,0,0,0.08)] dark:border-[rgba(255,255,255,0.12)] rounded text-base bg-white dark:bg-[#111827] text-[rgba(0,0,0,0.9)] dark:text-[rgba(255,255,255,0.87)] focus:outline-none focus:ring-2 focus:ring-[#0891b2]"
@@ -88,12 +108,12 @@ const OTP: React.FC = () => {
               type="submit"
               className={`rounded-full px-6 py-2 text-sm font-medium text-white transition ${
                 verificationCode.length === 6 && !isSubmitting
-                  ? 'bg-[#0a66c2] hover:bg-[#0e7490]'
-                  : 'bg-[rgba(0,0,0,0.08)] dark:bg-[rgba(255,255,255,0.12)] cursor-not-allowed'
+                  ? "bg-[#0a66c2] hover:bg-[#0e7490]"
+                  : "bg-[rgba(0,0,0,0.08)] dark:bg-[rgba(255,255,255,0.12)] cursor-not-allowed"
               }`}
               disabled={verificationCode.length !== 6 || isSubmitting}
             >
-              {isSubmitting ? 'Verifying...' : 'Submit'}
+              {isSubmitting ? "Verifying..." : "Submit"}
             </button>
           </form>
 
