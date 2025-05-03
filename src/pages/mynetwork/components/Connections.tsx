@@ -31,6 +31,7 @@ import {
   setUser2ProfilePicturePop,
   setUser2HeadlinePop,
 } from "@/slices/messaging/messagingSlice";
+import { checkConversationExists } from "@/endpoints/messaging";
 
 const Connections: React.FC = () => {
   const navigate = useNavigate();
@@ -50,17 +51,28 @@ const Connections: React.FC = () => {
   const [error, setError] = useState<AxiosError | null>(null);
 
   /*messaging popup*/
-  const handlePopUp = (
+  const handlePopUp = async (
     user2Id: string,
     name: string,
     profilePicture: string,
     headline: string
   ) => {
-    dispatch(setUser2IdPop(user2Id));
-    dispatch(setUser2NamePop(name));
-    dispatch(setUser2ProfilePicturePop(profilePicture));
-    dispatch(setUser2HeadlinePop(headline));
-    dispatch(setShowPopup(true));
+    try {
+      const result = await checkConversationExists(token!, user2Id);
+
+      if (result.conversationExists) {
+        dispatch(setShowPopup(false));
+        navigate("/messaging");
+      } else {
+        dispatch(setUser2IdPop(user2Id));
+        dispatch(setUser2NamePop(name));
+        dispatch(setUser2ProfilePicturePop(profilePicture));
+        dispatch(setUser2HeadlinePop(headline));
+        dispatch(setShowPopup(true));
+      }
+    } catch (error) {
+      console.error("Error checking conversation:", error);
+    }
   };
 
   const handleRemoveConnection = useCallback(
