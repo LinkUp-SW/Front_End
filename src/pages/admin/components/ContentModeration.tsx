@@ -311,6 +311,7 @@ const ContentModeration = () => {
                               <div className="overflow-hidden">
                                 <PostLargePreview
                                   postData={postReportDetails?.content}
+                                  disableLink
                                 />
                               </div>
                             ) : selectedReport?.type === "Comment" ? (
@@ -318,7 +319,10 @@ const ContentModeration = () => {
                                 {commentReportDetails?.parent_post && (
                                   <div className="overflow-hidden">
                                     <PostLargePreview
-                                      postData={commentReportDetails.parent_post}
+                                      postData={
+                                        commentReportDetails.parent_post
+                                      }
+                                      disableLink
                                     />
                                   </div>
                                 )}
@@ -442,7 +446,6 @@ const ContentModeration = () => {
                             )}
 
                             <div className="flex flex-col sm:flex-row gap-3 mt-4">
-                              
                               <button
                                 className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-4 rounded-xl flex-1"
                                 onClick={() =>

@@ -338,14 +338,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
         <div className="flex w-full justify-end border-t dark:border-gray-600 pt-4 gap-2">
           <BlueButton
             onClick={async () => {
-              // Extract tagged users with IDs for your API
-              const taggedUsers = extractTaggedUsers(postText);
-              // Get just the IDs for the API
-              const taggedUserIds = taggedUsers.map((user) => user.id);
-
-
               // Format the content for display (remove the :user_id parts)
-
               if (detectedUrl && selectedMedia.length === 0) {
                 submitPost(detectedUrl);
                 setDetectedUrl(null);
