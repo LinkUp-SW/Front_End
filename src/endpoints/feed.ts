@@ -758,7 +758,7 @@ export const editCompanyPost = async (
   },
   token: string
 ) => {
-  const response = await axiosInstance.patch(
+  const response = await axiosInstance.put(
     `api/v1/company/update-post-from-company/${postParams.organization_id}/${postParams.post_id}`,
     {
       headers: {
