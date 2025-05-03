@@ -145,11 +145,6 @@ export const getEngagementButtons = (
     icon: React.createElement(RepostIcon),
     callback: () => {},
   },
-  {
-    name: "Send",
-    icon: React.createElement(SendIcon),
-    callback: () => {},
-  },
 ];
 
 export const getCommentActions: (

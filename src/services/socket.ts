@@ -55,7 +55,9 @@ export interface IncomingNotificationCount {
   count: number;
 }
 
-// Base interface for all socket events
+export interface incomingTotalCount {
+  totalUnreadCount:number;
+}
 export interface BaseSocketEvent {
   type: string;
   [key: string]: unknown;
@@ -66,6 +68,7 @@ export type SocketEventData =
   | incomingTypingIndicator 
   | incomingMessageRead 
   | incomingUnreadMessagesCount 
+  |incomingTotalCount
   | IncomingNotification
   | IncomingNotificationCount
   | BaseSocketEvent;
@@ -99,13 +102,11 @@ class SocketService {
 
         // Setup authentication
         this.socket.on('connect', () => {
-          console.log('Socket connected, authenticating...');
           this.socket!.emit("authenticate", { token });
         });
 
         // Handle authentication response
-        this.socket.on("authenticated", (data) => {
-          console.log('Socket authenticated:', data);
+        this.socket.on("authenticated", () => {
           resolve();
         });
 
@@ -138,7 +139,6 @@ class SocketService {
       this.socket.disconnect();
       this.socket = null;
       this.listeners.clear();
-      console.log('Socket disconnected');
     }
   }
 
@@ -146,25 +146,21 @@ class SocketService {
     if (!this.socket) return;
 
     // Connection events
-    this.socket.on('disconnect', (reason) => {
-      console.log('Socket disconnected from server, reason:', reason);
+    this.socket.on('disconnect', () => {
     });
 
     // Message related events
-    this.socket.on('new_message', (data) => {
-      console.log('New message received:', data);
+    this.socket.on('new_message', () => {
     });
 
-    this.socket.on('message_sent', (data) => {
-      console.log('Message sent confirmation:', data);
+    this.socket.on('message_sent', () => {
     });
 
     this.socket.on('message_error', (error) => {
       console.error('Message send error:', error);
     });
 
-    this.socket.on('message_reacted', (data) => {
-      console.log('Message reaction:', data);
+    this.socket.on('message_reacted', () => {
     });
 
     this.socket.on('reaction_error', (error) => {
@@ -172,8 +168,7 @@ class SocketService {
     });
 
     // Unread messages and conversations
-    this.socket.on('unread_messages_count', (data) => {
-      console.log('Unread messages count:', data);
+    this.socket.on('unread_messages_count', () => {
     });
 
     // this.socket.on('unread_conversations', (data) => {
@@ -181,8 +176,7 @@ class SocketService {
     // });
 
     // Read receipts
-    this.socket.on('messages_read', (data) => {
-      console.log('Messages read by:', data);
+    this.socket.on('messages_read', () => {
     });
 
     this.socket.on('read_error', (error) => {
@@ -190,38 +184,30 @@ class SocketService {
     });
 
     // Typing indicators
-    this.socket.on('user_typing', (data) => {
-      console.log('User typing:', data);
+    this.socket.on('user_typing', () => {
     });
 
-    this.socket.on('user_stop_typing', (data) => {
-      console.log('User stopped typing:', data);
+    this.socket.on('user_stop_typing', () => {
     });
 
     // Presence
-    this.socket.on('user_online', (data) => {
-      console.log('User online:', data);
+    this.socket.on('user_online', () => {
     });
 
-    this.socket.on('user_offline', (data) => {
-      console.log('User offline:', data);
+    this.socket.on('user_offline', () => {
     });
     
-    this.socket.on('conversation_unread_count', (data) => {
-      console.log('Count for each conversation:', data);
+    this.socket.on('conversation_unread_count', () => {
     });
 
     // ADDED: Notification related events
-    this.socket.on('new_notification', (data) => {
-      console.log('New notification received:', data);
+    this.socket.on('new_notification', () => {
     });
 
-    this.socket.on('unread_notifications_count', (data) => {
-      console.log('Unread notifications count:', data);
+    this.socket.on('unread_notifications_count', () => {
     });
 
-    this.socket.on('notification_error', (error) => {
-      console.error('Notification error:', error);
+    this.socket.on('notification_error', () => {
     });
   }
 

@@ -201,7 +201,6 @@ const AddExperienceModal: React.FC<AddExperienceModalProps> = ({
 
       // We rely on the server returning a 200 status to confirm success
       const response = await addWorkExperience(authToken, toBeSentFormData);
-      console.log(response.experience);
       // If we reach here, the request is successful (status 200)
       toast.success(response?.message || "Experience added successfully!");
       // Update the parent state with the newly created experience

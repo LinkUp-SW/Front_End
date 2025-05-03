@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate  } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { WithNavBar } from "../../components";
 import { FaEye } from "react-icons/fa";
 import EditPageDialog from "./components/manageCompanyPageComponents/EditPageDialog";
 import SettingsComponent from "./components/manageCompanyPageComponents/SettingsPage";
 import CompanyJobsComponent from "./components/manageCompanyPageComponents/CompanyJobs";
-import AnalyticsComponent from './components/manageCompanyPageComponents/CompanyAnalyticsComponent';
+import AnalyticsComponent from "./components/manageCompanyPageComponents/CompanyAnalyticsComponent";
 import {
   getCompanyAdminView,
   getCompanyAllView,
@@ -105,7 +105,7 @@ interface CompanyUpdateData {
 const ManageCompanyPage = () => {
   const { companyId } = useParams<{ companyId: string }>();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<NavigationTab>('jobs');
+  const [activeTab, setActiveTab] = useState<NavigationTab>("jobs");
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -147,7 +147,7 @@ const ManageCompanyPage = () => {
 
   const handleViewAsMember = () => {
     if (companyId) {
-      navigate(`/company/${companyId}`); 
+      navigate(`/company/${companyId}`);
     } else {
       toast.error("Company ID not found");
     }
@@ -168,7 +168,6 @@ const ManageCompanyPage = () => {
       try {
         setIsLoading(true);
         const response = await getCompanyAdminView(companyId);
-        console.log("API Response:", response);
 
         if (response && response.company) {
           const company = response.company;
@@ -210,9 +209,7 @@ const ManageCompanyPage = () => {
     }
 
     try {
-      console.log(`Fetching full company data for ID: ${companyId}`);
       const response = await getCompanyAllView(companyId);
-      console.log("API Response:", response);
 
       if (response && response.companyProfile) {
         // Map API Company response to our FullCompanyData type
@@ -242,7 +239,6 @@ const ManageCompanyPage = () => {
         };
 
         setFullCompanyData(fullData);
-        console.log("Company type:", fullData.type);
 
         return fullData;
       } else {
@@ -287,7 +283,6 @@ const ManageCompanyPage = () => {
       const response = await updateCompanyProfile(companyId, data);
 
       if (response && (response.success || response.message)) {
-        console.log("Company profile updated successfully");
         setEditDialogOpen(false);
         toast.success("Company information updated successfully!");
 
@@ -402,7 +397,6 @@ const ManageCompanyPage = () => {
                     alt={`${companyData.name} logo`}
                     className="w-full object-cover"
                     onError={(e) => {
-                      console.log("Image failed to load:", companyData.logo);
                       (e.target as HTMLImageElement).src =
                         "/api/placeholder/50/50";
                     }}
@@ -413,12 +407,16 @@ const ManageCompanyPage = () => {
             </div>
 
             <div className="p-4 pb-3 mt-8">
-              <h2 className="text-lg font-medium text-gray-900 dark:text-white">{companyData.name}</h2>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{companyData.followerCount} followers</p>
-             
-              <button 
+              <h2 className="text-lg font-medium text-gray-900 dark:text-white">
+                {companyData.name}
+              </h2>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+                {companyData.followerCount} followers
+              </p>
+
+              <button
                 className="mt-4 w-full border border-gray-300 dark:border-gray-600 rounded-full py-2 text-sm flex justify-center items-center text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                onClick={handleViewAsMember} 
+                onClick={handleViewAsMember}
               >
                 <FaEye className="mr-2" size={16} />
                 View as member
@@ -528,8 +526,6 @@ const ManageCompanyPage = () => {
             </div>
           ) : (
             <div className=" dark:bg-gray-800 rounded-lg shadow p-6 dark:border-gray-700">
-              
-
               {activeTab === "page-posts" && (
                 <div className="text-gray-700 dark:text-gray-300 w-full">
                   <CreatePostButton company={companyData} />

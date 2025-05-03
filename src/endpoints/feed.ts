@@ -88,14 +88,14 @@ export const fetchLinkPreview = async (
           };
         }
       } catch (proxyError) {
-        console.log("Could not fetch enhanced metadata:", proxyError);
+        console.error("Could not fetch enhanced metadata:", proxyError);
         // Continue with basic preview data
       }
     }
 
     return previewData;
   } catch (error) {
-    console.log("Error creating link preview:", error);
+    console.error("Error creating link preview:", error);
 
     // Return basic fallback for invalid URLs
     return {
@@ -130,7 +130,6 @@ export const getPostsFeed = async (
     },
     params: postPayload,
   });
-  console.log("GetPostsFeed:", response.data);
 
   // Filter out null posts and transform the rest
   const validPosts = (response.data.posts || []).filter(
@@ -147,11 +146,6 @@ export const getPostsFeed = async (
       hasInitiallyLoaded: false,
     },
   }));
-
-  console.log("Returned:", {
-    posts: transformedPosts,
-    next_cursor: response.data.next_cursor,
-  });
 
   return {
     posts: transformedPosts.map((post: PostType) => ({
@@ -179,7 +173,6 @@ export const fetchSinglePost = async (
         replyLimit: 2,
       },
     });
-    console.log("FetchSinglePost response:", response.data);
 
     // Extract comments from the response
     const commentsArray = response.data.comments?.comments;
@@ -187,20 +180,7 @@ export const fetchSinglePost = async (
     const commentsCursor = response.data.comments?.next_cursor || null;
 
     // Return post with embedded comments
-    console.log("Here:", {
-      ...response.data.post,
-      author: {
-        ...response.data.post.author,
-        connection_degree: "1st",
-      },
-      comments_data: {
-        comments: commentsArray, // Include comments from API response
-        count: comments_count,
-        next_cursor: commentsCursor,
-        isLoading: false,
-        hasInitiallyLoaded: true, // Mark as initially loaded since we have comments
-      },
-    });
+
     return {
       ...response.data.post,
       author: {
@@ -216,7 +196,7 @@ export const fetchSinglePost = async (
       },
     };
   } catch (error) {
-    console.log(error);
+    console.error(error);
     throw error;
   }
 };
@@ -230,7 +210,7 @@ export const getPostComments = async (): Promise<CommentType[]> => {
     );
     return response.data;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     throw error;
   }
 };
@@ -256,7 +236,6 @@ export const loadPostComments = async (
       replyLimit: 2, // Get a few replies for each comment
     },
   });
-  console.log("API response:", response);
 
   return {
     comments: Object.values(response.data.comments),
@@ -274,7 +253,7 @@ export const getSinglePost = async (postId: string): Promise<PostType> => {
     );
     return response.data;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     throw error;
   }
 };
@@ -290,7 +269,7 @@ export const getSingleComments = async (
     );
     return response.data;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     throw error;
   }
 };
@@ -304,7 +283,7 @@ export const getPostReactions = async (): Promise<string[]> => {
     );
     return response.data;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     throw error;
   }
 };
@@ -343,7 +322,6 @@ export const editComment = async (
   },
   token: string
 ) => {
-  console.log("Payload:", postPayload);
   const response = await axiosInstance.patch(
     `api/v2/post/comment/${postPayload.post_id}/${postPayload.comment_id}`,
     postPayload,
@@ -392,7 +370,6 @@ export const createComment = async (
       },
     }
   );
-  console.log("HERE", response);
 
   return response.data;
 };
@@ -597,7 +574,7 @@ export const repostInstant = async (
     );
     return response.data;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     throw error;
   }
 };
@@ -625,7 +602,7 @@ export const repostWithThoughts = async (
     );
     return response.data;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     throw error;
   }
 };
@@ -649,7 +626,6 @@ export const getCompanyPosts = async (
       params: postPayload,
     }
   );
-  console.log("GetCompanyPosts:", response.data);
 
   // Filter out null posts and transform the rest
   const validPosts = (response.data.posts || []).filter(
@@ -666,11 +642,6 @@ export const getCompanyPosts = async (
       hasInitiallyLoaded: false,
     },
   }));
-
-  console.log("Returned:", {
-    posts: transformedPosts,
-    next_cursor: response.data.next_cursor,
-  });
 
   return {
     posts: transformedPosts.map((post: PostType) => ({
@@ -715,7 +686,6 @@ export const getSearchPosts = async (
     },
     params: postPayload,
   });
-  console.log("getSearchPosts:", response.data);
 
   // Filter out null posts and transform the rest
   const validPosts = (response.data.posts || []).filter(
@@ -732,11 +702,6 @@ export const getSearchPosts = async (
       hasInitiallyLoaded: false,
     },
   }));
-
-  console.log("Returned:", {
-    posts: transformedPosts,
-    next_cursor: response.data.next_cursor,
-  });
 
   return {
     posts: transformedPosts.map((post: PostType) => ({

@@ -136,7 +136,6 @@ const AddResumeModal: React.FC<AddResumeModalProps> = ({ onClose }) => {
       }
       const response = await addUserResume(token, file);
 
-      console.log(response);
 
       dispatch(
         editUserBio({

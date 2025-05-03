@@ -24,7 +24,6 @@ export const createCompanyProfile = async (companyData: CompanyProfileData): Pro
   const token = getAuthToken();
   const url = '/api/v1/company/create-company-profile';
  
-  console.log('Creating company with data:', companyData);
   
   // Clean up data before sending - removing undefined values
   const cleanData = Object.fromEntries(
@@ -63,11 +62,7 @@ export const updateCompanyProfile = async (companyId: string, companyData: Parti
   const token = getAuthToken();
   const url = `/api/v1/company/update-company-profile/${companyId}`;
   
-  console.log('Updating company with data:', {
-    ...companyData,
-    logo: companyData.logo ? '[BASE64_DATA]' : undefined
-  });
-  
+
   // Clean up data before sending - removing undefined values
   const cleanData = Object.fromEntries(
     Object.entries(companyData).filter(([, value]) => value !== undefined && value !== '')
@@ -83,7 +78,6 @@ export const deactivateCompanyPage = async (companyId: string): Promise<{ succes
   const token = getAuthToken();
   const url = `/api/v1/company/delete-company-profile/${companyId}`;
   
-  console.log('Deactivating company page:', companyId);
   
   const response = await axiosInstance.delete(url, getAuthHeader(token));
   return response.data;
@@ -98,7 +92,6 @@ export const createJobFromCompany = async (organizationId: string, jobData: Part
     Object.entries(jobData).filter(([, value]) => value !== undefined && value !== '')
   );
   
-  console.log('Creating job with data:', cleanData);
   
   const response = await axiosInstance.post(url, cleanData, getAuthHeader(token));
   return response.data;

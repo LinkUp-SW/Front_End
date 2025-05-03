@@ -7,7 +7,6 @@ import {
 import { Link } from "react-router-dom";
 import { HiGlobeEuropeAfrica as GlobeIcon } from "react-icons/hi2";
 import { LiaEllipsisHSolid as EllipsisIcon } from "react-icons/lia";
-import { IoMdClose as CloseIcon } from "react-icons/io";
 import {
   Button,
   Dialog,
@@ -43,7 +42,6 @@ const PostHeader: React.FC<PostHeaderProps> = ({
   postMenuOpen,
   setPostMenuOpen,
   menuActions,
-  savedPostView = false,
   edited,
   publicPost,
   date,
@@ -155,15 +153,6 @@ const PostHeader: React.FC<PostHeaderProps> = ({
                 />
               </DialogContent>
             </Dialog>
-            {!savedPostView && (
-              <Button
-                className="rounded-full hover:bg-neutral-100 w-7 h-7 relative top-1 aspect-square dark:hover:bg-zinc-700 hover:cursor-pointer dark:hover:text-neutral-200"
-                variant="ghost"
-                size="sm"
-              >
-                <CloseIcon />
-              </Button>
-            )}
           </nav>
         </div>
         {/* {action && (

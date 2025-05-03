@@ -114,7 +114,6 @@ const Post: React.FC<PostProps> = ({
   const [willDelete, setWillDelete] = useState(false);
   const [companyData, setCompanyData] = useState<BasicCompanyData | null>();
   const instant = originalPost?.post_type === "Repost instant";
-  console.log(instant);
 
   const [topStats, setTopStats] = useState(
     getReactionIcons(
@@ -156,7 +155,6 @@ const Post: React.FC<PostProps> = ({
 
     try {
       const response = await getCompanyAdminView(postData.author.username);
-      console.log("API Response:", response);
 
       if (response && response.company) {
         const company = response.company;
@@ -185,8 +183,6 @@ const Post: React.FC<PostProps> = ({
       if (userId && response.admins.some((admin) => admin.user_id === userId)) {
         setIsCompanyAdmin(postData.is_company || false);
       }
-      console.log("Searching for user", userId);
-      console.log("Admins list:", response.admins);
     } catch (err) {
       // Only show error toast if not 403 (forbidden)
       if ((err as AxiosError).status !== 403) {
@@ -196,7 +192,6 @@ const Post: React.FC<PostProps> = ({
   };
   useEffect(() => {
     if (postData.is_company === true) {
-      console.log("fetching admins");
       fetchAdmins();
       fetchCompanyData();
     }
@@ -249,9 +244,6 @@ const Post: React.FC<PostProps> = ({
     );
   }
 
-  console.log("PostData:", postData);
-  console.log("Original Post:", originalPost);
-
   // Comment handling functions
   const handleToggleComments = async () => {
     if (!token) {
@@ -296,14 +288,11 @@ const Post: React.FC<PostProps> = ({
       );
 
       // Fetch comments
-      console.log(originalPost && instant);
       const response = await loadPostComments(
         targetPost._id,
         token,
         comments_data.nextCursor || 0
       );
-
-      console.log("Comments response:", response);
 
       // Process response properly based on structure
       const newComments = Array.isArray(response.comments)
@@ -338,7 +327,6 @@ const Post: React.FC<PostProps> = ({
           },
         })
       );
-      console.log("End  post:", postData);
     } catch (error) {
       console.error("Failed to load comments:", error);
       toast.error("Failed to load comments");
@@ -372,7 +360,6 @@ const Post: React.FC<PostProps> = ({
     try {
       // Call the API to create the comment
       const createdComment = await createComment(newComment, token);
-      console.log("Created Comment:", createdComment);
 
       if (!newComment.parent_id) {
         // Add top-level comment
@@ -842,7 +829,7 @@ const Post: React.FC<PostProps> = ({
                   />
                 );
               } catch (error) {
-                console.log(error);
+                console.error(error);
                 // Assuming you have a DocumentPreview component
                 return (
                   <DocumentPreview
@@ -933,11 +920,13 @@ const Post: React.FC<PostProps> = ({
                 {stats.comments} comments
               </p>
             )}
-            {stats.reposts !== 0 && stats.comments && stats.comments !== 0 && (
+            {stats.reposts !== 0 && stats.comments && stats.comments !== 0 ? (
               <p className="text-xs text-gray-500 dark:text-neutral-400 font-bold">
                 {" "}
                 ·
               </p>
+            ) : (
+              <></>
             )}
             {stats.reposts !== 0 && (
               <>

@@ -1,5 +1,4 @@
 import { Experience } from "@/types";
-import { ResourcesSection, ViewedSection } from "../components";
 import ExperienceSkeletonLoader from "../components/experiences/ExperienceSkeletonLoader";
 import Cookies from "js-cookie";
 import { useParams } from "react-router-dom";
@@ -19,6 +18,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  LinkUpFooter,
+  WhosHiringImage,
   WithNavBar,
 } from "@/components";
 import Header from "../components/modals/components/Header";
@@ -179,8 +180,8 @@ const UserExperiencesPage = () => {
 
         {/* Right Sidebar */}
         <div className="lg:col-span-1 space-y-4">
-          <ViewedSection />
-          <ResourcesSection />
+        <WhosHiringImage />
+        <LinkUpFooter />
         </div>
       </div>
 

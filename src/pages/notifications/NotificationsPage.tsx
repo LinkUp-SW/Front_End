@@ -129,12 +129,8 @@ const NotificationsPage: React.FC = () => {
     }
 
     try {
-      console.log("Fetching notifications from API...");
       const response = await getNotifications(token);
-      
-      console.log(`Received ${response.notifications.length} notifications from server`);
-      console.log(`Unread count from server: ${response.unReadCount}`);
-      
+
       setNotifications(response.notifications);
       setUnreadCount(response.unReadCount);
       setError(null);
@@ -151,9 +147,7 @@ const NotificationsPage: React.FC = () => {
   const updateUnreadCount = async () => {
     if (!token) return;
     try {
-      console.log("Updating unread count from API...");
       const count = await getUnreadNotificationsCount(token);
-      console.log(`Updated unread count from API: ${count}`);
       setUnreadCount(count);
     } catch (error) {
       console.error("Error updating unread count:", error);
@@ -162,7 +156,6 @@ const NotificationsPage: React.FC = () => {
 
   // Handle new notifications from socket
   const handleNewNotification = useCallback((data: IncomingNotification) => {
-    console.log("Socket received new notification:", data);
     
     // Validate the notification type
     const notificationType = validateNotificationType(data.type);
@@ -183,44 +176,35 @@ const NotificationsPage: React.FC = () => {
       }
     };
     
-    console.log("Processed new notification:", newNotification);
     
     // Add it to the notifications list (at the beginning since it's newest)
     setNotifications(prev => {
       // Check if this notification already exists in the list
       const exists = prev.some(n => n.id === newNotification.id);
       if (exists) {
-        console.log("Notification already exists, not adding duplicate");
         return prev;
       }
       
-      console.log("Adding new notification to state");
       return [newNotification, ...prev];
     });
     
     // Increment unread count
     setUnreadCount(prevCount => {
       const newCount = prevCount + 1;
-      console.log(`Updated unread count: ${newCount}`);
       return newCount;
     });
   }, []);
 
   // Handle unread notification count updates from socket
   const handleUnreadNotificationsCount = useCallback((data: IncomingNotificationCount) => {
-    console.log("Socket received unread notifications count:", data);
     setUnreadCount(data.count);
   }, []);
 
   // Connect to socket and register event listeners
-  useEffect(() => {
-    console.log("Socket connection status:", socketConnected ? "Connected" : "Disconnected");
-    
+  useEffect(() => {    
     if (token) {
       // If socket is connected, register listeners
-      if (socketConnected) {
-        console.log("Setting up socket notification listeners");
-        
+      if (socketConnected) {        
         // Register socket event listeners
         const removeNewNotificationListener = socketService.on<IncomingNotification>(
           'new_notification', 
@@ -234,14 +218,12 @@ const NotificationsPage: React.FC = () => {
         
         // Cleanup listeners when component unmounts
         return () => {
-          console.log("Cleaning up socket notification listeners");
           removeNewNotificationListener();
           removeUnreadCountListener();
         };
       } else {
         // If socket is not connected but we have a token, we might want to
         // attempt reconnection or inform the user
-        console.log("Socket not connected. Using API fallback for notifications.");
       }
     }
   }, [token, socketConnected, handleNewNotification, handleUnreadNotificationsCount]);
@@ -249,7 +231,6 @@ const NotificationsPage: React.FC = () => {
   // Fetch notifications when component mounts
   useEffect(() => {
     if (!notificationsLoaded.current) {
-      console.log("Initial fetch of notifications");
       fetchNotifications();
     }
   }, []);
@@ -284,7 +265,6 @@ const NotificationsPage: React.FC = () => {
   }, []);
 
   const handleTabChange = (tab: Tab): void => {
-    console.log(`Changing to tab: ${tab}`);
     setActiveTab(tab);
     if (tab !== "posts") {
       setShowPostDropdown(false);
@@ -292,7 +272,6 @@ const NotificationsPage: React.FC = () => {
   };
 
   const handlePostFilterSelection = (filter: PostFilter): void => {
-    console.log(`Setting post filter: ${filter}`);
     setActivePostFilter(filter);
     setShowPostDropdown(false);
   };
@@ -316,13 +295,11 @@ const NotificationsPage: React.FC = () => {
   const handleNotificationClick = async (notification: Notification) => {
     // Don't mark as read if already read or no ID
     if (!notification.id || notification.isRead) {
-      console.log("Notification already read or has no ID, skipping mark as read");
       // Still navigate even if already read
       handleNavigation(notification.type, notification.referenceId);
       return;
     }
 
-    console.log(`Marking notification as read: ${notification.id}`);
     
     // Optimistically update the UI
     setClickedNotifications((prev) => {
@@ -334,10 +311,8 @@ const NotificationsPage: React.FC = () => {
     try {
       // Use socket if connected, fallback to API call
       if (socketConnected) {
-        console.log(`Using socket to mark notification as read: ${notification.id}`);
         socketService.markNotificationAsRead(notification.id);
       } else {
-        console.log(`Using API to mark notification as read: ${notification.id}`);
         await markNotificationAsRead(token as string, notification.id);
       }
 
@@ -351,7 +326,6 @@ const NotificationsPage: React.FC = () => {
       // Decrement the unread count
       setUnreadCount((prevCount) => {
         const newCount = Math.max(0, prevCount - 1);
-        console.log(`Updated unread count after marking as read: ${newCount}`);
         return newCount;
       });
 
@@ -382,16 +356,13 @@ const NotificationsPage: React.FC = () => {
     e.stopPropagation();
     if (!notification.id || notification.isRead) return;
 
-    console.log(`Marking notification as read from options menu: ${notification.id}`);
     setActiveOptionsDropdown(null);
 
     try {
       // Use socket if connected, fallback to API call
       if (socketConnected) {
-        console.log(`Using socket to mark notification as read: ${notification.id}`);
         socketService.markNotificationAsRead(notification.id);
       } else {
-        console.log(`Using API to mark notification as read: ${notification.id}`);
         await markNotificationAsRead(token as string, notification.id);
       }
 
@@ -405,7 +376,6 @@ const NotificationsPage: React.FC = () => {
       // Decrement the unread count
       setUnreadCount((prevCount) => {
         const newCount = Math.max(0, prevCount - 1);
-        console.log(`Updated unread count after marking as read: ${newCount}`);
         return newCount;
       });
 
@@ -421,13 +391,11 @@ const NotificationsPage: React.FC = () => {
   // Mark all notifications as read
   const handleMarkAllAsRead = () => {
     if (!notifications.length || !token) {
-      console.log("No notifications to mark as read or no token");
       return;
     }
     
     try {
       if (socketConnected) {
-        console.log("Using socket to mark all notifications as read");
         socketService.markAllNotificationsAsRead();
         
         // Optimistically update UI
@@ -435,7 +403,6 @@ const NotificationsPage: React.FC = () => {
           prevNotifications.map(item => ({ ...item, isRead: true }))
         );
         setUnreadCount(0);
-        console.log("All notifications marked as read");
       } else {
         console.warn("Socket not connected, can't mark all as read");
         // Could implement an API fallback here
@@ -508,31 +475,24 @@ const NotificationsPage: React.FC = () => {
   };
 
   const handleNavigation = (type: Notification["type"], refId: string) => {
-    console.log(`Navigating based on notification type: ${type}, refId: ${refId}`);
     
     if (type === "connection_request") {
-      console.log("Navigating to /my-network");
       return navigate(`/my-network`);
     }
     if (type === "follow") {
-      console.log("Navigating to /following-followers");
       return navigate("/following-followers");
     }
     if (type === "message") {
-      console.log("Navigating to /messaging");
       return navigate("/messaging");
     }
     if (type === 'comment' || type === 'reacted') {
-      console.log(`Navigating to post: /feed/posts/${refId}`);
       return navigate(`/feed/posts/${refId}`)
     }
     if (type === 'connection_accepted') {
-      console.log("Navigating to connections");
       return navigate(`/connections/${userId}`)
     }
   };
 
-  console.log(`Rendering NotificationsPage with ${filteredNotifications.length} notifications, tab: ${activeTab}`);
 
   return (
     <div className={`${styles.container} ${isDarkMode ? styles.darkMode : ""}`}>

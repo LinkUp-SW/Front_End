@@ -12,6 +12,8 @@ import { getUserPosts } from "@/endpoints/userProfile";
 import { setPosts } from "@/slices/feed/postsSlice";
 import { RootState } from "@/store";
 import { toast } from "sonner";
+import { PostType } from "@/types";
+import { AxiosError } from "axios";
 
 export function useFeedPosts(
   single: boolean = false,
@@ -45,9 +47,11 @@ export function useFeedPosts(
 
     try {
       const payload = { cursor: nextCursor, limit: 5 };
-
+      let response: { posts: PostType[]; next_cursor: number | null } = {
+        posts: [],
+        next_cursor: 0,
+      };
       let fetchedPosts = [];
-      console.log("COMPANY", company);
       if (search) {
         // Add search posts case
         const response = await getSearchPosts(user_token, {
@@ -58,17 +62,16 @@ export function useFeedPosts(
         fetchedPosts = response?.posts || [];
       } else if (company) {
         // Add company posts case
-        const response = await getCompanyPosts(user_token, company);
+        response = await getCompanyPosts(user_token, company);
         fetchedPosts = response?.posts || [];
-        console.log("Company Fetched POsts", fetchedPosts);
       } else if (profile && id) {
-        const response = await getUserPosts(user_token, id, payload);
+        response = await getUserPosts(user_token, id, payload);
         fetchedPosts = response?.posts || [];
       } else if (single && id) {
         const post = await fetchSinglePost(id, user_token);
         fetchedPosts = post ? [post] : [];
       } else {
-        const response = await getPostsFeed(user_token, payload);
+        response = await getPostsFeed(user_token, payload);
         fetchedPosts = response?.posts || [];
       }
 
@@ -80,11 +83,15 @@ export function useFeedPosts(
         dispatch(setPosts([...posts, ...fetchedPosts]));
       }
 
-      setNextCursor((prev) => prev + fetchedPosts.length);
+      setNextCursor(response.next_cursor || 0);
       setHasMore(fetchedPosts.length === 5);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Error loading posts:", error);
-      toast.error("Failed to load posts");
+      if ((error as AxiosError)?.response?.status === 403) {
+        toast.error("You do not have permission to view this post");
+      } else {
+        toast.error("Failed to load posts");
+      }
     } finally {
       setIsLoading(false);
       setInitialLoading(false);

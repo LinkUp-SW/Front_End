@@ -277,27 +277,28 @@ const ReactionsModal: React.FC<ReactionsModalProps> = ({
           groupedReactions[activeTab].map((reaction) => (
             <Link
               key={reaction._id}
-              to={`/user-profile/${reaction.author.username}`}
+              to={`/user-profile/${reaction?.author?.username}`}
             >
               <div className="flex cursor-pointer items-center w-full justify-between gap-4 p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
                 <div className="flex">
                   <img
-                    src={reaction.author.profile_picture}
-                    alt={reaction.author.username}
+                    src={reaction?.author?.profile_picture}
+                    alt={reaction?.author?.username}
                     className="w-10 h-10 rounded-full mr-2"
                   />
                   <div>
                     <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                      {reaction.author.first_name} {reaction.author.last_name}
+                      {reaction?.author?.first_name}{" "}
+                      {reaction?.author?.last_name}
                     </p>
                     <p className="text-xs text-gray-500 dark:text-gray-400">
-                      {reaction.author.headline}
+                      {reaction?.author?.headline}
                     </p>
                   </div>
                 </div>
 
                 <img
-                  src={emojiMap[reaction.reaction]}
+                  src={emojiMap[reaction?.reaction]}
                   className="w-8 h-8"
                 ></img>
               </div>

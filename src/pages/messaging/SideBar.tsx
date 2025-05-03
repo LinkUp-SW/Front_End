@@ -6,9 +6,13 @@ import {
   selectUserStatus,
   selectUserId,
   setResponsiveIsSidebar,
-  setDataInfo
+  setDataInfo,
+  setTotalCount,
 } from "../../slices/messaging/messagingSlice";
-import { incomingUnreadMessagesCount,SocketEventData} from "@/services/socket";
+import {
+  incomingUnreadMessagesCount,
+  SocketEventData,
+} from "@/services/socket";
 import { toggleStarred } from "../../slices/messaging/messagingSlice";
 import * as Popover from "@radix-ui/react-popover";
 import { FaStar } from "react-icons/fa";
@@ -33,7 +37,9 @@ import {
   deleteConversation,
   markConversationAsRead,
   markConversationAsUnread,
+  blockUser,
 } from "@/endpoints/messaging";
+
 import Cookies from "js-cookie";
 import { Conversation } from "@/endpoints/messaging";
 import { toast } from "sonner";
@@ -61,12 +67,17 @@ const SideBar = () => {
 
   // const [dataInfo, setDataInfo] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [isOpen, setIsOpen] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [isBlockOpen, setIsBlockOpen] = useState(false);
 
-  const openModal = () => setIsOpen(true);
-  const closeModal = () => setIsOpen(false);
+  const openDeleteModal = () => setIsDeleteOpen(true);
+  const closeDeleteModal = () => setIsDeleteOpen(false);
+  const openBlockModal = () => setIsBlockOpen(true);
+  const closeBlockModal = () => setIsBlockOpen(false);
 
-  const dataInfo = useSelector((state: RootState) => state.messaging.setDataInfo);
+  const dataInfo = useSelector(
+    (state: RootState) => state.messaging.setDataInfo
+  );
 
   useEffect(() => {
     const fetchConversations = async () => {
@@ -75,8 +86,7 @@ const SideBar = () => {
 
         const data: { conversations: Conversation[] } =
           await getAllConversations(token);
-          dispatch(setDataInfo(data.conversations));
-        toast.success("Conversations loaded successfully");
+        dispatch(setDataInfo(data.conversations));
       } catch (error) {
         console.error("Failed to fetch conversations:", error);
         toast.error("Failed to load Conversations");
@@ -87,8 +97,6 @@ const SideBar = () => {
 
     fetchConversations();
   }, []);
-
-
 
   useEffect(() => {
     dataInfo.forEach((conversation) => {
@@ -103,7 +111,7 @@ const SideBar = () => {
     const handleUserOnline = (incoming: SocketEventData) => {
       // Type assertion to cast the incoming data to { userId: string }
       const { userId } = incoming as { userId: string };
-  
+
       if (userId !== id) {
         const updatedData = dataInfo.map((conversation) =>
           conversation.otherUser.userId === userId
@@ -119,11 +127,11 @@ const SideBar = () => {
         dispatch(setDataInfo(updatedData));
       }
     };
-  
+
     const handleUserOffline = (incoming: SocketEventData) => {
       // Type assertion to cast the incoming data to { userId: string }
       const { userId } = incoming as { userId: string };
-  
+
       if (userId !== id) {
         const updatedData = dataInfo.map((conversation) =>
           conversation.otherUser.userId === userId
@@ -139,44 +147,75 @@ const SideBar = () => {
         dispatch(setDataInfo(updatedData));
       }
     };
-  
+
     socketService.on("user_online", handleUserOnline);
     socketService.on("user_offline", handleUserOffline);
-  
+
     return () => {
       socketService.off("user_online", handleUserOnline);
       socketService.off("user_offline", handleUserOffline);
     };
   }, [id, dataInfo]);
-  
-  
+
+  // useEffect(() => {
+  //   const handleTotalUnreadCount = (incoming: incomingTotalCount) => {
+  //     console.log("unread_messages_count received:", incoming);
+
+  //     // Check if the data has the expected structure
+  //     if (incoming && typeof incoming.totalUnreadCount === 'number') {
+  //       dispatch(setTotalCount(incoming.totalUnreadCount));
+  //     } else {
+  //       console.error("Invalid data structure received for unread_messages_count:", incoming);
+  //     }
+  //   };
+
+  //   // Debug: Log when effect runs
+  //   console.log("Setting up unread_messages_count listener");
+
+  //   // Make sure we're using the correct event name
+  //   socketService.on("unread_messages_count", handleTotalUnreadCount);
+
+  //   return () => {
+  //     console.log("Cleaning up unread_messages_count listener");
+  //     socketService.off("unread_messages_count", handleTotalUnreadCount);
+  //   };
+  // }, [dispatch]); // Keep only dispatch as dependency
 
   useEffect(() => {
+    const handleUnreadCount = (incoming: incomingUnreadMessagesCount) => {
+      const updatedData = dataInfo.map((message) =>
+        message.conversationId === incoming.conversationId
+          ? {
+              ...message,
+              unreadCount: incoming.count,
+              conversationType:
+                incoming.count > 0
+                  ? message.conversationType.includes("Unread")
+                    ? message.conversationType
+                    : [...message.conversationType, "Unread"]
+                  : message.conversationType.filter(
+                      (type) => type !== "Unread"
+                    ),
+            }
+          : message
+      );
+      const totalUnreadMessages = updatedData.reduce(
+        (sum, msg) => sum + msg.unreadCount,
+        0
+      );
+      dispatch(setTotalCount(totalUnreadMessages));
+      dispatch(setDataInfo(updatedData));
+    };
+
     const unsubscribe = socketService.on<incomingUnreadMessagesCount>(
       "conversation_unread_count",
-      (incoming) => {
-        console.log("haneeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeet")
-          const updatedData = dataInfo.map((message) =>
-            message.conversationId === incoming.conversationId
-              ? {
-                  ...message,
-                  unreadCount: incoming.count,
-                  conversationType: incoming.count > 0 
-                    ? message.conversationType.includes("Unread") 
-                      ? message.conversationType 
-                      : [...message.conversationType, "Unread"]
-                    : message.conversationType
-                }
-              : message
-          );
-          dispatch(setDataInfo(updatedData));
-      }
+      handleUnreadCount
     );
-  
+
     return () => {
       unsubscribe();
     };
-  }, []);
+  }, [dataInfo, dispatch]);
 
   const filterButtonData = {
     Focused: dataInfo,
@@ -207,7 +246,6 @@ const SideBar = () => {
       info.lastMessage.message.toLowerCase().includes(search.toLowerCase())
   );
 
-  // In SideBar.tsx, update the handleSelectConversation function
   const handleSelectConversation = async (
     conversationID: string,
     dataType: string[],
@@ -225,7 +263,7 @@ const SideBar = () => {
     if (dataType.includes("Unread")) {
       if (token) {
         try {
-          await markConversationAsRead(token, conversationID); 
+          await markConversationAsRead(token, conversationID);
 
           const updatedData = dataInfo.map((message) =>
             message.conversationId === conversationID
@@ -333,6 +371,19 @@ const SideBar = () => {
     } catch (err) {
       console.error("Error deleting:", err);
       toast.error("Failed to delete conversation");
+    }
+  };
+  const handlingBlockUser = async (userID: string) => {
+    try {
+      await blockUser(token!, userID);
+      const updatedData = dataInfo.filter(
+        (conv) => userID !== conv.otherUser.userId
+      );
+      dispatch(setDataInfo(updatedData));
+      toast.success("User blocked successfully");
+    } catch (err) {
+      console.error("Error blocking user:", err);
+      toast.error("Failed to block user");
     }
   };
 
@@ -465,8 +516,8 @@ const SideBar = () => {
                     )}
                   </div>
 
-                  <p className="text-sm text-gray-600 truncate mt-1 ">
-                    {data.lastMessage?.message || ""}
+                  <p className="text-sm text-gray-600 truncate w-40 mt-1 ">
+                    {data.lastMessage?.message || "attachement sent"}
                   </p>
                 </div>
               </div>
@@ -534,14 +585,65 @@ const SideBar = () => {
                         </button>
                         <div>
                           <button
+                            id="block"
+                            className="block w-full text-left py-2 px-3 text-sm hover:bg-gray-100 rounded"
+                            onClick={openBlockModal}
+                          >
+                            Block
+                          </button>
+                          {isBlockOpen && (
+                            <Dialog
+                              open={isBlockOpen}
+                              onOpenChange={setIsBlockOpen}
+                            >
+                              <DialogContent>
+                                <DialogHeader>
+                                  <DialogTitle>Block</DialogTitle>
+                                  <DialogDescription>
+                                    You’re about to block
+                                    {data.otherUser.firstName}{" "}
+                                    {data.otherUser.lastName}
+                                  </DialogDescription>
+                                  <DialogDescription>
+                                    You’ll no longer be connected, and will lose
+                                    any endorsements or recommendations from
+                                    this person.
+                                  </DialogDescription>
+                                </DialogHeader>
+                                <DialogFooter>
+                                  <button
+                                    onClick={closeBlockModal}
+                                    className="btn btn-cancel"
+                                  >
+                                    Back
+                                  </button>
+                                  <button
+                                    onClick={() => {
+                                      handlingBlockUser(data.otherUser.userId);
+                                      closeBlockModal();
+                                    }}
+                                    className="bg-blue-700 text-white rounded-md p-2"
+                                  >
+                                    Block
+                                  </button>
+                                </DialogFooter>
+                              </DialogContent>
+                            </Dialog>
+                          )}
+                        </div>
+                        <div>
+                          <button
                             id="delete-conversation"
                             className="block w-full text-left py-2 px-3 text-sm hover:bg-gray-100 rounded"
-                            onClick={openModal}
+                            onClick={openDeleteModal}
                           >
                             Delete conversation
                           </button>
-                          {isOpen && (
-                            <Dialog open={isOpen} onOpenChange={setIsOpen}>
+                          {isDeleteOpen && (
+                            <Dialog
+                              open={isDeleteOpen}
+                              onOpenChange={setIsDeleteOpen}
+                            >
                               <DialogContent>
                                 <DialogHeader>
                                   <DialogTitle>
@@ -554,7 +656,7 @@ const SideBar = () => {
                                 </DialogHeader>
                                 <DialogFooter>
                                   <button
-                                    onClick={closeModal}
+                                    onClick={closeDeleteModal}
                                     className="btn btn-cancel"
                                   >
                                     Cancel
@@ -562,7 +664,7 @@ const SideBar = () => {
                                   <button
                                     onClick={() => {
                                       handlingDeleteConv(data.conversationId);
-                                      closeModal();
+                                      closeDeleteModal();
                                     }}
                                     className="bg-blue-700 text-white rounded-md p-2"
                                   >
@@ -591,12 +693,11 @@ const SideBar = () => {
                   <FaStar id="star" size={15} className="text-[#c37d16]" />
                 )}
 
-                {data.conversationType.includes("Unread") &&
-                   (
-                    <span className="flex items-center justify-center text-xs rounded-full text-white w-4 h-4 bg-blue-600 font-medium">
-                      
-                    </span>
-                  )}
+                {data.conversationType.includes("Unread") && (
+                  <span className="flex items-center justify-center text-xs rounded-full text-white w-4 h-4 bg-blue-600 font-medium">
+                    {data.unreadCount > 0 ? data.unreadCount : ""}
+                  </span>
+                )}
               </div>
             </div>
           ))}

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaInfoCircle } from "react-icons/fa";
-import SettingsLayoutPage from "../../components/hoc/SettingsLayoutPage";
-import { validatePassword } from "../../utils";
+import SettingsLayoutPage from "@/components/hoc/SettingsLayoutPage";
+import { validatePassword } from "@/utils";
 import { changePassword } from "@/endpoints/settingsEndpoints";
 import Cookies from "js-cookie";
 import { toast } from "sonner";
@@ -83,17 +83,11 @@ const ChangePasswordPage: React.FC = () => {
           currentPassword,
           newPassword
         );
-
-        if (response.success) {
-          setStatusMessage("Password changed successfully");
-          toast.success(response.message);
-          setTimeout(() => {
-            handleBack();
-          }, 1500);
-        } else {
-          toast.error(response.message || "Failed to change password");
-          setStatusMessage(response.message || "Failed to change password");
-        }
+        setStatusMessage("Password changed successfully");
+        toast.success(response.message);
+        setTimeout(() => {
+          handleBack();
+        }, 1500);
       } catch (error) {
         setStatusMessage("An error occurred. Please try again later.");
         toast.error(getErrorMessage(error));
@@ -104,9 +98,7 @@ const ChangePasswordPage: React.FC = () => {
     }
   };
 
-  const handleForgotPassword = () => {
-    console.log("Forgot password clicked");
-  };
+
 
   return (
     <SettingsLayoutPage>
@@ -129,10 +121,12 @@ const ChangePasswordPage: React.FC = () => {
           <div className="relative mb-6">
             <button
               onClick={() => setShowPasswordInfo(!showPasswordInfo)}
-              className="flex items-center bg-transparent border-0 text-[var(--badge-color)] px-3 py-2 rounded-2xl bg-[rgba(10,102,194,0.08)] dark:bg-[rgba(10,102,194,0.15)] cursor-pointer text-sm"
+              className="flex items-center border-0 text-[var(--badge-color)] px-3 py-2 rounded-2xl bg-[rgba(10,102,194,0.08)] dark:bg-[rgba(10,102,194,0.15)] cursor-pointer text-sm"
             >
               <FaInfoCircle className="mr-2 text-base" />
-              <span className="dark:text-white">What makes a strong password?</span>
+              <span className="dark:text-white">
+                What makes a strong password?
+              </span>
             </button>
 
             {showPasswordInfo && (
@@ -261,13 +255,6 @@ const ChangePasswordPage: React.FC = () => {
                 }`}
             >
               {isLoading ? "Processing..." : "Save Password"}
-            </button>
-
-            <button
-              onClick={handleForgotPassword}
-              className="bg-transparent border-0 text-[var(--badge-color)] cursor-pointer text-base text-left p-0 w-fit mb-4 dark:text-white"
-            >
-              Forgot Password
             </button>
           </div>
         </div>
