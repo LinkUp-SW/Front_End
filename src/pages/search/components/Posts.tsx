@@ -26,28 +26,30 @@ const Posts = ({ query }: { query: string }) => {
   }, [screenWidth]);
 
   return (
-    <div className="flex justify-center mt-6">
-      <div className="max-w-3xl w-full bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 flex flex-col">
-        {/* Main content area */}
-        <div className="flex-1">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 border border-gray-200 dark:border-gray-700">
-            <h1 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">
-              Posts
-            </h1>
+    posts.length !== 0 && (
+      <div className="flex justify-center mt-6">
+        <div className="max-w-3xl w-full bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 flex flex-col">
+          {/* Main content area */}
+          <div className="flex-1">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 border border-gray-200 dark:border-gray-700">
+              <h1 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">
+                Posts
+              </h1>
 
-            <main className="flex flex-col w-full">
-              <PostList
-                posts={posts}
-                viewMore={viewMore}
-                isLoading={postsLoading}
-                initialLoading={initialLoading}
-                observerRef={observerRef}
-              />
-            </main>
+              <main className="flex flex-col w-full">
+                <PostList
+                  posts={posts}
+                  viewMore={viewMore}
+                  isLoading={postsLoading}
+                  initialLoading={initialLoading}
+                  observerRef={observerRef}
+                />
+              </main>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    )
   );
 };
 
