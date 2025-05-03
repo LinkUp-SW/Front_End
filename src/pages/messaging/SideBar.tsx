@@ -7,6 +7,7 @@ import {
   selectUserId,
   setResponsiveIsSidebar,
   setDataInfo,
+  setTotalCount,
 } from "../../slices/messaging/messagingSlice";
 import {
   incomingUnreadMessagesCount,
@@ -36,7 +37,7 @@ import {
   deleteConversation,
   markConversationAsRead,
   markConversationAsUnread,
-  blockUser
+  blockUser,
 } from "@/endpoints/messaging";
 
 import Cookies from "js-cookie";
@@ -73,7 +74,7 @@ const SideBar = () => {
   const closeDeleteModal = () => setIsDeleteOpen(false);
   const openBlockModal = () => setIsBlockOpen(true);
   const closeBlockModal = () => setIsBlockOpen(false);
-  
+
   const dataInfo = useSelector(
     (state: RootState) => state.messaging.setDataInfo
   );
@@ -157,6 +158,30 @@ const SideBar = () => {
     };
   }, [id, dataInfo]);
 
+  // useEffect(() => {
+  //   const handleTotalUnreadCount = (incoming: incomingTotalCount) => {
+  //     console.log("unread_messages_count received:", incoming);
+
+  //     // Check if the data has the expected structure
+  //     if (incoming && typeof incoming.totalUnreadCount === 'number') {
+  //       dispatch(setTotalCount(incoming.totalUnreadCount));
+  //     } else {
+  //       console.error("Invalid data structure received for unread_messages_count:", incoming);
+  //     }
+  //   };
+
+  //   // Debug: Log when effect runs
+  //   console.log("Setting up unread_messages_count listener");
+
+  //   // Make sure we're using the correct event name
+  //   socketService.on("unread_messages_count", handleTotalUnreadCount);
+
+  //   return () => {
+  //     console.log("Cleaning up unread_messages_count listener");
+  //     socketService.off("unread_messages_count", handleTotalUnreadCount);
+  //   };
+  // }, [dispatch]); // Keep only dispatch as dependency
+
   useEffect(() => {
     const handleUnreadCount = (incoming: incomingUnreadMessagesCount) => {
       const updatedData = dataInfo.map((message) =>
@@ -175,6 +200,11 @@ const SideBar = () => {
             }
           : message
       );
+      const totalUnreadMessages = updatedData.reduce(
+        (sum, msg) => sum + msg.unreadCount,
+        0
+      );
+      dispatch(setTotalCount(totalUnreadMessages));
       dispatch(setDataInfo(updatedData));
     };
 
@@ -187,6 +217,7 @@ const SideBar = () => {
       unsubscribe();
     };
   }, [dataInfo, dispatch]);
+
   const filterButtonData = {
     Focused: dataInfo,
     [FILTER_OPTIONS_MESSAGES.UNREAD]: dataInfo.filter((info) =>
@@ -346,7 +377,7 @@ const SideBar = () => {
   const handlingBlockUser = async (userID: string) => {
     try {
       await blockUser(token!, userID);
-        const updatedData = dataInfo.filter(
+      const updatedData = dataInfo.filter(
         (conv) => userID !== conv.otherUser.userId
       );
       dispatch(setDataInfo(updatedData));
@@ -356,7 +387,6 @@ const SideBar = () => {
       toast.error("Failed to block user");
     }
   };
-
 
   return (
     <>
@@ -487,8 +517,8 @@ const SideBar = () => {
                     )}
                   </div>
 
-                  <p className="text-sm text-gray-600 truncate mt-1 ">
-                    {data.lastMessage?.message || ""}
+                  <p className="text-sm text-gray-600 truncate w-40 mt-1 ">
+                    {data.lastMessage?.message || "attachement sent"}
                   </p>
                 </div>
               </div>
@@ -563,20 +593,23 @@ const SideBar = () => {
                             Block
                           </button>
                           {isBlockOpen && (
-                            <Dialog open={isBlockOpen} onOpenChange={setIsBlockOpen}>
+                            <Dialog
+                              open={isBlockOpen}
+                              onOpenChange={setIsBlockOpen}
+                            >
                               <DialogContent>
                                 <DialogHeader>
-                                  <DialogTitle>
-                                    Block
-                                  </DialogTitle>
+                                  <DialogTitle>Block</DialogTitle>
                                   <DialogDescription>
-                                  You’re about to block{data.otherUser.firstName}{" "}
-                                    {data.otherUser.lastName} 
+                                    You’re about to block
+                                    {data.otherUser.firstName}{" "}
+                                    {data.otherUser.lastName}
                                   </DialogDescription>
                                   <DialogDescription>
-                                  You’ll no longer be connected, and will lose any endorsements or recommendations from this person.
+                                    You’ll no longer be connected, and will lose
+                                    any endorsements or recommendations from
+                                    this person.
                                   </DialogDescription>
-
                                 </DialogHeader>
                                 <DialogFooter>
                                   <button
@@ -608,7 +641,10 @@ const SideBar = () => {
                             Delete conversation
                           </button>
                           {isDeleteOpen && (
-                            <Dialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
+                            <Dialog
+                              open={isDeleteOpen}
+                              onOpenChange={setIsDeleteOpen}
+                            >
                               <DialogContent>
                                 <DialogHeader>
                                   <DialogTitle>
