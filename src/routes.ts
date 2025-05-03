@@ -36,7 +36,7 @@ import {
   CompanyCreationPage,
   ManageCompanyPage,
   CreateJobPage,
-  CompanyProfileView
+  CompanyProfileView,
   DashboardPage,
   SettingsPage,
   UsersPage,
