@@ -23,17 +23,34 @@ const AddDocumentModal: React.FC<AddDocumentModalProps> = ({
 
   const handleAdd = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
-    if (!files) return;
+    if (!files || files.length === 0) return;
+
+    const file = files[0]; // Only take the first file
     const maxFileSizeInMB = 10;
     const maxFileSize = maxFileSizeInMB * 1048576; // 10 MB
 
-    if (files[0].size > maxFileSize) {
-      toast.error(
-        `File "${files[0].name}" exceeds the maximum size of ${maxFileSizeInMB} MB.`
-      );
-      return false;
+    // Validate file type
+    if (!file.type.match(/^application\/pdf$/)) {
+      toast.error(`File "${file.name}" must be a PDF document.`);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ""; // Reset input
+      }
+      return;
     }
-    setCurrentSelectedMedia(files ? Array.from(files) : []);
+
+    // Validate file size
+    if (file.size > maxFileSize) {
+      toast.error(
+        `File "${file.name}" exceeds the maximum size of ${maxFileSizeInMB} MB.`
+      );
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ""; // Reset input
+      }
+      return;
+    }
+
+    // Set only the single file
+    setCurrentSelectedMedia([file]);
   };
 
   useEffect(() => {

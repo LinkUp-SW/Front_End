@@ -3,9 +3,7 @@ import { WithNavBar } from '../../components';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from './components/jobsPageComponents/Sidebar';
 import TopJobPicks from './components/jobsPageComponents/TopJobsPicks';
-import RecentSearches from './components/jobsPageComponents/RecentSearches';
 import MoreJobs from './components/jobsPageComponents/MoreJobs';
-import { RECENT_SEARCHES } from '../../constants/index';
 import { Job } from './types';
 import { fetchJobs, fetchTopJobs, convertJobDataToJob } from '../../endpoints/jobs';
 import Cookies from 'js-cookie';
@@ -16,7 +14,6 @@ const JobsPage: React.FC = () => {
   // State for job listings
   const [topJobs, setTopJobs] = useState<Job[]>([]);
   const [moreJobs, setMoreJobs] = useState<Job[]>([]);
-  const [recentSearches, setRecentSearches] = useState(RECENT_SEARCHES);
   const [loading, setLoading] = useState(false);
   const [topJobsLoading, setTopJobsLoading] = useState(false);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
@@ -36,10 +33,6 @@ const JobsPage: React.FC = () => {
 
   const dismissMoreJob = (jobId: string) => {
     setMoreJobs(moreJobs.filter(job => job.id !== jobId));
-  };
-
-  const clearRecentSearches = () => {
-    setRecentSearches([]);
   };
 
   const handleJobSelect = (jobId: string) => {
@@ -161,11 +154,6 @@ const JobsPage: React.FC = () => {
             onDismissJob={dismissTopJob}
             onSelectJob={handleJobSelect} 
             loading={topJobsLoading}
-          />
-
-          <RecentSearches 
-            searches={recentSearches}
-            onClear={clearRecentSearches}
           />
           
           <MoreJobs 

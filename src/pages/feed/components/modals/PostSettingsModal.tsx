@@ -3,13 +3,13 @@ import RadioButton from "../buttons/RadioButton";
 import TransparentButton from "../buttons/TransparentButton";
 import { HiGlobeEuropeAfrica as GlobeIcon } from "react-icons/hi2";
 import { FaPeopleGroup as PeopleIcon } from "react-icons/fa6";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface PostSettingsModalProps {
   setActiveModal: (value: string) => void;
   privacySetting: string;
   setPrivacySetting: (value: string) => void;
-  commentSetting: string;
+  commentSetting: string | boolean;
 }
 
 const PostSettingsModal: React.FC<PostSettingsModalProps> = ({
@@ -19,6 +19,16 @@ const PostSettingsModal: React.FC<PostSettingsModalProps> = ({
   commentSetting,
 }) => {
   const [currentSettings, setCurrentSettings] = useState(privacySetting);
+
+  useEffect(() => {
+    if (typeof currentSettings === "boolean" && currentSettings === true) {
+      setCurrentSettings("Anyone");
+    } else if (typeof currentSettings === "boolean" && !currentSettings) {
+      console.log("Setting here to ");
+      setCurrentSettings("Connections only");
+    }
+    console.log(currentSettings);
+  }, [currentSettings]);
   return (
     <div className="flex-col flex">
       <h1 className="border-b dark:border-gray-600 pb-4 px-5 text-xl font-medium">

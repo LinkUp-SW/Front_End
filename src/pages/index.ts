@@ -44,6 +44,13 @@ import CreateJobPage from "./company/CreateJobPage";
 // Import new visibility pages
 import VisibilityPage from "./settings/VisibilityPage";
 import BlockingListPage from "./settings/BlockingListPage";
+import AdminPanelSidebar from "./admin/components/AdminPanel";
+import DashboardPage from "./admin/DashboardPage";
+
+import UsersPage from "./admin/UsersPage";
+import AnalyticsPage from "./admin/AnalyticsPage";
+
+import ContentModerationPage from "./admin/ContentModerationPage";import CompanyProfileView from "./company/CompanyProfile"
 
 //Export the Imported Pages
 export {
@@ -89,7 +96,16 @@ export {
   CompanyCreationPage,
   ManageCompanyPage,
   CreateJobPage,
+  CompanyProfileView,
   // Export new visibility pages
   VisibilityPage,
-  BlockingListPage
+  BlockingListPage,
+  AdminPanelSidebar,
+  DashboardPage,
+ 
+  UsersPage,
+  AnalyticsPage,
+
+  ContentModerationPage
+
 };

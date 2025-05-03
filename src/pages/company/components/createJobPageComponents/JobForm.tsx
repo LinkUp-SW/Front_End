@@ -66,6 +66,14 @@ interface CompanyAPIResult {
   logo?: string;
 }
 
+// Define enhanced validation errors interface
+interface ValidationErrors {
+  title: boolean;
+  location: boolean;
+  salary: boolean;
+  salaryNegative?: boolean;
+  salaryInvalid?: boolean;
+}
 
 const JobForm: React.FC = () => {
   const { companyId } = useParams<{ companyId: string }>();
@@ -76,6 +84,15 @@ const JobForm: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isFreeJob, setIsFreeJob] = useState<boolean>(!companyId);
   
+  // Form validation state
+  const [validationErrors, setValidationErrors] = useState<ValidationErrors>({
+    title: false,
+    location: false,
+    salary: false,
+    salaryNegative: false,
+    salaryInvalid: false
+  });
+
   // Company search state
   const [companySearchQuery, setCompanySearchQuery] = useState('');
   const [companySearchResults, setCompanySearchResults] = useState<CompanySearchResult[]>([]);
@@ -108,8 +125,56 @@ const JobForm: React.FC = () => {
     hasEasyApply: true,
     verified: true
   });
-
   
+  // Salary validation function
+  const validateSalary = (value: string) => {
+    // Clear any existing salary validation errors first
+    setValidationErrors(prev => ({
+      ...prev,
+      salaryNegative: false,
+      salaryInvalid: false
+    }));
+
+    if (!value.trim()) {
+      return; // Empty values are handled by the required validation
+    }
+
+    // Check for negative numbers in different formats
+    // Handle various formats like "$50,000", "$50k-$70k", or "50000-70000"
+    const numbersOnly = value.replace(/[$,k\s]/gi, '');
+    
+    // Split by hyphen or dash to check range values
+    const parts = numbersOnly.split(/[-–—]/);
+    
+    // Check if any part is negative
+    const hasNegative = parts.some(part => {
+      // Only check parts that actually contain numbers
+      if (/\d/.test(part)) {
+        return parseFloat(part) < 0;
+      }
+      return false;
+    });
+
+    if (hasNegative) {
+      setValidationErrors(prev => ({
+        ...prev,
+        salaryNegative: true
+      }));
+      return;
+    }
+
+    // Check if the salary format is valid
+    // Simple regex to check if the format is reasonable (allowing ranges, $ symbols, commas, and 'k' for thousands)
+    const validSalaryRegex = /^[$]?[\d,.k\s]+(?:[-–—][$]?[\d,.k\s]+)?(?:\s*(?:per\s*year|yearly|annual|\/\s*year|p\.?a\.?|per\s*month|monthly|\/\s*month|p\.?m\.?))?$/i;
+    
+    if (!validSalaryRegex.test(value)) {
+      setValidationErrors(prev => ({
+        ...prev,
+        salaryInvalid: true
+      }));
+    }
+  };
+
   const searchCompanies = async (query: string) => {
     if (!query || query.length < 2) {
       setCompanySearchResults([]);
@@ -229,6 +294,11 @@ const JobForm: React.FC = () => {
     const { name, value } = e.target;
     setJobData(prev => ({ ...prev, [name]: value }));
     
+    // Clear validation error when user edits a field
+    if (name in validationErrors) {
+      setValidationErrors(prev => ({ ...prev, [name]: false }));
+    }
+    
     // If company name is being changed, show search results
     if (name === 'company' && isFreeJob) {
       setCompanySearchQuery(value);
@@ -262,8 +332,42 @@ const JobForm: React.FC = () => {
     setJobData(prev => ({ ...prev, [field]: items }));
   };
 
+  // Validation function
+  const validateFirstStep = (): boolean => {
+    const errors: ValidationErrors = {
+      title: !jobData.title.trim(),
+      location: !jobData.location.trim(),
+      salary: !jobData.salary.trim(),
+      salaryNegative: false,
+      salaryInvalid: false
+    };
+    
+    // If salary is provided, validate it
+    if (jobData.salary.trim()) {
+      validateSalary(jobData.salary);
+    }
+    
+    setValidationErrors(prev => ({
+      ...prev,
+      title: errors.title,
+      location: errors.location,
+      salary: errors.salary
+    }));
+    
+    // Check if any validation errors exist
+    return !Object.values(validationErrors).some(hasError => hasError);
+  };
+
   // Navigation handlers
   const handleNext = () => {
+    if (currentStep === 1) {
+      // Validate first step fields before proceeding
+      if (!validateFirstStep()) {
+        toast.error('Please correct all errors before proceeding');
+        return;
+      }
+    }
+    
     if (currentStep < totalSteps) {
       setCurrentStep(prev => prev + 1);
     } else {
@@ -280,6 +384,13 @@ const JobForm: React.FC = () => {
   // Form submission
   const handleSubmit = async () => {
     try {
+      // Final validation before submission
+      if (!validateFirstStep()) {
+        toast.error('Please correct all errors before submitting');
+        setCurrentStep(1); // Go back to first step if validation fails
+        return;
+      }
+      
       setIsLoading(true);
       
       // Check if company is selected
@@ -393,6 +504,8 @@ const JobForm: React.FC = () => {
             companySearchResults={companySearchResults}
             companySearchQuery={companySearchQuery}
             handleSelectCompany={handleSelectCompany}
+            validationErrors={validationErrors}
+            validateSalary={validateSalary}
           />
         )}
         {currentStep === 2 && (

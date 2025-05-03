@@ -6,12 +6,13 @@ import {
   LinkUpFooter,
   WhosHiringImage,
 } from "../../components";
-import { PremiumBanner, Shortcuts, CreatePost } from "./components";
+import { PremiumBanner, Shortcuts } from "./components";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { useFeedPosts } from "@/hooks/useFeedPosts";
 import PostList from "./components/PostList"; // <-- Import PostList
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
+import CreatePostButton from "./components/CreatePostButton";
 
 interface FeedPageProps {
   single?: boolean;
@@ -70,7 +71,7 @@ const FeedPage: React.FC<FeedPageProps> = ({
 
         {/* Main Content */}
         <main className="flex flex-col w-full md:max-w-[27.8rem] lg:max-w-[35rem]">
-          {!single && !profile.length && <CreatePost />}
+          {!single && !profile.length && <CreatePostButton />}
           <div className="mt-4" />
           <PostList
             posts={posts}

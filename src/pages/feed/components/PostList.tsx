@@ -33,7 +33,7 @@ const PostList: React.FC<PostListProps> = ({
   if (posts.length === 0) {
     return (
       <p className="text-center text-2xl bg-white dark:bg-gray-900 p-4 rounded-lg">
-        No posts to display. Start connecting to people!
+        No posts to display.
       </p>
     );
   }
@@ -43,9 +43,20 @@ const PostList: React.FC<PostListProps> = ({
       {posts.map((post) => (
         <Post
           key={post._id}
-          postData={post}
+          postData={
+            post.original_post && post.post_type === "Repost instant"
+              ? post.original_post
+              : post
+          }
           viewMore={viewMore}
-          action={post.activityContext}
+          action={post.activity_context}
+          originalPost={
+            post.post_type === "Repost instant"
+              ? post
+              : post.post_type === "Repost thought"
+              ? post.original_post
+              : undefined
+          }
         />
       ))}
       {isLoading && <PostSkeleton />}

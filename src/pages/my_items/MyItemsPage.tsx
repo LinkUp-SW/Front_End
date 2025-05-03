@@ -3,7 +3,6 @@ import { useLocation } from "react-router-dom";
 import {
   LeftSidebar,
   SavedJobsDashboard,
-  InterviewTipsPanel,
   Footer,
 } from "@/components";
 import { useEffect, useState } from "react";
@@ -55,10 +54,6 @@ const MyItemsPage: React.FC = () => {
             <>
               <div className="md:col-span-6">
                 <SavedJobsDashboard />
-              </div>
-
-              <div className="md:col-span-3">
-                <InterviewTipsPanel />
               </div>
             </>
           ) : (

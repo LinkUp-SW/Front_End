@@ -29,7 +29,9 @@ import LinkPreview from "../LinkPreview"; // Import the LinkPreview component
 import React from "react";
 import UserTagging from "@/pages/feed/components/UserTagging";
 import { processTextFormatting } from "@/components/truncate_text/TruncatedText";
-import { PostDBObject } from "@/types";
+import { PostDBObject, PostType } from "@/types";
+import PostLargePreview from "../PostLargePreview";
+import { BasicCompanyData } from "@/pages/company/ManageCompanyPage";
 
 interface CreatePostModalProps {
   profileImageUrl: string;
@@ -43,6 +45,8 @@ interface CreatePostModalProps {
   taggedUsers: { name: string; id: string }[];
   setTaggedUsers: (users: Array<{ name: string; id: string }>) => void;
   post?: PostDBObject | null;
+  repostedPost?: PostType;
+  company: BasicCompanyData | null;
 }
 
 const CreatePostModal: React.FC<CreatePostModalProps> = ({
@@ -57,6 +61,8 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
   taggedUsers,
   setTaggedUsers,
   post,
+  repostedPost,
+  company,
 }) => {
   const { data } = useSelector((state: RootState) => state.userBio);
   const MemoizedEmojiPicker = memo(EmojiPicker);
@@ -138,13 +144,18 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
           className="flex w-fit z-0 p-2  gap-4  hover:cursor-pointer hover:bg-neutral-100 dark:hover:bg-gray-700 rounded-2xl"
         >
           <Avatar className="h-12 w-12 pl-0">
-            <AvatarImage src={profileImageUrl} alt="Profile" />
+            <AvatarImage
+              src={company ? company.logo : profileImageUrl}
+              alt="Profile"
+            />
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
           <div className="flex flex-col  text-black dark:text-neutral-200 ">
             <div className="flex items-center gap-3">
               <p className="text-xl font-medium text-nowrap">
-                {data?.bio.first_name + " " + data?.bio.last_name}
+                {company
+                  ? company.name
+                  : data?.bio.first_name + " " + data?.bio.last_name}
               </p>
               <FaChevronDown />
             </div>
@@ -184,32 +195,34 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
         {selectedMedia.length > 0 && (
           <div>
             {/* Media Preview */}
-            <div className="flex justify-end gap-2">
-              <IconButton
-                onClick={() => {
-                  if (selectedMedia[0].type === "application/pdf") {
-                    setActiveModal("add-document");
-                  } else {
-                    setActiveModal("add-media");
-                  }
-                }}
-                size={"icon"}
-                className="text-white bg-gray-700 dark:hover:bg-neutral-400 hover:bg-gray-800 dark:text-neutral-700 dark:bg-neutral-200"
-                id="edit-button"
-              >
-                <EditIcon />
-              </IconButton>
-              <IconButton
-                size={"icon"}
-                onClick={() => {
-                  setSelectedMedia([]);
-                }}
-                className=" rounded-full dark:bg-gray-200 dark:hover:bg-neutral-400  text-white bg-gray-700 hover:bg-gray-800 dark:text-gray-900"
-                id="remove-media-button"
-              >
-                <CloseIcon />
-              </IconButton>
-            </div>
+            {!repostedPost && (
+              <div className="flex justify-end gap-2">
+                <IconButton
+                  onClick={() => {
+                    if (selectedMedia[0].type === "application/pdf") {
+                      setActiveModal("add-document");
+                    } else {
+                      setActiveModal("add-media");
+                    }
+                  }}
+                  size={"icon"}
+                  className="text-white bg-gray-700 dark:hover:bg-neutral-400 hover:bg-gray-800 dark:text-neutral-700 dark:bg-neutral-200"
+                  id="edit-button"
+                >
+                  <EditIcon />
+                </IconButton>
+                <IconButton
+                  size={"icon"}
+                  onClick={() => {
+                    setSelectedMedia([]);
+                  }}
+                  className=" rounded-full dark:bg-gray-200 dark:hover:bg-neutral-400  text-white bg-gray-700 hover:bg-gray-800 dark:text-gray-900"
+                  id="remove-media-button"
+                >
+                  <CloseIcon />
+                </IconButton>
+              </div>
+            )}
 
             {selectedMedia[0].type.startsWith("image/") ? (
               <PostImages
@@ -225,8 +238,12 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
                   controls
                 />
               </div>
-            ) : (
+            ) : selectedMedia[0].type.startsWith("document/") ? (
               <DocumentPreview currentSelectedMedia={selectedMedia} />
+            ) : (
+              //<PostLargePreview postData={}/>
+
+              <PostLargePreview borders postData={repostedPost} />
             )}
           </div>
         )}

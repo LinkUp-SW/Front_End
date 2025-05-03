@@ -57,6 +57,7 @@ export interface SearchJobs {
   experience_level: string;
   salary: number;
   timeAgo: string;
+  is_saved: boolean;
   organization: Organization;
 }
 
@@ -69,6 +70,35 @@ interface JobSearchResponse {
   nextCursor: string;
 }
 
+// New interface for user information in job application
+export interface UserInfo {
+  bio: {
+    contact_info: {
+      phone_number: number;
+      country_code: string;
+    };
+    first_name: string;
+    last_name: string;
+    headline: string;
+  };
+  _id: string;
+  profile_photo: string;
+  resume: string;
+  email: string;
+}
+
+// New interface for job application payload
+export interface JobApplicationData {
+  phone_number: number;
+  country_code: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  profile_photo: string;
+  resume: string; // Will now contain base64 data if newly uploaded
+  is_uploaded: boolean;
+}
+
 // Token helper function
 const getAuthToken = () => {
   const token = Cookies.get('linkup_auth_token');
@@ -77,7 +107,6 @@ const getAuthToken = () => {
   }
   return token;
 };
-
 
 // Helper function to add auth header
 const getAuthHeader = (token: string) => ({
@@ -111,8 +140,6 @@ export const fetchSingleJob = async (token: string, jobId: string): Promise<{ da
   return response.data;
 };
 
-
-
 // Saved jobs functions
 export const fetchSavedJobs = async (): Promise<JobData[]> => {
   const token = getAuthToken();
@@ -132,6 +159,25 @@ export const removeFromSaved = async (jobId: string): Promise<{ message: string 
   const token = getAuthToken();
   const url = `/api/v1/jobs/unsave-jobs/${jobId}`;
   const response = await axiosInstance.delete(url, getAuthHeader(token));
+  return response.data;
+};
+
+// New job application related functions
+export const fetchUserJobApplicationInfo = async (): Promise<UserInfo> => {
+  const token = getAuthToken();
+  const response = await axiosInstance.get('/api/v1/job-application/apply-for-job', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.data.data;
+};
+
+export const submitJobApplication = async (jobId: string, applicationData: JobApplicationData): Promise<{ message: string }> => {
+  const token = getAuthToken();
+  const response = await axiosInstance.post(
+    `/api/v1/job-application/create-job-application/${jobId}`, 
+    applicationData,
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
   return response.data;
 };
 
@@ -172,9 +218,8 @@ export const convertJobDataToJob = (jobData: JobData): Job => {
   };
 };
 
-
 export const getSearchJobs = async (
-  
+  token:string,
   query:string,
   cursor:string | null,
   limit:number |null
@@ -183,10 +228,39 @@ export const getSearchJobs = async (
     "/api/v1/jobs/search-jobs",
     {
       headers: {
+        Authorization: `Bearer ${token}`
       
       },
       params: { query, cursor, limit },
     }
   );
   return response.data;
+};
+
+export interface AppliedJobsResponse {
+  message: string;
+  count: number;
+  data: AppliedJobData[];
 }
+
+export interface AppliedJobData extends JobData {
+  application_status: 'Pending' | 'Viewed' | 'Accepted' | 'Rejected';
+  application_id: string;
+}
+
+// Add this new function to fetch applied jobs
+export const fetchAppliedJobs = async (): Promise<AppliedJobData[]> => {
+  const token = getAuthToken();
+  const url = '/api/v1/job-application/get-applied-jobs';
+  const response = await axiosInstance.get(url, getAuthHeader(token));
+  return response.data.data || [];
+};
+
+// Helper to convert AppliedJobData to Job interface with application status
+export const convertAppliedJobDataToJob = (jobData: AppliedJobData): Job & { application_status: string, application_id: string } => {
+  return {
+    ...convertJobDataToJob(jobData),
+    application_status: jobData.application_status,
+    application_id: jobData.application_id
+  };
+};

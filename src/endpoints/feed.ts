@@ -1,6 +1,6 @@
 import axiosInstance from "@/services/axiosInstance";
 import { CommentDBType, CommentType, PostDBObject, PostType } from "@/types";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 
 // Add this new interface for link preview data
 export interface LinkPreviewData {
@@ -123,8 +123,8 @@ export const getPostsFeed = async (
     limit: number;
     replyLimit?: number | 3;
   }
-): Promise<{ posts: PostType[]; nextCursor: number | null }> => {
-  const response = await axiosInstance.get(`/api/v1/post/posts/feed`, {
+): Promise<{ posts: PostType[]; next_cursor: number | null }> => {
+  const response = await axiosInstance.get(`/api/v2/post/posts/feed`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -139,10 +139,10 @@ export const getPostsFeed = async (
 
   const transformedPosts = validPosts.map((post: PostType) => ({
     ...post,
-    commentsData: {
+    comments_data: {
       comments: [], // Empty initially
-      count: post.commentsCount || 0,
-      nextCursor: 0,
+      count: post.comments_count || 0,
+      next_cursor: 0,
       isLoading: false,
       hasInitiallyLoaded: false,
     },
@@ -150,12 +150,18 @@ export const getPostsFeed = async (
 
   console.log("Returned:", {
     posts: transformedPosts,
-    nextCursor: response.data.nextCursor,
+    next_cursor: response.data.next_cursor,
   });
 
   return {
-    posts: transformedPosts,
-    nextCursor: response.data.nextCursor,
+    posts: transformedPosts.map((post: PostType) => ({
+      ...post,
+      author: {
+        ...post.author,
+        connection_degree: "1st",
+      },
+    })),
+    next_cursor: response.data.next_cursor,
   };
 };
 
@@ -164,7 +170,7 @@ export const fetchSinglePost = async (
   token: string
 ): Promise<PostType> => {
   try {
-    const response = await axiosInstance.get(`api/v1/post/posts/${postId}`, {
+    const response = await axiosInstance.get(`api/v2/post/posts/${postId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -177,26 +183,34 @@ export const fetchSinglePost = async (
 
     // Extract comments from the response
     const commentsArray = response.data.comments?.comments;
-    const commentsCount = response.data.comments?.count || 0;
-    const commentsCursor = response.data.comments?.nextCursor || null;
+    const comments_count = response.data.comments?.count || 0;
+    const commentsCursor = response.data.comments?.next_cursor || null;
 
     // Return post with embedded comments
     console.log("Here:", {
       ...response.data.post,
-      commentsData: {
+      author: {
+        ...response.data.post.author,
+        connection_degree: "1st",
+      },
+      comments_data: {
         comments: commentsArray, // Include comments from API response
-        count: commentsCount,
-        nextCursor: commentsCursor,
+        count: comments_count,
+        next_cursor: commentsCursor,
         isLoading: false,
         hasInitiallyLoaded: true, // Mark as initially loaded since we have comments
       },
     });
     return {
       ...response.data.post,
-      commentsData: {
+      author: {
+        ...response.data.post.author,
+        connection_degree: "1st",
+      },
+      comments_data: {
         comments: commentsArray, // Include comments from API response
-        count: commentsCount,
-        nextCursor: commentsCursor,
+        count: comments_count,
+        next_cursor: commentsCursor,
         isLoading: false,
         hasInitiallyLoaded: true, // Mark as initially loaded since we have comments
       },
@@ -230,9 +244,9 @@ export const loadPostComments = async (
 ): Promise<{
   comments: CommentType[];
   count: number;
-  nextCursor: number | null;
+  next_cursor: number | null;
 }> => {
-  const response = await axiosInstance.get(`api/v1/post/comment/${postId}`, {
+  const response = await axiosInstance.get(`api/v2/post/comment/${postId}`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -247,7 +261,7 @@ export const loadPostComments = async (
   return {
     comments: Object.values(response.data.comments),
     count: response.data.count,
-    nextCursor: response.data.nextCursor,
+    next_cursor: response.data.next_cursor,
   };
 };
 
@@ -296,7 +310,7 @@ export const getPostReactions = async (): Promise<string[]> => {
 };
 
 export const deletePost = async (postId: string, token: string) => {
-  const response = await axiosInstance.delete(`api/v1/post/posts/${postId}`, {
+  const response = await axiosInstance.delete(`api/v2/post/posts/${postId}`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -309,7 +323,7 @@ export const deleteComment = async (
   token: string
 ) => {
   const response = await axiosInstance.delete(
-    `api/v1/post/comment/${postPayload.post_id}/${postPayload.comment_id}`,
+    `api/v2/post/comment/${postPayload.post_id}/${postPayload.comment_id}`,
     {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -329,17 +343,22 @@ export const editComment = async (
   },
   token: string
 ) => {
-  const response = await axiosInstance.patch(`api/v1/post/comment`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-    data: postPayload,
-  });
+  console.log("Payload:", postPayload);
+  const response = await axiosInstance.patch(
+    `api/v2/post/comment/${postPayload.post_id}/${postPayload.comment_id}`,
+    postPayload,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      data: postPayload,
+    }
+  );
   return response.data;
 };
 
 export const createPost = async (postPayload: PostDBObject, token: string) => {
-  const response = await axiosInstance.post("api/v1/post/posts", postPayload, {
+  const response = await axiosInstance.post("api/v2/post/posts", postPayload, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -348,11 +367,15 @@ export const createPost = async (postPayload: PostDBObject, token: string) => {
 };
 
 export const editPost = async (postPayload: PostDBObject, token: string) => {
-  const response = await axiosInstance.patch("api/v1/post/posts", postPayload, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  const response = await axiosInstance.patch(
+    `api/v2/post/posts/${postPayload._id}`,
+    postPayload,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
   return response.data;
 };
 
@@ -361,7 +384,7 @@ export const createComment = async (
   token: string
 ) => {
   const response = await axiosInstance.post(
-    `api/v1/post/comment/${postPayload.post_id}`,
+    `api/v2/post/comment/${postPayload.post_id}`,
     postPayload,
     {
       headers: {
@@ -376,7 +399,7 @@ export const createComment = async (
 
 export const getReactions = async (
   postPayload: {
-    cursor: number;
+    cursor: number | null;
     limit: number;
     specificReaction: string | null;
     targetType: string;
@@ -385,7 +408,7 @@ export const getReactions = async (
   postId: string,
   token: string
 ) => {
-  const response = await axiosInstance.get(`api/v1/post/reaction/${postId}`, {
+  const response = await axiosInstance.get(`api/v2/post/reaction/${postId}`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -409,8 +432,8 @@ export const deleteReaction = async (
 ) => {
   const response = await axiosInstance.delete(
     !commentId
-      ? `api/v1/post/reaction/${postId}/`
-      : `api/v1/post/reaction/${postId}/${commentId}`,
+      ? `api/v2/post/reaction/${postId}/`
+      : `api/v2/post/reaction/${postId}/${commentId}`,
     {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -431,7 +454,7 @@ export const getCommentsForPost = async (
   postId: string,
   token: string
 ) => {
-  const response = await axiosInstance.get(`api/v1/post/comment/${postId}`, {
+  const response = await axiosInstance.get(`api/v2/post/comment/${postId}`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -456,7 +479,7 @@ export const getReplies = async (
   token: string
 ) => {
   const response = await axiosInstance.get(
-    `api/v1/post/comment/${postId}/${commentId}`,
+    `api/v2/post/comment/${postId}/${commentId}`,
     {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -478,7 +501,7 @@ export const createReaction = async (
   token: string
 ) => {
   const response = await axiosInstance.post(
-    `api/v1/post/reaction/${postId}`,
+    `api/v2/post/reaction/${postId}`,
     postPayload,
     {
       headers: {
@@ -492,7 +515,7 @@ export const createReaction = async (
 
 export const savePost = async (postId: string, token: string) => {
   const response = await axiosInstance.post(
-    `api/v1/post/save-post`,
+    `api/v2/post/save-post`,
     { postId: postId },
     {
       headers: {
@@ -505,7 +528,7 @@ export const savePost = async (postId: string, token: string) => {
 };
 
 export const unsavePost = async (postId: string, token: string) => {
-  const response = await axiosInstance.delete(`api/v1/post/save-post`, {
+  const response = await axiosInstance.delete(`api/v2/post/save-post`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -522,12 +545,227 @@ export const getSavedPosts = async (
   },
   token: string
 ) => {
-  const response = await axiosInstance.get(`api/v1/post/save-post`, {
+  const response = await axiosInstance.get(`api/v2/post/save-post`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
     params: postPayload, // Use params instead of data for GET requests
   });
 
+  return response.data;
+};
+
+export const reportContent = async (
+  postPayload: { contentRef: string; contentType: string; reason: string },
+  token: string
+) => {
+  try {
+    const response = await axiosInstance.post(
+      `api/v1/admin/report`,
+      postPayload,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      if (error.response?.status === 400) {
+        return { message: "You already reported this before.", report: "" };
+      }
+      // Re-throw other errors
+      throw error;
+    }
+  }
+};
+
+export const repostInstant = async (
+  postPayload: { mediaType: string; media: string[]; postType: string },
+  token: string
+) => {
+  try {
+    const response = await axiosInstance.post(
+      `api/v2/post/posts`,
+      postPayload,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
+export const repostWithThoughts = async (
+  postPayload: {
+    content: string;
+    commentsDisabled: string;
+    publicPost: boolean;
+    mediaType: string;
+    media: string[];
+    postType: string;
+  },
+  token: string
+) => {
+  try {
+    const response = await axiosInstance.post(
+      `api/v2/post/posts`,
+      postPayload,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
+export const getCompanyPosts = async (
+  token: string,
+  organization_id: string,
+
+  postPayload?: {
+    cursor: number;
+    limit: number;
+    replyLimit?: number | 3;
+  }
+): Promise<{ posts: PostType[]; next_cursor: number | null }> => {
+  const response = await axiosInstance.get(
+    `api/v1/company/get-posts-from-company/${organization_id}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      params: postPayload,
+    }
+  );
+  console.log("GetCompanyPosts:", response.data);
+
+  // Filter out null posts and transform the rest
+  const validPosts = (response.data.posts || []).filter(
+    (post: PostType) => post !== null
+  );
+
+  const transformedPosts = validPosts.map((post: PostType) => ({
+    ...post,
+    comments_data: {
+      comments: [], // Empty initially
+      count: post.comments_count || 0,
+      next_cursor: 0,
+      isLoading: false,
+      hasInitiallyLoaded: false,
+    },
+  }));
+
+  console.log("Returned:", {
+    posts: transformedPosts,
+    next_cursor: response.data.next_cursor,
+  });
+
+  return {
+    posts: transformedPosts.map((post: PostType) => ({
+      ...post,
+      author: {
+        ...post.author,
+        connection_degree: "1st",
+      },
+    })),
+    next_cursor: response.data.next_cursor,
+  };
+};
+
+export const createCompanyPost = async (
+  postPayload: PostDBObject,
+  organization_id: string,
+  token: string
+) => {
+  const response = await axiosInstance.post(
+    `api/v1/company/create-post-from-company/${organization_id}`,
+    postPayload,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
+
+export const getSearchPosts = async (
+  token: string,
+  postPayload: {
+    query: string;
+    cursor: number;
+    limit: number;
+  }
+): Promise<{ posts: PostType[]; next_cursor: number | null }> => {
+  const response = await axiosInstance.get(`api/v2/post/search/posts`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    params: postPayload,
+  });
+  console.log("getSearchPosts:", response.data);
+
+  // Filter out null posts and transform the rest
+  const validPosts = (response.data.posts || []).filter(
+    (post: PostType) => post !== null
+  );
+
+  const transformedPosts = validPosts.map((post: PostType) => ({
+    ...post,
+    comments_data: {
+      comments: [], // Empty initially
+      count: post.comments_count || 0,
+      next_cursor: 0,
+      isLoading: false,
+      hasInitiallyLoaded: false,
+    },
+  }));
+
+  console.log("Returned:", {
+    posts: transformedPosts,
+    next_cursor: response.data.next_cursor,
+  });
+
+  return {
+    posts: transformedPosts.map((post: PostType) => ({
+      ...post,
+      author: {
+        ...post.author,
+        connection_degree: "1st",
+      },
+    })),
+    next_cursor: response.data.next_cursor,
+  };
+};
+
+export const editCompanyPost = async (
+  postPayload: PostDBObject,
+  postParams: {
+    organization_id: string;
+    post_id: string;
+  },
+  token: string
+) => {
+  const response = await axiosInstance.put(
+    `api/v1/company/update-post-from-company/${postParams.organization_id}/${postParams.post_id}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      params: postPayload,
+    }
+  );
   return response.data;
 };
