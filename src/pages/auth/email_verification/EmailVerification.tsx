@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { sendOTP, verifyOTP } from "@/endpoints/userAuth";
 import { getErrorMessage } from "@/utils/errorHandler";
 import EmailVerificationLayout from "../components/EmailVerificationLayout";
+import Cookies from "js-cookie";
 
 const EmailVerification = () => {
   const [otp, setOtp] = useState("");
@@ -69,6 +70,7 @@ const EmailVerification = () => {
       toast.success(`${data.message}`);
       localStorage.removeItem("user-email");
       localStorage.removeItem("user-signup-credentials");
+      Cookies.set("linkup_user_type", "user");
       setTimeout(() => {
         window.location.replace("/feed");
       }, 1500);
