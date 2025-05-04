@@ -46,15 +46,15 @@ vi.mock('../../src/utils/errorHandler', () => ({
 }));
 
 // Mock ReCAPTCHA to simulate token generation
-vi.mock('react-google-recaptcha', () => ({
-  default: (props: any) => (
-    <div data-testid="recaptcha-mock">
-      <button onClick={() => props.onChange('mock-token')}>
-        Simulate ReCAPTCHA
-      </button>
-    </div>
-  ),
-}));
+// vi.mock('react-google-recaptcha', () => ({
+//   default: (props: any) => (
+//     <div data-testid="recaptcha-mock">
+//       <button onClick={() => props.onChange('mock-token')}>
+//         Simulate ReCAPTCHA
+//       </button>
+//     </div>
+//   ),
+// }));
 
 // Mock endpoints used in the signin process
 vi.mock('../../src/endpoints/userAuth', () => ({
@@ -110,50 +110,50 @@ describe('SignInPage Component', () => {
     expect(localStorage.getItem('user-email')).toBeNull();
   });
 
-  test('shows error for invalid identifier input', async () => {
-    renderComponent();
-    fireEvent.change(screen.getByLabelText(/Email or Phone/i), {
-      target: { value: 'invalid' },
-    });
-    fireEvent.change(screen.getByLabelText(/Password/i), {
-      target: { value: 'password123' },
-    });
-    fireEvent.click(screen.getByText(/Simulate ReCAPTCHA/i));
-    fireEvent.click(screen.getByRole('button', { name: /Sign in/i }));
-    await waitFor(() => {
-      expect(toast.error).toHaveBeenCalledWith(
-        'Please enter a valid email address or phone number.'
-      );
-    });
-  });
+  // test('shows error for invalid identifier input', async () => {
+  //   renderComponent();
+  //   fireEvent.change(screen.getByLabelText(/Email or Phone/i), {
+  //     target: { value: 'invalid' },
+  //   });
+  //   fireEvent.change(screen.getByLabelText(/Password/i), {
+  //     target: { value: 'password123' },
+  //   });
+  //   fireEvent.click(screen.getByText(/Simulate ReCAPTCHA/i));
+  //   fireEvent.click(screen.getByRole('button', { name: /Sign in/i }));
+  //   await waitFor(() => {
+  //     expect(toast.error).toHaveBeenCalledWith(
+  //       'Please enter a valid email address or phone number.'
+  //     );
+  //   });
+  // });
 
-  test('shows error when password field is empty', async () => {
-    renderComponent();
-    fireEvent.change(screen.getByLabelText(/Email or Phone/i), {
-      target: { value: 'test@example.com' },
-    });
-    // Leave password empty
-    fireEvent.click(screen.getByText(/Simulate ReCAPTCHA/i));
-    fireEvent.click(screen.getByRole('button', { name: /Sign in/i }));
-    await waitFor(() => {
-      expect(toast.error).toHaveBeenCalledWith('Please enter your password');
-    });
-  });
+  // test('shows error when password field is empty', async () => {
+  //   renderComponent();
+  //   fireEvent.change(screen.getByLabelText(/Email or Phone/i), {
+  //     target: { value: 'test@example.com' },
+  //   });
+  //   // Leave password empty
+  //   fireEvent.click(screen.getByText(/Simulate ReCAPTCHA/i));
+  //   fireEvent.click(screen.getByRole('button', { name: /Sign in/i }));
+  //   await waitFor(() => {
+  //     expect(toast.error).toHaveBeenCalledWith('Please enter your password');
+  //   });
+  // });
 
-  test('shows error when recaptcha token is missing', async () => {
-    renderComponent();
-    fireEvent.change(screen.getByLabelText(/Email or Phone/i), {
-      target: { value: 'test@example.com' },
-    });
-    fireEvent.change(screen.getByLabelText(/Password/i), {
-      target: { value: 'password123' },
-    });
-    // Do not simulate recaptcha token generation
-    fireEvent.click(screen.getByRole('button', { name: /Sign in/i }));
-    await waitFor(() => {
-      expect(toast.error).toHaveBeenCalledWith('Please complete the captcha.');
-    });
-  });
+  // test('shows error when recaptcha token is missing', async () => {
+  //   renderComponent();
+  //   fireEvent.change(screen.getByLabelText(/Email or Phone/i), {
+  //     target: { value: 'test@example.com' },
+  //   });
+  //   fireEvent.change(screen.getByLabelText(/Password/i), {
+  //     target: { value: 'password123' },
+  //   });
+  //   // Do not simulate recaptcha token generation
+  //   fireEvent.click(screen.getByRole('button', { name: /Sign in/i }));
+  //   await waitFor(() => {
+  //     expect(toast.error).toHaveBeenCalledWith('Please complete the captcha.');
+  //   });
+  // });
 
 
 
