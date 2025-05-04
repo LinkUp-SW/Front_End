@@ -45,8 +45,7 @@ const EmailVerification = () => {
 
     const handleSendOTP = async () => {
       try {
-        const response = await sendOTP(userEmail);
-        console.log(response.otp);
+        await sendOTP(userEmail)
       } catch (error) {
         const err = getErrorMessage(error);
         toast.error(`Error: ${err}`);
