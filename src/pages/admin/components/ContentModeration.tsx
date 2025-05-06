@@ -193,7 +193,7 @@ const ContentModeration = () => {
       }
     } catch (error) {
       console.error("Dismiss report error:", error);
-      toast.error("An error occurred while dismissing report");
+      toast.error(getErrorMessage(error) || "An error occurred while dismissing content");
     }
   };
 
