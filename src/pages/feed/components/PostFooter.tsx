@@ -67,10 +67,10 @@ const PostFooter: React.FC<PostFooterProps> = ({
 
   const commentSuggestions = useMemo(
     () => [
-      `Congratulations, ${authorName}!`,
-      `Thank you for sharing, ${authorName}!`,
-      `Great insight, ${authorName}!`,
-      `Well explained, ${authorName}!`,
+      `Congratulations, ${authorName.split(" ")[0]}!`,
+      `Thank you for sharing, ${authorName.split(" ")[0]}!`,
+      `Great insight, ${authorName.split(" ")[0]}!`,
+      `Well explained, ${authorName.split(" ")[0]}!`,
       "I appreciate this!",
       "Useful takeaway",
       "Valuable content",
