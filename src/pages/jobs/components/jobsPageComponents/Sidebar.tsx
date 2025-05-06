@@ -4,9 +4,9 @@ import { FaSortDown } from "react-icons/fa6";
 import { FaEdit, FaBookmark } from "react-icons/fa";
 import { FiTarget } from "react-icons/fi";
 import { FOOTER_LINKS } from "../../../../constants/index";
-import { getUserCompanies } from "@/endpoints/company"; 
-import { Company } from "../../types"; 
-
+import { getUserCompanies } from "@/endpoints/company";
+import { Company } from "../../types";
+import buildingsImg from "@/assets/buildings.jpeg";
 const Sidebar: React.FC = () => {
   const navigate = useNavigate();
   const [userCompanies, setUserCompanies] = useState<Company[]>([]);
@@ -16,14 +16,14 @@ const Sidebar: React.FC = () => {
   useEffect(() => {
     const fetchUserCompanies = async () => {
       setIsLoading(true);
-      
+
       try {
         const response = await getUserCompanies();
         setUserCompanies(response.organizations || []);
         setError(null);
       } catch {
-        setError('Failed to load your pages');
-        console.error('Failed to fetch user companies');
+        setError("Failed to load your pages");
+        console.error("Failed to fetch user companies");
       } finally {
         setIsLoading(false);
       }
@@ -80,51 +80,63 @@ const Sidebar: React.FC = () => {
         <div className="w-full bg-white rounded-lg shadow-sm border border-gray-200 dark:bg-gray-800 dark:border-gray-700 transition-colors">
           <div className="p-4">
             <h2 className="text-lg font-medium mb-2 text-gray-800 dark:text-gray-200">
-              My pages ({isLoading ? '...' : userCompanies.length})
+              My pages ({isLoading ? "..." : userCompanies.length})
             </h2>
-            
+
             {isLoading ? (
-              <div className="py-4 text-center text-gray-500 dark:text-gray-400">Loading...</div>
+              <div className="py-4 text-center text-gray-500 dark:text-gray-400">
+                Loading...
+              </div>
             ) : error ? (
-              <div className="py-4 text-center text-red-500 dark:text-red-400">{error}</div>
+              <div className="py-4 text-center text-red-500 dark:text-red-400">
+                {error}
+              </div>
             ) : userCompanies.length === 0 ? (
               <div className="py-4 text-center text-gray-500 dark:text-gray-400">
                 You don't have any pages yet
               </div>
             ) : (
-              userCompanies.map(company => (
-                <div 
-                  key={company._id} 
+              userCompanies.map((company) => (
+                <div
+                  key={company._id}
                   id={`company-page-item-${company._id}`}
                   className="flex items-center justify-between py-3 border-b border-gray-100 dark:border-gray-700 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                   onClick={() => handleCompanyClick(company._id)}
                 >
                   <div className="flex items-center w-full min-w-0">
                     <div className="flex-shrink-0 mr-3">
-                      <img 
-                        src={company.logo || "/src/assets/buildings.jpeg"} 
-                        alt={company.name} 
+                      <img
+                        src={company.logo || buildingsImg}
+                        alt={company.name}
                         className="w-8 h-8 bg-gray-200 dark:bg-gray-600 rounded"
                       />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="font-medium text-gray-800 dark:text-gray-200 truncate" title={company.name}>
+                      <p
+                        className="font-medium text-gray-800 dark:text-gray-200 truncate"
+                        title={company.name}
+                      >
                         {company.name}
                       </p>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">Activity</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        Activity
+                      </p>
                     </div>
                   </div>
                 </div>
               ))
             )}
           </div>
-          
+
           <div className="p-4 border-t border-gray-200 dark:border-gray-700">
-            <p className="text-gray-600 dark:text-gray-400 mb-2">Grow your business</p>
-            <button 
-              className="flex items-center text-gray-800 dark:text-gray-200 font-medium hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-            >
-              <FiTarget className="mr-2 text-gray-800 dark:text-gray-200" size={20} />
+            <p className="text-gray-600 dark:text-gray-400 mb-2">
+              Grow your business
+            </p>
+            <button className="flex items-center text-gray-800 dark:text-gray-200 font-medium hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+              <FiTarget
+                className="mr-2 text-gray-800 dark:text-gray-200"
+                size={20}
+              />
               Try Campaign Manager
             </button>
           </div>

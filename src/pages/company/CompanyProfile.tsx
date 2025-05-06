@@ -23,6 +23,7 @@ import {
   BiMapPin, 
   BiBriefcase, 
 } from 'react-icons/bi';
+import buildingsImg from '@/assets/buildings.jpeg'
 
 interface CompanyData {
   _id: string;
@@ -259,7 +260,7 @@ const CompanyProfileView = () => {
                 alt={`${companyData.name} logo`} 
                 className="w-20 h-20 sm:w-24 sm:h-24 object-cover"
                 onError={(e) => {
-                  (e.target as HTMLImageElement).src = "/src/assets/buildings.jpeg";
+                  (e.target as HTMLImageElement).src = buildingsImg;
                 }}
               />
             </div>
