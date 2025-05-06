@@ -1,6 +1,7 @@
 import { useState, FormEvent, useEffect, useRef, ChangeEvent } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components';
 import { toast } from 'sonner';
+import buildingsImg from '@/assets/buildings.jpeg'
 
 interface CompanyFormData {
   name: string;
@@ -66,7 +67,7 @@ const EditPageDialog = ({ open, onOpenChange, companyData, onSubmit }: EditPageD
     category_type: '',
     logo: '', 
   });
-  const [logoUrl, setLogoUrl] = useState('/src/assets/buildings.jpeg');
+  const [logoUrl, setLogoUrl] = useState(buildingsImg);
   const [hasLocation, setHasLocation] = useState(false);
   const [hasStreetAddress, setHasStreetAddress] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
