@@ -32,6 +32,16 @@ import { blockUser } from "@/endpoints/userProfile";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { editUserBio } from "@/slices/user_profile/userBioSlice";
+import { socketService } from "@/services/socket";
+import { UserProfileBio } from "@/types";
+import { checkConversationExists } from "@/endpoints/messaging";
+import {
+  setShowPopup,
+  setUser2IdPop,
+  setUser2NamePop,
+  setUser2ProfilePicturePop,
+  setUser2HeadlinePop,
+} from "@/slices/messaging/messagingSlice";
 
 export type FollowStatus = {
   isFollowing?: boolean;
@@ -54,6 +64,7 @@ export interface ProfileActionButtonsProps {
   isViewerSubscribed: boolean;
   setOpenSubscribeNowDialog: React.Dispatch<React.SetStateAction<boolean>>;
   isPremium: boolean;
+  data:UserProfileBio
 }
 
 const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
@@ -69,6 +80,7 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
   isViewerSubscribed,
   setOpenSubscribeNowDialog,
   isPremium,
+  data
 }) => {
   const { id } = useParams();
   const userBioState = useSelector((state: RootState) => state.userBio);
@@ -121,6 +133,7 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
         id as string,
         email
       );
+      socketService.sendNotification(id as string, Cookies.get('linkup_user_id') as string, 'connection_request',undefined,'new connection request')
       toast.success(response.message);
       setLocalFollowStatus((prev) => ({
         ...prev,
@@ -292,17 +305,40 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
   //-- If isConnectByEmail true open a Dialog
 
   // --- Other Handlers ---
-  const handleMessage = useCallback(() => {
-    if (
-      followStatus.isInConnection ||
-      isAllowingMessage ||
-      isViewerSubscribed
-    ) {
-      alert("You Can Send Message Directly");
-    } else {
-      setOpenSubscribeNowDialog(true);
-    }
-  }, []);
+  const handleMessage = useCallback(
+    async (
+      user2Id: string,
+      name: string,
+      profilePicture: string,
+      headline: string
+    ) => {
+      if (
+        followStatus.isInConnection ||
+        isAllowingMessage ||
+        isViewerSubscribed
+      ) {
+       try {
+             const result = await checkConversationExists(authToken!, user2Id);
+       
+             if (result.conversationExists) {
+               dispatch(setShowPopup(false));
+               navigate("/messaging");
+             } else {
+               dispatch(setUser2IdPop(user2Id));
+               dispatch(setUser2NamePop(name));
+               dispatch(setUser2ProfilePicturePop(profilePicture));
+               dispatch(setUser2HeadlinePop(headline));
+               dispatch(setShowPopup(true));
+             }
+           } catch (error) {
+             console.error("Error checking conversation:", error);
+           }
+      } else {
+        setOpenSubscribeNowDialog(true);
+      }
+    },
+    []
+  );
 
   const handleBlock = useCallback(async () => {
     let resolveDelay: (result: string) => void;
@@ -429,7 +465,7 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
           <CustomButton
             id="profile-action-message-button"
             variant="secondary"
-            onClick={handleMessage}
+            onClick={()=>handleMessage(id!,data.bio.first_name,data.profile_photo,data.bio.headline)}
           >
             <FaPaperPlane size={20} />
             Message
@@ -477,7 +513,7 @@ const ProfileActionButtons: React.FC<ProfileActionButtonsProps> = ({
           <CustomButton
             id="profile-action-message-button"
             variant="secondary"
-            onClick={handleMessage}
+            onClick={()=>handleMessage(id!,data.bio.first_name,data.profile_photo,data.bio.headline)}
           >
             <FaPaperPlane size={20} />
             Message

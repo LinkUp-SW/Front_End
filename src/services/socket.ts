@@ -1,4 +1,5 @@
 import { io, Socket } from 'socket.io-client';
+import { toast } from 'sonner';
 
 export interface SocketIncomingMessage {
   conversationId: string;
@@ -202,6 +203,7 @@ class SocketService {
 
     // ADDED: Notification related events
     this.socket.on('new_notification', () => {
+      toast.info('new notification')
     });
 
     this.socket.on('unread_notifications_count', () => {
@@ -279,13 +281,14 @@ class SocketService {
   }
 
   // Send a notification (for testing or specific use cases)
-  sendNotification(recipientId: string, type: string, content?: string, referenceId?: string): void {
+  sendNotification(recipientId: string,senderId:string, type: string, referenceId?: string,content?: string): void {
     if (!this.socket?.connected) return;
     this.socket.emit("new_notification", {
       recipientId,
+      senderId,
       type,
+      referenceId,
       content,
-      referenceId
     });
   }
 

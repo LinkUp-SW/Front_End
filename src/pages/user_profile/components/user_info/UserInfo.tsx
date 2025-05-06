@@ -93,6 +93,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ setIsProfileVisible }) => {
 
         <ProfileActionButtons
           isOwner={data.is_me}
+          data={data}
           isConnectByEmail={data.isConnectByEmail}
           setNumOfConnections={setNumOfConnections}
           setIsInConnections={setIsInConnections}

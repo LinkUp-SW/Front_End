@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { socketService } from "@/services/socket";
 
 const AllPeople: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -84,6 +85,14 @@ const AllPeople: React.FC = () => {
     setConnectingUserIds((prev) => [...prev, userId]);
     try {
       await connectWithUser(token, userId, email);
+      socketService.sendNotification(
+        userId as string,
+        Cookies.get("linkup_user_id") as string,
+        "connection_request",
+        undefined,
+        "new connection request"
+      );
+
       toast.success("Connection request sent successfully!");
       setPeople((prev) =>
         prev.map((person) =>
@@ -108,6 +117,7 @@ const AllPeople: React.FC = () => {
     setAcceptingUserIds((prev) => [...prev, userId]);
     try {
       await acceptInvitation(token, userId);
+      socketService.sendNotification(userId as string, Cookies.get('linkup_user_id') as string, 'connection_accepted',undefined,'Connection Accepted')
       toast.success("Connection accepted!");
       setPeople((prev) =>
         prev.map((person) =>
@@ -265,54 +275,66 @@ const AllPeople: React.FC = () => {
                       )}
 
                       {/* Email Dialog */}
-                       <Dialog open={!!openDialogUserId} onOpenChange={() => {
-                                setOpenDialogUserId(null);
-                                setEmailInput("");
-                                setEmailTouched(false);
-                              }}>
-                                <DialogContent className="dark:bg-gray-800 dark:text-white">
-                                  <DialogHeader>
-                                    <DialogTitle className="dark:text-white">Enter Email to Connect</DialogTitle>
-                                    <DialogDescription className="dark:text-gray-300">
-                                      This user requires email verification to connect.
-                                    </DialogDescription>
-                                  </DialogHeader>
-                                  <div className="flex flex-col gap-2 mt-4">
-                                    <Input
-                                      type="email"
-                                      placeholder="Enter email"
-                                      value={emailInput}
-                                      onChange={(e) => {
-                                        setEmailInput(e.target.value);
-                                        setEmailTouched(true);
-                                      }}
-                                      className="dark:bg-gray-700 dark:text-white dark:border-gray-600"
-                                    />
-                                    {!isValidEmail(emailInput) && emailTouched && (
-                                      <p className="text-sm text-red-500">The email you entered is invalid.</p>
-                                    )}
-                                    <Button
-                                      onClick={() =>
-                                        openDialogUserId && handleConnect(openDialogUserId, emailInput)
-                                      }
-                                      disabled={
-                                        !emailInput ||
-                                        !isValidEmail(emailInput) ||
-                                        connectingUserIds.includes(openDialogUserId || "")
-                                      }
-                                      className={`${
-                                        emailInput && isValidEmail(emailInput)
-                                          ? "bg-blue-600 text-white hover:bg-blue-700"
-                                          : "bg-gray-300 text-gray-600"
-                                      } rounded-md px-4 py-2 transition-colors duration-200`}
-                                    >
-                                      {connectingUserIds.includes(openDialogUserId || "")
-                                        ? "Connecting..."
-                                        : "Submit"}
-                                    </Button>
-                                  </div>
-                                </DialogContent>
-                              </Dialog>
+                      <Dialog
+                        open={!!openDialogUserId}
+                        onOpenChange={() => {
+                          setOpenDialogUserId(null);
+                          setEmailInput("");
+                          setEmailTouched(false);
+                        }}
+                      >
+                        <DialogContent className="dark:bg-gray-800 dark:text-white">
+                          <DialogHeader>
+                            <DialogTitle className="dark:text-white">
+                              Enter Email to Connect
+                            </DialogTitle>
+                            <DialogDescription className="dark:text-gray-300">
+                              This user requires email verification to connect.
+                            </DialogDescription>
+                          </DialogHeader>
+                          <div className="flex flex-col gap-2 mt-4">
+                            <Input
+                              type="email"
+                              placeholder="Enter email"
+                              value={emailInput}
+                              onChange={(e) => {
+                                setEmailInput(e.target.value);
+                                setEmailTouched(true);
+                              }}
+                              className="dark:bg-gray-700 dark:text-white dark:border-gray-600"
+                            />
+                            {!isValidEmail(emailInput) && emailTouched && (
+                              <p className="text-sm text-red-500">
+                                The email you entered is invalid.
+                              </p>
+                            )}
+                            <Button
+                              onClick={() =>
+                                openDialogUserId &&
+                                handleConnect(openDialogUserId, emailInput)
+                              }
+                              disabled={
+                                !emailInput ||
+                                !isValidEmail(emailInput) ||
+                                connectingUserIds.includes(
+                                  openDialogUserId || ""
+                                )
+                              }
+                              className={`${
+                                emailInput && isValidEmail(emailInput)
+                                  ? "bg-blue-600 text-white hover:bg-blue-700"
+                                  : "bg-gray-300 text-gray-600"
+                              } rounded-md px-4 py-2 transition-colors duration-200`}
+                            >
+                              {connectingUserIds.includes(
+                                openDialogUserId || ""
+                              )
+                                ? "Connecting..."
+                                : "Submit"}
+                            </Button>
+                          </div>
+                        </DialogContent>
+                      </Dialog>
                     </div>
                   </div>
                 ))
