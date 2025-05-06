@@ -148,6 +148,7 @@ const Post: React.FC<PostProps> = ({
   const [isCompanyAdmin, setIsCompanyAdmin] = useState(false);
   const isInstantRepost = postData.post_type === "Repost instant";
   const isRepostWithThoughts = postData.media?.media_type === "post";
+  console.log("Post:", postData);
 
   const targetPost = isInstantRepost && originalPost ? originalPost : postData;
 
