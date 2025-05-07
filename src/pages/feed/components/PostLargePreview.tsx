@@ -282,6 +282,7 @@ const PostLargePreview: React.FC<PostLargePreviewProps> = ({
           hideActions={true}
           savedPostView={true}
           disableLink={disableLink}
+          is_company={postData.is_company}
         />
         {postData.content && (
           <TruncatedText

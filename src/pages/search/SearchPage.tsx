@@ -112,7 +112,7 @@ const SearchPage: React.FC = () => {
           <div className="flex justify-center items-center h-64">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
           </div>
-        ) : hasResults ? (
+        ) : hasQuery ? ( // Changed from hasResults to hasQuery
           <>
             {hasPeople ? (
               <section id="people">
@@ -120,17 +120,19 @@ const SearchPage: React.FC = () => {
               </section>
             ) : null}
 
+            {/* Always render Posts when there's a query */}
             <section id="posts">
               <Posts query={query} setPostsFound={setPostsFound} />
             </section>
 
+            {/* Always render Jobs when there's a query */}
             <section id="jobs">
               <Jobs query={query} setJobsFound={setJobsFound} />
             </section>
           </>
         ) : (
           <div className="w-full text-center text-gray-500 border rounded-md p-6 shadow-sm">
-            <p className="text-lg font-medium">No results found.</p>
+            <p className="text-lg font-medium">Please enter a search query.</p>
           </div>
         )}
       </main>
