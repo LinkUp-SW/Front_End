@@ -37,7 +37,7 @@ const ProfileStrength = () => {
   };
 
   return (
-    <section className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 transition-colors duration-300">
+    <section className="bg-white dark:bg-gray-800 p-6 rounded-2xl w-full shadow-xl border border-gray-100 dark:border-gray-700 transition-colors duration-300">
       <style>{`
         @keyframes scaleIn {
           0% { transform: scale(0); opacity: 0; }
