@@ -10,6 +10,7 @@ import { startConversation } from "@/endpoints/messaging";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
+import { socketService } from "@/services/socket";
 const NewMessage = () => {
   const navigate = useNavigate();
   const [textMessage, setTextMessage] = useState("");
@@ -46,6 +47,7 @@ const NewMessage = () => {
       }
 
       await startConversation(token!, user2Id, textMessage);
+      socketService.sendPrivateMessage(user2Id, textMessage, undefined);
 
       setTextMessage("");
       dispatch(setShowPopup(false));

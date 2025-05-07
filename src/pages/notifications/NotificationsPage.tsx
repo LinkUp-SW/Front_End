@@ -516,28 +516,19 @@ const NotificationsPage: React.FC = () => {
       <div className={styles.content}>
         <div className={styles.leftSidebar}>
           <ProfileCard />
-          <div className={styles.notificationSettings}>
-            <h3>Manage your notifications</h3>
-            <a href="/settings/notifications" className={styles.settingsLink}>
+          <div className={`${styles.notificationSettings} flex flex-col`}>
+            <h3>Manage your profile</h3>
+            <a href="/settings/preference" className={styles.settingsLink}>
               View settings
             </a>
             {unReadCount > 0 && (
               <button
-                className={styles.markAllReadButton}
+                className={`${styles.markAllReadButton} affirmativeBtn rounded-md mt-2`}
                 onClick={handleMarkAllAsRead}
               >
                 Mark all as read
               </button>
             )}
-            {/* Display socket connection status for debugging */}
-            <div className={styles.socketStatus}>
-              Socket:{" "}
-              {socketConnected ? (
-                <span className={styles.connected}>Connected</span>
-              ) : (
-                <span className={styles.disconnected}>Disconnected</span>
-              )}
-            </div>
           </div>
         </div>
 
@@ -634,83 +625,91 @@ const NotificationsPage: React.FC = () => {
               {loading ? (
                 <div className={styles.loading}>Loading notifications...</div>
               ) : filteredNotifications.length > 0 ? (
-                filteredNotifications.map((notification) => (
-                  <div
-                    key={notification.id}
-                    className={`${styles.notificationItem} ${
-                      notification.isRead ||
-                      clickedNotifications.has(notification.id)
-                        ? styles.readNotification
-                        : styles.unreadNotification
-                    } ${
-                      clickedNotifications.has(notification.id)
-                        ? styles.clickedNotification
-                        : ""
-                    }`}
-                    onClick={() => handleNotificationClick(notification)}
-                  >
-                    {!notification.isRead &&
-                      !clickedNotifications.has(notification.id) && (
-                        <div className={styles.notificationIndicator}></div>
-                      )}
-                    <div className={styles.notificationImage}>
-                      <img
-                        src={
-                          notification.sender?.profilePhoto ||
-                          "/api/placeholder/50/50"
-                        }
-                        alt={`${notification.sender?.firstName || "User"} ${
-                          notification.sender?.lastName || "Name"
-                        }`}
-                      />
-                    </div>
+                filteredNotifications
+                  .sort(
+                    (a, b) =>
+                      new Date(b.createdAt).getTime() -
+                      new Date(a.createdAt).getTime()
+                  )
+                  .map((notification) => (
+                    <div
+                      key={notification.id}
+                      className={`${styles.notificationItem} ${
+                        notification.isRead ||
+                        clickedNotifications.has(notification.id)
+                          ? styles.readNotification
+                          : styles.unreadNotification
+                      } ${
+                        clickedNotifications.has(notification.id)
+                          ? styles.clickedNotification
+                          : ""
+                      }`}
+                      onClick={() => handleNotificationClick(notification)}
+                    >
+                      {!notification.isRead &&
+                        !clickedNotifications.has(notification.id) && (
+                          <div className={styles.notificationIndicator}></div>
+                        )}
+                      <div className={styles.notificationImage}>
+                        <img
+                          src={
+                            notification.sender?.profilePhoto ||
+                            "/api/placeholder/50/50"
+                          }
+                          alt={`${notification.sender?.firstName || "User"} ${
+                            notification.sender?.lastName || "Name"
+                          }`}
+                        />
+                      </div>
 
-                    <div className={styles.notificationContent}>
-                      <p>{notification.content}</p>
-                      {notification.referenceId && (
+                      <div className={styles.notificationContent}>
+                        <p>{notification.content}</p>
+                        {notification.referenceId && (
+                          <button
+                            className={styles.actionButton}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleNavigation(
+                                notification.type,
+                                notification.referenceId
+                              );
+                            }}
+                          >
+                            View {notification.type}
+                          </button>
+                        )}
+                      </div>
+                      <div className={styles.notificationTime}>
+                        {formatNotificationTime(notification.createdAt)}
+                      </div>
+                      <div className={styles.notificationOptions}>
                         <button
-                          className={styles.actionButton}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleNavigation(
-                              notification.type,
-                              notification.referenceId
-                            );
-                          }}
+                          type="button"
+                          aria-label="More options"
+                          onClick={(e) =>
+                            toggleOptionsDropdown(e, notification.id)
+                          }
                         >
-                          View {notification.type}
+                          ...
                         </button>
-                      )}
-                    </div>
-                    <div className={styles.notificationTime}>
-                      {formatNotificationTime(notification.createdAt)}
-                    </div>
-                    <div className={styles.notificationOptions}>
-                      <button
-                        type="button"
-                        aria-label="More options"
-                        onClick={(e) =>
-                          toggleOptionsDropdown(e, notification.id)
-                        }
-                      >
-                        ...
-                      </button>
 
-                      {activeOptionsDropdown === notification.id && (
-                        <div className={styles.optionsDropdown}>
-                          {!notification.isRead && (
-                            <div
-                              className={styles.optionItem}
-                              onClick={(e) => handleMarkAsRead(e, notification)}
-                            >
-                              Mark as read
-                            </div>
-                          )}
-                        </div>
-                      )}
+                        {activeOptionsDropdown === notification.id && (
+                          <div className={styles.optionsDropdown}>
+                            {!notification.isRead && (
+                              <div
+                                className={styles.optionItem}
+                                onClick={(e) =>
+                                  handleMarkAsRead(e, notification)
+                                }
+                              >
+                                Mark as read
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))
+                  ))
               ) : (
                 <div className={styles.emptyState}>
                   <div className={styles.emptyStateImage}>

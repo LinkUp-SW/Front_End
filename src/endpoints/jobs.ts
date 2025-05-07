@@ -264,3 +264,35 @@ export const convertAppliedJobDataToJob = (jobData: AppliedJobData): Job & { app
     application_id: jobData.application_id
   };
 };
+
+export enum ReportReasonEnum {
+  spam = "spam",
+  harassment = "harassment",
+  nudity = "nudity",
+  hate_speech = "hate speech",
+  scam = "scam",
+  other = "other",
+}
+
+export interface JobReportPayload {
+  contentRef: string;
+  contentType: string;
+  reason: ReportReasonEnum;
+}
+
+export const reportJob = async (
+  jobId: string,
+  reason: ReportReasonEnum
+): Promise<{ message: string }> => {
+  const token = getAuthToken();
+  const url = '/api/v1/admin/report';
+  
+  const payload: JobReportPayload = {
+    contentRef: jobId,
+    contentType: "Job",
+    reason: reason
+  };
+  
+  const response = await axiosInstance.post(url, payload, getAuthHeader(token));
+  return response.data;
+};

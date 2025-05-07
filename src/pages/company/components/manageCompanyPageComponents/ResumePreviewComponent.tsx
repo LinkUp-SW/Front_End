@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {  useState } from 'react';
 import { toast } from 'sonner';
 
 interface ResumePreviewComponentProps {
@@ -10,9 +10,7 @@ const ResumePreviewComponent: React.FC<ResumePreviewComponentProps> = ({ resumeU
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [previewError, setPreviewError] = useState(false);
-  useEffect(()=>{
-console.log(resumeUrl)
-  },[resumeUrl])
+
 
   // Function to handle opening the preview
   const handleOpenPreview = () => {

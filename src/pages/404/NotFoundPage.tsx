@@ -20,7 +20,7 @@ const NotFoundPage = () => {
         </p>
         <button
           type="button"
-          onClick={() => navigate("/")}
+          onClick={() => navigate("/feed")}
           className="mt-4 w-full rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow hover:bg-indigo-500 focus-visible:outline-2 cursor-pointer focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:bg-indigo-700 dark:hover:bg-indigo-600 transition-all duration-300 ease-in-out"
         >
           Go Home

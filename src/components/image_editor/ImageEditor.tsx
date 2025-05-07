@@ -300,7 +300,7 @@ export default function ImageEditor({
   return (
     <div
       id="image-editor-container"
-      className="container mx-auto py-8 px-4 animate-fade-in"
+      className="container mx-auto py-8 px-4 animate-fade-in max-h-[30rem] md:max-h-full overflow-y-scroll md:overflow-y-hidden"
     >
       <Card
         id="image-editor-card"

@@ -67,13 +67,13 @@ const UserProfilePopover: React.FC<UserProfilePopoverProps> = ({
         <div className="h-[0.05rem] w-full bg-gray-500 dark:bg-gray-300" />
         <h2 className="pt-1 font-semibold">Manage</h2>
         <Link
-          to={"#"}
+          to={`/user-profile/${userId}/posts`}
           className="text-sm px-2 pt-2 text-gray-500 dark:text-gray-400 hover:underline"
         >
           Posts & Activities
         </Link>
         <Link
-          to={"#"}
+          to={"/my-items/saved-jobs"}
           className="text-sm text-gray-500 dark:text-gray-400 p-2 hover:underline"
         >
           Saved Items

@@ -82,7 +82,7 @@ const SettingsLayoutPage: React.FC<SettingsLayoutPageProps> = ({
               {sidebarOpen ? <FaTimes /> : <FaBars />}
             </button>
             {/* Logo */}
-            <Link to="/">
+            <Link to="/feed">
               <img
                 src={linkupLogo}
                 alt="LinkUp"

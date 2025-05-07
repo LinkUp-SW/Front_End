@@ -2,6 +2,8 @@ import React, { useState, useEffect, useCallback } from "react";
 import { getJobsFromCompany } from "@/endpoints/company";
 import { toast } from "sonner";
 import manOnChair from "@/assets/man_on_chair.svg";
+import { useNavigate } from "react-router-dom";
+
 interface JobViewerProps {
   companyId?: string;
   isVisible: boolean;
@@ -40,6 +42,12 @@ function sanitizeJob(apiJob: ApiJob): Job {
 }
 
 const JobCard: React.FC<{ job: Job }> = ({ job }) => {
+  const navigate = useNavigate();
+  
+  const handleViewDetails = () => {
+    navigate(`/jobs/see-more?selected=${job._id}`);
+  };
+
   return (
     <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-md dark:hover:shadow-gray-700 transition-shadow bg-white dark:bg-gray-800">
       <div className="flex justify-between items-start gap-2 mb-2">
@@ -63,7 +71,10 @@ const JobCard: React.FC<{ job: Job }> = ({ job }) => {
         Posted on: {new Date(job.posted_time).toLocaleDateString()}
       </p>
 
-      <button className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm font-medium transition-colors">
+      <button 
+        className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm font-medium transition-colors"
+        onClick={handleViewDetails}
+      >
         View Details
       </button>
     </div>

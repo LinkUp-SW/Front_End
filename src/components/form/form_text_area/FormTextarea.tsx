@@ -29,7 +29,7 @@ const FormTextarea: React.FC<FormTextareaProps> = ({
     />
     <div className="flex justify-end text-xs text-gray-500 dark:text-gray-400">
       <span>
-        {value.length}/{maxLength}
+        {value ? value.length : 0}/{maxLength}
       </span>
     </div>
   </div>

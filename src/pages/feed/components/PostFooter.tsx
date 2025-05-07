@@ -67,10 +67,10 @@ const PostFooter: React.FC<PostFooterProps> = ({
 
   const commentSuggestions = useMemo(
     () => [
-      `Congratulations, ${authorName}!`,
-      `Thank you for sharing, ${authorName}!`,
-      `Great insight, ${authorName}!`,
-      `Well explained, ${authorName}!`,
+      `Congratulations, ${authorName.split(" ")[0]}!`,
+      `Thank you for sharing, ${authorName.split(" ")[0]}!`,
+      `Great insight, ${authorName.split(" ")[0]}!`,
+      `Well explained, ${authorName.split(" ")[0]}!`,
       "I appreciate this!",
       "Useful takeaway",
       "Valuable content",
@@ -228,7 +228,8 @@ const PostFooter: React.FC<PostFooterProps> = ({
         </Carousel>
       )}
       {comment_privacy === "Connections only" &&
-        connection_degree !== "1st" && (
+        connection_degree !== "1st" &&
+        connection_degree !== "me" && (
           <div className="flex gap-4 w-full items-center">
             <FaCommentSlash />
             <div className="text-left w-full dark:text-neutral-200 ">
@@ -237,7 +238,8 @@ const PostFooter: React.FC<PostFooterProps> = ({
           </div>
         )}
       {(comment_privacy !== "Connections only" ||
-        connection_degree === "1st") && (
+        connection_degree === "1st" ||
+        connection_degree === "me") && (
         <>
           <div className="flex w-full items-center justify-between h-full">
             <div className="flex space-x-3 justify-start items-center w-full h-full">
@@ -262,7 +264,8 @@ const PostFooter: React.FC<PostFooterProps> = ({
                     value={commentInput}
                     disabled={
                       (comment_privacy === "Connections only" &&
-                        connection_degree !== "1st") ||
+                        connection_degree !== "1st" &&
+                        connection_degree !== "me") ||
                       comment_privacy === "No one"
                     }
                     autoFocus
@@ -401,7 +404,8 @@ const PostFooter: React.FC<PostFooterProps> = ({
                     }
                     disabled={
                       (comment_privacy === "Connections only" &&
-                        connection_degree !== "1st") ||
+                        connection_degree !== "1st" &&
+                        connection_degree !== "me") ||
                       comment_privacy === "No one"
                     }
                   >

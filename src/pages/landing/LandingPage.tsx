@@ -3,8 +3,22 @@ import manOnChair from "../../assets/man_on_chair.svg";
 import googleSvg from "../../assets/google.svg";
 import { Link } from "react-router-dom";
 import { initiateGoogleAuth } from "@/endpoints/userAuth";
+import Cookies from "js-cookie";
+import { useEffect } from "react";
 
 const HomePage = () => {
+  const token = Cookies.get("linkup_auth_token");
+  const userId = Cookies.get("linkup_user_id");
+  const userType = Cookies.get("linkup_user_type");
+  useEffect(() => {
+    if (token && userId && userType) {
+      window.location.replace("/feed");
+    }
+  }, [token, userId, userType]);
+
+  if (token || userId || userType) {
+    return null;
+  }
   return (
     <main className="flex flex-col items-center min-h-screen w-full p-5 dark:bg-gray-900 dark:text-white">
       <header className="max-w-[70rem] w-full">

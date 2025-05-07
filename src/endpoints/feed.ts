@@ -150,10 +150,6 @@ export const getPostsFeed = async (
   return {
     posts: transformedPosts.map((post: PostType) => ({
       ...post,
-      author: {
-        ...post.author,
-        connection_degree: "1st",
-      },
     })),
     next_cursor: response.data.next_cursor,
   };
@@ -183,10 +179,6 @@ export const fetchSinglePost = async (
 
     return {
       ...response.data.post,
-      author: {
-        ...response.data.post.author,
-        connection_degree: "1st",
-      },
       comments_data: {
         comments: commentsArray, // Include comments from API response
         count: comments_count,
@@ -646,10 +638,6 @@ export const getCompanyPosts = async (
   return {
     posts: transformedPosts.map((post: PostType) => ({
       ...post,
-      author: {
-        ...post.author,
-        connection_degree: "1st",
-      },
     })),
     next_cursor: response.data.next_cursor,
   };
@@ -706,10 +694,6 @@ export const getSearchPosts = async (
   return {
     posts: transformedPosts.map((post: PostType) => ({
       ...post,
-      author: {
-        ...post.author,
-        connection_degree: "1st",
-      },
     })),
     next_cursor: response.data.next_cursor,
   };

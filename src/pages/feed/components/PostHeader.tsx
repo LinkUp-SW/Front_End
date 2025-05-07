@@ -33,6 +33,7 @@ interface PostHeaderProps {
   date: number;
   hideActions?: boolean;
   disableLink?: boolean;
+  is_company?: boolean;
 }
 
 const PostHeader: React.FC<PostHeaderProps> = ({
@@ -47,6 +48,7 @@ const PostHeader: React.FC<PostHeaderProps> = ({
   date,
   hideActions = false,
   disableLink = false,
+  is_company = false,
 }) => {
   const timeAgo = moment(date * 1000).fromNow();
 
@@ -57,9 +59,18 @@ const PostHeader: React.FC<PostHeaderProps> = ({
     }
   };
 
+
   return (
     <header className="flex items-center space-x-3 w-full pl-4 pt-1 pb-4">
-      <Link to={disableLink ? `#` : `/user-profile/${user.username}`}>
+      <Link
+        to={
+          disableLink
+            ? "#"
+            : is_company === true
+            ? `/company/${user.username}`
+            : `/user-profile/${user.username}`
+        }
+      >
         <img
           src={user.profile_picture}
           alt={user.username}
