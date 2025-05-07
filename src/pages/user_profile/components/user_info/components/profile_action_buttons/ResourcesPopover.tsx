@@ -4,7 +4,6 @@ import CustomButton from "./CustomButton";
 import { FaUsersSlash, FaUserPlus, FaUserMinus } from "react-icons/fa";
 import { IoCloseCircle, IoCheckmarkSharp } from "react-icons/io5";
 import { CiCirclePlus, CiClock2 } from "react-icons/ci";
-import { BsInfoSquareFill } from "react-icons/bs";
 import { ImBlocked } from "react-icons/im";
 import { PiNewspaperBold } from "react-icons/pi";
 import { TbFileCv } from "react-icons/tb";
@@ -109,7 +108,6 @@ interface OwnerPopoverContentProps {
 const OwnerPopoverContent: React.FC<OwnerPopoverContentProps> = ({
   onViewBlockedUsers,
   onViewActivity,
-  onAboutProfile,
 }) => {
   const userBio = useSelector((state: RootState) => state.userBio.data);
   return (
@@ -142,14 +140,14 @@ const OwnerPopoverContent: React.FC<OwnerPopoverContentProps> = ({
         </a>
       )}
 
-      <button
+      {/* <button
         id="owner-popover-about-profile-button"
         onClick={onAboutProfile}
         className="w-full dark:hover:bg-gray-700 inline-flex text-xs font-semibold cursor-pointer transition-all duration-300 ease-in-out hover:bg-gray-200 p-2 rounded items-center gap-2"
       >
         <BsInfoSquareFill size={16} />
         <span>About this profile</span>
-      </button>
+      </button> */}
     </div>
   );
 };
@@ -185,7 +183,6 @@ const NonOwnerPopoverContent: React.FC<NonOwnerPopoverContentProps> = ({
   onCancelRequest,
   onRemoveConnection,
   onBlock,
-  onAboutProfile,
   isInRecievedConnection,
   onAccept,
   email,
@@ -272,14 +269,14 @@ const NonOwnerPopoverContent: React.FC<NonOwnerPopoverContentProps> = ({
         <span>View Resume</span>
       </a>
     )}
-    <button
+    {/* <button
       id="non-owner-about-button"
       onClick={onAboutProfile}
       className="w-full dark:hover:bg-gray-700 inline-flex text-xs font-semibold cursor-pointer transition-all duration-300 ease-in-out hover:bg-gray-200 p-2 rounded items-center gap-2"
     >
       <BsInfoSquareFill size={14} />
       <span>About</span>
-    </button>
+    </button> */}
   </div>
 );
 
