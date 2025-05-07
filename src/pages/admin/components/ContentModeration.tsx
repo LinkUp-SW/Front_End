@@ -25,6 +25,7 @@ import PostPreviewSkeleton from "@/pages/feed/components/PostPreviewSkeleton";
 import CommentWithReplies from "@/pages/feed/components/CommentWithReplies";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import PostLargePreview from "@/pages/feed/components/PostLargePreview";
+import { getErrorMessage } from "@/utils/errorHandler";
 
 interface Report {
   content_id: string;
@@ -175,7 +176,7 @@ const ContentModeration = () => {
       }
     } catch (error) {
       console.error("Delete content error:", error);
-      toast.error("An error occurred while deleting content");
+      toast.error(getErrorMessage(error) || "An error occurred while deleting content");
     }
   };
 
@@ -192,7 +193,7 @@ const ContentModeration = () => {
       }
     } catch (error) {
       console.error("Dismiss report error:", error);
-      toast.error("An error occurred while dismissing report");
+      toast.error(getErrorMessage(error) || "An error occurred while dismissing content");
     }
   };
 
