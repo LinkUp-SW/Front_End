@@ -18,6 +18,14 @@ const MediaManager: React.FC<MediaManagerProps> = ({ media, setMedia, id }) => {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
+
+      // Check if the selected file is an image by its MIME type
+      if (!file.type.startsWith("image/")) {
+        toast.error("Please select an image file.");
+        e.target.value = ""; // Clear the file input
+        return; // Exit if it's not an image
+      }
+
       const reader = new FileReader();
       reader.onloadend = () => {
         // The result is a Base64 string with the media type prefix (e.g., data:image/png;base64,...)
@@ -52,6 +60,7 @@ const MediaManager: React.FC<MediaManagerProps> = ({ media, setMedia, id }) => {
       media: pendingFile,
       title: title.trim(),
       description: description.trim(),
+      type: "image",
     };
     setMedia([...media, newMedia]);
     setPendingFile(null);
