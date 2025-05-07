@@ -58,8 +58,7 @@ const PostHeader: React.FC<PostHeaderProps> = ({
       closeButton.click();
     }
   };
-  console.log(user.first_name);
-  console.log(is_company);
+
 
   return (
     <header className="flex items-center space-x-3 w-full pl-4 pt-1 pb-4">
