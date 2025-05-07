@@ -45,7 +45,7 @@ export const ProfileHeader = ({
           {user.first_name} {user.last_name}
         </h1>
         <p className="text-gray-600 dark:text-gray-200">
-          {splitHeadline(user.headline||'')}
+          {splitHeadline(user.headline || "")}
         </p>
         <div className="inline-flex items-center gap-2 mt-1">
           <p className="text-sm text-gray-500 dark:text-gray-200">
@@ -81,7 +81,7 @@ export const ProfileHeader = ({
       <div className="sm:grid gap-2  hidden flex-grow min-w-fit max-w-fit">
         {intros.work_experience && (
           <Link
-            to={"#"}
+            to={`/company/${intros.work_experience._id}`}
             className="flex gap-2 items-center hover:text-blue-500 dark:hover:text-blue-300 hover:underline transition-all duration-300 ease-in-out"
           >
             <img
@@ -95,7 +95,7 @@ export const ProfileHeader = ({
 
         {intros.education && (
           <Link
-            to={"#"}
+            to={`/company/${intros.education._id}`}
             className="flex gap-2 items-center hover:text-blue-500 dark:hover:text-blue-300 hover:underline transition-all duration-300 ease-in-out"
           >
             <img
