@@ -35,7 +35,9 @@ const Posts: React.FC<PostsProps> = ({ query, setPostsFound }) => {
       <div className="max-w-3xl w-full bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 flex flex-col">
         <div className="flex-1">
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 border border-gray-200 dark:border-gray-700">
-            <h1 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Posts</h1>
+            <h1 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">
+              Posts
+            </h1>
             <main className="flex flex-col w-full">
               <PostList
                 posts={posts}
