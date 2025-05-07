@@ -15,6 +15,10 @@ const HomePage = () => {
       window.location.replace("/feed");
     }
   }, [token, userId, userType]);
+
+  if (token || userId || userType) {
+    return null;
+  }
   return (
     <main className="flex flex-col items-center min-h-screen w-full p-5 dark:bg-gray-900 dark:text-white">
       <header className="max-w-[70rem] w-full">
