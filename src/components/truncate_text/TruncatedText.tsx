@@ -387,7 +387,7 @@ const TruncatedText: React.FC<TruncatedTextProps> = ({
       <p
         ref={textRef}
         id={id}
-        className="text-sm whitespace-pre-wrap break-words invisible w-1/2 absolute -z-10"
+        className="text-sm whitespace-pre-wrap break-words max-w-fit invisible w-1/2 absolute -z-10"
       >
         {content}
       </p>
