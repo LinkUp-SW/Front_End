@@ -366,8 +366,8 @@ const Post: React.FC<PostProps> = ({
           postData.author.username,
           userId as string,
           "comment",
-          undefined,
-          "Someone Commented on a post"
+          newComment.post_id,
+          `${userId} Commented on ${postData.author.username}'s Post`
         );
 
       if (!newComment.parent_id) {
@@ -481,8 +481,8 @@ const Post: React.FC<PostProps> = ({
           postData.author.username,
           userId as string,
           "reacted",
-          undefined,
-          "Someone Reacted on a post"
+          targetPost._id,
+          `${userId} Reacted on ${targetPost.author.username}'s Post`
         );
 
       setTopStats(getReactionIcons(result.top_reactions || []));
