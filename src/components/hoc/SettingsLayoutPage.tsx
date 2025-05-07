@@ -5,6 +5,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 import AuthMiddleware from "./AuthMiddleware";
 import { TbPremiumRights } from "react-icons/tb";
+import linkupLogo from '@/assets/link_up.png'
 
 interface SettingsLayoutPageProps {
   children?: ReactNode;
@@ -83,7 +84,7 @@ const SettingsLayoutPage: React.FC<SettingsLayoutPageProps> = ({
             {/* Logo */}
             <Link to="/">
               <img
-                src="/src/assets/link_up.png"
+                src={linkupLogo}
                 alt="LinkUp"
                 className="h-8 dark:invert"
                 onError={(e) => {

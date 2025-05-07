@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { getJobsFromCompany } from '@/endpoints/company';
 import { JobCard, Job } from './CompanyJobCard'; 
 import JobApplicantsComponent from './JobApplicantsComponent';
-
+import manOnChair from '@/assets/man_on_chair.svg'
 interface CompanyJobsComponentProps {
   companyId?: string;
 }
@@ -131,7 +131,7 @@ const CompanyJobsComponent: React.FC<CompanyJobsComponentProps> = ({ companyId }
       <div className="flex flex-col items-center justify-center py-8 sm:py-16 px-4">
         <div className="w-40 h-40 sm:w-64 sm:h-64 mb-4 sm:mb-6 flex justify-center">
           <img 
-            src='/src/assets/man_on_chair.svg'  
+            src={manOnChair}  
             alt="Person working on chair" 
             className="w-full "
           />

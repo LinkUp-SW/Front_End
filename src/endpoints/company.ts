@@ -140,6 +140,14 @@ export const getCompanyAdmins = async (companyId: string): Promise<{ admins: Adm
   return response.data;
 };
 
+export const getCompanyProfileAdmins = async (companyId: string): Promise<{ admins: Admin[] }> => {
+  const token = getAuthToken();
+  const url = `/api/v1/company/get-admins-for-users/${companyId}`;
+  
+  const response = await axiosInstance.get(url, getAuthHeader(token));
+  return response.data;
+};
+
 export const searchUsers = async (query: string): Promise<{ results: User[] }> => {
   const token = getAuthToken();
   const url = `/api/v1/search/users/${query}`;
