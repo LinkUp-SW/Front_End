@@ -60,7 +60,6 @@ const MediaManager: React.FC<MediaManagerProps> = ({ media, setMedia, id }) => {
       media: pendingFile,
       title: title.trim(),
       description: description.trim(),
-      type: "image",
     };
     setMedia([...media, newMedia]);
     setPendingFile(null);

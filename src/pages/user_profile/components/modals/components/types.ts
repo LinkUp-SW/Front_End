@@ -3,5 +3,4 @@ export interface MediaItem {
   media: string,
   title: string,
   description: string
-  type: "image";
 }
