@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { getCompanyAdmins } from '@/endpoints/company';
+import { getCompanyProfileAdmins } from '@/endpoints/company';
 import { toast } from 'sonner';
 import { BiGroup } from 'react-icons/bi';
 
@@ -25,7 +25,7 @@ const AdminViewerComponent: React.FC<AdminViewerProps> = ({ companyId, isVisible
     
     try {
       setIsLoading(true);
-      const response = await getCompanyAdmins(companyId);
+      const response = await getCompanyProfileAdmins(companyId);
       setAdmins(response.admins || []);
     } catch (err) {
       console.error('Failed to fetch admins:', err);

@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { sendOTP, verifyOTP } from "@/endpoints/userAuth";
 import { getErrorMessage } from "@/utils/errorHandler";
 import EmailVerificationLayout from "../components/EmailVerificationLayout";
+import Cookies from "js-cookie";
 
 const EmailVerification = () => {
   const [otp, setOtp] = useState("");
@@ -26,7 +27,7 @@ const EmailVerification = () => {
           return;
         }
       } catch (error) {
-        console.error(error);
+        console.log(error);
       }
     } else if (storedUserEmail) {
       setUserEmail(storedUserEmail);
@@ -44,7 +45,7 @@ const EmailVerification = () => {
 
     const handleSendOTP = async () => {
       try {
-        await sendOTP(userEmail);
+        await sendOTP(userEmail)
       } catch (error) {
         const err = getErrorMessage(error);
         toast.error(`Error: ${err}`);
@@ -68,6 +69,7 @@ const EmailVerification = () => {
       toast.success(`${data.message}`);
       localStorage.removeItem("user-email");
       localStorage.removeItem("user-signup-credentials");
+      Cookies.set("linkup_user_type", "user");
       setTimeout(() => {
         window.location.replace("/feed");
       }, 1500);
@@ -83,7 +85,8 @@ const EmailVerification = () => {
 
     setIsResending(true);
     try {
-      await sendOTP(userEmail);
+      const response = await sendOTP(userEmail);
+      console.log(response.otp);
       toast.success("A new verification code has been sent to your email!");
       setResendTimer(30);
     } catch (error) {

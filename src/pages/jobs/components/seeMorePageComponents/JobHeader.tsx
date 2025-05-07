@@ -3,6 +3,7 @@ import { Job } from "../../types";
 import Cookies from 'js-cookie';
 import { saveJob, removeFromSaved, fetchSavedJobs } from "../../../../endpoints/jobs";
 import JobApplicationDialog from './JobApplicationDialog';
+import JobReportDialog from './JobReportDialog'; 
 
 interface JobHeaderProps {
   job: Job;
@@ -13,6 +14,7 @@ const JobHeader: React.FC<JobHeaderProps> = ({ job }) => {
   const [saveInProgress, setSaveInProgress] = useState<boolean>(false);
   const [isChecking, setIsChecking] = useState<boolean>(true); // New state for tracking initial check
   const [isDialogOpen, setIsDialogOpen] = useState(false); // Added dialog state
+  const [isReportDialogOpen, setIsReportDialogOpen] = useState(false); // Added report dialog state
   
   // Check if the job is in the saved jobs list on component mount and prop change
   useEffect(() => {
@@ -100,6 +102,11 @@ const JobHeader: React.FC<JobHeaderProps> = ({ job }) => {
     setIsDialogOpen(true);
   };
 
+  // Handler for Report Job button
+  const handleReportJob = () => {
+    setIsReportDialogOpen(true);
+  };
+
   return (
     <>
       <div className="flex justify-between items-start mb-2">
@@ -108,22 +115,25 @@ const JobHeader: React.FC<JobHeaderProps> = ({ job }) => {
         </div>
         <div className="flex space-x-2">
           <button 
-            id="btn-job-alerts"
-            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
-            title="Get job alerts"
+            id="btn-job-report"
+            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 group"
+            title="Report this job"
+            onClick={handleReportJob}
+            aria-label="Report this job"
           >
-            <svg className="w-5 h-5 text-gray-700 dark:text-gray-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M15 17h5l-1.4-1.4c-.6-.6-1-1.4-1-2.3V9c0-3.1-2.2-5.7-5.2-6.3v-.6c0-1.2-1-2.1-2.1-2.1S9 .9 9 2.1v.6C5.9 3.3 3.7 6 3.7 9v4.3c0 .9-.4 1.7-1 2.3L1.3 17h5"/>
-              <path d="M10 19a2 2 0 1 0 4 0"/>
-            </svg>
-          </button>
-          <button 
-            id="btn-job-options"
-            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
-            title="More options"
-          >
-            <svg className="w-5 h-5 text-gray-700 dark:text-gray-300" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+            <svg 
+              className="w-5 h-5 text-gray-500 dark:text-gray-400 group-hover:text-red-500 dark:group-hover:text-red-400 transition-colors" 
+              viewBox="0 0 24 24" 
+              fill="none" 
+              stroke="currentColor" 
+              strokeWidth="2" 
+              strokeLinecap="round" 
+              strokeLinejoin="round"
+            >
+              <path d="M3 3l18 18" />
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+              <path d="M12 9v4" />
+              <path d="M12 17h.01" />
             </svg>
           </button>
         </div>
@@ -178,7 +188,7 @@ const JobHeader: React.FC<JobHeaderProps> = ({ job }) => {
         >
           {buttonIsLoading ? (
             <>
-              <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-current" xmlns="https://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
@@ -210,6 +220,13 @@ const JobHeader: React.FC<JobHeaderProps> = ({ job }) => {
       <JobApplicationDialog 
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
+        job={job}
+      />
+
+      {/* Add the JobReportDialog component */}
+      <JobReportDialog
+        open={isReportDialogOpen}
+        onOpenChange={setIsReportDialogOpen}
         job={job}
       />
     </>

@@ -17,6 +17,7 @@ import { RootState } from "@/store";
 import { useSelector } from "react-redux";
 import { useFeedPosts } from "@/hooks/useFeedPosts";
 import PostList from "../feed/components/PostList";
+import buildingsImg from '@/assets/buildings.jpeg'
 
 // Define a type for the navigation tabs
 type NavigationTab =
@@ -393,7 +394,7 @@ const ManageCompanyPage = () => {
               <div className="absolute bottom-0 left-4 transform translate-y-1/2 bg-white dark:bg-gray-700 p-1 rounded-lg shadow">
                 <div className="w-16 h-16 flex overflow-hidden rounded-lg bg-gray-200 dark:bg-gray-600">
                   <img
-                    src={companyData.logo || "/src/assets/buildings.jpeg"}
+                    src={companyData.logo || buildingsImg}
                     alt={`${companyData.name} logo`}
                     className="w-full object-cover"
                     onError={(e) => {

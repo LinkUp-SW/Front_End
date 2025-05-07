@@ -4,18 +4,17 @@ import { FormInput } from "@/components";
 import { useFormStatus } from "@/hooks/useFormStatus";
 import { Link } from "react-router-dom";
 import googleSvg from "@/assets/google.svg";
-import ReCAPTCHA from "react-google-recaptcha";
+// import ReCAPTCHA from "react-google-recaptcha";
 import { toast } from "sonner";
 import { initiateGoogleAuth, signin } from "@/endpoints/userAuth";
 import { validateEmail } from "@/utils";
 import { getErrorMessage } from "@/utils/errorHandler";
 import Cookies from "js-cookie";
 
-
 const SignInPage: React.FC = () => {
   const [identifier, setIdentifier] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
+  // const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
   const { isSubmitting, startSubmitting, stopSubmitting } = useFormStatus();
 
   useEffect(() => {
@@ -32,8 +31,8 @@ const SignInPage: React.FC = () => {
   // Helper function to validate the form
   const validateForm = (
     identifier: string,
-    password: string,
-    recaptchaToken: string | null
+    password: string
+    // recaptchaToken: string | null
   ) => {
     if (!validateIdentifier(identifier)) {
       toast.error("Please enter a valid email address or phone number.");
@@ -43,10 +42,10 @@ const SignInPage: React.FC = () => {
       toast.error("Please enter your password");
       return false;
     }
-    if (!recaptchaToken) {
-      toast.error("Please complete the captcha.");
-      return false;
-    }
+    // if (!recaptchaToken) {
+    //   toast.error("Please complete the captcha.");
+    //   return false;
+    // }
     return true;
   };
 
@@ -55,17 +54,14 @@ const SignInPage: React.FC = () => {
     event: FormEvent<HTMLFormElement>,
     identifier: string,
     password: string,
-    recaptchaToken: string | null,
+    // recaptchaToken: string | null,
     startSubmitting: () => void,
     stopSubmitting: () => void
   ): Promise<void> => {
     event.preventDefault();
 
     try {
-      if (
-        !validateForm(identifier, password, recaptchaToken) ||
-        !recaptchaToken
-      ) {
+      if (!validateForm(identifier, password)) {
         return;
       }
       startSubmitting();
@@ -85,10 +81,6 @@ const SignInPage: React.FC = () => {
         localStorage.setItem("user-email", data.user.email);
         return window.location.replace("/email-verification");
       }
-
-      
-   
-
       toast.success("Signed in successfully!");
       Cookies.set("linkup_user_type", data.user.isAdmin ? "admin" : "user");
       if (data.user.isAdmin) {
@@ -143,7 +135,7 @@ const SignInPage: React.FC = () => {
               event,
               identifier,
               password,
-              recaptchaToken,
+              // recaptchaToken,
               startSubmitting,
               stopSubmitting
             )
@@ -182,10 +174,10 @@ const SignInPage: React.FC = () => {
             </Link>
           </div>
           <div className="flex items-center justify-between">
-            <ReCAPTCHA
+            {/* <ReCAPTCHA
               sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
               onChange={(token: string | null) => setRecaptchaToken(token)}
-            />
+            /> */}
           </div>
           <div>
             <button
