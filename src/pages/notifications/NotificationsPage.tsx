@@ -517,13 +517,13 @@ const NotificationsPage: React.FC = () => {
         <div className={styles.leftSidebar}>
           <ProfileCard />
           <div className={`${styles.notificationSettings} flex flex-col`}>
-            <h3>Manage your notifications</h3>
+            <h3>Manage your profile</h3>
             <a href="/settings/preference" className={styles.settingsLink}>
               View settings
             </a>
             {unReadCount > 0 && (
               <button
-                className={`${styles.markAllReadButton} affirmativeBtn`}
+                className={`${styles.markAllReadButton} affirmativeBtn rounded-md mt-2`}
                 onClick={handleMarkAllAsRead}
               >
                 Mark all as read
