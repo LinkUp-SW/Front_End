@@ -817,6 +817,7 @@ const Post: React.FC<PostProps> = ({
           edited={postData.is_edited || false}
           publicPost={postData.public_post}
           date={date}
+          is_company={postData.is_company}
         />
         {postData.content && (
           <TruncatedText

@@ -226,6 +226,7 @@ const PostPreview: React.FC<PostPreviewProps> = ({
               savedPostView
               date={post.date}
               hideActions={hideActions}
+              is_company={post.is_company}
             />
           </div>
         )}
